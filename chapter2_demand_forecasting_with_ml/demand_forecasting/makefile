@@ -6,7 +6,7 @@ DOCKER_TEST_TAG := test
 
 DOCKER_REPOSITORY := shibui/building-ml-system
 
-DEMAND_FORECASTING_DIR := $(ABSOLUTE_PATH)/demand_forecasting
+DEMAND_FORECASTING_DIR := $(ABSOLUTE_PATH)
 DEMAND_FORECASTING_TRAIN_DIR := $(DEMAND_FORECASTING_DIR)/train
 DEMAND_FORECASTING_EVALUATE_DIR := $(DEMAND_FORECASTING_DIR)/evaluate
 DEMAND_FORECASTING_PREDICT_DIR := $(DEMAND_FORECASTING_DIR)/predict
@@ -15,7 +15,7 @@ DEMAND_FORECASTING_PREDICT_DIR := $(DEMAND_FORECASTING_DIR)/predict
 ############ COMMON COMMANDS ############
 .PHONY: download_kaggle
 download_kaggle:
-	cd $(DEMAND_FORECASTING_DIR)/dataset && \
+	cd $(DEMAND_FORECASTING_DIR)/data && \
 	kaggle competitions download -c demand-forecasting-kernels-only && \
 	unzip demand-forecasting-kernels-only.zip
 
