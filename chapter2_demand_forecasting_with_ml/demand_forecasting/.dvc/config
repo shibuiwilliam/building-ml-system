@@ -1,4 +1,0 @@
-[core]
-    remote = demand_forecasting
-['remote "demand_forecasting"']
-    url = gs://building_ml_system/demand_forecasting

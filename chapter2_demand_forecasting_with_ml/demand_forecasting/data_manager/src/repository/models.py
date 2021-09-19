@@ -4,16 +4,46 @@ from sqlalchemy.sql.sqltypes import Integer
 from src.db.db import Base
 
 
-class StoreMaster(Base):
-    __tablename__ = "stores_master"
+class RegionMaster(Base):
+    __tablename__ = "region_master"
 
     id = Column(
-        String(36),
+        String(32),
         nullable=False,
         primary_key=True,
     )
     name = Column(
-        String(6),
+        Text,
+        nullable=False,
+        unique=True,
+    )
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=current_timestamp(),
+        nullable=False,
+    )
+    updated_at = Column(
+        DateTime(timezone=True),
+        server_default=current_timestamp(),
+        nullable=False,
+    )
+
+
+class StoreMaster(Base):
+    __tablename__ = "store_master"
+
+    id = Column(
+        String(32),
+        nullable=False,
+        primary_key=True,
+    )
+    region_id = Column(
+        String(32),
+        ForeignKey("region_master.id"),
+        nullable=False,
+    )
+    name = Column(
+        Text,
         nullable=False,
         unique=True,
     )
@@ -30,15 +60,15 @@ class StoreMaster(Base):
 
 
 class ItemMaster(Base):
-    __tablename__ = "items_master"
+    __tablename__ = "item_master"
 
     id = Column(
-        String(36),
+        String(32),
         nullable=False,
         primary_key=True,
     )
     name = Column(
-        String(6),
+        Text,
         nullable=False,
         unique=True,
     )
@@ -58,13 +88,13 @@ class ItemPrice(Base):
     __tablename__ = "item_prices"
 
     id = Column(
-        String(36),
+        String(32),
         nullable=False,
         primary_key=True,
     )
     item_id = Column(
-        String(36),
-        ForeignKey("items_master.id"),
+        String(32),
+        ForeignKey("item_master.id"),
         nullable=False,
     )
     price = Column(
@@ -92,17 +122,22 @@ class ItemPrice(Base):
     )
 
 
-class ItemStock(Base):
-    __tablename__ = "item_stocks"
+class ItemStockPerStore(Base):
+    __tablename__ = "item_stocks_per_store"
 
     id = Column(
-        String(36),
+        String(32),
         nullable=False,
         primary_key=True,
     )
     item_id = Column(
-        String(36),
-        ForeignKey("items_master.id"),
+        String(32),
+        ForeignKey("item_master.id"),
+        nullable=False,
+    )
+    store_id = Column(
+        String(32),
+        ForeignKey("store_master.id"),
         nullable=False,
     )
     stock = Column(
@@ -110,7 +145,7 @@ class ItemStock(Base):
         nullable=False,
     )
     recorded_at = Column(
-        Date,
+        DateTime(timezone=True),
         nullable=False,
     )
     created_at = Column(
@@ -125,30 +160,30 @@ class ItemStock(Base):
     )
 
 
-class ItemStockPerStore(Base):
-    __tablename__ = "item_stocks_per_store"
+class ItemArrivalPerStore(Base):
+    __tablename__ = "item_arrivals_per_store"
 
     id = Column(
-        String(36),
+        String(32),
         nullable=False,
         primary_key=True,
     )
     item_id = Column(
-        String(36),
-        ForeignKey("items_master.id"),
+        String(32),
+        ForeignKey("item_master.id"),
         nullable=False,
     )
     store_id = Column(
-        String(36),
-        ForeignKey("stores_master.id"),
+        String(32),
+        ForeignKey("store_master.id"),
         nullable=False,
     )
-    stock = Column(
+    quantity = Column(
         Integer,
         nullable=False,
     )
-    recorded_at = Column(
-        Date,
+    arrived_at = Column(
+        DateTime(timezone=True),
         nullable=False,
     )
     created_at = Column(
@@ -167,21 +202,30 @@ class ItemSale(Base):
     __tablename__ = "item_sales"
 
     id = Column(
-        String(36),
+        String(32),
         nullable=False,
         primary_key=True,
     )
     item_id = Column(
-        String(36),
-        ForeignKey("items_master.id"),
+        String(32),
+        ForeignKey("item_master.id"),
+        nullable=False,
+    )
+    store_id = Column(
+        String(32),
+        ForeignKey("store_master.id"),
         nullable=False,
     )
     item_price_id = Column(
-        String(36),
+        String(32),
         ForeignKey("item_prices.id"),
         nullable=False,
     )
     quantity = Column(
+        Integer,
+        nullable=False,
+    )
+    total_sales = Column(
         Integer,
         nullable=False,
     )
