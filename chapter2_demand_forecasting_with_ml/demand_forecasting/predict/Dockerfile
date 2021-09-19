@@ -2,7 +2,7 @@ ARG FROM_IMAGE=python:3.9-slim
 
 FROM ${FROM_IMAGE}
 
-ARG LOCAL_DIR=demand_forecasting/predict
+ARG LOCAL_DIR=predict
 
 ENV PROJECT_DIR opt
 WORKDIR /${PROJECT_DIR}

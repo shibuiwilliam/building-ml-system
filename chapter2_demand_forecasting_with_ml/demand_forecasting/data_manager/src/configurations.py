@@ -1,7 +1,7 @@
 import os
 from typing import Dict
 
-from constants import CONSTANT, TASK_TYPE
+from src.constants import CONSTANT
 
 
 class Configurations(object):
