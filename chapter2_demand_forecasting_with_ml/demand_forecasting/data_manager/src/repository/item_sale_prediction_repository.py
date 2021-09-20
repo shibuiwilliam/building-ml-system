@@ -9,7 +9,6 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import current_timestamp
 from src.middleware.database import Base
 from src.repository.item_master_repository import ItemMasterModel
-from src.repository.item_sale_repository import ItemSaleModel
 from src.repository.store_master_repository import StoreMasterModel
 
 logger = getLogger(name=__name__)
@@ -32,10 +31,6 @@ class ItemSalePredictionModel(Base):
         String(32),
         ForeignKey("store_master.id"),
         nullable=False,
-    )
-    item_sale_id = Column(
-        String(32),
-        nullable=True,
     )
     target_date = Column(
         Date,
@@ -61,7 +56,6 @@ class ItemSalePredictionBase(BaseModel):
     id: str
     item_id: str
     store_id: str
-    item_sale_id: Optional[str]
     target_date: date
     prediction: float
 
@@ -76,7 +70,6 @@ class ItemSalePredictionCreate(ItemSalePredictionBase):
 class ItemSalePrediction(ItemSalePredictionBase):
     item_name: str
     store_name: str
-    quantity: Optional[int]
     created_at: datetime
     updated_at: datetime
 
@@ -97,7 +90,6 @@ class AbstractItemSalePredictionRepository(ABC):
         item_id: Optional[str] = None,
         store_name: Optional[str] = None,
         store_id: Optional[str] = None,
-        item_sale_id: Optional[str] = None,
         target_date: Optional[date] = None,
         limit: int = 100,
         offset: int = 0,
@@ -135,7 +127,6 @@ class ItemSalePredictionRepository(AbstractItemSalePredictionRepository):
         item_id: Optional[str] = None,
         store_name: Optional[str] = None,
         store_id: Optional[str] = None,
-        item_sale_id: Optional[str] = None,
         target_date: Optional[date] = None,
         limit: int = 100,
         offset: int = 0,
@@ -151,16 +142,12 @@ class ItemSalePredictionRepository(AbstractItemSalePredictionRepository):
             filters.append(StoreMasterModel.name == store_name)
         if store_id is not None:
             filters.append(ItemSalePredictionModel.store_id == store_id)
-        if item_sale_id is not None:
-            filters.append(ItemSalePredictionModel.item_sale_id == item_sale_id)
         if target_date is not None:
             filters.append(ItemSalePredictionModel.target_date == target_date)
         records = (
             db.query(
-                ItemSaleModel,
                 ItemMasterModel,
                 StoreMasterModel,
-                ItemSaleModel,
             )
             .join(
                 ItemMasterModel,
@@ -170,11 +157,6 @@ class ItemSalePredictionRepository(AbstractItemSalePredictionRepository):
             .join(
                 StoreMasterModel,
                 StoreMasterModel.id == ItemSalePredictionModel.store_id,
-                isouter=True,
-            )
-            .join(
-                ItemSaleModel,
-                ItemSaleModel.id == ItemSalePredictionModel.item_sale_id,
                 isouter=True,
             )
             .filter(and_(*filters))
@@ -192,10 +174,8 @@ class ItemSalePredictionRepository(AbstractItemSalePredictionRepository):
                 id=r.ItemSalePredictionModel.id,
                 item_id=r.ItemSalePredictionModel.item_id,
                 store_id=r.ItemSalePredictionModel.store_id,
-                item_sale_id=r.ItemSalePredictionModel.item_sale_id,
                 target_date=r.ItemSalePrediction.target_date,
                 prediction=r.ItemSalePrediction.prediction,
-                quantity=r.ItemSaleModel.quantity,
                 item_name=r.ItemMasterModel.name,
                 store_name=r.StoreMasterModel.name,
                 created_at=r.ItemSalePrediction.created_at,

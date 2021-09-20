@@ -15,8 +15,10 @@ class DatabaseConfigurations(object):
 
 class Configurations(object):
     data_directory = os.getenv("DATA_DIRECTORY", "/opt/data/")
-    region_file = os.getenv("REGION_FILE", "regions.csv")
-    store_file = os.getenv("STORE_FILE", "stores.csv")
-    item_file = os.getenv("ITEM_FILE", "items.csv")
-    item_price = os.getenv("ITEM_PRICE", "item_prices.csv")
-    item_sale_records_2017_2019 = os.getenv("ITEM_SALE_RECORDS_FILE", "item_sale_records_2017_2019.csv")
+    region_file_path = os.path.join(data_directory, os.getenv("REGION_FILE", "regions.csv"))
+    store_file_path = os.path.join(data_directory, os.getenv("STORE_FILE", "stores.csv"))
+    item_file_path = os.path.join(data_directory, os.getenv("ITEM_FILE", "items.csv"))
+    item_price_path = os.path.join(data_directory, os.getenv("ITEM_PRICE", "item_prices.csv"))
+    item_sale_records_2017_2019_path = os.path.join(
+        data_directory, os.getenv("ITEM_SALE_RECORDS_FILE", "item_sale_records_2017_2019.csv")
+    )

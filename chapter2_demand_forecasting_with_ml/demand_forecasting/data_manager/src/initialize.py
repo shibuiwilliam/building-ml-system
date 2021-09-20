@@ -3,6 +3,7 @@ from logging import getLogger
 from sqlalchemy import Column, Index
 from sqlalchemy.engine import Engine
 from src.configurations import Configurations
+from src.container.container import container
 from src.middleware.database import Base, get_context_db
 from src.repository.item_arrival_repository import ItemArrivalModel
 from src.repository.item_master_repository import ItemMasterModel
@@ -188,3 +189,25 @@ def initialize_data(
         engine=engine,
         checkfirst=checkfirst,
     )
+
+    with get_context_db() as db:
+        container.store_service.initialize_region_master(
+            db=db,
+            file_path=Configurations.region_file_path,
+        )
+        container.store_service.initialize_store_master(
+            db=db,
+            file_path=Configurations.store_file_path,
+        )
+        container.item_service.initialize_item_master(
+            db=db,
+            file_path=Configurations.item_file_path,
+        )
+        container.item_service.initialize_item_price(
+            db=db,
+            file_path=Configurations.item_price_path,
+        )
+        container.item_service.initialize_item_sale(
+            db=db,
+            file_path=Configurations.item_sale_records_2017_2019_path,
+        )

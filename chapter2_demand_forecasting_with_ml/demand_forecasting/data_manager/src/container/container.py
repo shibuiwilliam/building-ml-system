@@ -11,13 +11,12 @@ from src.repository.item_sale_repository import AbstractItemSaleRepository, Item
 from src.repository.item_stock_repository import AbstractItemStockRepository, ItemStockRepository
 from src.repository.region_master_repository import AbstractRegionMasterRepository, RegionMasterRepository
 from src.repository.store_master_repository import AbstractStoreMasterRepository, StoreMasterRepository
+from src.service.item_service import AbstractItemService, ItemService
 from src.service.store_service import AbstractStoreService, StoreService
 
 
 class Container(object):
     def __init__(self):
-        pass
-
         self.__item_arrival_repository: AbstractItemArrivalRepository = ItemArrivalRepository()
         self.__item_master_repository: AbstractItemMasterRepository = ItemMasterRepository()
         self.__item_price_repository: AbstractItemPriceRepository = ItemPriceRepository()
@@ -31,3 +30,14 @@ class Container(object):
             region_master_repository=self.__region_master_repository,
             store_master_repository=self.__store_master_repository,
         )
+        self.item_service: AbstractItemService = ItemService(
+            item_arrival_repository=self.__item_arrival_repository,
+            item_master_repository=self.__item_master_repository,
+            item_price_repository=self.__item_price_repository,
+            item_sale_prediction_repository=self.__item_sale_prediction_repository,
+            item_sale_repository=self.__item_sale_repository,
+            item_stock_repository=self.__item_stock_repository,
+        )
+
+
+container = Container()

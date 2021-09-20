@@ -55,7 +55,7 @@ class ItemPriceModel(Base):
 class ItemPriceBase(BaseModel):
     id: str
     item_id: str
-    price: str
+    price: int
     applied_from: date
     applied_to: Optional[date]
 
@@ -70,7 +70,7 @@ class ItemPriceCreate(ItemPriceBase):
 class ItemPriceUpdate(BaseModel):
     id: str
     item_id: str
-    price: str
+    price: int
     applied_from: date
     applied_to: date
 
