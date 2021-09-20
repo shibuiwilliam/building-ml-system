@@ -13,7 +13,7 @@ router = APIRouter()
 
 
 @router.get("/masters", response_model=List[ItemMaster])
-def get_item_master(
+async def get_item_master(
     id: Optional[str] = None,
     item_name: Optional[str] = None,
     db: Session = Depends(get_db),
@@ -26,7 +26,7 @@ def get_item_master(
 
 
 @router.get("/prices", response_model=List[ItemPrice])
-def get_item_price(
+async def get_item_price(
     id: Optional[str] = None,
     item_name: Optional[str] = None,
     item_id: Optional[str] = None,
@@ -45,7 +45,7 @@ def get_item_price(
 
 
 @router.get("/sales", response_model=List[ItemSale])
-def get_item_sale(
+async def get_item_sale(
     id: Optional[str] = None,
     item_name: Optional[str] = None,
     item_id: Optional[str] = None,

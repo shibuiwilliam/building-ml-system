@@ -17,7 +17,7 @@ services:
     restart: always
     stdin_open: true
 
-  db_registration:
+  data_manager:
     container_name: data_manager
     image: shibui/building-ml-system:demand_forecasting_data_manager_0.0.0
     restart: always
@@ -37,3 +37,18 @@ services:
       - "./master_data:/opt/data"
     depends_on:
       - postgres
+
+  bi:
+    container_name: bi
+    image: shibui/building-ml-system:demand_forecasting_bi_0.0.0
+    restart: always
+    environment:
+      - WAIT_SECOND=10
+    entrypoint:
+      - "streamlit"
+      - "run"
+      - "src/main.py"
+    ports:
+      - "8501:8501"
+    depends_on:
+      - data_manager

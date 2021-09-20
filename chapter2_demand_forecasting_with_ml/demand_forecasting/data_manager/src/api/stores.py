@@ -10,7 +10,7 @@ router = APIRouter()
 
 
 @router.get("/masters", response_model=List[StoreMaster])
-def get_store_master(
+async def get_store_master(
     id: Optional[str] = None,
     region_id: Optional[str] = None,
     store_name: Optional[str] = None,

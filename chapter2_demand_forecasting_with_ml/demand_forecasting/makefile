@@ -11,6 +11,7 @@ DEMAND_FORECASTING_TRAIN_DIR := $(DEMAND_FORECASTING_DIR)/train
 DEMAND_FORECASTING_EVALUATE_DIR := $(DEMAND_FORECASTING_DIR)/evaluate
 DEMAND_FORECASTING_PREDICT_DIR := $(DEMAND_FORECASTING_DIR)/predict
 DEMAND_FORECASTING_DATA_MANAGER_DIR := $(DEMAND_FORECASTING_DIR)/data_manager
+DEMAND_FORECASTING_BI_DIR := $(DEMAND_FORECASTING_DIR)/bi
 
 
 ############ COMMON COMMANDS ############
@@ -286,62 +287,136 @@ test_demand_forecasting_data_manager: build_demand_forecasting_data_manager_test
 		$(DOCKER_DEMAND_FORECASTING_DATA_MANAGER_IMAGE_NAME_TEST)
 
 
+############ DEMAND FORECASTING BI COMMANDS ############
+DOCKERFILE_DEMAND_FORECASTING_BI = $(DEMAND_FORECASTING_BI_DIR)/$(DOCKERFILE)
+DOCKER_DEMAND_FORECASTING_BI_TAG = demand_forecasting_bi
+DOCKER_DEMAND_FORECASTING_BI_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_DEMAND_FORECASTING_BI_TAG)_$(VERSION)
+DOCKER_DEMAND_FORECASTING_BI_IMAGE_NAME_TEST = $(DOCKER_REPOSITORY):$(DOCKER_DEMAND_FORECASTING_BI_TAG)_$(VERSION)_$(DOCKER_TEST_TAG)
+
+.PHONY: patch_demand_forecasting_bi
+patch_demand_forecasting_bi:
+	cd $(DEMAND_FORECASTING_BI_DIR) && \
+	poetry version patch
+
+.PHONY: minor_upgrade_demand_forecasting_bi
+minor_upgrade_demand_forecasting_bi:
+	cd $(DEMAND_FORECASTING_BI_DIR) && \
+	poetry version minor
+
+.PHONY: major_upgrade_demand_forecasting_bi
+major_upgrade_demand_forecasting_bi:
+	cd $(DEMAND_FORECASTING_BI_DIR) && \
+	poetry version major
+
+.PHONY: req_demand_forecasting_bi
+req_demand_forecasting_bi:
+	cd $(DEMAND_FORECASTING_BI_DIR) && \
+	poetry export \
+		--without-hashes \
+		-f requirements.txt \
+		--output requirements.txt
+
+.PHONY: req_demand_forecasting_bi_test
+req_demand_forecasting_test_bi:
+	cd $(DEMAND_FORECASTING_BI_DIR) && \
+	poetry export \
+		--dev \
+		--without-hashes \
+		-f requirements.txt \
+		--output requirements_test.txt
+
+.PHONY: build_demand_forecasting_bi
+build_demand_forecasting_bi: 
+	docker build \
+		-t $(DOCKER_DEMAND_FORECASTING_BI_IMAGE_NAME) \
+		-f $(DOCKERFILE_DEMAND_FORECASTING_BI) \
+		.
+	 
+.PHONY: push_demand_forecasting_bi
+push_demand_forecasting_bi: 
+	docker push $(DOCKER_DEMAND_FORECASTING_BI_IMAGE_NAME)
+
+.PHONY: build_demand_forecasting_bi_test
+build_demand_forecasting_bi_test: build_demand_forecasting_bi
+	docker build \
+		--build-arg FROM_IMAGE=$(DOCKER_DEMAND_FORECASTING_BI_IMAGE_NAME) \
+		-t $(DOCKER_DEMAND_FORECASTING_BI_IMAGE_NAME_TEST) \
+		-f $(DOCKERFILE_DEMAND_FORECASTING_BI_TEST) \
+		.
+
+.PHONY: test_demand_forecasting_bi
+test_demand_forecasting_bi: build_demand_forecasting_bi_test
+	docker run \
+		--rm \
+		--name test \
+		$(DOCKER_DEMAND_FORECASTING_BI_IMAGE_NAME_TEST)
+
+
 ############ ALL COMMANDS ############
 .PHONY: patch_demand_forecasting_all
 patch_demand_forecasting_all: patch_demand_forecasting_train \
 	patch_demand_forecasting_evaluate \
 	patch_demand_forecasting_predict \
-	patch_demand_forecasting_data_manager
+	patch_demand_forecasting_data_manager \
+	patch_demand_forecasting_bi
 
 .PHONY: minor_upgrade_demand_forecasting_all
 minor_upgrade_demand_forecasting_all: minor_upgrade_demand_forecasting_train \
 	minor_upgrade_demand_forecasting_evaluate \
 	minor_upgrade_demand_forecasting_predict \
-	minor_upgrade_demand_forecasting_data_manager
+	minor_upgrade_demand_forecasting_data_manager \
+	minor_upgrade_demand_forecasting_bi
 
 .PHONY: major_upgrade_demand_forecasting_all
 major_upgrade_demand_forecasting_all: major_upgrade_demand_forecasting_train \
 	major_upgrade_demand_forecasting_evaluate \
 	major_upgrade_demand_forecasting_predict \
-	major_upgrade_demand_forecasting_data_manager
+	major_upgrade_demand_forecasting_data_manager \
+	major_upgrade_demand_forecasting_bi
 
 .PHONY: req_demand_forecasting_all
 req_demand_forecasting_all: req_demand_forecasting_train \
 	req_demand_forecasting_evaluate \
 	req_demand_forecasting_predict \
-	req_demand_forecasting_data_manager
+	req_demand_forecasting_data_manager \
+	req_demand_forecasting_bi
 
 .PHONY: req_demand_forecasting_all_test
 req_demand_forecasting_test_all: req_demand_forecasting_train_test \
 	req_demand_forecasting_evaluate_test \
 	req_demand_forecasting_predict_test \
-	req_demand_forecasting_data_manager_test
+	req_demand_forecasting_data_manager_test \
+	req_demand_forecasting_bi_test
 
 .PHONY: build_demand_forecasting_all
 build_demand_forecasting_all: build_demand_forecasting_train \
 	build_demand_forecasting_evaluate \
 	build_demand_forecasting_predict \
-	build_demand_forecasting_data_manager
+	build_demand_forecasting_data_manager \
+	build_demand_forecasting_bi
 	 
 .PHONY: push_demand_forecasting_all
 push_demand_forecasting_all: push_demand_forecasting_train \
 	push_demand_forecasting_evaluate \
 	push_demand_forecasting_predict \
-	push_demand_forecasting_data_manager
+	push_demand_forecasting_data_manager \
+	push_demand_forecasting_bi
 
 .PHONY: build_demand_forecasting_all_test
 build_demand_forecasting_all_test: build_demand_forecasting_all \
 	build_demand_forecasting_train_test \
 	build_demand_forecasting_evaluate_test \
 	build_demand_forecasting_predict_test \
-	build_demand_forecasting_data_manager_test
+	build_demand_forecasting_data_manager_test \
+	build_demand_forecasting_bi_test
 
 .PHONY: test_demand_forecasting_all
 test_demand_forecasting_all: build_demand_forecasting_all_test \
 	test_demand_forecasting_train \
 	test_demand_forecasting_evaluate \
 	test_demand_forecasting_predict \
-	test_demand_forecasting_data_manager
+	test_demand_forecasting_data_manager \
+	test_demand_forecasting_bi
 
 
 ############ DOCKER COMPOSE COMMANDS ############
