@@ -184,24 +184,24 @@ class ItemSaleRepository(AbstractItemSaleRepository):
             )
             .join(
                 ItemMasterModel,
-                ItemMasterModel.id == ItemSale.item_id,
+                ItemMasterModel.id == ItemSaleModel.item_id,
                 isouter=True,
             )
             .join(
                 StoreMasterModel,
-                StoreMasterModel.id == ItemSale.store_id,
+                StoreMasterModel.id == ItemSaleModel.store_id,
                 isouter=True,
             )
             .join(
                 ItemPriceModel,
-                ItemPriceModel.id == ItemSale.item_price_id,
+                ItemPriceModel.id == ItemSaleModel.item_price_id,
                 isouter=True,
             )
             .filter(and_(*filters))
             .order_by(
                 StoreMasterModel.name,
                 ItemMasterModel.name,
-                ItemSale.sold_at,
+                ItemSaleModel.sold_at,
             )
             .limit(limit)
             .offset(offset)
@@ -212,8 +212,9 @@ class ItemSaleRepository(AbstractItemSaleRepository):
                 id=r.ItemSaleModel.id,
                 item_id=r.ItemSaleModel.item_id,
                 store_id=r.ItemSaleModel.store_id,
+                item_price_id=r.ItemSaleModel.item_price_id,
                 quantity=r.ItemSaleModel.quantity,
-                total_sales=r.ItemSale.total_sales,
+                total_sales=r.ItemSaleModel.total_sales,
                 sold_at=r.ItemSaleModel.sold_at,
                 day_of_week=r.ItemSaleModel.day_of_week,
                 item_name=r.ItemMasterModel.name,

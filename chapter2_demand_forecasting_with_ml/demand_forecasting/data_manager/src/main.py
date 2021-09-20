@@ -1,7 +1,6 @@
 from logging import getLogger
 
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI
 from src.api import health, items, stores
 from src.configurations import Configurations
 from src.initialize import initialize_data, initialize_tables

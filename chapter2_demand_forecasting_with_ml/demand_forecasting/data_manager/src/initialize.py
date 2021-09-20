@@ -163,13 +163,6 @@ def create_indices(
     )
     create_index(
         table=ItemSalePredictionModel,
-        column=ItemSalePredictionModel.item_sale_id,
-        engine=engine,
-        checkfirst=checkfirst,
-        unique=False,
-    )
-    create_index(
-        table=ItemSalePredictionModel,
         column=ItemSalePredictionModel.target_date,
         engine=engine,
         checkfirst=checkfirst,

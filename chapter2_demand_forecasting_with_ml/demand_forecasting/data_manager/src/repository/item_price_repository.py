@@ -30,7 +30,6 @@ class ItemPriceModel(Base):
     price = Column(
         Integer,
         nullable=False,
-        unique=True,
     )
     applied_from = Column(
         Date,
@@ -141,7 +140,7 @@ class ItemPriceRepository(AbstractItemPriceRepository):
             db.query(ItemPriceModel, ItemMasterModel)
             .join(
                 ItemMasterModel,
-                ItemMasterModel.id == ItemPrice.item_id,
+                ItemMasterModel.id == ItemPriceModel.item_id,
                 isouter=True,
             )
             .filter(and_(*filters))
@@ -156,6 +155,7 @@ class ItemPriceRepository(AbstractItemPriceRepository):
                 id=r.ItemPriceModel.id,
                 item_name=r.ItemMasterModel.name,
                 item_id=r.ItemPriceModel.item_id,
+                price=r.ItemPriceModel.price,
                 applied_from=r.ItemPriceModel.applied_from,
                 applied_to=r.ItemPriceModel.applied_to,
                 created_at=r.ItemPriceModel.created_at,

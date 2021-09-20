@@ -146,6 +146,7 @@ class ItemSalePredictionRepository(AbstractItemSalePredictionRepository):
             filters.append(ItemSalePredictionModel.target_date == target_date)
         records = (
             db.query(
+                ItemSalePredictionModel,
                 ItemMasterModel,
                 StoreMasterModel,
             )
@@ -174,8 +175,8 @@ class ItemSalePredictionRepository(AbstractItemSalePredictionRepository):
                 id=r.ItemSalePredictionModel.id,
                 item_id=r.ItemSalePredictionModel.item_id,
                 store_id=r.ItemSalePredictionModel.store_id,
-                target_date=r.ItemSalePrediction.target_date,
-                prediction=r.ItemSalePrediction.prediction,
+                target_date=r.ItemSalePredictionModel.target_date,
+                prediction=r.ItemSalePredictionModel.prediction,
                 item_name=r.ItemMasterModel.name,
                 store_name=r.StoreMasterModel.name,
                 created_at=r.ItemSalePrediction.created_at,

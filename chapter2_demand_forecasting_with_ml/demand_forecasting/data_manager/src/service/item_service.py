@@ -304,7 +304,6 @@ class ItemService(AbstractItemService):
         )
         return result
 
-    @abstractmethod
     def register_item_price(
         self,
         db: Session,
@@ -327,7 +326,6 @@ class ItemService(AbstractItemService):
         )
         return result
 
-    @abstractmethod
     def register_item_sale(
         self,
         db: Session,
@@ -371,7 +369,7 @@ class ItemService(AbstractItemService):
         _item_sales = []
         for i, data in enumerate(item_sales):
             _item_sales.append(data)
-            if i % 5000 == 0:
+            if i % 10000 == 0:
                 result = self.item_sale_repository.bulk_register(
                     db=db,
                     item_sales=_item_sales,
@@ -412,18 +410,16 @@ class ItemService(AbstractItemService):
         )
         return result
 
-    @abstractmethod
     def bulk_register_item_sale_prediction(
         self,
         db: Session,
         item_sale_predictions: List[ItemSalePredictionCreate],
-        commit: bool = True,
     ) -> int:
         results = 0
         _item_sale_predictions = []
         for i, data in enumerate(item_sale_predictions):
             _item_sale_predictions.append(data)
-            if i % 5000 == 0:
+            if i % 10000 == 0:
                 result = self.item_sale_prediction_repository.bulk_register(
                     db=db,
                     item_sale_predictions=_item_sale_predictions,
@@ -470,7 +466,7 @@ class ItemService(AbstractItemService):
             result = self.register_item_price(
                 db=db,
                 id=data["id"],
-                item_id=data["id"],
+                item_id=data["item_id"],
                 price=int(data["price"]),
                 applied_from=datetime.strptime(data["applied_from"], "%Y-%m-%d"),
                 applied_to=datetime.strptime(data["applied_to"], "%Y-%m-%d")
@@ -493,7 +489,7 @@ class ItemService(AbstractItemService):
                 item_id=data["item_id"],
                 store_id=data["store_id"],
                 item_price_id=data["item_price_id"],
-                quantity=int(data["quantity"]),
+                quantity=int(data["sales"]),
                 total_sales=int(data["total_sales"]),
                 sold_at=datetime.strptime(data["date"], "%Y-%m-%d"),
                 day_of_week=data["day_of_week"],

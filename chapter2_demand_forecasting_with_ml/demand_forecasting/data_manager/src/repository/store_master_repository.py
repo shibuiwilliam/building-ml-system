@@ -109,7 +109,7 @@ class StoreMasterRepository(AbstractStoreMasterRepository):
         if region_name is not None:
             filters.append(RegionMasterModel.name == region_name)
         records = (
-            db.query(StoreMasterModel)
+            db.query(StoreMasterModel, RegionMasterModel)
             .join(
                 RegionMasterModel,
                 RegionMasterModel.id == StoreMasterModel.region_id,
@@ -125,8 +125,8 @@ class StoreMasterRepository(AbstractStoreMasterRepository):
                 region_id=r.StoreMasterModel.region_id,
                 name=r.StoreMasterModel.name,
                 region_name=r.RegionMasterModel.name,
-                created_at=r.created_at,
-                updated_at=r.updated_at,
+                created_at=r.StoreMasterModel.created_at,
+                updated_at=r.StoreMasterModel.updated_at,
             )
             for r in records
         ]
