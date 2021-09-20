@@ -1,15 +1,15 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from datetime import datetime
+from logging import getLogger
 from typing import List, Optional
 
 from pydantic import BaseModel, Extra
 from sqlalchemy import Column, DateTime, String, Text, and_
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import current_timestamp
-from src.middleware.logger import configure_logger
-from src.repository.db import Base
+from src.middleware.database import Base
 
-logger = configure_logger(name=__name__)
+logger = getLogger(name=__name__)
 
 
 class RegionMasterModel(Base):
@@ -57,7 +57,7 @@ class RegionMaster(RegionMasterBase):
         extra = Extra.forbid
 
 
-class AbstractRegionMasterRepository(metaclass=ABCMeta):
+class AbstractRegionMasterRepository(ABC):
     def __init__(self):
         pass
 
@@ -71,7 +71,7 @@ class AbstractRegionMasterRepository(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def record(
+    def register(
         self,
         db: Session,
         region_master: RegionMasterCreate,
@@ -106,7 +106,7 @@ class RegionMasterRepository(AbstractRegionMasterRepository):
             for r in records
         ]
 
-    def record(
+    def register(
         self,
         db: Session,
         region_master: RegionMasterCreate,
@@ -118,18 +118,14 @@ class RegionMasterRepository(AbstractRegionMasterRepository):
         )
         if len(is_exists) > 0:
             return is_exists[0]
-        data = RegionMasterModel(
-            id=region_master.id,
-            name=region_master.name,
-        )
+        data = RegionMasterModel(**region_master.dict())
         db.add(data)
         if commit:
             db.commit()
             db.refresh(data)
-            return RegionMaster(
+            records = self.retrieve(
+                db=db,
                 id=data.id,
-                name=data.name,
-                created_at=data.created_at,
-                updated_at=data.updated_at,
             )
+            return records[0]
         return None

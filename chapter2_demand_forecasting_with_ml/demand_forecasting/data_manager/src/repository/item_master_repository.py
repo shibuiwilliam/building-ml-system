@@ -1,15 +1,15 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from datetime import datetime
+from logging import getLogger
 from typing import List, Optional
 
 from pydantic import BaseModel, Extra
 from sqlalchemy import Column, DateTime, String, Text, and_
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import current_timestamp
-from src.middleware.logger import configure_logger
-from src.repository.db import Base
+from src.middleware.database import Base
 
-logger = configure_logger(name=__name__)
+logger = getLogger(name=__name__)
 
 
 class ItemMasterModel(Base):
@@ -57,7 +57,7 @@ class ItemMaster(ItemMasterBase):
         extra = Extra.forbid
 
 
-class AbstractItemMasterRepository(metaclass=ABCMeta):
+class AbstractItemMasterRepository(ABC):
     def __init__(self):
         pass
 
@@ -71,7 +71,7 @@ class AbstractItemMasterRepository(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def record(
+    def register(
         self,
         db: Session,
         item_master: ItemMasterCreate,
@@ -106,7 +106,7 @@ class ItemMasterRepository(AbstractItemMasterRepository):
             for r in records
         ]
 
-    def record(
+    def register(
         self,
         db: Session,
         item_master: ItemMasterCreate,
@@ -118,18 +118,14 @@ class ItemMasterRepository(AbstractItemMasterRepository):
         )
         if len(is_exists) > 0:
             return is_exists[0]
-        data = ItemMasterModel(
-            id=item_master.id,
-            name=item_master.name,
-        )
+        data = ItemMasterModel(**item_master.dict())
         db.add(data)
         if commit:
             db.commit()
             db.refresh(data)
-            return ItemMaster(
+            records = self.retrieve(
+                db=db,
                 id=data.id,
-                name=data.name,
-                created_at=data.created_at,
-                updated_at=data.updated_at,
             )
+            return records[0]
         return None

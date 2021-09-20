@@ -1,5 +1,6 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from datetime import date, datetime
+from logging import getLogger
 from typing import List, Optional
 
 from pydantic import BaseModel, Extra
@@ -7,12 +8,11 @@ from sqlalchemy import Column, Date, DateTime, ForeignKey, String, and_
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import current_timestamp
 from sqlalchemy.sql.sqltypes import Integer
-from src.middleware.logger import configure_logger
-from src.repository.db import Base
+from src.middleware.database import Base
 from src.repository.item_master_repository import ItemMasterModel
 from src.repository.store_master_repository import StoreMasterModel
 
-logger = configure_logger(name=__name__)
+logger = getLogger(name=__name__)
 
 
 class ItemArrivalModel(Base):
@@ -78,7 +78,7 @@ class ItemArrival(ItemArrivalBase):
         extra = Extra.forbid
 
 
-class AbstractItemArrivalRepository(metaclass=ABCMeta):
+class AbstractItemArrivalRepository(ABC):
     def __init__(self):
         pass
 
@@ -96,7 +96,7 @@ class AbstractItemArrivalRepository(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def record(
+    def register(
         self,
         db: Session,
         item_arrival: ItemArrivalCreate,
@@ -137,12 +137,12 @@ class ItemArrivalRepository(AbstractItemArrivalRepository):
             .join(
                 ItemMasterModel,
                 ItemMasterModel.id == ItemArrival.item_id,
-                isout=True,
+                isouter=True,
             )
             .join(
                 StoreMasterModel,
                 StoreMasterModel.id == ItemArrival.store_id,
-                isout=True,
+                isouter=True,
             )
             .filter(and_(*filters))
             .order_by(
@@ -167,7 +167,7 @@ class ItemArrivalRepository(AbstractItemArrivalRepository):
             for r in records
         ]
 
-    def record(
+    def register(
         self,
         db: Session,
         item_arrival: ItemArrivalCreate,
@@ -180,23 +180,14 @@ class ItemArrivalRepository(AbstractItemArrivalRepository):
         )
         if len(is_exists) > 0:
             return is_exists[0]
-        data = ItemArrivalModel(
-            id=item_arrival.id,
-            item_id=item_arrival.item_id,
-            store_id=item_arrival.store_id,
-            quantity=item_arrival.quantity,
-            arrived_at=item_arrival.arrived_at,
-        )
+        data = ItemArrivalModel(**item_arrival.dict())
         db.add(data)
         if commit:
             db.commit()
             db.refresh(data)
-            return ItemArrival(
+            records = self.retrieve(
+                db=db,
                 id=data.id,
-                item_id=data.item_id,
-                store_id=data.store_id,
-                arrived_at=data.arrived_at,
-                created_at=data.created_at,
-                updated_at=data.updated_at,
             )
+            return records[0]
         return None

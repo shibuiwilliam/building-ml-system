@@ -1,15 +1,16 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from datetime import datetime
+from logging import getLogger
 from typing import List, Optional
 
 from pydantic import BaseModel, Extra
-from sqlalchemy import Column, Date, DateTime, ForeignKey, String, Text, and_
+from sqlalchemy import Column, DateTime, ForeignKey, String, Text, and_
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import current_timestamp
-from src.middleware.logger import configure_logger
-from src.repository.db import Base
+from src.middleware.database import Base
+from src.repository.region_master_repository import RegionMasterModel
 
-logger = configure_logger(name=__name__)
+logger = getLogger(name=__name__)
 
 
 class StoreMasterModel(Base):
@@ -53,6 +54,7 @@ class StoreMasterCreate(StoreMasterBase):
 
 
 class StoreMaster(StoreMasterBase):
+    region_name: str
     created_at: datetime
     updated_at: datetime
 
@@ -60,7 +62,7 @@ class StoreMaster(StoreMasterBase):
         extra = Extra.forbid
 
 
-class AbstractStoreMasterRepository(metaclass=ABCMeta):
+class AbstractStoreMasterRepository(ABC):
     def __init__(self):
         pass
 
@@ -71,14 +73,15 @@ class AbstractStoreMasterRepository(metaclass=ABCMeta):
         id: Optional[str] = None,
         region_id: Optional[str] = None,
         name: Optional[str] = None,
+        region_name: Optional[str] = None,
     ) -> List[StoreMaster]:
         raise NotImplementedError
 
     @abstractmethod
-    def record(
+    def register(
         self,
         db: Session,
-        region_master: StoreMasterCreate,
+        store_master: StoreMasterCreate,
         commit: bool = True,
     ) -> Optional[StoreMaster]:
         raise NotImplementedError
@@ -94,6 +97,7 @@ class StoreMasterRepository(AbstractStoreMasterRepository):
         id: Optional[str] = None,
         region_id: Optional[str] = None,
         name: Optional[str] = None,
+        region_name: Optional[str] = None,
     ) -> List[StoreMaster]:
         filters = []
         if id is not None:
@@ -102,19 +106,32 @@ class StoreMasterRepository(AbstractStoreMasterRepository):
             filters.append(StoreMasterModel.region_id == region_id)
         if name is not None:
             filters.append(StoreMasterModel.name == name)
-        records = db.query(StoreMasterModel).filter(and_(*filters)).order_by(StoreMasterModel.name).all()
+        if region_name is not None:
+            filters.append(RegionMasterModel.name == region_name)
+        records = (
+            db.query(StoreMasterModel)
+            .join(
+                RegionMasterModel,
+                RegionMasterModel.id == StoreMasterModel.region_id,
+                isouter=True,
+            )
+            .filter(and_(*filters))
+            .order_by(StoreMasterModel.name)
+            .all()
+        )
         return [
             StoreMaster(
-                id=r.id,
-                region_id=r.region_id,
-                name=r.name,
+                id=r.StoreMasterModel.id,
+                region_id=r.StoreMasterModel.region_id,
+                name=r.StoreMasterModel.name,
+                region_name=r.RegionMasterModel.name,
                 created_at=r.created_at,
                 updated_at=r.updated_at,
             )
             for r in records
         ]
 
-    def record(
+    def register(
         self,
         db: Session,
         store_master: StoreMasterCreate,
@@ -126,20 +143,14 @@ class StoreMasterRepository(AbstractStoreMasterRepository):
         )
         if len(is_exists) > 0:
             return is_exists[0]
-        data = StoreMasterModel(
-            id=store_master.id,
-            region_id=store_master.region_id,
-            name=store_master.name,
-        )
+        data = StoreMasterModel(**store_master.dict())
         db.add(data)
         if commit:
             db.commit()
             db.refresh(data)
-            return StoreMaster(
+            records = self.retrieve(
+                db=db,
                 id=data.id,
-                region_id=data.region_id,
-                name=data.name,
-                created_at=data.created_at,
-                updated_at=data.updated_at,
             )
+            return records[0]
         return None

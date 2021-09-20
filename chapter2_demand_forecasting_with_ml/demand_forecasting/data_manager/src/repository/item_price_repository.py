@@ -1,5 +1,6 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from datetime import date, datetime
+from logging import getLogger
 from typing import List, Optional
 
 from pydantic import BaseModel, Extra
@@ -7,11 +8,10 @@ from sqlalchemy import Column, Date, DateTime, ForeignKey, String, and_
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import current_timestamp
 from sqlalchemy.sql.sqltypes import Integer
-from src.middleware.logger import configure_logger
-from src.repository.db import Base
+from src.middleware.database import Base
 from src.repository.item_master_repository import ItemMasterModel
 
-logger = configure_logger(name=__name__)
+logger = getLogger(name=__name__)
 
 
 class ItemPriceModel(Base):
@@ -87,7 +87,7 @@ class ItemPrice(ItemPriceBase):
         extra = Extra.forbid
 
 
-class AbstractItemPriceRepository(metaclass=ABCMeta):
+class AbstractItemPriceRepository(ABC):
     def __init__(self):
         pass
 
@@ -104,7 +104,7 @@ class AbstractItemPriceRepository(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def record(
+    def register(
         self,
         db: Session,
         item_price: ItemPriceCreate,
@@ -142,7 +142,7 @@ class ItemPriceRepository(AbstractItemPriceRepository):
             .join(
                 ItemMasterModel,
                 ItemMasterModel.id == ItemPrice.item_id,
-                isout=True,
+                isouter=True,
             )
             .filter(and_(*filters))
             .order_by(
@@ -164,7 +164,7 @@ class ItemPriceRepository(AbstractItemPriceRepository):
             for r in records
         ]
 
-    def record(
+    def register(
         self,
         db: Session,
         item_price: ItemPriceCreate,
@@ -178,22 +178,14 @@ class ItemPriceRepository(AbstractItemPriceRepository):
         )
         if len(is_exists) > 0:
             return is_exists[0]
-        data = ItemPriceModel(
-            id=item_price.id,
-            item_id=item_price.item_id,
-            applied_from=item_price.applied_from,
-            applied_to=item_price.applied_to,
-        )
+        data = ItemPriceModel(**item_price.dict())
         db.add(data)
         if commit:
             db.commit()
             db.refresh(data)
-            return ItemPrice(
+            records = self.retrieve(
+                db=db,
                 id=data.id,
-                item_id=data.item_id,
-                applied_from=data.applied_from,
-                applied_to=data.applied_to,
-                created_at=data.created_at,
-                updated_at=data.updated_at,
             )
+            return records[0]
         return None

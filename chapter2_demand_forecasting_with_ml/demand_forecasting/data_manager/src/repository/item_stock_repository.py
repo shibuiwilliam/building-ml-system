@@ -1,5 +1,6 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from datetime import date, datetime
+from logging import getLogger
 from typing import List, Optional
 
 from pydantic import BaseModel, Extra
@@ -7,12 +8,11 @@ from sqlalchemy import Column, Date, DateTime, ForeignKey, String, and_
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import current_timestamp
 from sqlalchemy.sql.sqltypes import Integer
-from src.middleware.logger import configure_logger
-from src.repository.db import Base
+from src.middleware.database import Base
 from src.repository.item_master_repository import ItemMasterModel
 from src.repository.store_master_repository import StoreMasterModel
 
-logger = configure_logger(name=__name__)
+logger = getLogger(name=__name__)
 
 
 class ItemStockModel(Base):
@@ -78,7 +78,7 @@ class ItemStock(ItemStockBase):
         extra = Extra.forbid
 
 
-class AbstractItemStockRepository(metaclass=ABCMeta):
+class AbstractItemStockRepository(ABC):
     def __init__(self):
         pass
 
@@ -96,7 +96,7 @@ class AbstractItemStockRepository(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def record(
+    def register(
         self,
         db: Session,
         item_stock: ItemStockCreate,
@@ -137,12 +137,12 @@ class ItemStockRepository(AbstractItemStockRepository):
             .join(
                 ItemMasterModel,
                 ItemMasterModel.id == ItemStock.item_id,
-                isout=True,
+                isouter=True,
             )
             .join(
                 StoreMasterModel,
                 StoreMasterModel.id == ItemStock.store_id,
-                isout=True,
+                isouter=True,
             )
             .filter(and_(*filters))
             .order_by(
@@ -167,7 +167,7 @@ class ItemStockRepository(AbstractItemStockRepository):
             for r in records
         ]
 
-    def record(
+    def register(
         self,
         db: Session,
         item_stock: ItemStockCreate,
@@ -180,23 +180,14 @@ class ItemStockRepository(AbstractItemStockRepository):
         )
         if len(is_exists) > 0:
             return is_exists[0]
-        data = ItemStockModel(
-            id=item_stock.id,
-            item_id=item_stock.item_id,
-            store_id=item_stock.store_id,
-            stock=item_stock.stock,
-            recorded_at=item_stock.recorded_at,
-        )
+        data = ItemStockModel(**item_stock.dict())
         db.add(data)
         if commit:
             db.commit()
             db.refresh(data)
-            return ItemStock(
+            records = self.retrieve(
+                db=db,
                 id=data.id,
-                item_id=data.item_id,
-                store_id=data.store_id,
-                recorded_at=data.recorded_at,
-                created_at=data.created_at,
-                updated_at=data.updated_at,
             )
+            return records[0]
         return None

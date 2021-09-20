@@ -1,5 +1,6 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from datetime import date, datetime
+from logging import getLogger
 from typing import List, Optional
 
 from pydantic import BaseModel, Extra
@@ -7,13 +8,12 @@ from sqlalchemy import Column, Date, DateTime, ForeignKey, String, and_
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import current_timestamp
 from sqlalchemy.sql.sqltypes import Integer
-from src.middleware.logger import configure_logger
-from src.repository.db import Base
+from src.middleware.database import Base
 from src.repository.item_master_repository import ItemMasterModel
 from src.repository.item_price_repository import ItemPriceModel
 from src.repository.store_master_repository import StoreMasterModel
 
-logger = configure_logger(name=__name__)
+logger = getLogger(name=__name__)
 
 
 class ItemSaleModel(Base):
@@ -51,6 +51,10 @@ class ItemSaleModel(Base):
         Date,
         nullable=False,
     )
+    day_of_week = Column(
+        String(3),
+        nullable=False,
+    )
     created_at = Column(
         DateTime(timezone=True),
         server_default=current_timestamp(),
@@ -71,6 +75,7 @@ class ItemSaleBase(BaseModel):
     quantity: int
     total_sales: int
     sold_at: date
+    day_of_week: str
 
 
 class ItemSaleCreate(ItemSaleBase):
@@ -91,7 +96,7 @@ class ItemSale(ItemSaleBase):
         extra = Extra.forbid
 
 
-class AbstractItemSaleRepository(metaclass=ABCMeta):
+class AbstractItemSaleRepository(ABC):
     def __init__(self):
         pass
 
@@ -107,16 +112,28 @@ class AbstractItemSaleRepository(metaclass=ABCMeta):
         item_price_id: Optional[str] = None,
         quantity: Optional[int] = None,
         sold_at: Optional[date] = None,
+        day_of_week: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
     ) -> List[ItemSale]:
         raise NotImplementedError
 
     @abstractmethod
-    def record(
+    def register(
         self,
         db: Session,
         item_sale: ItemSaleCreate,
         commit: bool = True,
     ) -> Optional[ItemSale]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def bulk_register(
+        self,
+        db: Session,
+        item_sales: List[ItemSaleCreate],
+        commit: bool = True,
+    ) -> int:
         raise NotImplementedError
 
 
@@ -135,6 +152,9 @@ class ItemSaleRepository(AbstractItemSaleRepository):
         item_price_id: Optional[str] = None,
         quantity: Optional[int] = None,
         sold_at: Optional[date] = None,
+        day_of_week: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
     ) -> List[ItemSale]:
         filters = []
         if id is not None:
@@ -153,6 +173,8 @@ class ItemSaleRepository(AbstractItemSaleRepository):
             filters.append(ItemSaleModel.quantity == quantity)
         if sold_at is not None:
             filters.append(ItemSaleModel.sold_at == sold_at)
+        if day_of_week is not None:
+            filters.append(ItemSaleModel.day_of_week == day_of_week)
         records = (
             db.query(
                 ItemSaleModel,
@@ -163,17 +185,17 @@ class ItemSaleRepository(AbstractItemSaleRepository):
             .join(
                 ItemMasterModel,
                 ItemMasterModel.id == ItemSale.item_id,
-                isout=True,
+                isouter=True,
             )
             .join(
                 StoreMasterModel,
                 StoreMasterModel.id == ItemSale.store_id,
-                isout=True,
+                isouter=True,
             )
             .join(
                 ItemPriceModel,
                 ItemPriceModel.id == ItemSale.item_price_id,
-                isout=True,
+                isouter=True,
             )
             .filter(and_(*filters))
             .order_by(
@@ -181,6 +203,8 @@ class ItemSaleRepository(AbstractItemSaleRepository):
                 ItemMasterModel.name,
                 ItemSale.sold_at,
             )
+            .limit(limit)
+            .offset(offset)
             .all()
         )
         return [
@@ -191,6 +215,7 @@ class ItemSaleRepository(AbstractItemSaleRepository):
                 quantity=r.ItemSaleModel.quantity,
                 total_sales=r.ItemSale.total_sales,
                 sold_at=r.ItemSaleModel.sold_at,
+                day_of_week=r.ItemSaleModel.day_of_week,
                 item_name=r.ItemMasterModel.name,
                 store_name=r.StoreMasterModel.name,
                 price=r.ItemPriceModel.price,
@@ -200,38 +225,33 @@ class ItemSaleRepository(AbstractItemSaleRepository):
             for r in records
         ]
 
-    def record(
+    def register(
         self,
         db: Session,
         item_sale: ItemSaleCreate,
         commit: bool = True,
     ) -> Optional[ItemSale]:
-        data = ItemSaleModel(
-            id=item_sale.id,
-            item_id=item_sale.item_id,
-            store_id=item_sale.store_id,
-            item_price_id=item_sale.item_price_id,
-            quantity=item_sale.quantity,
-            total_sales=item_sale.total_sales,
-            sold_at=item_sale.sold_at,
-        )
+        data = ItemSaleModel(**item_sale.dict())
         db.add(data)
         if commit:
             db.commit()
             db.refresh(data)
-            records = self.retrieve(db=db, id=data.id)
-            return ItemSale(
-                id=records[0].id,
-                item_id=records[0].item_id,
-                store_id=records[0].store_id,
-                item_price_id=records[0].item_price_id,
-                quantity=records[0].quantity,
-                total_sales=records[0].total_sales,
-                sold_at=records[0].sold_at,
-                item_name=records[0].item_name,
-                store_name=records[0].store_name,
-                price=records[0].price,
-                created_at=records[0].created_at,
-                updated_at=records[0].updated_at,
+            records = self.retrieve(
+                db=db,
+                id=data.id,
             )
+            return records[0]
         return None
+
+    def bulk_register(
+        self,
+        db: Session,
+        item_sales: List[ItemSaleCreate],
+        commit: bool = True,
+    ) -> int:
+        data = [ItemSaleModel(**item_sale.dict()) for item_sale in item_sales]
+        db.bulk_save_objects(data)
+        if commit:
+            db.commit()
+            return len(data)
+        return 0
