@@ -5,13 +5,47 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from src.container.container import container
 from src.middleware.database import get_db
+from src.repository.item_master_repository import ItemMaster
+from src.repository.item_price_repository import ItemPrice
 from src.repository.item_sale_repository import ItemSale
 
 router = APIRouter()
 
 
-@router.get("/", response_model=List[ItemSale])
+@router.get("/masters", response_model=List[ItemMaster])
 def get_item_master(
+    id: Optional[str] = None,
+    item_name: Optional[str] = None,
+    db: Session = Depends(get_db),
+):
+    return container.item_service.retrieve_item_master(
+        db=db,
+        id=id,
+        item_name=item_name,
+    )
+
+
+@router.get("/prices", response_model=List[ItemPrice])
+def get_item_price(
+    id: Optional[str] = None,
+    item_name: Optional[str] = None,
+    item_id: Optional[str] = None,
+    applied_from: Optional[date] = None,
+    applied_to: Optional[date] = None,
+    db: Session = Depends(get_db),
+):
+    return container.item_service.retrieve_item_price(
+        db=db,
+        id=id,
+        item_name=item_name,
+        item_id=item_id,
+        applied_from=applied_from,
+        applied_to=applied_to,
+    )
+
+
+@router.get("/sales", response_model=List[ItemSale])
+def get_item_sale(
     id: Optional[str] = None,
     item_name: Optional[str] = None,
     item_id: Optional[str] = None,

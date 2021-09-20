@@ -9,11 +9,11 @@ from src.repository.store_master_repository import StoreMaster
 router = APIRouter()
 
 
-@router.get("/", response_model=List[StoreMaster])
+@router.get("/masters", response_model=List[StoreMaster])
 def get_store_master(
     id: Optional[str] = None,
     region_id: Optional[str] = None,
-    name: Optional[str] = None,
+    store_name: Optional[str] = None,
     region_name: Optional[str] = None,
     db: Session = Depends(get_db),
 ):
@@ -21,6 +21,6 @@ def get_store_master(
         db=db,
         id=id,
         region_id=region_id,
-        name=name,
+        store_name=store_name,
         region_name=region_name,
     )

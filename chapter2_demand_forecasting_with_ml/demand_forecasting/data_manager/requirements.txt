@@ -9,3 +9,4 @@ sqlalchemy==1.4.23; (python_version >= "2.7" and python_full_version < "3.0.0") 
 starlette==0.14.2; python_version >= "3.6"
 typing-extensions==3.10.0.2; python_full_version >= "3.6.1" and python_version >= "3.6"
 uvicorn==0.15.0
+uvloop==0.16.0; python_version >= "3.7"

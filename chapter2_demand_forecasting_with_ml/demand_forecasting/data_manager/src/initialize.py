@@ -177,7 +177,7 @@ def create_indices(
     )
 
 
-def initialize_data(
+def initialize_tables(
     engine: Engine,
     checkfirst: bool = True,
 ):
@@ -190,6 +190,8 @@ def initialize_data(
         checkfirst=checkfirst,
     )
 
+
+def initialize_data():
     with get_context_db() as db:
         container.store_service.initialize_region_master(
             db=db,

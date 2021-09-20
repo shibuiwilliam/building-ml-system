@@ -20,18 +20,19 @@ services:
   db_registration:
     container_name: data_manager
     image: shibui/building-ml-system:demand_forecasting_data_manager_0.0.0
-    restart: "no"
+    restart: always
     environment:
       - POSTGRES_SERVER=postgres
       - POSTGRES_PORT=5432
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=demand_forecasting
+      - PORT=8000
     entrypoint:
-      - "python"
-      - "-m"
-      - "src.main"
+      - "./run.sh"
+    ports:
+      - "8000:8000"
     volumes:
-      - "./data:/opt/data"
+      - "./master_data:/opt/data"
     depends_on:
       - postgres

@@ -14,6 +14,10 @@ class DatabaseConfigurations(object):
 
 
 class Configurations(object):
+    api_title = os.getenv("API_TITLE", "demand_forecasting")
+    api_description = os.getenv("API_DESCRIPTION", "demand forecasting data api")
+    api_version = os.getenv("API_VERSION", "0")
+
     data_directory = os.getenv("DATA_DIRECTORY", "/opt/data/")
     region_file_path = os.path.join(data_directory, os.getenv("REGION_FILE", "regions.csv"))
     store_file_path = os.path.join(data_directory, os.getenv("STORE_FILE", "stores.csv"))
@@ -22,3 +26,6 @@ class Configurations(object):
     item_sale_records_2017_2019_path = os.path.join(
         data_directory, os.getenv("ITEM_SALE_RECORDS_FILE", "item_sale_records_2017_2019.csv")
     )
+
+    initialize_tables = bool(os.getenv("INITIALIZE_TABLES", 1))
+    initialize_data = bool(os.getenv("INITIALIZE_DATA", 1))

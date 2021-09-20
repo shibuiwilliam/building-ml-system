@@ -26,7 +26,7 @@ class AbstractStoreService(ABC):
         db: Session,
         id: Optional[str] = None,
         region_id: Optional[str] = None,
-        name: Optional[str] = None,
+        store_name: Optional[str] = None,
         region_name: Optional[str] = None,
     ) -> List[StoreMaster]:
         raise NotImplementedError
@@ -83,14 +83,14 @@ class StoreService(AbstractStoreService):
         db: Session,
         id: Optional[str] = None,
         region_id: Optional[str] = None,
-        name: Optional[str] = None,
+        store_name: Optional[str] = None,
         region_name: Optional[str] = None,
     ) -> List[StoreMaster]:
         result = self.store_master_repository.retrieve(
             db=db,
             id=id,
             region_id=region_id,
-            name=name,
+            name=store_name,
             region_name=region_name,
         )
         return result

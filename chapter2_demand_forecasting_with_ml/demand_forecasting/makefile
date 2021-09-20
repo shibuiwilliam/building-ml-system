@@ -1,6 +1,6 @@
 ABSOLUTE_PATH := $(shell pwd)
 DOCKERFILE := Dockerfile
-DOCKER_COMPOSE := docker_compose.yml
+DOCKER_COMPOSE := docker-compose.yaml
 VERSION := 0.0.0
 DOCKER_TEST_TAG := test
 
@@ -25,7 +25,6 @@ dvc_init:
 	cd $(DEMAND_FORECASTING_DIR) && \
 	dvc init --subdir
 	
-
 
 ############ DEMAND FORECASTING TRAIN COMMANDS ############
 DOCKERFILE_DEMAND_FORECASTING_TRAIN = $(DEMAND_FORECASTING_TRAIN_DIR)/$(DOCKERFILE)
@@ -344,3 +343,16 @@ test_demand_forecasting_all: build_demand_forecasting_all_test \
 	test_demand_forecasting_predict \
 	test_demand_forecasting_data_manager
 
+
+############ DOCKER COMPOSE COMMANDS ############
+.PHONY: up
+up:
+	docker-compose \
+		-f $(DOCKER_COMPOSE) \
+		up -d
+
+.PHONY: down
+down:
+	docker-compose \
+		-f $(DOCKER_COMPOSE) \
+		down

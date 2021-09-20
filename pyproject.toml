@@ -8,6 +8,8 @@ version = "0.0.0"
 [tool.poetry.dependencies]
 kaggle = "^1.5.12"
 python = "3.9"
+psycopg2-binary = "^2.9.1"
+uvloop = "^0.16.0"
 
 [tool.poetry.dev-dependencies]
 

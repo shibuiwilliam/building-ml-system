@@ -38,6 +38,27 @@ class AbstractItemService(ABC):
         self.item_stock_repository = item_stock_repository
 
     @abstractmethod
+    def retrieve_item_master(
+        self,
+        db: Session,
+        id: Optional[str] = None,
+        item_name: Optional[str] = None,
+    ) -> List[ItemMaster]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def retrieve_item_price(
+        self,
+        db: Session,
+        id: Optional[str] = None,
+        item_name: Optional[str] = None,
+        item_id: Optional[str] = None,
+        applied_from: Optional[date] = None,
+        applied_to: Optional[date] = None,
+    ) -> List[ItemPrice]:
+        raise NotImplementedError
+
+    @abstractmethod
     def retrieve_item_sale(
         self,
         db: Session,
@@ -178,6 +199,38 @@ class ItemService(AbstractItemService):
             item_stock_repository=item_stock_repository,
         )
         self.weekdays = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
+
+    def retrieve_item_master(
+        self,
+        db: Session,
+        id: Optional[str] = None,
+        item_name: Optional[str] = None,
+    ) -> List[ItemMaster]:
+        result = self.item_master_repository.retrieve(
+            db=db,
+            id=id,
+            name=item_name,
+        )
+        return result
+
+    def retrieve_item_price(
+        self,
+        db: Session,
+        id: Optional[str] = None,
+        item_name: Optional[str] = None,
+        item_id: Optional[str] = None,
+        applied_from: Optional[date] = None,
+        applied_to: Optional[date] = None,
+    ) -> List[ItemPrice]:
+        result = self.item_price_repository.retrieve(
+            db=db,
+            id=id,
+            item_name=item_name,
+            item_id=item_id,
+            applied_from=applied_from,
+            applied_to=applied_to,
+        )
+        return result
 
     def retrieve_item_sale(
         self,
