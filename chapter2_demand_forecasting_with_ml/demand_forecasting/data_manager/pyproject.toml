@@ -6,14 +6,14 @@ name = "data_manager"
 version = "0.0.0"
 
 [tool.poetry.dependencies]
-pydantic = "^1.8.2"
-python = "3.9"
 SQLAlchemy = "^1.4.23"
 fastapi = "^0.68.1"
 gunicorn = "^20.1.0"
+psycopg2-binary = "^2.9.1"
+pydantic = "^1.8.2"
+python = "3.9,<3.10"
 uvicorn = "^0.15.0"
 uvloop = "^0.16.0"
-psycopg2-binary = "^2.9.1"
 
 [tool.poetry.dev-dependencies]
 
