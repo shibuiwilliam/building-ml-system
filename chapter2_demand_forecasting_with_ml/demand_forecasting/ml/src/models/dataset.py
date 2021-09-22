@@ -4,7 +4,7 @@ from typing import Tuple
 import pandas as pd
 from pandera import Check, Column, DataFrameSchema, Index
 
-DAYS_OF_WEEK = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
+DAYS_OF_WEEK = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
 STORES = [
     "nagoya",
     "shinjuku",
