@@ -1,5 +1,6 @@
+from abc import ABC, abstractmethod
 from datetime import date, datetime
-from typing import Dict, List, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -11,6 +12,9 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.preprocessing import FunctionTransformer, MinMaxScaler, OneHotEncoder
 from src.models.dataset import DAYS_OF_WEEK, ITEMS, STORES
+from src.utils.logger import configure_logger
+
+logger = configure_logger(__name__)
 
 
 class ItemSelector(BaseEstimator, TransformerMixin):
@@ -57,7 +61,62 @@ class Expm1Transformer(BaseEstimator, TransformerMixin):
         return np.expm1(x)
 
 
-class DataPreprocessPipeline(BaseEstimator, TransformerMixin):
+class BasePreprocessPipeline(ABC, BaseEstimator, TransformerMixin):
+    def __init__(self):
+        pass
+
+    @abstractmethod
+    def fit(
+        self,
+        x: pd.DataFrame,
+        y=None,
+    ):
+        raise NotImplementedError
+
+    @abstractmethod
+    def transform(
+        self,
+        x: pd.DataFrame,
+    ) -> Union[np.ndarray, scipy.sparse.csr.csr_matrix]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def fit_transform(
+        self,
+        x: pd.DataFrame,
+        y=None,
+    ) -> Union[np.ndarray, scipy.sparse.csr.csr_matrix]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def to_dataframe(
+        self,
+        base_dataframe: pd.DataFrame,
+        x: Union[np.ndarray, scipy.sparse.csr.csr_matrix],
+    ) -> pd.DataFrame:
+        raise NotImplementedError
+
+    @abstractmethod
+    def train_test_split_by_date(
+        self,
+        preprocessed_df: pd.DataFrame,
+        train_start_date: date,
+        train_end_date: date,
+        test_start_date: date,
+        test_end_date: date,
+    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def dump_pipeline(self, file_path: str):
+        raise NotImplementedError
+
+    @abstractmethod
+    def load_pipeline(self, file_path: str):
+        raise NotImplementedError
+
+
+class DataPreprocessPipeline(BasePreprocessPipeline):
     def __init__(self):
         self.day_of_week = [[d] for d in DAYS_OF_WEEK]
         self.day_of_month = [[i] for i in range(1, 32, 1)]
@@ -310,8 +369,8 @@ class DataPreprocessPipeline(BaseEstimator, TransformerMixin):
         ].reset_index(drop=True)
         return df_train, df_test
 
-    def dump(self, file_path: str):
+    def dump_pipeline(self, file_path: str):
         dump(self.pipeline, file_path)
 
-    def load(self, file_path: str):
+    def load_pipeline(self, file_path: str):
         self.pipeline = load(file_path)

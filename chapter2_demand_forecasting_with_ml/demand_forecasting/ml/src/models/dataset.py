@@ -1,8 +1,11 @@
-from datetime import date, datetime
-from typing import Tuple
+from datetime import datetime
 
 import pandas as pd
 from pandera import Check, Column, DataFrameSchema, Index
+from src.utils.logger import configure_logger
+
+logger = configure_logger(__name__)
+
 
 DAYS_OF_WEEK = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
 
@@ -93,13 +96,8 @@ def select_and_create_columns(
     return df
 
 
-def train_test_split_by_date(
-    df_data: pd.DataFrame,
-    train_start_date: date,
-    train_end_date: date,
-    test_start_date: date,
-    test_end_date: date,
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    df_train = df_data[df_data["date"] >= train_start_date][df_data["date"] <= train_end_date].reset_index(drop=True)
-    df_test = df_data[df_data["date"] >= test_start_date][df_data["date"] <= test_end_date].reset_index(drop=True)
-    return df_train, df_test
+def save_dataframe_to_csv(
+    df: pd.DataFrame,
+    file_path: str,
+):
+    df.to_csv(file_path)

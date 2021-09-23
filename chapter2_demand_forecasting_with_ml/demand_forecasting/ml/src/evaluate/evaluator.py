@@ -5,6 +5,9 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import mean_squared_error
 from src.models.dataset import DAYS_OF_WEEK, ITEMS, STORES
+from src.utils.logger import configure_logger
+
+logger = configure_logger(__name__)
 
 
 class Evaluator(object):

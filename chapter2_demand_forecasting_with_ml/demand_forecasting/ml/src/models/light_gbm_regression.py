@@ -1,6 +1,6 @@
 import random
 from collections import OrderedDict
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, Union
 
 import lightgbm as lgb
 import numpy as np
@@ -8,7 +8,11 @@ import onnxmltools
 import pandas as pd
 import scipy
 from onnxmltools.convert.common.data_types import FloatTensorType
+from src.models.base_model import BaseDemandForecastingModel
 from src.models.preprocess import Expm1Transformer
+from src.utils.logger import configure_logger
+
+logger = configure_logger(__name__)
 
 DEFAULT_PARAMS = {
     "task": "train",
@@ -27,7 +31,7 @@ DEFAULT_PARAMS = {
 }
 
 
-class LightGBMRegressionDemandForecasting(object):
+class LightGBMRegressionDemandForecasting(BaseDemandForecastingModel):
     def __init__(
         self,
         params: Dict = DEFAULT_PARAMS,
@@ -42,7 +46,7 @@ class LightGBMRegressionDemandForecasting(object):
         x_test: Union[np.ndarray, scipy.sparse.csr.csr_matrix, pd.DataFrame],
         y_train: Union[np.ndarray, scipy.sparse.csr.csr_matrix, pd.DataFrame],
         y_test: Union[np.ndarray, scipy.sparse.csr.csr_matrix, pd.DataFrame],
-    ) -> Dict[OrderedDict, Any]:
+    ):
         lgbtrain = lgb.Dataset(
             data=x_train,
             label=y_train,
@@ -64,17 +68,22 @@ class LightGBMRegressionDemandForecasting(object):
             evals_result=evals_result,
             verbose_eval=100,
         )
-        return evals_result
+        logger.info(
+            f"""
+Train history:
+{evals_result}
+        """
+        )
 
     def predict(
         self,
-        x_test: Union[np.ndarray, scipy.sparse.csr.csr_matrix],
+        x_test: Union[np.ndarray, scipy.sparse.csr.csr_matrix, pd.DataFrame],
     ) -> np.ndarray:
         log1p_predictions = self.model.predict(x_test)
         predictions = Expm1Transformer().fit_transform(log1p_predictions)
         return predictions
 
-    def save_as_txt(
+    def save(
         self,
         file_path: str,
     ):
@@ -83,7 +92,7 @@ class LightGBMRegressionDemandForecasting(object):
     def save_as_onnx(
         self,
         file_path: str,
-        sample_input: Union[np.ndarray, scipy.sparse.csr.csr_matrix],
+        sample_input: Union[np.ndarray, scipy.sparse.csr.csr_matrix, pd.DataFrame],
     ):
         initial_types = [["inputs", FloatTensorType([None, sample_input.shape[1]])]]
         onnx_model = onnxmltools.convert_lightgbm(self.model, initial_types=initial_types)
