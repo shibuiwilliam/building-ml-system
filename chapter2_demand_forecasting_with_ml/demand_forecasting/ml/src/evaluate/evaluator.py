@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from typing import List, Union
+from typing import List, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -25,18 +25,16 @@ class Evaluator(object):
         self.true_sales = true_sales
         self.predicted_sales = predicted_sales
         self.absolute = absolute
+        self.diffs: Optional[np.ndarray] = None
+        self.error_rates: Optional[np.ndarray] = None
+        self.date_based_results: Optional[pd.DataFrame] = None
+        self.week_based_results: Optional[pd.DataFrame] = None
 
         self.__set_week()
-        self.diffs: np.ndarray = self.__set_diffs()
-        self.error_rates: np.ndarray = self.__set_error_rate()
-        self.date_based_results = self.make_date_based_results()
-        self.week_based_results = self.make_week_based_results()
-
-    def __set_week(self):
-        for date in self.dates:
-            isocalendar = date.isocalendar()
-            self.week.append(isocalendar.week)
-            self.day_of_week.append(DAYS_OF_WEEK[isocalendar.weekday - 1])
+        self.__set_diffs()
+        self.__set_error_rate()
+        self.__make_date_based_results()
+        self.__make_week_based_results()
 
     def get_mse(
         self,
@@ -48,15 +46,22 @@ class Evaluator(object):
             squared=squared,
         )
 
-    def __set_diffs(self) -> np.ndarray:
+    def __set_week(self):
+        for date in self.dates:
+            isocalendar = date.isocalendar()
+            self.week.append(isocalendar.week)
+            self.day_of_week.append(DAYS_OF_WEEK[isocalendar.weekday - 1])
+
+    def __set_diffs(self):
         diff = self.true_sales - self.predicted_sales
-        return np.abs(diff) if self.absolute else diff
+        self.diffs = np.abs(diff) if self.absolute else diff
 
-    def __set_error_rate(self) -> np.ndarray:
-        return self.diffs / self.true_sales
+    def __set_error_rate(self):
+        self.__set_diffs()
+        self.error_rates = self.diffs / self.true_sales
 
-    def make_date_based_results(self) -> pd.DataFrame:
-        df = pd.DataFrame(
+    def __make_date_based_results(self):
+        self.date_based_results = pd.DataFrame(
             {
                 "dates": self.dates,
                 "week": self.week,
@@ -69,10 +74,9 @@ class Evaluator(object):
                 "error_rates": self.error_rates,
             }
         )
-        df["date"] = pd.to_datetime(df["date"])
-        return df
+        self.date_based_results["date"] = pd.to_datetime(self.date_based_results["date"])
 
-    def make_week_based_results(self) -> pd.DataFrame:
+    def __make_week_based_results(self):
         weeks = set(self.week)
         _weeks = []
         _stores = []
@@ -94,7 +98,7 @@ class Evaluator(object):
                     _predicted_sales.append(_df.predicted_sales.sum())
                     _diffs.append(_df.diffs.sum())
                     _error_rates.append(_df.error_rates.sum())
-        df = pd.DataFrame(
+        self.week_based_results = pd.DataFrame(
             {
                 "weeks": _weeks,
                 "stores": _stores,
@@ -105,4 +109,11 @@ class Evaluator(object):
                 "error_rates": _error_rates,
             }
         )
-        return df
+
+    def save_date_based_results(self, file_path: str):
+        if self.date_based_results is not None:
+            self.date_based_results.to_csv(file_path)
+
+    def save_week_based_results(self, file_path: str):
+        if self.week_based_results is not None:
+            self.week_based_results.to_csv(file_path)

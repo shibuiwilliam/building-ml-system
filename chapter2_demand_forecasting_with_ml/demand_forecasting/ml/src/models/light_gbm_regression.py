@@ -1,26 +1,47 @@
+import random
 from collections import OrderedDict
-from typing import Any, Dict, Union
+from typing import Any, Dict, List, Union
 
 import lightgbm as lgb
 import numpy as np
 import onnxmltools
+import pandas as pd
 import scipy
 from onnxmltools.convert.common.data_types import FloatTensorType
 from src.models.preprocess import Expm1Transformer
 
+DEFAULT_PARAMS = {
+    "task": "train",
+    "boosting": "gbdt",
+    "objective": "regression",
+    "metric": {"mse"},
+    "num_leaves": 10,
+    "learning_rate": 0.01,
+    "feature_fraction": 0.8,
+    "max_depth": -1,
+    "verbose": 0,
+    "num_boost_round": 20000,
+    "early_stopping_rounds": 200,
+    "num_threads": 0,
+    "seed": random.randint(0, 9999),
+}
+
 
 class LightGBMRegressionDemandForecasting(object):
-    def __init__(self, params: Dict):
+    def __init__(
+        self,
+        params: Dict = DEFAULT_PARAMS,
+    ):
         self.params = params
         self.model: lgb.basic.Booster = None
         self.column_length: int = 0
 
     def train(
         self,
-        x_train: Union[np.ndarray, scipy.sparse.csr.csr_matrix],
-        x_test: Union[np.ndarray, scipy.sparse.csr.csr_matrix],
-        y_train: Union[np.ndarray, scipy.sparse.csr.csr_matrix],
-        y_test: Union[np.ndarray, scipy.sparse.csr.csr_matrix],
+        x_train: Union[np.ndarray, scipy.sparse.csr.csr_matrix, pd.DataFrame],
+        x_test: Union[np.ndarray, scipy.sparse.csr.csr_matrix, pd.DataFrame],
+        y_train: Union[np.ndarray, scipy.sparse.csr.csr_matrix, pd.DataFrame],
+        y_test: Union[np.ndarray, scipy.sparse.csr.csr_matrix, pd.DataFrame],
     ) -> Dict[OrderedDict, Any]:
         lgbtrain = lgb.Dataset(
             data=x_train,
