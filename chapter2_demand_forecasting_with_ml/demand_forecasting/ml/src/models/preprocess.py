@@ -361,13 +361,13 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
         test_start_date: date,
         test_end_date: date,
     ) -> Tuple[pd.DataFrame, pd.DataFrame]:
-        df_train = preprocessed_df[preprocessed_df["date"] >= train_start_date][
+        train_df = preprocessed_df[preprocessed_df["date"] >= train_start_date][
             preprocessed_df["date"] <= train_end_date
         ].reset_index(drop=True)
-        df_test = preprocessed_df[preprocessed_df["date"] >= test_start_date][
+        test_df = preprocessed_df[preprocessed_df["date"] >= test_start_date][
             preprocessed_df["date"] <= test_end_date
         ].reset_index(drop=True)
-        return df_train, df_test
+        return train_df, test_df
 
     def dump_pipeline(self, file_path: str):
         dump(self.pipeline, file_path)

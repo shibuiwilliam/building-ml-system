@@ -39,6 +39,7 @@ class LightGBMRegressionDemandForecasting(BaseDemandForecastingModel):
         self.params = params
         self.model: lgb.basic.Booster = None
         self.column_length: int = 0
+        self.name = "light_gbm_regression"
 
     def train(
         self,
@@ -46,6 +47,7 @@ class LightGBMRegressionDemandForecasting(BaseDemandForecastingModel):
         x_test: Union[np.ndarray, scipy.sparse.csr.csr_matrix, pd.DataFrame],
         y_train: Union[np.ndarray, scipy.sparse.csr.csr_matrix, pd.DataFrame],
         y_test: Union[np.ndarray, scipy.sparse.csr.csr_matrix, pd.DataFrame],
+        verbose_eval: int = 100,
     ):
         lgbtrain = lgb.Dataset(
             data=x_train,
@@ -66,7 +68,7 @@ class LightGBMRegressionDemandForecasting(BaseDemandForecastingModel):
             valid_sets=[lgbtrain, lgbval],
             early_stopping_rounds=self.params["early_stopping_rounds"],
             evals_result=evals_result,
-            verbose_eval=100,
+            verbose_eval=verbose_eval,
         )
         logger.info(
             f"""
@@ -92,8 +94,7 @@ Train history:
     def save_as_onnx(
         self,
         file_path: str,
-        sample_input: Union[np.ndarray, scipy.sparse.csr.csr_matrix, pd.DataFrame],
     ):
-        initial_types = [["inputs", FloatTensorType([None, sample_input.shape[1]])]]
+        initial_types = [["inputs", FloatTensorType([None, self.column_length])]]
         onnx_model = onnxmltools.convert_lightgbm(self.model, initial_types=initial_types)
         onnxmltools.utils.save_model(onnx_model, file_path)
