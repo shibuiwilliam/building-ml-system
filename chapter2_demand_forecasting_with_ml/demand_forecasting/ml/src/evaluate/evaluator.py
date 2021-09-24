@@ -99,8 +99,12 @@ class Evaluator(object):
                     _items.append(item)
                     _true_sales.append(_df.true_sales.sum())
                     _predicted_sales.append(_df.predicted_sales.sum())
-                    _diffs.append(_df.diffs.sum())
-                    _error_rates.append(_df.error_rates.sum())
+                    _diff = _df.true_sales.sum() - _df.predicted_sales.sum()
+                    if self.absolute:
+                        _diff = abs(_diff)
+                    _diffs.append(_diff)
+                    _error_rate = _diff / _df.true_sales.sum()
+                    _error_rates.append(_error_rate)
         self.week_based_results = pd.DataFrame(
             {
                 "weeks": _weeks,

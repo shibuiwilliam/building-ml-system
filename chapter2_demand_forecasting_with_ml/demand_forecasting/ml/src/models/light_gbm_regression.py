@@ -19,7 +19,7 @@ DEFAULT_PARAMS = {
     "boosting": "gbdt",
     "objective": "regression",
     "metric": {"mse"},
-    "num_leaves": 10,
+    "num_leaves": 3,
     "learning_rate": 0.01,
     "feature_fraction": 0.8,
     "max_depth": -1,

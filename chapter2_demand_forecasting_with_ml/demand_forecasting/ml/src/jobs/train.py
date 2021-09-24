@@ -1,6 +1,6 @@
 import os
 from datetime import date, datetime
-from typing import Optional
+from typing import Dict, Optional
 
 import pandas as pd
 from pandera import DataFrameSchema
@@ -50,12 +50,13 @@ class TrainJob(object):
 
         self.evaluator: Optional[Evaluator] = None
 
-    def run(
+    def experiment(
         self,
         train_start_date: date,
         train_end_date: date,
         test_start_date: date,
         test_end_date: date,
+        train_params: Dict,
     ):
         now = datetime.today().strftime("%Y%m%d_%H%M%S")
         self.file_name += f"_{now}"
@@ -106,6 +107,7 @@ class TrainJob(object):
         y_train = self.train_df[["date", "store", "item", "sales"]]
         y_test = self.test_df[["date", "store", "item", "sales"]]
 
+        self.model.params = train_params
         self.model.train(
             x_train=x_train,
             x_test=x_test,
