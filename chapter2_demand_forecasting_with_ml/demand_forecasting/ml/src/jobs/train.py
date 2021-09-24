@@ -36,9 +36,6 @@ class TrainJob(object):
         self.updated_schema = updated_schema
 
         self.save_file_directory = save_file_directory
-        self.base_file_name = "demand_forecasting"
-
-        self.evaluator: Optional[Evaluator] = None
 
     def __make_directory(
         self,
@@ -79,7 +76,7 @@ class TrainJob(object):
         )
         selected_df = select_and_create_columns(
             df=raw_df,
-            schema=UPDATED_SCHEMA,
+            schema=self.updated_schema,
         )
         save_dataframe_to_csv(
             df=selected_df,
@@ -124,7 +121,7 @@ class TrainJob(object):
 
         preprocessed_df = self.__preprocess(directory=directory)
 
-        self.train_df, self.test_df = self.preprocess_pipeline.train_test_split_by_date(
+        train_df, test_df = self.preprocess_pipeline.train_test_split_by_date(
             preprocessed_df=preprocessed_df,
             train_start_date=train_start_date,
             train_end_date=train_end_date,
@@ -132,19 +129,19 @@ class TrainJob(object):
             test_end_date=test_end_date,
         )
         save_dataframe_to_csv(
-            df=self.train_df,
+            df=train_df,
             file_path=os.path.join(directory, f"train_df_{self.__get_now()}.csv"),
         )
         save_dataframe_to_csv(
-            df=self.test_df,
+            df=test_df,
             file_path=os.path.join(directory, f"test_df_{self.__get_now()}.csv"),
         )
 
-        x_train = self.train_df.drop(["date", "store", "item", "sales"], axis=1)
-        y_train = self.train_df.sales
+        x_train = train_df.drop(["date", "store", "item", "sales"], axis=1)
+        y_train = train_df.sales
 
-        x_test = self.test_df.drop(["date", "store", "item", "sales"], axis=1)
-        y_test = self.test_df.sales
+        x_test = test_df.drop(["date", "store", "item", "sales"], axis=1)
+        y_test = test_df.sales
 
         self.model.params = model_params
         evals_result = self.model.train(
@@ -166,18 +163,18 @@ class TrainJob(object):
         sales = self.preprocess_pipeline.inverse_transform_target(y=y_test)
         predictions = self.preprocess_pipeline.inverse_transform_target(y=logp1_predictions)
 
-        self.evaluator = Evaluator(
-            dates=self.test_df.date,
-            stores=self.test_df.store,
-            items=self.test_df.item,
+        evaluator = Evaluator(
+            dates=test_df.date,
+            stores=test_df.store,
+            items=test_df.item,
             true_sales=sales,
             predicted_sales=predictions,
             absolute=False,
         )
-        self.evaluator.save_date_based_results(
+        evaluator.save_date_based_results(
             file_path=os.path.join(directory, f"{self.model.name}_date_based_results_{self.__get_now()}.csv")
         )
-        self.evaluator.save_week_based_results(
+        evaluator.save_week_based_results(
             file_path=os.path.join(directory, f"{self.model.name}_week_based_results_{self.__get_now()}.csv")
         )
         logger.info("done experiment...")

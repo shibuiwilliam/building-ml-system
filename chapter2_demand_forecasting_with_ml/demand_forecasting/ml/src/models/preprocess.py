@@ -24,7 +24,9 @@ class ItemSelector(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, x):
-        return x[[self.key]]
+        if self.key in x.columns:
+            return x[[self.key]]
+        return None
 
 
 class ItemsSelector(BaseEstimator, TransformerMixin):
@@ -35,6 +37,12 @@ class ItemsSelector(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, x):
+        existing_keys = []
+        for key in self.keys:
+            if key in x.columns:
+                existing_keys.append(key)
+        if len(existing_keys) == 0:
+            return None
         return x[self.keys]
 
 
@@ -46,7 +54,9 @@ class Log1pTransformer(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, x):
-        return np.log1p(x)
+        if x is not None:
+            return np.log1p(x)
+        return None
 
 
 class Expm1Transformer(BaseEstimator, TransformerMixin):
@@ -123,7 +133,12 @@ class BasePreprocessPipeline(ABC, BaseEstimator, TransformerMixin):
 
 
 class DataPreprocessPipeline(BasePreprocessPipeline):
-    def __init__(self):
+    def __init__(
+        self,
+        include_target: bool = True,
+    ):
+        self.include_target = include_target
+
         self.day_of_week = [[d] for d in DAYS_OF_WEEK]
         self.day_of_month = [[i] for i in range(1, 32, 1)]
         self.week_of_year = [[i] for i in range(1, 54, 1)]
@@ -280,19 +295,21 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
             "date": Column(datetime),
             "store": Column(str, checks=Check.isin(STORES)),
             "item": Column(str, checks=Check.isin(ITEMS)),
-            "sales": Column(float, checks=Check.greater_than_or_equal_to(0)),
             "item_price": Column(float, checks=Check(lambda x: x >= 0.0 and x <= 1.0, element_wise=True)),
             "day_of_year": Column(float, checks=Check(lambda x: x >= 0.0 and x <= 1.0, element_wise=True)),
-            "is_month_start": Column(int, checks=Check.isin((0, 1))),
-            "is_month_end": Column(int, checks=Check.isin((0, 1))),
-            "store_.*": Column(int, checks=Check.isin((0, 1)), regex=True),
-            "item_.*[^price]": Column(int, checks=Check.isin((0, 1)), regex=True),
-            "day_of_week_.*": Column(int, checks=Check.isin((0, 1)), regex=True),
-            "day_of_month_.*": Column(int, checks=Check.isin((0, 1)), regex=True),
-            "week_of_year_.*": Column(int, checks=Check.isin((0, 1)), regex=True),
-            "month_.*": Column(int, checks=Check.isin((0, 1)), regex=True),
-            "year_.*": Column(int, checks=Check.isin((0, 1)), regex=True),
+            "is_month_start": Column(float, checks=Check.isin((0, 1))),
+            "is_month_end": Column(float, checks=Check.isin((0, 1))),
+            "store_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
+            "item_.*[^price]": Column(float, checks=Check.isin((0, 1)), regex=True),
+            "day_of_week_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
+            "day_of_month_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
+            "week_of_year_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
+            "month_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
+            "year_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
         }
+
+        if self.include_target:
+            self._schema["sales"] = Column(float, checks=Check.greater_than_or_equal_to(0))
 
         self.schema = DataFrameSchema(
             self._schema,
@@ -346,7 +363,9 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
         week_of_year_categories = [f"week_of_year_{c}" for c in self.week_of_year_ohe.categories_[0].tolist()]
         months_categories = [f"month_{c}" for c in self.months_ohe.categories_[0].tolist()]
         years_categories = [f"year_{c}" for c in self.years_ohe.categories_[0].tolist()]
-        self.preprocessed_columns.extend(["sales", "item_price", "day_of_year", "is_month_start", "is_month_end"])
+        if self.include_target:
+            self.preprocessed_columns.append("sales")
+        self.preprocessed_columns.extend(["item_price", "day_of_year", "is_month_start", "is_month_end"])
         self.preprocessed_columns.extend(store_categories)
         self.preprocessed_columns.extend(item_categories)
         self.preprocessed_columns.extend(day_of_week_categories)
@@ -355,10 +374,7 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
         self.preprocessed_columns.extend(months_categories)
         self.preprocessed_columns.extend(years_categories)
 
-        self.types = {c: "int64" for c in self.preprocessed_columns}
-        self.types["sales"] = "float64"
-        self.types["item_price"] = "float64"
-        self.types["day_of_year"] = "float64"
+        self.types = {c: "float64" for c in self.preprocessed_columns}
 
         logger.debug(f"columns and types: {self.types}")
 

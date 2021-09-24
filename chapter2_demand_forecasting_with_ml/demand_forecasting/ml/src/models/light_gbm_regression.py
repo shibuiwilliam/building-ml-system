@@ -6,7 +6,7 @@ import lightgbm as lgb
 import numpy as np
 import onnxmltools
 import pandas as pd
-from onnxmltools.convert.common.data_types import FloatTensorType
+from onnxmltools.convert.common.data_types import DoubleTensorType
 from src.models.base_model import BaseDemandForecastingModel
 from src.utils.logger import configure_logger
 
@@ -117,6 +117,6 @@ class LightGBMRegressionDemandForecasting(BaseDemandForecastingModel):
         file_path: str,
     ):
         logger.info(f"save model as onnx: {file_path}")
-        initial_types = [["inputs", FloatTensorType([None, self.column_length])]]
+        initial_types = [["inputs", DoubleTensorType([None, self.column_length])]]
         onnx_model = onnxmltools.convert_lightgbm(self.model, initial_types=initial_types)
         onnxmltools.utils.save_model(onnx_model, file_path)
