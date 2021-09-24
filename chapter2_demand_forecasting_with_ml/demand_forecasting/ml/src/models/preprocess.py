@@ -291,32 +291,15 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
         self.preprocessed_columns: List[str] = []
         self.types: Dict[str, str] = {}
 
-        self._schema = {
-            "date": Column(datetime),
-            "store": Column(str, checks=Check.isin(STORES)),
-            "item": Column(str, checks=Check.isin(ITEMS)),
-            "item_price": Column(float, checks=Check(lambda x: x >= 0.0 and x <= 1.0, element_wise=True)),
-            "day_of_year": Column(float, checks=Check(lambda x: x >= 0.0 and x <= 1.0, element_wise=True)),
-            "is_month_start": Column(float, checks=Check.isin((0, 1))),
-            "is_month_end": Column(float, checks=Check.isin((0, 1))),
-            "store_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
-            "item_.*[^price]": Column(float, checks=Check.isin((0, 1)), regex=True),
-            "day_of_week_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
-            "day_of_month_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
-            "week_of_year_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
-            "month_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
-            "year_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
-        }
+        self._schema: Dict = {}
 
-        if self.include_target:
-            self._schema["sales"] = Column(float, checks=Check.greater_than_or_equal_to(0))
-
-        self.schema = DataFrameSchema(
+        self.schema: DataFrameSchema = DataFrameSchema(
             self._schema,
             index=Index(int),
             strict=True,
             coerce=True,
         )
+        self.define_schema()
 
     def fit(
         self,
@@ -348,6 +331,34 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
         y: Union[np.ndarray, pd.Series],
     ) -> Union[np.ndarray, pd.Series]:
         return Expm1Transformer().fit_transform(y)
+
+    def define_schema(self):
+        self._schema = {
+            "date": Column(datetime),
+            "store": Column(str, checks=Check.isin(STORES)),
+            "item": Column(str, checks=Check.isin(ITEMS)),
+            "item_price": Column(float, checks=Check(lambda x: x >= 0.0 and x <= 1.0, element_wise=True)),
+            "day_of_year": Column(float, checks=Check(lambda x: x >= 0.0 and x <= 1.0, element_wise=True)),
+            "is_month_start": Column(float, checks=Check.isin((0, 1))),
+            "is_month_end": Column(float, checks=Check.isin((0, 1))),
+            "store_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
+            "item_.*[^price]": Column(float, checks=Check.isin((0, 1)), regex=True),
+            "day_of_week_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
+            "day_of_month_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
+            "week_of_year_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
+            "month_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
+            "year_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
+        }
+
+        if self.include_target:
+            self._schema["sales"] = Column(float, checks=Check.greater_than_or_equal_to(0))
+
+        self.schema = DataFrameSchema(
+            self._schema,
+            index=Index(int),
+            strict=True,
+            coerce=True,
+        )
 
     def __set_columns(self):
         self.preprocessed_columns = []
@@ -387,6 +398,8 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
         _x = x if isinstance(x, np.ndarray) else x.toarray()
         preprocessed_df = pd.DataFrame(_x, columns=self.preprocessed_columns).astype(self.types)
         preprocessed_df = pd.concat([base_dataframe[["date", "store", "item"]], preprocessed_df], axis=1)
+
+        self.define_schema()
         preprocessed_df = self.schema.validate(preprocessed_df)
         return preprocessed_df
 

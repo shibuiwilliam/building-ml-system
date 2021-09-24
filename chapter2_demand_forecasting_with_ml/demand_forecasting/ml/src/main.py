@@ -285,6 +285,8 @@ PARAMETERS:
         )
 
     preprocess_pipeline = train_job.preprocess_pipeline
+    preprocess_pipeline.include_target = False
+
     if train_job.onnx_file_path != "":
         onnx_file_path = train_job.onnx_file_path
 

@@ -111,7 +111,7 @@ class PredictionJob(object):
         prediction_df = pd.concat(
             [
                 predictions.preprocessed_data,
-                pd.Series(predictions.predictions),
+                pd.Series(predictions.predictions, name="predictions"),
             ],
             axis=1,
         ).reset_index(drop=True)
