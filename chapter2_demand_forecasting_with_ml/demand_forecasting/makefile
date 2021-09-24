@@ -90,6 +90,28 @@ test_demand_forecasting_ml: build_demand_forecasting_ml_test
 		$(DOCKER_DEMAND_FORECASTING_ML_IMAGE_NAME_TEST)
 
 
+.PHONY: run_ml
+run_ml: build_demand_forecasting_ml
+	docker run \
+		-it \
+		-d \
+		--name ml_test \
+		-v $(DEMAND_FORECASTING_DIR)/data:/opt/data \
+		$(DOCKER_DEMAND_FORECASTING_ML_IMAGE_NAME) \
+		python \
+			-m src.main \
+			--data_file_path /opt/data/item_sale_records_2017_2019.csv \
+			--model_name light_gbm_regression \
+			--save_file_directory /opt/data \
+			--train_start_date 2017-01-01 \
+			--train_end_date 2019-12-15 \
+			--test_start_date 2019-12-23 \
+			--test_end_date 2019-12-29 \
+			--experiment_param_file_path /opt/data/light_gbm_regression_experiment_params.json \
+			--train_param_file_path /opt/data/light_gbm_regression_train_params.json \
+			--run_experiment \
+			--run_train
+
 ############ DEMAND FORECASTING DATA_MANAGER COMMANDS ############
 DOCKERFILE_DEMAND_FORECASTING_DATA_MANAGER = $(DEMAND_FORECASTING_DATA_MANAGER_DIR)/$(DOCKERFILE)
 DOCKER_DEMAND_FORECASTING_DATA_MANAGER_TAG = demand_forecasting_data_manager

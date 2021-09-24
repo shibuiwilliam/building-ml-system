@@ -13,11 +13,11 @@ logger = configure_logger(__name__)
 class Evaluator(object):
     def __init__(
         self,
-        dates: List[Union[date, datetime]],
-        stores: List[str],
-        items: List[str],
-        true_sales: np.ndarray,
-        predicted_sales: np.ndarray,
+        dates: pd.Series,
+        stores: pd.Series,
+        items: pd.Series,
+        true_sales: Union[np.ndarray, pd.Series],
+        predicted_sales: Union[np.ndarray, pd.Series],
         absolute: bool = False,
     ):
         self.dates = dates
@@ -43,11 +43,13 @@ class Evaluator(object):
         self,
         squared: bool = True,
     ):
-        return mean_squared_error(
+        mse = mean_squared_error(
             self.true_sales,
             self.predicted_sales,
             squared=squared,
         )
+        logger.info(f"mean squared error with squared={squared}: {mse}")
+        return mse
 
     def __set_week(self):
         for date in self.dates:
@@ -56,8 +58,8 @@ class Evaluator(object):
             self.day_of_week.append(DAYS_OF_WEEK[isocalendar.weekday - 1])
 
     def __set_diffs(self):
-        diff = self.true_sales - self.predicted_sales
-        self.diffs = np.abs(diff) if self.absolute else diff
+        diffs = self.true_sales - self.predicted_sales
+        self.diffs = abs(diffs) if self.absolute else diffs
 
     def __set_error_rate(self):
         self.__set_diffs()
@@ -67,7 +69,7 @@ class Evaluator(object):
         self.date_based_results = pd.DataFrame(
             {
                 "dates": self.dates,
-                "week": self.week,
+                "weeks": self.week,
                 "day_of_week": self.day_of_week,
                 "stores": self.stores,
                 "items": self.items,
@@ -77,7 +79,7 @@ class Evaluator(object):
                 "error_rates": self.error_rates,
             }
         )
-        self.date_based_results["date"] = pd.to_datetime(self.date_based_results["date"])
+        self.date_based_results["dates"] = pd.to_datetime(self.date_based_results["dates"])
 
     def __make_week_based_results(self):
         weeks = set(self.week)
@@ -91,9 +93,9 @@ class Evaluator(object):
         for store in STORES:
             for item in ITEMS:
                 for week in weeks:
-                    _df = self.date_based_results[self.date_based_results["store"] == store][
-                        self.date_based_results["item"] == item
-                    ][self.date_based_results["week"] == week]
+                    _df = self.date_based_results[self.date_based_results["stores"] == store][
+                        self.date_based_results["items"] == item
+                    ][self.date_based_results["weeks"] == week]
                     _weeks.append(week)
                     _stores.append(store)
                     _items.append(item)
@@ -118,9 +120,11 @@ class Evaluator(object):
         )
 
     def save_date_based_results(self, file_path: str):
+        logger.info(f"save daily based dataframe to csv: {file_path}")
         if self.date_based_results is not None:
-            self.date_based_results.to_csv(file_path)
+            self.date_based_results.to_csv(file_path, index=False)
 
     def save_week_based_results(self, file_path: str):
+        logger.info(f"save weekly based dataframe to csv: {file_path}")
         if self.week_based_results is not None:
-            self.week_based_results.to_csv(file_path)
+            self.week_based_results.to_csv(file_path, index=False)

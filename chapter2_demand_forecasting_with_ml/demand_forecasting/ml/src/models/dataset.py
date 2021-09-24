@@ -73,9 +73,11 @@ def load_csv_as_df(
     file_path: str,
     schema: DataFrameSchema = BASE_SCHEMA,
 ) -> pd.DataFrame:
+    logger.info(f"load data from {file_path}")
     df = pd.read_csv(file_path)
     df["date"] = pd.to_datetime(df["date"])
     df = schema.validate(df)
+    logger.info("done load data")
     return df
 
 
@@ -83,6 +85,7 @@ def select_and_create_columns(
     df: pd.DataFrame,
     schema: DataFrameSchema = UPDATED_SCHEMA,
 ) -> pd.DataFrame:
+    logger.info("convert data...")
     df["day_of_month"] = df.date.dt.day
     df["day_of_year"] = df.date.dt.dayofyear
     df["month"] = df.date.dt.month
@@ -93,6 +96,7 @@ def select_and_create_columns(
     df.sort_values(by=["store", "item", "date"], axis=0, inplace=True)
     df = df.reset_index(drop=True)
     df = schema.validate(df)
+    logger.info("done converting data...")
     return df
 
 
@@ -100,4 +104,5 @@ def save_dataframe_to_csv(
     df: pd.DataFrame,
     file_path: str,
 ):
-    df.to_csv(file_path)
+    logger.info(f"save dataframe to {file_path}")
+    df.to_csv(file_path, index=False)

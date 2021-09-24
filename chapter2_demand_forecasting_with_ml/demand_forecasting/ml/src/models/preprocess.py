@@ -4,7 +4,6 @@ from typing import Any, Dict, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
-import scipy
 from joblib import dump, load
 from pandera import Check, Column, DataFrameSchema, Index
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -77,7 +76,7 @@ class BasePreprocessPipeline(ABC, BaseEstimator, TransformerMixin):
     def transform(
         self,
         x: pd.DataFrame,
-    ) -> Union[np.ndarray, scipy.sparse.csr.csr_matrix]:
+    ) -> np.ndarray:
         raise NotImplementedError
 
     @abstractmethod
@@ -85,14 +84,21 @@ class BasePreprocessPipeline(ABC, BaseEstimator, TransformerMixin):
         self,
         x: pd.DataFrame,
         y=None,
-    ) -> Union[np.ndarray, scipy.sparse.csr.csr_matrix]:
+    ) -> np.ndarray:
+        raise NotImplementedError
+
+    @abstractmethod
+    def inverse_transform_target(
+        self,
+        y: pd.DataFrame,
+    ) -> pd.DataFrame:
         raise NotImplementedError
 
     @abstractmethod
     def to_dataframe(
         self,
         base_dataframe: pd.DataFrame,
-        x: Union[np.ndarray, scipy.sparse.csr.csr_matrix],
+        x: np.ndarray,
     ) -> pd.DataFrame:
         raise NotImplementedError
 
@@ -297,7 +303,7 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
 
     def fit(
         self,
-        x: pd.DataFrame,
+        x: Union[np.ndarray, pd.DataFrame, pd.Series],
         y=None,
     ):
         self.pipeline.fit(x)
@@ -305,25 +311,37 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
 
     def transform(
         self,
-        x: pd.DataFrame,
-    ) -> Union[np.ndarray, scipy.sparse.csr.csr_matrix]:
+        x: Union[np.ndarray, pd.DataFrame, pd.Series],
+    ) -> np.ndarray:
         _x = self.pipeline.transform(x)
         self.__set_columns()
         return _x
 
     def fit_transform(
         self,
-        x: pd.DataFrame,
+        x: Union[np.ndarray, pd.DataFrame, pd.Series],
         y=None,
-    ) -> Union[np.ndarray, scipy.sparse.csr.csr_matrix]:
+    ) -> np.ndarray:
         _x = self.pipeline.fit_transform(x)
         self.__set_columns()
         return _x
 
+    def inverse_transform_target(
+        self,
+        y: Union[np.ndarray, pd.Series],
+    ) -> Union[np.ndarray, pd.Series]:
+        return Expm1Transformer().fit_transform(y)
+
     def __set_columns(self):
-        store_categories = self.feature_union.transformer_list[3][-1].steps[-1][-1].categories_[0].tolist()
-        item_categories = self.feature_union.transformer_list[3][-1].steps[-1][-1].categories_[1].tolist()
-        day_of_week_categories = self.day_of_week_ohe.categories_[0].tolist()
+        self.preprocessed_columns = []
+
+        store_categories = [
+            f"store_{c}" for c in self.pipeline.transformer_list[3][-1].steps[-1][-1].categories_[0].tolist()
+        ]
+        item_categories = [
+            f"item_{c}" for c in self.pipeline.transformer_list[3][-1].steps[-1][-1].categories_[1].tolist()
+        ]
+        day_of_week_categories = [f"day_of_week_{c}" for c in self.day_of_week_ohe.categories_[0].tolist()]
         day_of_month_categories = [f"day_of_month_{c}" for c in self.day_of_month_ohe.categories_[0].tolist()]
         week_of_year_categories = [f"week_of_year_{c}" for c in self.week_of_year_ohe.categories_[0].tolist()]
         months_categories = [f"month_{c}" for c in self.months_ohe.categories_[0].tolist()]
@@ -342,11 +360,14 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
         self.types["item_price"] = "float64"
         self.types["day_of_year"] = "float64"
 
+        logger.debug(f"columns and types: {self.types}")
+
     def to_dataframe(
         self,
         base_dataframe: pd.DataFrame,
-        x: Union[np.ndarray, scipy.sparse.csr.csr_matrix],
+        x: np.ndarray,
     ) -> pd.DataFrame:
+        logger.info("convert to dataframe")
         _x = x if isinstance(x, np.ndarray) else x.toarray()
         preprocessed_df = pd.DataFrame(_x, columns=self.preprocessed_columns).astype(self.types)
         preprocessed_df = pd.concat([base_dataframe[["date", "store", "item"]], preprocessed_df], axis=1)
@@ -361,6 +382,9 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
         test_start_date: date,
         test_end_date: date,
     ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+        logger.info(
+            f"train test split by date: from {train_start_date} to {train_end_date} and from {test_start_date} to {test_end_date}"
+        )
         train_df = preprocessed_df[preprocessed_df["date"] >= train_start_date][
             preprocessed_df["date"] <= train_end_date
         ].reset_index(drop=True)
@@ -370,7 +394,9 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
         return train_df, test_df
 
     def dump_pipeline(self, file_path: str):
+        logger.info(f"save preprocess pipeline: {file_path}")
         dump(self.pipeline, file_path)
 
     def load_pipeline(self, file_path: str):
+        logger.info(f"load preprocess pipeline: {file_path}")
         self.pipeline = load(file_path)
