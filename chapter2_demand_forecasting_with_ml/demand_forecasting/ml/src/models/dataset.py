@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List, Optional
 
 import pandas as pd
 from pandera import Check, Column, DataFrameSchema, Index
@@ -52,17 +53,43 @@ BASE_SCHEMA = DataFrameSchema(
     coerce=True,
 )
 
-_UPDATED_SCHEMA = {c: s for c, s in _BASE_SCHEMA.items()}
-_UPDATED_SCHEMA["day_of_month"] = Column(int, checks=Check(lambda x: x >= 1 and x <= 31, element_wise=True))
-_UPDATED_SCHEMA["day_of_year"] = Column(int, checks=Check(lambda x: x >= 1 and x <= 366, element_wise=True))
-_UPDATED_SCHEMA["month"] = Column(int, checks=Check(lambda x: x >= 1 and x <= 12, element_wise=True))
-_UPDATED_SCHEMA["year"] = Column(int, checks=Check(lambda x: x >= 2000 and x <= 2030, element_wise=True))
-_UPDATED_SCHEMA["week_of_year"] = Column(int, checks=Check(lambda x: x >= 1 and x <= 53, element_wise=True))
-_UPDATED_SCHEMA["is_month_start"] = Column(int, checks=Check.isin((0, 1)))
-_UPDATED_SCHEMA["is_month_end"] = Column(int, checks=Check.isin((0, 1)))
+_PREDICTION_SCHEMA = {
+    "date": Column(datetime),
+    "day_of_week": Column(str, checks=Check.isin(DAYS_OF_WEEK)),
+    "store": Column(str, checks=Check.isin(STORES)),
+    "item": Column(str, checks=Check.isin(ITEMS)),
+    "item_price": Column(int, checks=Check.greater_than_or_equal_to(0)),
+}
+
+PREDICTION_SCHEMA = DataFrameSchema(
+    _PREDICTION_SCHEMA,
+    index=Index(int),
+    strict=True,
+    coerce=True,
+)
+
+_UPDATED_BASE_SCHEMA = {
+    "day_of_month": Column(int, checks=Check(lambda x: x >= 1 and x <= 31, element_wise=True)),
+    "day_of_year": Column(int, checks=Check(lambda x: x >= 1 and x <= 366, element_wise=True)),
+    "month": Column(int, checks=Check(lambda x: x >= 1 and x <= 12, element_wise=True)),
+    "year": Column(int, checks=Check(lambda x: x >= 2000 and x <= 2030, element_wise=True)),
+    "week_of_year": Column(int, checks=Check(lambda x: x >= 1 and x <= 53, element_wise=True)),
+    "is_month_start": Column(int, checks=Check.isin((0, 1))),
+    "is_month_end": Column(int, checks=Check.isin((0, 1))),
+}
+_UPDATED_SCHEMA = {**_BASE_SCHEMA, **_UPDATED_BASE_SCHEMA}
 
 UPDATED_SCHEMA = DataFrameSchema(
     _UPDATED_SCHEMA,
+    index=Index(int),
+    strict=True,
+    coerce=True,
+)
+
+_UPDATED_PREDICTION_SCHEMA = {**_PREDICTION_SCHEMA, **_UPDATED_BASE_SCHEMA}
+
+UPDATED_PREDICTION_SCHEMA = DataFrameSchema(
+    _UPDATED_PREDICTION_SCHEMA,
     index=Index(int),
     strict=True,
     coerce=True,
@@ -78,6 +105,20 @@ def load_csv_as_df(
     df["date"] = pd.to_datetime(df["date"])
     df = schema.validate(df)
     logger.info("done load data")
+    return df
+
+
+def select_by_store_and_item(
+    df: pd.DataFrame,
+    stores: Optional[List[str]] = None,
+    items: Optional[List[str]] = None,
+) -> pd.DataFrame:
+    if stores is not None:
+        logger.info(f"stores to be used: {stores}")
+        df = df[df["store"].isin(stores)]
+    if items is not None:
+        logger.info(f"items to be used: {items}")
+        df = df[df["item"].isin(items)]
     return df
 
 

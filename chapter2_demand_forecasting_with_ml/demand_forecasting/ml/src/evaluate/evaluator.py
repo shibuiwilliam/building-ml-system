@@ -82,7 +82,6 @@ class Evaluator(object):
         self.date_based_results["dates"] = pd.to_datetime(self.date_based_results["dates"])
 
     def __make_week_based_results(self):
-        weeks = set(self.week)
         _weeks = []
         _stores = []
         _items = []
@@ -90,9 +89,9 @@ class Evaluator(object):
         _predicted_sales = []
         _diffs = []
         _error_rates = []
-        for store in STORES:
-            for item in ITEMS:
-                for week in weeks:
+        for store in set(self.stores):
+            for item in set(self.items):
+                for week in set(self.week):
                     _df = self.date_based_results[self.date_based_results["stores"] == store][
                         self.date_based_results["items"] == item
                     ][self.date_based_results["weeks"] == week]

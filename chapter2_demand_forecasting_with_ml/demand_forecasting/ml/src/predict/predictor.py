@@ -1,3 +1,4 @@
+import dataclasses
 from abc import ABC, abstractmethod
 from typing import List, Union
 
@@ -10,17 +11,21 @@ from src.utils.logger import configure_logger
 logger = configure_logger(__name__)
 
 
+@dataclasses.dataclass(frozen=True)
+class Predictions(object):
+    preprocessed_data: pd.DataFrame
+    predictions: np.ndarray
+
+
 class BasePredictor(ABC):
     def __init__(
         self,
+        file_path: str,
         preprocess_pipeline: Union[FeatureUnion, Pipeline],
     ):
+        self.file_path = file_path
         self.preprocess_pipeline = preprocess_pipeline
         self.predictor = None
-
-    @abstractmethod
-    def load_model(self, file_path: str):
-        raise NotImplementedError
 
     @abstractmethod
     def describe(self):
@@ -30,16 +35,21 @@ class BasePredictor(ABC):
     def predict(
         self,
         data: pd.DataFrame,
-    ) -> np.ndarray:
+    ) -> Predictions:
         raise NotImplementedError
 
 
 class OnnxPredictor(BasePredictor):
     def __init__(
         self,
+        file_path: str,
         preprocess_pipeline: Union[FeatureUnion, Pipeline],
     ):
-        super().__init__(preprocess_pipeline=preprocess_pipeline)
+        super().__init__(
+            file_path=file_path,
+            preprocess_pipeline=preprocess_pipeline,
+        )
+
         self.predictor: onnxruntime.InferenceSession = None
 
         self.input_name: str = ""
@@ -49,8 +59,11 @@ class OnnxPredictor(BasePredictor):
         self.output_type: str = ""
         self.output_shape: List = []
 
-    def load_model(self, file_path: str):
-        self.predictor = onnxruntime.InferenceSession(file_path)
+        self.__load_model()
+
+    def __load_model(self):
+        logger.info(f"load model: {self.file_path}")
+        self.predictor = onnxruntime.InferenceSession(self.file_path)
 
         self.input_name = self.predictor.get_inputs()[0].name
         self.input_type = self.predictor.get_inputs()[0].type
@@ -68,7 +81,8 @@ class OnnxPredictor(BasePredictor):
     def predict(
         self,
         data: pd.DataFrame,
-    ) -> np.ndarray:
+    ) -> Predictions:
+        logger.info(f"run prediction for {data.shape} data")
         preprocessed_data = self.preprocess_pipeline.transform(x=data)
         preprocessed_df = self.preprocess_pipeline.to_dataframe(
             base_dataframe=data,
@@ -79,4 +93,8 @@ class OnnxPredictor(BasePredictor):
             [self.output_name],
             {self.input_name: x_test.values.astype("float64")},
         )
-        return predictions[0].reshape(1, -1)[0]
+        logger.info(f"done prediction for {data.shape} data")
+        return Predictions(
+            preprocessed_data=preprocessed_df,
+            predictions=predictions[0].reshape(1, -1)[0],
+        )
