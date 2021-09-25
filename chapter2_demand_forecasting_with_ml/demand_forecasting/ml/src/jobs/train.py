@@ -5,17 +5,11 @@ from typing import Dict, List, Optional, Union
 import numpy as np
 import pandas as pd
 from pandera import DataFrameSchema
+from src.dataset.data_retriever import load_df_from_csv, save_df_to_csv
+from src.dataset.schema import BASE_SCHEMA, UPDATED_SCHEMA
 from src.evaluate.evaluator import Evaluator
 from src.models.base_model import BaseDemandForecastingModel
-from src.models.dataset import (
-    BASE_SCHEMA,
-    UPDATED_SCHEMA,
-    load_csv_as_df,
-    save_dataframe_to_csv,
-    select_and_create_columns,
-    select_by_store_and_item,
-)
-from src.models.preprocess import BasePreprocessPipeline
+from src.models.preprocess import BasePreprocessPipeline, select_and_create_columns, select_by_store_and_item
 from src.utils.logger import configure_logger
 
 logger = configure_logger(__name__)
@@ -79,10 +73,10 @@ class TrainJob(object):
         directory: str,
     ) -> pd.DataFrame:
         logger.info(f"start preprocess...")
-        raw_df = load_csv_as_df(
-            file_path=self.data_file_path,
-            schema=self.base_schema,
-        )
+        raw_df = load_df_from_csv(file_path=self.data_file_path)
+        raw_df["date"] = pd.to_datetime(raw_df["date"])
+        raw_df = self.base_schema.validate(raw_df)
+
         store_item_selected = select_by_store_and_item(
             df=raw_df,
             stores=self.stores,
@@ -92,7 +86,7 @@ class TrainJob(object):
             df=store_item_selected,
             schema=self.updated_schema,
         )
-        save_dataframe_to_csv(
+        save_df_to_csv(
             df=selected_df,
             file_path=os.path.join(directory, f"updated_df_{self.__get_now()}.csv"),
         )
@@ -102,7 +96,7 @@ class TrainJob(object):
             base_dataframe=selected_df,
             x=preprocessed_array,
         )
-        save_dataframe_to_csv(
+        save_df_to_csv(
             df=preprocessed_df,
             file_path=os.path.join(directory, f"preprocessed_df_{self.__get_now()}.csv"),
         )
@@ -164,11 +158,11 @@ class TrainJob(object):
             test_start_date=test_start_date,
             test_end_date=test_end_date,
         )
-        save_dataframe_to_csv(
+        save_df_to_csv(
             df=train_df,
             file_path=os.path.join(directory, f"train_df_{self.__get_now()}.csv"),
         )
-        save_dataframe_to_csv(
+        save_df_to_csv(
             df=test_df,
             file_path=os.path.join(directory, f"test_df_{self.__get_now()}.csv"),
         )

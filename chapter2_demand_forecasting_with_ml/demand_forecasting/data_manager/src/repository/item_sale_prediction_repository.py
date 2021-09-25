@@ -135,7 +135,7 @@ class ItemSalePredictionRepository(AbstractItemSalePredictionRepository):
         if id is not None:
             filters.append(ItemSalePredictionModel.id == id)
         if item_name is not None:
-            filters.append(ItemMasterModel.name == item_id)
+            filters.append(ItemMasterModel.name == item_name)
         if item_id is not None:
             filters.append(ItemSalePredictionModel.item_id == item_id)
         if store_name is not None:

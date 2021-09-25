@@ -2,102 +2,161 @@ ABSOLUTE_PATH := $(shell pwd)
 DOCKERFILE := Dockerfile
 DOCKER_COMPOSE := docker-compose.yaml
 VERSION := 0.0.0
-DOCKER_TEST_TAG := test
 
 DOCKER_REPOSITORY := shibui/building-ml-system
 
-DEMAND_FORECASTING_DIR := $(ABSOLUTE_PATH)
-DEMAND_FORECASTING_ML_DIR := $(DEMAND_FORECASTING_DIR)/ml
-DEMAND_FORECASTING_DATA_MANAGER_DIR := $(DEMAND_FORECASTING_DIR)/data_manager
-DEMAND_FORECASTING_BI_DIR := $(DEMAND_FORECASTING_DIR)/bi
-
+DIR := $(ABSOLUTE_PATH)
+TAG = demand_forecasting
 
 ############ COMMON COMMANDS ############
 .PHONY: download_kaggle
 download_kaggle:
-	cd $(DEMAND_FORECASTING_DIR)/data && \
+	cd $(DIR)/data && \
 	kaggle competitions download -c demand-forecasting-kernels-only && \
 	unzip demand-forecasting-kernels-only.zip
 
 .PHONY: dvc_init
 dvc_init:
-	cd $(DEMAND_FORECASTING_DIR) && \
+	cd $(DIR) && \
 	dvc init --subdir
 	
 
-############ DEMAND FORECASTING ML COMMANDS ############
-DOCKERFILE_DEMAND_FORECASTING_ML = $(DEMAND_FORECASTING_ML_DIR)/$(DOCKERFILE)
-DOCKER_DEMAND_FORECASTING_ML_TAG = demand_forecasting_ml
-DOCKER_DEMAND_FORECASTING_ML_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_DEMAND_FORECASTING_ML_TAG)_$(VERSION)
-DOCKER_DEMAND_FORECASTING_ML_IMAGE_NAME_TEST = $(DOCKER_REPOSITORY):$(DOCKER_DEMAND_FORECASTING_ML_TAG)_$(VERSION)_$(DOCKER_TEST_TAG)
+############ DEMAND FORECASTING DATA_MANAGER COMMANDS ############
+DATA_MANAGER_DIR := $(DIR)/data_manager
+DOCKERFILE_DATA_MANAGER = $(DATA_MANAGER_DIR)/$(DOCKERFILE)
+DOCKER_DATA_MANAGER_TAG = $(TAG)_data_manager
+DOCKER_DATA_MANAGER_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_DATA_MANAGER_TAG)_$(VERSION)
+DOCKER_DATA_MANAGER_IMAGE_NAME_TEST = $(DOCKER_REPOSITORY):$(DOCKER_DATA_MANAGER_TAG)_$(VERSION)_$(DOCKER_TEST_TAG)
 
-.PHONY: patch_demand_forecasting_ml
-patch_demand_forecasting_ml:
-	cd $(DEMAND_FORECASTING_ML_DIR) && \
+.PHONY: patch_data_manager
+patch_data_manager:
+	cd $(DATA_MANAGER_DIR) && \
 	poetry version patch
 
-.PHONY: minor_upgrade_demand_forecasting_ml
-minor_upgrade_demand_forecasting_ml:
-	cd $(DEMAND_FORECASTING_ML_DIR) && \
+.PHONY: minor_upgrade_data_manager
+minor_upgrade_data_manager:
+	cd $(DATA_MANAGER_DIR) && \
 	poetry version minor
 
-.PHONY: major_upgrade_demand_forecasting_ml
-major_upgrade_demand_forecasting_ml:
-	cd $(DEMAND_FORECASTING_ML_DIR) && \
+.PHONY: major_upgrade_data_manager
+major_upgrade_data_manager:
+	cd $(DATA_MANAGER_DIR) && \
 	poetry version major
 
-.PHONY: req_demand_forecasting_ml
-req_demand_forecasting_ml:
-	cd $(DEMAND_FORECASTING_ML_DIR) && \
+.PHONY: req_data_manager
+req_data_manager:
+	cd $(DATA_MANAGER_DIR) && \
 	poetry export \
 		--without-hashes \
 		-f requirements.txt \
 		--output requirements.txt
 
-.PHONY: req_demand_forecasting_ml_test
-req_demand_forecasting_test_ml:
-	cd $(DEMAND_FORECASTING_ML_DIR) && \
-	poetry export \
-		--dev \
-		--without-hashes \
-		-f requirements.txt \
-		--output requirements_test.txt
-
-.PHONY: build_demand_forecasting_ml
-build_demand_forecasting_ml: 
+.PHONY: build_data_manager
+build_data_manager: 
 	docker build \
-		-t $(DOCKER_DEMAND_FORECASTING_ML_IMAGE_NAME) \
-		-f $(DOCKERFILE_DEMAND_FORECASTING_ML) \
+		-t $(DOCKER_DATA_MANAGER_IMAGE_NAME) \
+		-f $(DOCKERFILE_DATA_MANAGER) \
 		.
 	 
-.PHONY: push_demand_forecasting_ml
-push_demand_forecasting_ml: 
-	docker push $(DOCKER_DEMAND_FORECASTING_ML_IMAGE_NAME)
+.PHONY: push_data_manager
+push_data_manager: 
+	docker push $(DOCKER_DATA_MANAGER_IMAGE_NAME)
 
-.PHONY: build_demand_forecasting_ml_test
-build_demand_forecasting_ml_test: build_demand_forecasting_ml
+
+############ DEMAND FORECASTING DATA_CLIENT COMMANDS ############
+DATA_CLIENT_DIR := $(DIR)/data_client
+DOCKERFILE_DATA_CLIENT = $(DATA_CLIENT_DIR)/$(DOCKERFILE)
+DOCKER_DATA_CLIENT_TAG = $(TAG)_data_client
+DOCKER_DATA_CLIENT_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_DATA_CLIENT_TAG)_$(VERSION)
+DOCKER_DATA_CLIENT_IMAGE_NAME_TEST = $(DOCKER_REPOSITORY):$(DOCKER_DATA_CLIENT_TAG)_$(VERSION)_$(DOCKER_TEST_TAG)
+
+.PHONY: patch_data_client
+patch_data_client:
+	cd $(DATA_CLIENT_DIR) && \
+	poetry version patch
+
+.PHONY: minor_upgrade_data_client
+minor_upgrade_data_client:
+	cd $(DATA_CLIENT_DIR) && \
+	poetry version minor
+
+.PHONY: major_upgrade_data_client
+major_upgrade_data_client:
+	cd $(DATA_CLIENT_DIR) && \
+	poetry version major
+
+.PHONY: req_data_client
+req_data_client:
+	cd $(DATA_CLIENT_DIR) && \
+	poetry export \
+		--without-hashes \
+		-f requirements.txt \
+		--output requirements.txt
+
+.PHONY: build_data_client
+build_data_client: 
 	docker build \
-		--build-arg FROM_IMAGE=$(DOCKER_DEMAND_FORECASTING_ML_IMAGE_NAME) \
-		-t $(DOCKER_DEMAND_FORECASTING_ML_IMAGE_NAME_TEST) \
-		-f $(DOCKERFILE_DEMAND_FORECASTING_ML_TEST) \
+		-t $(DOCKER_DATA_CLIENT_IMAGE_NAME) \
+		-f $(DOCKERFILE_DATA_CLIENT) \
 		.
+	 
+.PHONY: push_data_client
+push_data_client: 
+	docker push $(DOCKER_DATA_CLIENT_IMAGE_NAME)
 
-.PHONY: test_demand_forecasting_ml
-test_demand_forecasting_ml: build_demand_forecasting_ml_test
-	docker run \
-		--rm \
-		--name test \
-		$(DOCKER_DEMAND_FORECASTING_ML_IMAGE_NAME_TEST)
+
+############ DEMAND FORECASTING ML COMMANDS ############
+ML_DIR := $(DIR)/ml
+DOCKERFILE_ML = $(ML_DIR)/$(DOCKERFILE)
+DOCKER_ML_TAG = $(TAG)_ml
+DOCKER_ML_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_ML_TAG)_$(VERSION)
+DOCKER_ML_IMAGE_NAME_TEST = $(DOCKER_REPOSITORY):$(DOCKER_ML_TAG)_$(VERSION)_$(DOCKER_TEST_TAG)
+
+.PHONY: patch_ml
+patch_ml:
+	cd $(ML_DIR) && \
+	poetry version patch
+
+.PHONY: minor_upgrade_ml
+minor_upgrade_ml:
+	cd $(ML_DIR) && \
+	poetry version minor
+
+.PHONY: major_upgrade_ml
+major_upgrade_ml:
+	cd $(ML_DIR) && \
+	poetry version major
+
+.PHONY: req_ml
+req_ml:
+	cd $(ML_DIR) && \
+	poetry export \
+		--without-hashes \
+		-f requirements.txt \
+		--output requirements.txt
+
+.PHONY: build_ml
+build_ml: 
+	docker build \
+		--build-arg FROM_IMAGE=$(DOCKER_DATA_CLIENT_IMAGE_NAME) \
+		-t $(DOCKER_ML_IMAGE_NAME) \
+		-f $(DOCKERFILE_ML) \
+		.
+	 
+.PHONY: push_ml
+push_ml: 
+	docker push $(DOCKER_ML_IMAGE_NAME)
 
 
 .PHONY: run_ml
-run_ml: build_demand_forecasting_ml
+run_ml: build_ml
 	docker run \
 		-it \
 		-d \
 		--name ml_test \
-		-v $(DEMAND_FORECASTING_DIR)/data:/opt/data \
-		$(DOCKER_DEMAND_FORECASTING_ML_IMAGE_NAME) \
+		-v $(DIR)/data:/opt/data \
+		--network ml \
+		$(DOCKER_ML_IMAGE_NAME) \
 		python \
 			-m src.main \
 			--data_file_path /opt/data/item_sale_records_2017_2019.csv \
@@ -115,183 +174,86 @@ run_ml: build_demand_forecasting_ml
 			--run_experiment \
 			--run_train
 
-############ DEMAND FORECASTING DATA_MANAGER COMMANDS ############
-DOCKERFILE_DEMAND_FORECASTING_DATA_MANAGER = $(DEMAND_FORECASTING_DATA_MANAGER_DIR)/$(DOCKERFILE)
-DOCKER_DEMAND_FORECASTING_DATA_MANAGER_TAG = demand_forecasting_data_manager
-DOCKER_DEMAND_FORECASTING_DATA_MANAGER_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_DEMAND_FORECASTING_DATA_MANAGER_TAG)_$(VERSION)
-DOCKER_DEMAND_FORECASTING_DATA_MANAGER_IMAGE_NAME_TEST = $(DOCKER_REPOSITORY):$(DOCKER_DEMAND_FORECASTING_DATA_MANAGER_TAG)_$(VERSION)_$(DOCKER_TEST_TAG)
-
-.PHONY: patch_demand_forecasting_data_manager
-patch_demand_forecasting_data_manager:
-	cd $(DEMAND_FORECASTING_DATA_MANAGER_DIR) && \
-	poetry version patch
-
-.PHONY: minor_upgrade_demand_forecasting_data_manager
-minor_upgrade_demand_forecasting_data_manager:
-	cd $(DEMAND_FORECASTING_DATA_MANAGER_DIR) && \
-	poetry version minor
-
-.PHONY: major_upgrade_demand_forecasting_data_manager
-major_upgrade_demand_forecasting_data_manager:
-	cd $(DEMAND_FORECASTING_DATA_MANAGER_DIR) && \
-	poetry version major
-
-.PHONY: req_demand_forecasting_data_manager
-req_demand_forecasting_data_manager:
-	cd $(DEMAND_FORECASTING_DATA_MANAGER_DIR) && \
-	poetry export \
-		--without-hashes \
-		-f requirements.txt \
-		--output requirements.txt
-
-.PHONY: req_demand_forecasting_data_manager_test
-req_demand_forecasting_test_data_manager:
-	cd $(DEMAND_FORECASTING_DATA_MANAGER_DIR) && \
-	poetry export \
-		--dev \
-		--without-hashes \
-		-f requirements.txt \
-		--output requirements_test.txt
-
-.PHONY: build_demand_forecasting_data_manager
-build_demand_forecasting_data_manager: 
-	docker build \
-		-t $(DOCKER_DEMAND_FORECASTING_DATA_MANAGER_IMAGE_NAME) \
-		-f $(DOCKERFILE_DEMAND_FORECASTING_DATA_MANAGER) \
-		.
-	 
-.PHONY: push_demand_forecasting_data_manager
-push_demand_forecasting_data_manager: 
-	docker push $(DOCKER_DEMAND_FORECASTING_DATA_MANAGER_IMAGE_NAME)
-
-.PHONY: build_demand_forecasting_data_manager_test
-build_demand_forecasting_data_manager_test: build_demand_forecasting_data_manager
-	docker build \
-		--build-arg FROM_IMAGE=$(DOCKER_DEMAND_FORECASTING_DATA_MANAGER_IMAGE_NAME) \
-		-t $(DOCKER_DEMAND_FORECASTING_DATA_MANAGER_IMAGE_NAME_TEST) \
-		-f $(DOCKERFILE_DEMAND_FORECASTING_DATA_MANAGER_TEST) \
-		.
-
-.PHONY: test_demand_forecasting_data_manager
-test_demand_forecasting_data_manager: build_demand_forecasting_data_manager_test
-	docker run \
-		--rm \
-		--name test \
-		$(DOCKER_DEMAND_FORECASTING_DATA_MANAGER_IMAGE_NAME_TEST)
-
 
 ############ DEMAND FORECASTING BI COMMANDS ############
-DOCKERFILE_DEMAND_FORECASTING_BI = $(DEMAND_FORECASTING_BI_DIR)/$(DOCKERFILE)
-DOCKER_DEMAND_FORECASTING_BI_TAG = demand_forecasting_bi
-DOCKER_DEMAND_FORECASTING_BI_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_DEMAND_FORECASTING_BI_TAG)_$(VERSION)
-DOCKER_DEMAND_FORECASTING_BI_IMAGE_NAME_TEST = $(DOCKER_REPOSITORY):$(DOCKER_DEMAND_FORECASTING_BI_TAG)_$(VERSION)_$(DOCKER_TEST_TAG)
+BI_DIR := $(DIR)/bi
+DOCKERFILE_BI = $(BI_DIR)/$(DOCKERFILE)
+DOCKER_BI_TAG = $(TAG)_bi
+DOCKER_BI_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_BI_TAG)_$(VERSION)
+DOCKER_BI_IMAGE_NAME_TEST = $(DOCKER_REPOSITORY):$(DOCKER_BI_TAG)_$(VERSION)_$(DOCKER_TEST_TAG)
 
-.PHONY: patch_demand_forecasting_bi
-patch_demand_forecasting_bi:
-	cd $(DEMAND_FORECASTING_BI_DIR) && \
+.PHONY: patch_bi
+patch_bi:
+	cd $(BI_DIR) && \
 	poetry version patch
 
-.PHONY: minor_upgrade_demand_forecasting_bi
-minor_upgrade_demand_forecasting_bi:
-	cd $(DEMAND_FORECASTING_BI_DIR) && \
+.PHONY: minor_upgrade_bi
+minor_upgrade_bi:
+	cd $(BI_DIR) && \
 	poetry version minor
 
-.PHONY: major_upgrade_demand_forecasting_bi
-major_upgrade_demand_forecasting_bi:
-	cd $(DEMAND_FORECASTING_BI_DIR) && \
+.PHONY: major_upgrade_bi
+major_upgrade_bi:
+	cd $(BI_DIR) && \
 	poetry version major
 
-.PHONY: req_demand_forecasting_bi
-req_demand_forecasting_bi:
-	cd $(DEMAND_FORECASTING_BI_DIR) && \
+.PHONY: req_bi
+req_bi:
+	cd $(BI_DIR) && \
 	poetry export \
 		--without-hashes \
 		-f requirements.txt \
 		--output requirements.txt
 
-.PHONY: req_demand_forecasting_bi_test
-req_demand_forecasting_test_bi:
-	cd $(DEMAND_FORECASTING_BI_DIR) && \
-	poetry export \
-		--dev \
-		--without-hashes \
-		-f requirements.txt \
-		--output requirements_test.txt
-
-.PHONY: build_demand_forecasting_bi
-build_demand_forecasting_bi: 
+.PHONY: build_bi
+build_bi: 
 	docker build \
-		-t $(DOCKER_DEMAND_FORECASTING_BI_IMAGE_NAME) \
-		-f $(DOCKERFILE_DEMAND_FORECASTING_BI) \
+		--build-arg FROM_IMAGE=$(DOCKER_DATA_CLIENT_IMAGE_NAME) \
+		-t $(DOCKER_BI_IMAGE_NAME) \
+		-f $(DOCKERFILE_BI) \
 		.
 	 
-.PHONY: push_demand_forecasting_bi
-push_demand_forecasting_bi: 
-	docker push $(DOCKER_DEMAND_FORECASTING_BI_IMAGE_NAME)
-
-.PHONY: build_demand_forecasting_bi_test
-build_demand_forecasting_bi_test: build_demand_forecasting_bi
-	docker build \
-		--build-arg FROM_IMAGE=$(DOCKER_DEMAND_FORECASTING_BI_IMAGE_NAME) \
-		-t $(DOCKER_DEMAND_FORECASTING_BI_IMAGE_NAME_TEST) \
-		-f $(DOCKERFILE_DEMAND_FORECASTING_BI_TEST) \
-		.
-
-.PHONY: test_demand_forecasting_bi
-test_demand_forecasting_bi: build_demand_forecasting_bi_test
-	docker run \
-		--rm \
-		--name test \
-		$(DOCKER_DEMAND_FORECASTING_BI_IMAGE_NAME_TEST)
+.PHONY: push_bi
+push_bi: 
+	docker push $(DOCKER_BI_IMAGE_NAME)
 
 
 ############ ALL COMMANDS ############
-.PHONY: patch_demand_forecasting_all
-patch_demand_forecasting_all: patch_demand_forecasting_ml \
-	patch_demand_forecasting_data_manager \
-	patch_demand_forecasting_bi
+.PHONY: patch_all
+patch_all: patch_data_manager \
+	patch_data_client \
+	patch_ml \
+	patch_bi
 
-.PHONY: minor_upgrade_demand_forecasting_all
-minor_upgrade_demand_forecasting_all: minor_upgrade_demand_forecasting_ml \
-	minor_upgrade_demand_forecasting_data_manager \
-	minor_upgrade_demand_forecasting_bi
+.PHONY: minor_upgrade_all
+minor_upgrade_all: minor_upgrade_data_manager \
+	minor_upgrade_data_client \
+	minor_upgrade_ml \
+	minor_upgrade_bi
 
-.PHONY: major_upgrade_demand_forecasting_all
-major_upgrade_demand_forecasting_all: major_upgrade_demand_forecasting_ml \
-	major_upgrade_demand_forecasting_data_manager \
-	major_upgrade_demand_forecasting_bi
+.PHONY: major_upgrade_all
+major_upgrade_all: major_upgrade_data_manager \
+	major_upgrade_data_client \
+	major_upgrade_ml \
+	major_upgrade_bi
 
-.PHONY: req_demand_forecasting_all
-req_demand_forecasting_all: req_demand_forecasting_ml \
-	req_demand_forecasting_data_manager \
-	req_demand_forecasting_bi
+.PHONY: req_all
+req_all: req_data_manager \
+	req_data_client \
+	req_ml \
+	req_bi
 
-.PHONY: req_demand_forecasting_all_test
-req_demand_forecasting_test_all: req_demand_forecasting_ml_test \
-	req_demand_forecasting_data_manager_test \
-	req_demand_forecasting_bi_test
-
-.PHONY: build_demand_forecasting_all
-build_demand_forecasting_all: build_demand_forecasting_ml \
-	build_demand_forecasting_data_manager \
-	build_demand_forecasting_bi
+.PHONY: build_all
+build_all: build_data_manager \
+	build_data_client \
+	build_ml \
+	build_bi
 	 
-.PHONY: push_demand_forecasting_all
-push_demand_forecasting_all: push_demand_forecasting_ml \
-	push_demand_forecasting_data_manager \
-	push_demand_forecasting_bi
-
-.PHONY: build_demand_forecasting_all_test
-build_demand_forecasting_all_test: build_demand_forecasting_all \
-	build_demand_forecasting_ml_test \
-	build_demand_forecasting_data_manager_test \
-	build_demand_forecasting_bi_test
-
-.PHONY: test_demand_forecasting_all
-test_demand_forecasting_all: build_demand_forecasting_all_test \
-	test_demand_forecasting_ml \
-	test_demand_forecasting_data_manager \
-	test_demand_forecasting_bi
+.PHONY: push_all
+push_all: push_data_manager \
+	push_data_client \
+	push_ml \
+	push_bi
 
 
 ############ DOCKER COMPOSE COMMANDS ############

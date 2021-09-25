@@ -129,7 +129,7 @@ class ItemPriceRepository(AbstractItemPriceRepository):
         if id is not None:
             filters.append(ItemPriceModel.id == id)
         if item_name is not None:
-            filters.append(ItemMasterModel.name == item_id)
+            filters.append(ItemMasterModel.name == item_name)
         if item_id is not None:
             filters.append(ItemPriceModel.item_id == item_id)
         if applied_from is not None:

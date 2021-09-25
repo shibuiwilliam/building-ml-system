@@ -4,14 +4,9 @@ from typing import List, Optional
 
 import pandas as pd
 from pandera import DataFrameSchema
-from src.models.dataset import (
-    PREDICTION_SCHEMA,
-    UPDATED_PREDICTION_SCHEMA,
-    load_csv_as_df,
-    save_dataframe_to_csv,
-    select_and_create_columns,
-    select_by_store_and_item,
-)
+from src.dataset.data_retriever import load_df_from_csv, save_df_to_csv
+from src.dataset.schema import PREDICTION_SCHEMA, UPDATED_PREDICTION_SCHEMA
+from src.models.preprocess import select_and_create_columns, select_by_store_and_item
 from src.predict.predictor import BasePredictor
 from src.utils.logger import configure_logger
 
@@ -67,10 +62,10 @@ class PredictionJob(object):
         directory: str,
     ) -> pd.DataFrame:
         logger.info(f"start preprocess...")
-        raw_df = load_csv_as_df(
-            file_path=self.prediction_file_path,
-            schema=self.base_schema,
-        )
+        raw_df = load_df_from_csv(file_path=self.prediction_file_path)
+        raw_df["date"] = pd.to_datetime(raw_df["date"])
+        raw_df = self.base_schema.validate(raw_df)
+
         store_item_selected = select_by_store_and_item(
             df=raw_df,
             stores=self.stores,
@@ -80,7 +75,7 @@ class PredictionJob(object):
             df=store_item_selected,
             schema=self.updated_schema,
         )
-        save_dataframe_to_csv(
+        save_df_to_csv(
             df=selected_df,
             file_path=os.path.join(directory, f"updated_df_{self.__get_now()}.csv"),
         )
@@ -115,7 +110,7 @@ class PredictionJob(object):
             ],
             axis=1,
         ).reset_index(drop=True)
-        save_dataframe_to_csv(
+        save_df_to_csv(
             df=prediction_df,
             file_path=os.path.join(directory, f"prediction_df_{self.__get_now()}.csv"),
         )

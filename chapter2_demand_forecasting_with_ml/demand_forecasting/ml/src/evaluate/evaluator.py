@@ -1,10 +1,9 @@
-from datetime import date, datetime
 from typing import List, Optional, Union
 
 import numpy as np
 import pandas as pd
 from sklearn.metrics import mean_squared_error
-from src.models.dataset import DAYS_OF_WEEK, ITEMS, STORES
+from src.dataset.schema import DAYS_OF_WEEK
 from src.utils.logger import configure_logger
 
 logger = configure_logger(__name__)

@@ -5,6 +5,7 @@ from typing import Optional, Tuple
 from uuid import uuid4
 
 import click
+from src.dataset.data_retriever import DataRetriever
 from src.jobs.predict import PredictionJob
 from src.jobs.train import TrainJob
 from src.models.models import MODELS
@@ -31,6 +32,13 @@ DATE_FORMAT = "%Y-%m-%d"
     default=None,
     required=False,
     help="prediction target path",
+)
+@click.option(
+    "--data_manager_api",
+    type=str,
+    default=None,
+    required=False,
+    help="data manager api endpoint",
 )
 @click.option(
     "--model_name",
@@ -132,6 +140,11 @@ DATE_FORMAT = "%Y-%m-%d"
     help=f"path to train params",
 )
 @click.option(
+    "--retrieve_data",
+    is_flag=True,
+    help="run data retrieval",
+)
+@click.option(
     "--run_experiment",
     is_flag=True,
     help="run experiment",
@@ -151,6 +164,7 @@ def main(
     save_file_directory: str = "/tmp",
     data_file_path: Optional[str] = None,
     prediction_file_path: Optional[str] = None,
+    data_manager_api: Optional[str] = None,
     onnx_file_path: Optional[str] = None,
     pretrained_model_path: Optional[str] = None,
     fitted_preprocess_file_path: Optional[str] = None,
@@ -164,6 +178,7 @@ def main(
     predict_end_date: Optional[str] = None,
     experiment_param_file_path: Optional[str] = None,
     train_param_file_path: Optional[str] = None,
+    retrieve_data: bool = False,
     run_experiment: bool = False,
     run_train: bool = False,
     run_prediction: bool = False,
@@ -175,6 +190,7 @@ PARAMETERS:
     save_file_directory:    {save_file_directory}
     data_file_path: {data_file_path}
     prediction_file_path:   {prediction_file_path}
+    data_manager_api:   {data_manager_api}
     onnx_file_path: {onnx_file_path}
     pretrained_model_path:  {pretrained_model_path}
     fitted_preprocess_file_path:    {fitted_preprocess_file_path}
@@ -188,6 +204,7 @@ PARAMETERS:
     predict_end_date:   {predict_end_date}
     experiment_param_file_path: {experiment_param_file_path}
     train_param_file_path: {train_param_file_path}
+    retrieve_data:  {retrieve_data}
     run_experiment: {run_experiment}
     run_train:  {run_train}
     run_prediction: {run_prediction}
@@ -200,16 +217,18 @@ PARAMETERS:
     _predict_start_date = datetime.strptime(predict_start_date, DATE_FORMAT) if predict_start_date is not None else None
     _predict_end_date = datetime.strptime(predict_end_date, DATE_FORMAT) if predict_end_date is not None else None
 
+    data_retriever = DataRetriever(api_endpoint=data_manager_api)
+
+    preprocess_pipeline = DataPreprocessPipeline()
+    if fitted_preprocess_file_path is not None:
+        preprocess_pipeline.load_pipeline(file_path=fitted_preprocess_file_path)
+
     meta_model = MODELS.get_value(name=model_name)
     if meta_model is None:
         raise ValueError
     model = meta_model.model()
     if pretrained_model_path is not None:
         model.load(file_path=pretrained_model_path)
-
-    preprocess_pipeline = DataPreprocessPipeline()
-    if fitted_preprocess_file_path is not None:
-        preprocess_pipeline.load_pipeline(file_path=fitted_preprocess_file_path)
 
     experiment_params = meta_model.params
     if experiment_param_file_path is not None:
@@ -284,27 +303,28 @@ PARAMETERS:
             model_params=train_params,
         )
 
-    preprocess_pipeline = train_job.preprocess_pipeline
-    preprocess_pipeline.include_target = False
+    if run_prediction:
+        preprocess_pipeline = train_job.preprocess_pipeline
+        preprocess_pipeline.include_target = False
 
-    if train_job.onnx_file_path != "":
-        onnx_file_path = train_job.onnx_file_path
+        if train_job.onnx_file_path != "":
+            onnx_file_path = train_job.onnx_file_path
 
-    predictor = OnnxPredictor(
-        file_path=onnx_file_path,
-        preprocess_pipeline=preprocess_pipeline,
-    )
-    prediction_job = PredictionJob(
-        prediction_file_path=prediction_file_path,
-        predictor=predictor,
-        stores=stores,
-        items=items,
-        save_file_directory=save_directory,
-    )
-    prediction_job.predict(
-        predict_start_date=_predict_start_date,
-        predict_end_date=_predict_end_date,
-    )
+        predictor = OnnxPredictor(
+            file_path=onnx_file_path,
+            preprocess_pipeline=preprocess_pipeline,
+        )
+        prediction_job = PredictionJob(
+            prediction_file_path=prediction_file_path,
+            predictor=predictor,
+            stores=stores,
+            items=items,
+            save_file_directory=save_directory,
+        )
+        prediction_job.predict(
+            predict_start_date=_predict_start_date,
+            predict_end_date=_predict_end_date,
+        )
 
 
 if __name__ == "__main__":

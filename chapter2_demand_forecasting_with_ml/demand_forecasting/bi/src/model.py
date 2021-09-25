@@ -1,11 +1,11 @@
-import asyncio
 from datetime import date, datetime
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 
 import httpx
 from configurations import Configurations
+from data_client.data_client import ItemClient, StoreClient
 from logger import configure_logger
-from pydantic import BaseModel, Extra
+from pydantic import BaseModel
 
 logger = configure_logger(__name__)
 
@@ -52,12 +52,6 @@ class BaseRepository(object):
         self.api_endpoint = api_endpoint
         self.timeout = timeout
         self.retries = retries
-        self.transport = httpx.AsyncHTTPTransport(
-            retries=self.retries,
-        )
-        self.header: Dict[str, str] = {
-            "accept": "application/json",
-        }
 
 
 class StoreRepository(BaseRepository):
@@ -72,40 +66,11 @@ class StoreRepository(BaseRepository):
             retries=retries,
             api_endpoint=api_endpoint,
         )
-        self.store_master_endpoint = f"{self.api_endpoint}/stores/masters"
-
-    async def async_retrieve(
-        self,
-        id: Optional[str] = None,
-        region_id: Optional[str] = None,
-        store_name: Optional[str] = None,
-        region_name: Optional[str] = None,
-    ) -> List[StoreMaster]:
-        async with httpx.AsyncClient(
+        self.store_client = StoreClient(
             timeout=self.timeout,
-            transport=self.transport,
-        ) as client:
-            params = dict()
-            if id is not None:
-                params["id"] = id
-            if region_id is not None:
-                params["region_id"] = region_id
-            if store_name is not None:
-                params["store_name"] = store_name
-            if region_name is not None:
-                params["region_name"] = region_name
-            r = await client.get(
-                url=self.store_master_endpoint,
-                params=params,
-                headers=self.header,
-            )
-            if r.status_code != 200:
-                return []
-            data = r.json()
-            if len(data) == 0:
-                return []
-            result = [StoreMaster(**d) for d in data]
-            return result
+            retries=self.retries,
+            api_endpoint=self.api_endpoint,
+        )
 
     def retrieve(
         self,
@@ -114,14 +79,14 @@ class StoreRepository(BaseRepository):
         store_name: Optional[str] = None,
         region_name: Optional[str] = None,
     ) -> List[StoreMaster]:
-        return asyncio.run(
-            self.async_retrieve(
-                id=id,
-                region_id=region_id,
-                store_name=store_name,
-                region_name=region_name,
-            )
+        response = self.store_client.retrieve(
+            id=id,
+            region_id=region_id,
+            store_name=store_name,
+            region_name=region_name,
         )
+        stores = [StoreMaster(**r.dict()) for r in response]
+        return stores
 
 
 class ItemRepository(BaseRepository):
@@ -136,100 +101,23 @@ class ItemRepository(BaseRepository):
             retries=retries,
             api_endpoint=api_endpoint,
         )
-        self.item_master_endpoint = f"{self.api_endpoint}/items/masters"
-        self.item_sale_endpoint = f"{self.api_endpoint}/items/sales"
-
-    async def async_retrieve_item_master(
-        self,
-        id: Optional[str] = None,
-        item_name: Optional[str] = None,
-    ) -> List[ItemMaster]:
-        async with httpx.AsyncClient(
+        self.item_client = ItemClient(
             timeout=self.timeout,
-            transport=self.transport,
-        ) as client:
-            params = dict()
-            if id is not None:
-                params["id"] = id
-            if item_name is not None:
-                params["item_name"] = item_name
-            r = await client.get(
-                url=self.item_master_endpoint,
-                params=params,
-                headers=self.header,
-            )
-            if r.status_code != 200:
-                return []
-            data = r.json()
-            if len(data) == 0:
-                return []
-            result = [ItemMaster(**d) for d in data]
-            return result
+            retries=self.retries,
+            api_endpoint=self.api_endpoint,
+        )
 
     def retrieve_item_master(
         self,
         id: Optional[str] = None,
         item_name: Optional[str] = None,
     ) -> List[ItemMaster]:
-        return asyncio.run(
-            self.async_retrieve_item_master(
-                id=id,
-                item_name=item_name,
-            )
+        response = self.item_client.retrieve_item_master(
+            id=id,
+            item_name=item_name,
         )
-
-    async def async_retrieve_item_sale(
-        self,
-        id: Optional[str] = None,
-        item_name: Optional[str] = None,
-        item_id: Optional[str] = None,
-        store_name: Optional[str] = None,
-        store_id: Optional[str] = None,
-        item_price_id: Optional[str] = None,
-        quantity: Optional[int] = None,
-        sold_at: Optional[date] = None,
-        day_of_week: Optional[str] = None,
-        limit: int = 100,
-        offset: int = 0,
-    ) -> List[ItemSale]:
-        async with httpx.AsyncClient(
-            timeout=self.timeout,
-            transport=self.transport,
-        ) as client:
-            params: Dict[str, Union[int, str, date]] = dict(
-                limit=limit,
-                offset=offset,
-            )
-            if id is not None:
-                params["id"] = id
-            if item_name is not None:
-                params["item_name"] = item_name
-            if item_id is not None:
-                params["item_id"] = item_id
-            if store_name is not None:
-                params["store_name"] = store_name
-            if store_id is not None:
-                params["store_id"] = store_id
-            if item_price_id is not None:
-                params["item_price_id"] = item_price_id
-            if quantity is not None:
-                params["quantity"] = quantity
-            if sold_at is not None:
-                params["sold_at"] = sold_at
-            if day_of_week is not None:
-                params["day_of_week"] = day_of_week
-            r = await client.get(
-                url=self.item_sale_endpoint,
-                params=params,
-                headers=self.header,
-            )
-            if r.status_code != 200:
-                return []
-            data = r.json()
-            if len(data) == 0:
-                return []
-            result = [ItemSale(**d) for d in data]
-            return result
+        item_masters = [ItemMaster(**r.dict()) for r in response]
+        return item_masters
 
     def retrieve_item_sale(
         self,
@@ -245,18 +133,18 @@ class ItemRepository(BaseRepository):
         limit: int = 100,
         offset: int = 0,
     ) -> List[ItemSale]:
-        return asyncio.run(
-            self.async_retrieve_item_sale(
-                id=id,
-                item_name=item_name,
-                item_id=item_id,
-                store_name=store_name,
-                store_id=store_id,
-                item_price_id=item_price_id,
-                quantity=quantity,
-                sold_at=sold_at,
-                day_of_week=day_of_week,
-                limit=limit,
-                offset=offset,
-            )
+        response = self.item_client.retrieve_item_sale(
+            id=id,
+            item_name=item_name,
+            item_id=item_id,
+            store_name=store_name,
+            store_id=store_id,
+            item_price_id=item_price_id,
+            quantity=quantity,
+            sold_at=sold_at,
+            day_of_week=day_of_week,
+            limit=limit,
+            offset=offset,
         )
+        item_masters = [ItemSale(**r.dict()) for r in response]
+        return item_masters

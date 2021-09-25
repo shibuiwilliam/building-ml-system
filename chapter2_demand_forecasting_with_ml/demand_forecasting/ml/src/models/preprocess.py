@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import date, datetime
-from typing import Any, Dict, List, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -10,10 +10,43 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.preprocessing import FunctionTransformer, MinMaxScaler, OneHotEncoder
-from src.models.dataset import DAYS_OF_WEEK, ITEMS, STORES
+from src.dataset.schema import DAYS_OF_WEEK, ITEMS, STORES, UPDATED_SCHEMA
 from src.utils.logger import configure_logger
 
 logger = configure_logger(__name__)
+
+
+def select_by_store_and_item(
+    df: pd.DataFrame,
+    stores: Optional[List[str]] = None,
+    items: Optional[List[str]] = None,
+) -> pd.DataFrame:
+    if stores is not None:
+        logger.info(f"stores to be used: {stores}")
+        df = df[df["store"].isin(stores)]
+    if items is not None:
+        logger.info(f"items to be used: {items}")
+        df = df[df["item"].isin(items)]
+    return df
+
+
+def select_and_create_columns(
+    df: pd.DataFrame,
+    schema: DataFrameSchema = UPDATED_SCHEMA,
+) -> pd.DataFrame:
+    logger.info("convert data...")
+    df["day_of_month"] = df.date.dt.day
+    df["day_of_year"] = df.date.dt.dayofyear
+    df["month"] = df.date.dt.month
+    df["year"] = df.date.dt.year
+    df["week_of_year"] = df.date.dt.weekofyear
+    df["is_month_start"] = (df.date.dt.is_month_start).astype(int)
+    df["is_month_end"] = (df.date.dt.is_month_end).astype(int)
+    df.sort_values(by=["store", "item", "date"], axis=0, inplace=True)
+    df = df.reset_index(drop=True)
+    df = schema.validate(df)
+    logger.info("done converting data...")
+    return df
 
 
 class ItemSelector(BaseEstimator, TransformerMixin):

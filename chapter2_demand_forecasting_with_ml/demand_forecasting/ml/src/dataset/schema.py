@@ -1,8 +1,8 @@
-from datetime import datetime
-from typing import List, Optional
+from datetime import date, datetime
+from typing import Optional
 
-import pandas as pd
 from pandera import Check, Column, DataFrameSchema, Index
+from pydantic import BaseModel
 from src.utils.logger import configure_logger
 
 logger = configure_logger(__name__)
@@ -96,54 +96,36 @@ UPDATED_PREDICTION_SCHEMA = DataFrameSchema(
 )
 
 
-def load_csv_as_df(
-    file_path: str,
-    schema: DataFrameSchema = BASE_SCHEMA,
-) -> pd.DataFrame:
-    logger.info(f"load data from {file_path}")
-    df = pd.read_csv(file_path)
-    df["date"] = pd.to_datetime(df["date"])
-    df = schema.validate(df)
-    logger.info("done load data")
-    return df
+class ItemSale(BaseModel):
+    id: str
+    item_id: str
+    store_id: str
+    item_price_id: str
+    quantity: int
+    total_sales: int
+    sold_at: date
+    day_of_week: str
+    item_name: str
+    store_name: str
+    price: int
+    created_at: datetime
+    updated_at: datetime
 
 
-def select_by_store_and_item(
-    df: pd.DataFrame,
-    stores: Optional[List[str]] = None,
-    items: Optional[List[str]] = None,
-) -> pd.DataFrame:
-    if stores is not None:
-        logger.info(f"stores to be used: {stores}")
-        df = df[df["store"].isin(stores)]
-    if items is not None:
-        logger.info(f"items to be used: {items}")
-        df = df[df["item"].isin(items)]
-    return df
+class ItemPrice(BaseModel):
+    id: str
+    item_id: str
+    price: int
+    applied_from: date
+    applied_to: Optional[date]
+    item_name: str
+    created_at: datetime
+    updated_at: datetime
 
 
-def select_and_create_columns(
-    df: pd.DataFrame,
-    schema: DataFrameSchema = UPDATED_SCHEMA,
-) -> pd.DataFrame:
-    logger.info("convert data...")
-    df["day_of_month"] = df.date.dt.day
-    df["day_of_year"] = df.date.dt.dayofyear
-    df["month"] = df.date.dt.month
-    df["year"] = df.date.dt.year
-    df["week_of_year"] = df.date.dt.weekofyear
-    df["is_month_start"] = (df.date.dt.is_month_start).astype(int)
-    df["is_month_end"] = (df.date.dt.is_month_end).astype(int)
-    df.sort_values(by=["store", "item", "date"], axis=0, inplace=True)
-    df = df.reset_index(drop=True)
-    df = schema.validate(df)
-    logger.info("done converting data...")
-    return df
-
-
-def save_dataframe_to_csv(
-    df: pd.DataFrame,
-    file_path: str,
-):
-    logger.info(f"save dataframe to {file_path}")
-    df.to_csv(file_path, index=False)
+class PredictionTarget(BaseModel):
+    store_name: str
+    item_name: str
+    date: date
+    day_of_week: str
+    price: int
