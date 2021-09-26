@@ -62,12 +62,32 @@ class BaseClient(object):
         self.api_endpoint = api_endpoint
         self.timeout = timeout
         self.retries = retries
-        self.transport = httpx.AsyncHTTPTransport(
+        self.transport = httpx.HTTPTransport(
+            retries=self.retries,
+        )
+        self.async_transport = httpx.AsyncHTTPTransport(
             retries=self.retries,
         )
         self.header: Dict[str, str] = {
             "accept": "application/json",
         }
+        self.health_check_endpoint = f"{self.api_endpoint}/health"
+
+    def ping(self) -> bool:
+        with httpx.Client(
+            timeout=self.timeout,
+            transport=self.transport,
+        ) as client:
+            r = client.get(
+                url=self.health_check_endpoint,
+                headers=self.header,
+            )
+            if r.status_code != 200:
+                return False
+            data = r.json()
+            if "health" in data.keys() and data["health"] == "ok":
+                return True
+            return False
 
 
 class StoreClient(BaseClient):
@@ -93,7 +113,7 @@ class StoreClient(BaseClient):
     ) -> List[StoreMaster]:
         async with httpx.AsyncClient(
             timeout=self.timeout,
-            transport=self.transport,
+            transport=self.async_transport,
         ) as client:
             params = dict()
             if id is not None:
@@ -157,7 +177,7 @@ class ItemClient(BaseClient):
     ) -> List[ItemMaster]:
         async with httpx.AsyncClient(
             timeout=self.timeout,
-            transport=self.transport,
+            transport=self.async_transport,
         ) as client:
             params = dict()
             if id is not None:
@@ -196,10 +216,13 @@ class ItemClient(BaseClient):
         item_id: Optional[str] = None,
         applied_from: Optional[date] = None,
         applied_to: Optional[date] = None,
+        applied_at: Optional[date] = None,
     ) -> List[ItemPrice]:
+        if (applied_from is not None or applied_to is not None) and applied_at is not None:
+            raise ValueError
         async with httpx.AsyncClient(
             timeout=self.timeout,
-            transport=self.transport,
+            transport=self.async_transport,
         ) as client:
             params = dict()
             if id is not None:
@@ -212,6 +235,8 @@ class ItemClient(BaseClient):
                 params["applied_from"] = applied_from
             if applied_to is not None:
                 params["applied_to"] = applied_to
+            if applied_at is not None:
+                params["applied_at"] = applied_at
             r = await client.get(
                 url=self.item_price_endpoint,
                 params=params,
@@ -232,6 +257,7 @@ class ItemClient(BaseClient):
         item_id: Optional[str] = None,
         applied_from: Optional[date] = None,
         applied_to: Optional[date] = None,
+        applied_at: Optional[date] = None,
     ) -> List[ItemPrice]:
         return asyncio.run(
             self.async_retrieve_item_price(
@@ -240,6 +266,7 @@ class ItemClient(BaseClient):
                 item_id=item_id,
                 applied_from=applied_from,
                 applied_to=applied_to,
+                applied_at=applied_at,
             )
         )
 
@@ -259,7 +286,7 @@ class ItemClient(BaseClient):
     ) -> List[ItemSale]:
         async with httpx.AsyncClient(
             timeout=self.timeout,
-            transport=self.transport,
+            transport=self.async_transport,
         ) as client:
             params: Dict[str, Union[int, str, date]] = dict(
                 limit=limit,

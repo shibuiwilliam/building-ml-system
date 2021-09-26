@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from logging import getLogger
 from typing import List, Optional
 
@@ -55,6 +55,7 @@ class AbstractItemService(ABC):
         item_id: Optional[str] = None,
         applied_from: Optional[date] = None,
         applied_to: Optional[date] = None,
+        applied_at: Optional[date] = None,
     ) -> List[ItemPrice]:
         raise NotImplementedError
 
@@ -221,7 +222,10 @@ class ItemService(AbstractItemService):
         item_id: Optional[str] = None,
         applied_from: Optional[date] = None,
         applied_to: Optional[date] = None,
+        applied_at: Optional[date] = None,
     ) -> List[ItemPrice]:
+        if (applied_from is not None or applied_to is not None) and applied_at is not None:
+            raise ValueError
         result = self.item_price_repository.retrieve(
             db=db,
             id=id,
@@ -229,6 +233,7 @@ class ItemService(AbstractItemService):
             item_id=item_id,
             applied_from=applied_from,
             applied_to=applied_to,
+            applied_at=applied_at,
         )
         return result
 
@@ -313,6 +318,8 @@ class ItemService(AbstractItemService):
         applied_to: Optional[date] = None,
         id: str = get_uuid(),
     ) -> Optional[ItemPrice]:
+        if applied_to is None:
+            applied_to = applied_from + timedelta(days=3650)
         result = self.item_price_repository.register(
             db=db,
             item_price=ItemPriceCreate(

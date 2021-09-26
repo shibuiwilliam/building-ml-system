@@ -172,7 +172,8 @@ run_ml: build_ml
 			--experiment_param_file_path /opt/data/light_gbm_regression_experiment_params.json \
 			--train_param_file_path /opt/data/light_gbm_regression_train_params.json \
 			--run_experiment \
-			--run_train
+			--run_train \
+			--run_prediction
 
 
 ############ DEMAND FORECASTING BI COMMANDS ############

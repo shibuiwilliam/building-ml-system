@@ -1,4 +1,5 @@
-from typing import Dict, List, Optional
+from time import sleep
+from typing import Dict, List
 
 import pandas as pd
 from configurations import Configurations
@@ -24,6 +25,10 @@ class StoreViewModel(object):
 
     def __init_store_masters(self):
         logger.info(f"initialize store master data")
+        while True:
+            if self.store_repository.ping():
+                break
+            sleep(10)
         self.store_master_list = self.store_repository.retrieve()
         region_masters = []
         store_masters = []
@@ -55,6 +60,10 @@ class ItemViewModel(object):
 
     def __init_item_masters(self):
         logger.info(f"initialize item master data")
+        while True:
+            if self.item_repository.ping():
+                break
+            sleep(10)
         self.item_master_list = self.item_repository.retrieve_item_master()
         item_masters = []
         for item_master in self.item_master_list:
@@ -83,6 +92,10 @@ class ItemSaleViewModel(object):
 
     def __init_item_sale(self):
         logger.info(f"initialize item sale data")
+        while True:
+            if self.item_repository.ping():
+                break
+            sleep(10)
         limit = 1000
         offset = 0
         while True:

@@ -1,7 +1,6 @@
 from datetime import date, datetime
-from typing import Dict, List, Optional
+from typing import List, Optional
 
-import httpx
 from configurations import Configurations
 from data_client.data_client import ItemClient, StoreClient
 from logger import configure_logger
@@ -72,6 +71,11 @@ class StoreRepository(BaseRepository):
             api_endpoint=self.api_endpoint,
         )
 
+    def ping(self) -> bool:
+        logger.info("send ping...")
+        response = self.store_client.ping()
+        return response
+
     def retrieve(
         self,
         id: Optional[str] = None,
@@ -106,6 +110,11 @@ class ItemRepository(BaseRepository):
             retries=self.retries,
             api_endpoint=self.api_endpoint,
         )
+
+    def ping(self) -> bool:
+        logger.info("send ping...")
+        response = self.item_client.ping()
+        return response
 
     def retrieve_item_master(
         self,

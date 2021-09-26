@@ -99,6 +99,7 @@ class AbstractItemPriceRepository(ABC):
         item_id: Optional[str] = None,
         applied_from: Optional[date] = None,
         applied_to: Optional[date] = None,
+        applied_at: Optional[date] = None,
     ) -> List[ItemPrice]:
         raise NotImplementedError
 
@@ -124,6 +125,7 @@ class ItemPriceRepository(AbstractItemPriceRepository):
         item_id: Optional[str] = None,
         applied_from: Optional[date] = None,
         applied_to: Optional[date] = None,
+        applied_at: Optional[date] = None,
     ) -> List[ItemPrice]:
         filters = []
         if id is not None:
@@ -136,6 +138,9 @@ class ItemPriceRepository(AbstractItemPriceRepository):
             filters.append(ItemPriceModel.applied_from <= applied_from)
         if applied_to is not None:
             filters.append(ItemPriceModel.applied_to >= applied_to)
+        if applied_at is not None:
+            filters.append(ItemPriceModel.applied_from <= applied_at)
+            filters.append(ItemPriceModel.applied_to >= applied_at)
         records = (
             db.query(ItemPriceModel, ItemMasterModel)
             .join(

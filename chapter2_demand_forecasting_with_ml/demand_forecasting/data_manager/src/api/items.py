@@ -32,6 +32,7 @@ async def get_item_price(
     item_id: Optional[str] = None,
     applied_from: Optional[date] = None,
     applied_to: Optional[date] = None,
+    applied_at: Optional[date] = None,
     db: Session = Depends(get_db),
 ):
     return container.item_service.retrieve_item_price(
@@ -41,6 +42,7 @@ async def get_item_price(
         item_id=item_id,
         applied_from=applied_from,
         applied_to=applied_to,
+        applied_at=applied_at,
     )
 
 

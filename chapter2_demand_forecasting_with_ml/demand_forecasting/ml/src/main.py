@@ -6,6 +6,7 @@ from uuid import uuid4
 
 import click
 from src.dataset.data_retriever import DataRetriever
+from src.jobs.data import DataJob
 from src.jobs.predict import PredictionJob
 from src.jobs.train import TrainJob
 from src.models.models import MODELS
@@ -190,10 +191,10 @@ PARAMETERS:
     save_file_directory:    {save_file_directory}
     data_file_path: {data_file_path}
     prediction_file_path:   {prediction_file_path}
-    data_manager_api:   {data_manager_api}
     onnx_file_path: {onnx_file_path}
     pretrained_model_path:  {pretrained_model_path}
     fitted_preprocess_file_path:    {fitted_preprocess_file_path}
+    data_manager_api:   {data_manager_api}
     store:  {store}
     item:   {item}
     train_start_date:   {train_start_date}
@@ -216,6 +217,38 @@ PARAMETERS:
     _test_end_date = datetime.strptime(test_end_date, DATE_FORMAT) if test_end_date is not None else None
     _predict_start_date = datetime.strptime(predict_start_date, DATE_FORMAT) if predict_start_date is not None else None
     _predict_end_date = datetime.strptime(predict_end_date, DATE_FORMAT) if predict_end_date is not None else None
+
+    uuid = str(uuid4()).replace("-", "")[:6]
+    base_directory_name = f"records_{uuid}"
+    save_directory = os.path.join(save_file_directory, base_directory_name)
+    os.makedirs(save_directory, exist_ok=True)
+    with open(os.path.join(save_directory, "params.json"), "w") as f:
+        json.dump(
+            {
+                "model_name": model_name,
+                "save_file_directory": save_file_directory,
+                "data_file_path": data_file_path,
+                "prediction_file_path": prediction_file_path,
+                "onnx_file_path": onnx_file_path,
+                "pretrained_model_path": pretrained_model_path,
+                "fitted_preprocess_file_path": fitted_preprocess_file_path,
+                "data_manager_api": data_manager_api,
+                "store": store,
+                "item": item,
+                "train_start_date": train_start_date,
+                "train_end_date": train_end_date,
+                "test_start_date": test_start_date,
+                "test_end_date": test_end_date,
+                "predict_start_date": predict_start_date,
+                "predict_end_date": predict_end_date,
+                "experiment_param_file_path": experiment_param_file_path,
+                "train_param_file_path": train_param_file_path,
+                "run_experiment": run_experiment,
+                "run_train": run_train,
+                "run_prediction": run_prediction,
+            },
+            f,
+        )
 
     data_retriever = DataRetriever(api_endpoint=data_manager_api)
 
@@ -240,39 +273,29 @@ PARAMETERS:
         with open(train_param_file_path, "r") as f:
             train_params = json.load(f)
 
-    uuid = str(uuid4()).replace("-", "")[:6]
-    base_directory_name = f"records_{uuid}"
-    save_directory = os.path.join(save_file_directory, base_directory_name)
-    os.makedirs(save_directory, exist_ok=True)
-    with open(os.path.join(save_directory, "params.json"), "w") as f:
-        json.dump(
-            {
-                "model_name": model_name,
-                "save_file_directory": save_file_directory,
-                "data_file_path": data_file_path,
-                "prediction_file_path": prediction_file_path,
-                "onnx_file_path": onnx_file_path,
-                "pretrained_model_path": pretrained_model_path,
-                "fitted_preprocess_file_path": fitted_preprocess_file_path,
-                "store": store,
-                "item": item,
-                "train_start_date": train_start_date,
-                "train_end_date": train_end_date,
-                "test_start_date": test_start_date,
-                "test_end_date": test_end_date,
-                "predict_start_date": predict_start_date,
-                "predict_end_date": predict_end_date,
-                "experiment_param_file_path": experiment_param_file_path,
-                "train_param_file_path": train_param_file_path,
-                "run_experiment": run_experiment,
-                "run_train": run_train,
-                "run_prediction": run_prediction,
-            },
-            f,
-        )
-
     stores = list(store) if len(store) > 0 else None
     items = list(item) if len(item) > 0 else None
+
+    data_job = DataJob(
+        data_retriever=data_retriever,
+        stores=stores,
+        items=items,
+        save_file_directory=save_directory,
+    )
+
+    if retrieve_data:
+        file_path = data_job.retrieve(
+            train_start_date=_train_start_date.date(),
+            train_end_date=_train_end_date.date(),
+            test_start_date=_test_start_date.date(),
+            test_end_date=_test_end_date.date(),
+            predict_start_date=_predict_start_date.date(),
+            predict_end_date=_predict_end_date.date(),
+        )
+        if file_path.train_file_path is not None:
+            data_file_path = file_path.train_file_path
+        if file_path.prediction_file_path is not None:
+            prediction_file_path = file_path.prediction_file_path
 
     train_job = TrainJob(
         data_file_path=data_file_path,

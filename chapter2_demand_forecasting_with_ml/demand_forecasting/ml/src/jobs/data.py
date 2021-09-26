@@ -1,9 +1,9 @@
 import dataclasses
 import os
 from datetime import date, datetime, timedelta
+from time import sleep
 from typing import List, Optional
 
-import pandas as pd
 from pandera import DataFrameSchema
 from src.dataset.data_retriever import BaseDataRetriever, save_df_to_csv
 from src.dataset.schema import BASE_SCHEMA, DAYS_OF_WEEK, ITEMS, STORES, PredictionTarget
@@ -13,9 +13,9 @@ logger = configure_logger(__name__)
 
 
 @dataclasses.dataclass(frozen=True)
-class DataFilePath(object):
-    train_file_path: str
-    prediction_file_path: str
+class FilePath(object):
+    train_file_path: Optional[str]
+    prediction_file_path: Optional[str]
 
 
 class DataJob(object):
@@ -101,7 +101,7 @@ class DataJob(object):
         test_end_date: Optional[date] = None,
         predict_start_date: Optional[date] = None,
         predict_end_date: Optional[date] = None,
-    ) -> DataFilePath:
+    ) -> FilePath:
         logger.info("start data retrieval...")
 
         directory = self.__make_directory(
@@ -115,15 +115,21 @@ class DataJob(object):
         )
 
         train_data_record = []
-        train_file_path = os.path.join(directory, f"train_{self.__get_now()}.csv")
+        train_file_path = None
         prediction_data_record = []
-        prediction_file_path = os.path.join(directory, f"prediction_{self.__get_now()}.csv")
+        prediction_file_path = None
+
+        while True:
+            if self.data_retriever.ping():
+                break
+            sleep(10)
 
         if train_start_date is not None and train_end_date is not None:
             dates = self.__list_dates_between_two_dates(
                 start_date=train_start_date,
                 end_date=train_end_date,
             )
+            logger.info(f"retrieve training data for: {dates}")
             for d in dates:
                 offset = 0
                 while True:
@@ -142,6 +148,7 @@ class DataJob(object):
                 start_date=test_start_date,
                 end_date=test_end_date,
             )
+            logger.info(f"retrieve test data for: {dates}")
             for d in dates:
                 offset = 0
                 while True:
@@ -156,7 +163,9 @@ class DataJob(object):
                     offset += self.limit
 
         if len(train_data_record) > 0:
+            logger.info(f"retrieved training data: {len(train_data_record)}")
             train_df = self.data_retriever.train_data_to_dataframe(item_sales=train_data_record)
+            train_file_path = os.path.join(directory, f"train_{self.__get_now()}.csv")
             save_df_to_csv(
                 df=train_df,
                 file_path=train_file_path,
@@ -167,12 +176,16 @@ class DataJob(object):
                 start_date=predict_start_date,
                 end_date=predict_end_date,
             )
+            logger.info(f"retrieve prediction data for: {dates}")
             _stores = self.stores if self.stores is not None else STORES
             _items = self.items if self.items is not None else ITEMS
             for d in dates:
                 for store in _stores:
                     for item in _items:
-                        item_prices = self.data_retriever.retrieve_item_price(item_name=item)
+                        item_prices = self.data_retriever.retrieve_item_price(
+                            item_name=item,
+                            applied_at=d,
+                        )
                         item_price = 0
                         if len(item_prices) > 0:
                             item_price = item_prices[0].price
@@ -187,14 +200,18 @@ class DataJob(object):
                         )
 
         if len(prediction_data_record) > 0:
-            prediction_df = self.data_retriever.prediction_data_to_dataframe(prediction_targets=prediction_data_record)
+            logger.info(f"retrieved prediction data: {len(prediction_data_record)}")
+            prediction_df = self.data_retriever.prediction_data_to_dataframe(
+                prediction_targets=prediction_data_record,
+            )
+            prediction_file_path = os.path.join(directory, f"prediction_{self.__get_now()}.csv")
             save_df_to_csv(
                 df=prediction_df,
                 file_path=prediction_file_path,
             )
 
         logger.info("done data retrieval...")
-        return DataFilePath(
+        return FilePath(
             train_file_path=train_file_path,
             prediction_file_path=prediction_file_path,
         )

@@ -38,6 +38,10 @@ class BaseDataRetriever(ABC):
         self.retries = retries
 
     @abstractmethod
+    def ping(self) -> bool:
+        raise NotImplementedError
+
+    @abstractmethod
     def retrieve_item_sale(
         self,
         id: Optional[str] = None,
@@ -62,6 +66,7 @@ class BaseDataRetriever(ABC):
         item_id: Optional[str] = None,
         applied_from: Optional[date] = None,
         applied_to: Optional[date] = None,
+        applied_at: Optional[date] = None,
     ) -> List[ItemPrice]:
         raise NotImplementedError
 
@@ -83,6 +88,11 @@ class DataRetriever(BaseDataRetriever):
             retries=self.retries,
             api_endpoint=self.api_endpoint,
         )
+
+    def ping(self) -> bool:
+        logger.info("send ping...")
+        response = self.item_client.ping()
+        return response
 
     def retrieve_item_sale(
         self,
@@ -121,6 +131,7 @@ class DataRetriever(BaseDataRetriever):
         item_id: Optional[str] = None,
         applied_from: Optional[date] = None,
         applied_to: Optional[date] = None,
+        applied_at: Optional[date] = None,
     ) -> List[ItemPrice]:
         response = self.item_client.retrieve_item_price(
             id=id,
@@ -128,6 +139,7 @@ class DataRetriever(BaseDataRetriever):
             item_id=item_id,
             applied_from=applied_from,
             applied_to=applied_to,
+            applied_at=applied_at,
         )
         item_sales = [ItemPrice(**r.dict()) for r in response]
         return item_sales
@@ -165,7 +177,7 @@ class DataRetriever(BaseDataRetriever):
         for prediction_target in prediction_targets:
             data.append(
                 {
-                    "date": datetime.combine(prediction_target.sold_at, time()),
+                    "date": datetime.combine(prediction_target.date, time()),
                     "day_of_week": prediction_target.day_of_week,
                     "store": prediction_target.store_name,
                     "item": prediction_target.item_name,

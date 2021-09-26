@@ -42,6 +42,51 @@ services:
     depends_on:
       - postgres
 
+  ml:
+    container_name: ml
+    image: shibui/building-ml-system:demand_forecasting_ml_0.0.0
+    restart: "no"
+    networks:
+      - default
+    command:
+      - "python"
+      - "-m"
+      - "src.main"
+      - "--data_file_path"
+      - "/opt/data/item_sale_records_2017_2019.csv"
+      - "--prediction_file_path"
+      - "/opt/data/item_target_20191223_20191229.csv"
+      - "--model_name"
+      - "light_gbm_regression"
+      - "--save_file_directory"
+      - "/opt/data"
+      - "--data_manager_api"
+      - "http://data_manager:8000/v0"
+      - "--train_start_date"
+      - "2017-01-01"
+      - "--train_end_date"
+      - "2019-12-08"
+      - "--test_start_date"
+      - "2019-12-16"
+      - "--test_end_date"
+      - "2019-12-22"
+      - "--predict_start_date"
+      - "2019-12-23"
+      - "--predict_end_date"
+      - "2019-12-29"
+      - "--experiment_param_file_path"
+      - "/opt/data/light_gbm_regression_experiment_params.json"
+      - "--train_param_file_path"
+      - "/opt/data/light_gbm_regression_train_params.json"
+      - "--retrieve_data"
+      - "--run_experiment"
+      - "--run_train"
+      - "--run_prediction"
+    volumes:
+      - "./data:/opt/data"
+    depends_on:
+      - data_manager
+
   bi:
     container_name: bi
     image: shibui/building-ml-system:demand_forecasting_bi_0.0.0
@@ -49,6 +94,7 @@ services:
     networks:
       - default
     environment:
+      - API_ENDPOINT=http://data_manager:8000/v0
       - WAIT_SECOND=10
     entrypoint:
       - "streamlit"
@@ -58,6 +104,7 @@ services:
       - "8501:8501"
     depends_on:
       - data_manager
+
 networks:
   default:
     name: ml
