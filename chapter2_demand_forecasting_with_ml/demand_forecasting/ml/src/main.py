@@ -5,6 +5,8 @@ from typing import Optional, Tuple
 from uuid import uuid4
 
 import click
+from omegaconf import DictConfig
+import hydra
 from src.dataset.data_retriever import DataRetriever
 from src.jobs.data import DataJob
 from src.jobs.predict import PredictionJob
@@ -19,127 +21,126 @@ logger = configure_logger(__name__)
 DATE_FORMAT = "%Y-%m-%d"
 
 
-@click.command(name="demand forecasting")
-@click.option(
-    "--data_file_path",
-    type=str,
-    default=None,
-    required=False,
-    help="data path",
-)
-@click.option(
-    "--prediction_file_path",
-    type=str,
-    default=None,
-    required=False,
-    help="prediction target path",
-)
-@click.option(
-    "--data_manager_api",
-    type=str,
-    default=None,
-    required=False,
-    help="data manager api endpoint",
-)
-@click.option(
-    "--model_name",
-    type=str,
-    default="light_gbm_regression",
-    required=True,
-    help="model name",
-)
-@click.option(
-    "--save_file_directory",
-    type=str,
-    default="/tmp",
-    required=True,
-    help="save result directory",
-)
-@click.option(
-    "--onnx_file_path",
-    type=str,
-    default=None,
-    required=False,
-    help="pretrained onnx model file path",
-)
-@click.option(
-    "--pretrained_model_path",
-    type=str,
-    default=None,
-    required=False,
-    help="pretrained model file path",
-)
-@click.option(
-    "--fitted_preprocess_file_path",
-    type=str,
-    default=None,
-    required=False,
-    help="already fitted preprocess pipeline file path",
-)
-@click.option(
-    "--store",
-    "-s",
-    type=str,
-    required=False,
-    multiple=True,
-    help="store names to target; not specified = all; multiple specification allowed",
-)
-@click.option(
-    "--item",
-    "-i",
-    type=str,
-    required=False,
-    multiple=True,
-    help="item names to target; not specified = all; multiple specification allowed",
-)
-@click.option(
-    "--train_start_date",
-    type=str,
-    required=False,
-    help=f"train start date; format {DATE_FORMAT}",
-)
-@click.option(
-    "--train_end_date",
-    type=str,
-    required=False,
-    help=f"train end date; format {DATE_FORMAT}",
-)
-@click.option(
-    "--test_start_date",
-    type=str,
-    required=False,
-    help=f"test start date; format {DATE_FORMAT}",
-)
-@click.option(
-    "--test_end_date",
-    type=str,
-    required=False,
-    help=f"test end date; format {DATE_FORMAT}",
-)
-@click.option(
-    "--predict_start_date",
-    type=str,
-    required=False,
-    help=f"predict start date; format {DATE_FORMAT}",
-)
-@click.option(
-    "--predict_end_date",
-    type=str,
-    required=False,
-    help=f"predict end date; format {DATE_FORMAT}",
-)
-@click.option(
-    "--experiment_param_file_path",
-    type=str,
-    required=False,
-    help=f"path to experiment params",
-)
-@click.option(
-    "--train_param_file_path",
-    type=str,
-    required=False,
-    help=f"path to train params",
-)
+# @click.option(
+#     "--data_file_path",
+#     type=str,
+#     default=None,
+#     required=False,
+#     help="data path",
+# )
+# @click.option(
+#     "--prediction_file_path",
+#     type=str,
+#     default=None,
+#     required=False,
+#     help="prediction target path",
+# )
+# @click.option(
+#     "--data_manager_api",
+#     type=str,
+#     default=None,
+#     required=False,
+#     help="data manager api endpoint",
+# )
+# @click.option(
+#     "--model_name",
+#     type=str,
+#     default="light_gbm_regression",
+#     required=True,
+#     help="model name",
+# )
+# @click.option(
+#     "--save_file_directory",
+#     type=str,
+#     default="/tmp",
+#     required=True,
+#     help="save result directory",
+# )
+# @click.option(
+#     "--onnx_file_path",
+#     type=str,
+#     default=None,
+#     required=False,
+#     help="pretrained onnx model file path",
+# )
+# @click.option(
+#     "--pretrained_model_path",
+#     type=str,
+#     default=None,
+#     required=False,
+#     help="pretrained model file path",
+# )
+# @click.option(
+#     "--fitted_preprocess_file_path",
+#     type=str,
+#     default=None,
+#     required=False,
+#     help="already fitted preprocess pipeline file path",
+# )
+# @click.option(
+#     "--store",
+#     "-s",
+#     type=str,
+#     required=False,
+#     multiple=True,
+#     help="store names to target; not specified = all; multiple specification allowed",
+# )
+# @click.option(
+#     "--item",
+#     "-i",
+#     type=str,
+#     required=False,
+#     multiple=True,
+#     help="item names to target; not specified = all; multiple specification allowed",
+# )
+# @click.option(
+#     "--train_start_date",
+#     type=str,
+#     required=False,
+#     help=f"train start date; format {DATE_FORMAT}",
+# )
+# @click.option(
+#     "--train_end_date",
+#     type=str,
+#     required=False,
+#     help=f"train end date; format {DATE_FORMAT}",
+# )
+# @click.option(
+#     "--test_start_date",
+#     type=str,
+#     required=False,
+#     help=f"test start date; format {DATE_FORMAT}",
+# )
+# @click.option(
+#     "--test_end_date",
+#     type=str,
+#     required=False,
+#     help=f"test end date; format {DATE_FORMAT}",
+# )
+# @click.option(
+#     "--predict_start_date",
+#     type=str,
+#     required=False,
+#     help=f"predict start date; format {DATE_FORMAT}",
+# )
+# @click.option(
+#     "--predict_end_date",
+#     type=str,
+#     required=False,
+#     help=f"predict end date; format {DATE_FORMAT}",
+# )
+# @click.option(
+#     "--experiment_param_file_path",
+#     type=str,
+#     required=False,
+#     help=f"path to experiment params",
+# )
+# @click.option(
+#     "--train_param_file_path",
+#     type=str,
+#     required=False,
+#     help=f"path to train params",
+# )
 @click.option(
     "--retrieve_data",
     is_flag=True,
@@ -160,57 +161,39 @@ DATE_FORMAT = "%Y-%m-%d"
     is_flag=True,
     help="run prediction",
 )
+@hydra.main(
+    config_path="/opt/data/hydra",
+    config_name="default",
+)
 def main(
-    model_name: str,
-    save_file_directory: str = "/tmp",
-    data_file_path: Optional[str] = None,
-    prediction_file_path: Optional[str] = None,
-    data_manager_api: Optional[str] = None,
-    onnx_file_path: Optional[str] = None,
-    pretrained_model_path: Optional[str] = None,
-    fitted_preprocess_file_path: Optional[str] = None,
-    store: Tuple = tuple(),
-    item: Tuple = tuple(),
-    train_start_date: Optional[str] = None,
-    train_end_date: Optional[str] = None,
-    test_start_date: Optional[str] = None,
-    test_end_date: Optional[str] = None,
-    predict_start_date: Optional[str] = None,
-    predict_end_date: Optional[str] = None,
-    experiment_param_file_path: Optional[str] = None,
-    train_param_file_path: Optional[str] = None,
+    cfg: DictConfig,
+    # model_name: str,
+    # save_file_directory: str = "/tmp",
+    # data_file_path: Optional[str] = None,
+    # prediction_file_path: Optional[str] = None,
+    # data_manager_api: Optional[str] = None,
+    # onnx_file_path: Optional[str] = None,
+    # pretrained_model_path: Optional[str] = None,
+    # fitted_preprocess_file_path: Optional[str] = None,
+    # store: Tuple = tuple(),
+    # item: Tuple = tuple(),
+    # train_start_date: Optional[str] = None,
+    # train_end_date: Optional[str] = None,
+    # test_start_date: Optional[str] = None,
+    # test_end_date: Optional[str] = None,
+    # predict_start_date: Optional[str] = None,
+    # predict_end_date: Optional[str] = None,
+    # experiment_param_file_path: Optional[str] = None,
+    # train_param_file_path: Optional[str] = None,
     retrieve_data: bool = False,
     run_experiment: bool = False,
     run_train: bool = False,
     run_prediction: bool = False,
 ):
-    logger.info(
-        f"""
-PARAMETERS:
-    model_name: {model_name}
-    save_file_directory:    {save_file_directory}
-    data_file_path: {data_file_path}
-    prediction_file_path:   {prediction_file_path}
-    onnx_file_path: {onnx_file_path}
-    pretrained_model_path:  {pretrained_model_path}
-    fitted_preprocess_file_path:    {fitted_preprocess_file_path}
-    data_manager_api:   {data_manager_api}
-    store:  {store}
-    item:   {item}
-    train_start_date:   {train_start_date}
-    train_end_date: {train_end_date}
-    test_start_date:    {test_start_date}
-    test_end_date:  {test_end_date}
-    predict_start_date: {predict_start_date}
-    predict_end_date:   {predict_end_date}
-    experiment_param_file_path: {experiment_param_file_path}
-    train_param_file_path: {train_param_file_path}
-    retrieve_data:  {retrieve_data}
-    run_experiment: {run_experiment}
-    run_train:  {run_train}
-    run_prediction: {run_prediction}
-    """
-    )
+    logger.info(f"config: {cfg}")
+    cwd = os.getcwd()
+    logger.info(f"os cwd: {cwd}")
+
     _train_start_date = datetime.strptime(train_start_date, DATE_FORMAT) if train_start_date is not None else None
     _train_end_date = datetime.strptime(train_end_date, DATE_FORMAT) if train_end_date is not None else None
     _test_start_date = datetime.strptime(test_start_date, DATE_FORMAT) if test_start_date is not None else None

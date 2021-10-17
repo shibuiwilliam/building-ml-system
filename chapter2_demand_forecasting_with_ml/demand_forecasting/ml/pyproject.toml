@@ -21,6 +21,9 @@ onnxruntime = "^1.9.0"
 onnx = "^1.10.1"
 onnxmltools = "^1.9.1"
 httpx = "^0.19.0"
+optuna = "^2.10.0"
+mlflow = "^1.20.2"
+hydra-core = "^1.1.1"
 
 [tool.poetry.dev-dependencies]
 
