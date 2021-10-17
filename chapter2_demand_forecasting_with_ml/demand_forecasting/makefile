@@ -158,22 +158,7 @@ run_ml: build_ml
 		--network ml \
 		$(DOCKER_ML_IMAGE_NAME) \
 		python \
-			-m src.main \
-			--data_file_path /opt/data/item_sale_records_2017_2019.csv \
-			--prediction_file_path /opt/data/item_target_20191223_20191229.csv \
-			--model_name light_gbm_regression \
-			--save_file_directory /opt/data \
-			--train_start_date 2017-01-01 \
-			--train_end_date 2019-12-08 \
-			--test_start_date 2019-12-16 \
-			--test_end_date 2019-12-22 \
-			--predict_start_date 2019-12-23 \
-			--predict_end_date 2019-12-29 \
-			--experiment_param_file_path /opt/data/light_gbm_regression_experiment_params.json \
-			--train_param_file_path /opt/data/light_gbm_regression_train_params.json \
-			--run_experiment \
-			--run_train \
-			--run_prediction
+			-m src.main
 
 
 ############ DEMAND FORECASTING BI COMMANDS ############

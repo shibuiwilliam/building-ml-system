@@ -1,17 +1,44 @@
 from abc import ABC, abstractmethod
-from typing import Union
+from enum import Enum
+from typing import Any, Dict, List, Union
 
 import numpy as np
 import pandas as pd
+from pydantic import BaseModel
 from src.utils.logger import configure_logger
 
 logger = configure_logger(__name__)
 
 
+class SUGGEST_TYPE(Enum):
+    CATEGORICAL = "categorical"
+    INT = "int"
+    UNIFORM = "uniform"
+
+
+class SearchParams(BaseModel):
+    name: str
+    suggest_type: SUGGEST_TYPE
+    value_range: Any
+
+
 class BaseDemandForecastingModel(ABC):
     def __init__(self):
-        self.params = None
+        self.name: str = "base_demand_forecasting"
+        self.params: Dict = {}
         self.model = None
+        self.search_params: List[SearchParams] = []
+
+    @abstractmethod
+    def define_default_search_params(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def define_search_params(
+        self,
+        search_params: List[SearchParams],
+    ):
+        raise NotImplementedError
 
     @abstractmethod
     def train(
@@ -27,7 +54,7 @@ class BaseDemandForecastingModel(ABC):
     def predict(
         self,
         x_test: Union[np.ndarray, pd.DataFrame],
-    ) -> np.ndarray:
+    ) -> Union[np.ndarray, pd.DataFrame]:
         raise NotImplementedError
 
     @abstractmethod

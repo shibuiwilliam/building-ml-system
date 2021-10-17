@@ -5,8 +5,8 @@ from typing import Optional, Tuple
 from uuid import uuid4
 
 import click
-from omegaconf import DictConfig
 import hydra
+from omegaconf import DictConfig
 from src.dataset.data_retriever import DataRetriever
 from src.jobs.data import DataJob
 from src.jobs.predict import PredictionJob

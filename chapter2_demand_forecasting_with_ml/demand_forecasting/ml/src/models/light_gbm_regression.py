@@ -1,13 +1,14 @@
-import json
 from collections import OrderedDict
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import lightgbm as lgb
 import numpy as np
 import onnxmltools
 import pandas as pd
+import yaml
+from lightgbm import LGBMRegressor
 from onnxmltools.convert.common.data_types import DoubleTensorType
-from src.models.base_model import BaseDemandForecastingModel
+from src.models.base_model import SUGGEST_TYPE, BaseDemandForecastingModel, SearchParams
 from src.utils.logger import configure_logger
 
 logger = configure_logger(__name__)
@@ -34,10 +35,41 @@ class LightGBMRegressionDemandForecasting(BaseDemandForecastingModel):
         self,
         params: Dict = DEFAULT_PARAMS,
     ):
-        self.params = params
-        self.model: lgb.basic.Booster = None
-        self.column_length: int = 0
         self.name = "light_gbm_regression"
+        self.params = params
+        self.model: LGBMRegressor = LGBMRegressor(**self.params)
+        self.search_params: List[SearchParams] = []
+        self.column_length: int = 0
+
+    def define_default_search_params(self):
+        self.search_params = [
+            SearchParams(
+                name="num_leaves",
+                suggest_type=SUGGEST_TYPE.INT,
+                value_range=(2, 100),
+            ),
+            SearchParams(
+                name="max_depth",
+                suggest_type=SUGGEST_TYPE.INT,
+                value_range=(2, 100),
+            ),
+            SearchParams(
+                name="learning_rate",
+                suggest_type=SUGGEST_TYPE.UNIFORM,
+                value_range=[0.0001, 0.01],
+            ),
+            SearchParams(
+                name="feature_fraction",
+                suggest_type=SUGGEST_TYPE.UNIFORM,
+                value_range=[0.001, 0.9],
+            ),
+        ]
+
+    def define_search_params(
+        self,
+        search_params: List[SearchParams],
+    ):
+        self.search_params = search_params
 
     def train(
         self,
@@ -46,38 +78,21 @@ class LightGBMRegressionDemandForecasting(BaseDemandForecastingModel):
         x_test: Optional[Union[np.ndarray, pd.DataFrame]] = None,
         y_test: Optional[Union[np.ndarray, pd.DataFrame]] = None,
         verbose_eval: int = 100,
-    ) -> Dict[OrderedDict, Any]:
+    ):
         logger.info(f"start train with params: {self.params}")
-        lgbtrain = lgb.Dataset(
-            data=x_train,
-            label=y_train,
+        self.model.fit(
+            X=x_train,
+            y=y_train,
+            eval_set=([(x_train, y_train), (x_test, y_test)]),
+            early_stopping_rounds=200,
+            eval_metric=["mse"],
+            verbose=verbose_eval,
         )
-        valid_sets = [lgbtrain]
-        if x_test is not None and y_test is not None:
-            lgbval = lgb.Dataset(
-                data=x_test,
-                label=y_test,
-                reference=lgbtrain,
-            )
-            valid_sets.append(lgbval)
-
-        self.column_length = x_train.shape[1]
-        evals_result: Dict[OrderedDict, Any] = {}
-        self.model = lgb.train(
-            self.params,
-            lgbtrain,
-            num_boost_round=self.params["num_boost_round"],
-            valid_sets=valid_sets,
-            early_stopping_rounds=self.params["early_stopping_rounds"],
-            evals_result=evals_result,
-            verbose_eval=verbose_eval,
-        )
-        return evals_result
 
     def predict(
         self,
         x_test: Union[np.ndarray, pd.DataFrame],
-    ) -> np.ndarray:
+    ) -> Union[np.ndarray, pd.DataFrame]:
         predictions = self.model.predict(x_test)
         return predictions
 
@@ -87,23 +102,14 @@ class LightGBMRegressionDemandForecasting(BaseDemandForecastingModel):
     ):
         logger.info(f"save model params: {file_path}")
         with open(file_path, "w") as f:
-            json.dump(self.params, f)
-
-    def save_train_history(
-        self,
-        evals_result: Dict[OrderedDict, Any],
-        file_path: str,
-    ):
-        logger.info(f"save train history: {file_path}")
-        with open(file_path, "w") as f:
-            json.dump(evals_result, f)
+            yaml.dump(self.params, f)
 
     def save(
         self,
         file_path: str,
     ):
         logger.info(f"save model: {file_path}")
-        self.model.save_model(file_path)
+        self.model.booster_.save_model(file_path)
 
     def load(
         self,
