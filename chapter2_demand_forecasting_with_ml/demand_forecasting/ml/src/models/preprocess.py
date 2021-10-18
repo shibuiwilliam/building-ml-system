@@ -1,9 +1,9 @@
+import random
 from abc import ABC, abstractmethod
 from typing import List, Optional, Union
 
 import numpy as np
 import pandas as pd
-import random
 from joblib import dump, load
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.compose import ColumnTransformer
