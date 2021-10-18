@@ -34,9 +34,13 @@ class LightGBMRegressionDemandForecasting(BaseDemandForecastingModel):
     def __init__(
         self,
         params: Dict = DEFAULT_PARAMS,
+        early_stopping_rounds: int = 200,
+        verbose_eval: int = 100,
     ):
         self.name = "light_gbm_regression"
         self.params = params
+        self.early_stopping_rounds = early_stopping_rounds
+        self.verbose_eval = verbose_eval
         self.model: LGBMRegressor = LGBMRegressor(**self.params)
         self.search_params: List[SearchParams] = []
         self.column_length: int = 0
@@ -77,16 +81,18 @@ class LightGBMRegressionDemandForecasting(BaseDemandForecastingModel):
         y_train: Union[np.ndarray, pd.DataFrame],
         x_test: Optional[Union[np.ndarray, pd.DataFrame]] = None,
         y_test: Optional[Union[np.ndarray, pd.DataFrame]] = None,
-        verbose_eval: int = 100,
     ):
         logger.info(f"start train with params: {self.params}")
+        eval_set = [(x_train, y_train)]
+        if x_test is not None and y_test is not None:
+            eval_set.append((x_test, y_test))
         self.model.fit(
             X=x_train,
             y=y_train,
-            eval_set=([(x_train, y_train), (x_test, y_test)]),
-            early_stopping_rounds=200,
+            eval_set=eval_set,
+            early_stopping_rounds=self.early_stopping_rounds,
             eval_metric=["mse"],
-            verbose=verbose_eval,
+            verbose=self.verbose_eval,
         )
 
     def predict(

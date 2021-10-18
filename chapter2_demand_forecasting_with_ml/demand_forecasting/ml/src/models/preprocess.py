@@ -3,6 +3,7 @@ from typing import List, Optional, Union
 
 import numpy as np
 import pandas as pd
+import random
 from joblib import dump, load
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.compose import ColumnTransformer
@@ -51,6 +52,46 @@ class Expm1Transformer(BaseEstimator, TransformerMixin):
 
     def transform(self, x):
         return np.expm1(x)
+
+
+class WeekBasedSplit:
+    def __init__(
+        self,
+        n_splits: int = 3,
+        gap: int = 2,
+        min_train_size_rate: float = 0.7,
+    ):
+        if min_train_size_rate >= 1.0:
+            raise ValueError
+        self.n_splits = n_splits
+        self.gap = gap
+        self.min_train_size_rate = min_train_size_rate
+        self.max_test_size_rate = 1.0 - self.min_train_size_rate
+
+    def split(
+        self,
+        X: pd.DataFrame,
+        y=None,
+        groups=None,
+    ):
+        year_weeks = X.year.astype(str).str.cat(X.week_of_year.astype(str), sep="_").unique()
+        year_week_index = [i for i in range(len(year_weeks))]
+        x_size = len(year_week_index)
+        min_train_size = int(x_size * self.min_train_size_rate)
+        candidates = year_week_index[self.gap + min_train_size :]
+        for _ in range(self.n_splits):
+            train_position = random.choice(candidates)
+            train_year_week = year_weeks[train_position]
+            train_year, train_week = train_year_week.split("_")
+
+            test_position = train_position + self.gap
+            test_year_week = year_weeks[test_position]
+            test_year, test_week = test_year_week.split("_")
+
+            yield np.array(list(x_train.index)), np.array(list(x_test.index))
+
+    def get_n_splits(self, X, y=None, groups=None):
+        return self.n_splits
 
 
 class BasePreprocessPipeline(ABC, BaseEstimator, TransformerMixin):

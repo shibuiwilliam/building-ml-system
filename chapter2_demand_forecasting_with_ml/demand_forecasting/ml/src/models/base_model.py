@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, Optional
 
 import numpy as np
 import pandas as pd
@@ -44,9 +44,9 @@ class BaseDemandForecastingModel(ABC):
     def train(
         self,
         x_train: Union[np.ndarray, pd.DataFrame],
-        x_test: Union[np.ndarray, pd.DataFrame],
         y_train: Union[np.ndarray, pd.DataFrame],
-        y_test: Union[np.ndarray, pd.DataFrame],
+        x_test: Optional[Union[np.ndarray, pd.DataFrame]] = None,
+        y_test: Optional[Union[np.ndarray, pd.DataFrame]] = None,
     ):
         raise NotImplementedError
 
