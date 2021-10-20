@@ -1,6 +1,6 @@
 import random
 from abc import ABC, abstractmethod
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Tuple
 
 import numpy as np
 import pandas as pd
@@ -10,7 +10,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import FunctionTransformer, MinMaxScaler, OneHotEncoder
-from src.dataset.schema import BASE_SCHEMA, MONTHS, WEEKLY_SCHEMA, WEEKS, YEARS
+from src.dataset.schema import BASE_SCHEMA, MONTHS, WEEKLY_SCHEMA, WEEKS, YEARS, WEEK_BASED_SPLIT_SCHEMA
 from src.utils.logger import configure_logger
 
 logger = configure_logger(__name__)
@@ -59,38 +59,48 @@ class WeekBasedSplit:
         self,
         n_splits: int = 3,
         gap: int = 2,
-        min_train_size_rate: float = 0.7,
+        min_train_size_rate=0.7,
     ):
         if min_train_size_rate >= 1.0:
             raise ValueError
         self.n_splits = n_splits
         self.gap = gap
         self.min_train_size_rate = min_train_size_rate
-        self.max_test_size_rate = 1.0 - self.min_train_size_rate
 
     def split(
         self,
         X: pd.DataFrame,
         y=None,
         groups=None,
-    ):
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        X = WEEK_BASED_SPLIT_SCHEMA.validate(X)
         year_weeks = X.year.astype(str).str.cat(X.week_of_year.astype(str), sep="_").unique()
         year_week_index = [i for i in range(len(year_weeks))]
         x_size = len(year_week_index)
         min_train_size = int(x_size * self.min_train_size_rate)
-        candidates = year_week_index[self.gap + min_train_size :]
+        candidates = year_week_index[self.gap + min_train_size : -self.gap]
         for _ in range(self.n_splits):
             train_position = random.choice(candidates)
             train_year_week = year_weeks[train_position]
-            train_year, train_week = train_year_week.split("_")
+            _train_year, _train_week = train_year_week.split("_")
+            train_year, train_week = int(_train_year), int(_train_week)
 
             test_position = train_position + self.gap
             test_year_week = year_weeks[test_position]
-            test_year, test_week = test_year_week.split("_")
+            _test_year, _test_week = test_year_week.split("_")
+            test_year, test_week = int(_test_year), int(_test_week)
+
+            x_train = X[(X.year < train_year) | ((X.year == train_year) & (X.week_of_year <= train_week))]
+            x_test = X[(X.year > test_year) | ((X.year == test_year) & (X.week_of_year >= test_week))]
 
             yield np.array(list(x_train.index)), np.array(list(x_test.index))
 
-    def get_n_splits(self, X, y=None, groups=None):
+    def get_n_splits(
+        self,
+        X,
+        y=None,
+        groups=None,
+    ) -> int:
         return self.n_splits
 
 

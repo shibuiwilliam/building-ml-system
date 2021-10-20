@@ -78,25 +78,33 @@ WEEKLY_SCHEMA = DataFrameSchema(
     coerce=True,
 )
 
-_PREPROCESSED_SCHEMA = (
-    {
-        "store": Column(str, checks=Check.isin(STORES)),
-        "item": Column(str, checks=Check.isin(ITEMS)),
-        "sales.*": Column(float, checks=Check.greater_than_or_equal_to(0), nullable=True, regex=True),
-        "item_price": Column(float, checks=Check(lambda x: x >= 0.0 and x <= 1.0, element_wise=True)),
-        "store_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
-        "item_.*[^price]": Column(float, checks=Check.isin((0, 1)), regex=True),
-        "week_of_year_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
-        "month_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
-        "year_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
-    },
-)
+_PREPROCESSED_SCHEMA = {
+    "store": Column(str, checks=Check.isin(STORES)),
+    "item": Column(str, checks=Check.isin(ITEMS)),
+    "sales.*": Column(float, checks=Check.greater_than_or_equal_to(0), nullable=True, regex=True),
+    "item_price": Column(float, checks=Check(lambda x: x >= 0.0 and x <= 1.0, element_wise=True)),
+    "store_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
+    "item_.*[^price]": Column(float, checks=Check.isin((0, 1)), regex=True),
+    "week_of_year_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
+    "month_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
+    "year_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
+}
 
 PREPROCESSED_SCHEMA = DataFrameSchema(
     _PREPROCESSED_SCHEMA,
     index=Index(int),
     strict=True,
     coerce=True,
+)
+
+_WEEK_BASED_SPLIT_SCHEMA = {
+    "year": Column(int),
+    "week_of_year": Column(int, checks=Check.isin(WEEKS)),
+}
+
+WEEK_BASED_SPLIT_SCHEMA = DataFrameSchema(
+    _WEEK_BASED_SPLIT_SCHEMA,
+    index=Index(int),
 )
 
 
@@ -123,6 +131,7 @@ _UPDATED_BASE_SCHEMA = {
     "is_month_start": Column(int, checks=Check.isin((0, 1))),
     "is_month_end": Column(int, checks=Check.isin((0, 1))),
 }
+
 _UPDATED_SCHEMA = {**_BASE_SCHEMA, **_UPDATED_BASE_SCHEMA}
 
 UPDATED_SCHEMA = DataFrameSchema(
