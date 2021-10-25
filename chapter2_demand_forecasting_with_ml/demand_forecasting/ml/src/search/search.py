@@ -6,6 +6,7 @@ import numpy as np
 import optuna
 import pandas as pd
 from omegaconf import DictConfig
+from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import BaseCrossValidator, cross_validate
 from src.models.base_model import BaseDemandForecastingModel
 from src.search.schema import SUGGEST_TYPE, SearchParams
@@ -166,18 +167,45 @@ class OptunaRunner(object):
                         search_param.value_range[1],
                     )
 
-            logger.debug(f"params: {params}")
+            logger.info(f"params: {params}")
 
-            scores = cross_validate(
-                estimator=model.model,
-                X=self.data,
-                y=self.target,
-                cv=self.cv,
-                scoring=self.scorings,
-                error_score=np.nan,
-                fit_params=fit_params,
-            )
-            logger.debug(f"result: {scores}")
-            return scores[scoring].mean()
+            if isinstance(self.cv, int):
+                scores = cross_validate(
+                    estimator=model.model,
+                    X=self.data,
+                    y=self.target,
+                    cv=self.cv,
+                    scoring=self.scorings,
+                    error_score=np.nan,
+                    fit_params=fit_params,
+                )
+                logger.debug(f"result: {scores}")
+                return scores[scoring].mean()
+            else:
+                evaluations = []
+                for train_index, test_index in self.cv.split(X=self.data):
+                    model.reset_model(params=params)
+                    if fit_params is not None:
+                        early_stopping_rounds = fit_params.get("early_stopping_rounds", 200)
+                        eval_metrics = fit_params.get("eval_metric", "mse")
+                        verbose_eval = fit_params.get("verbose_eval", 1000)
+                    x_train = self.data.iloc[train_index]
+                    y_train = self.target.iloc[train_index]
+                    x_test = self.data.iloc[test_index]
+                    y_test = self.target.iloc[test_index]
+                    eval_set = [(x_train, y_train), (x_test, y_test)]
+
+                    model.model.fit(
+                        X=x_train,
+                        y=y_train,
+                        eval_set=eval_set,
+                        early_stopping_rounds=early_stopping_rounds,
+                        eval_metric=eval_metrics,
+                        verbose=verbose_eval,
+                    )
+                    preds = model.model.predict(x_test)
+                    evaluation = mean_squared_error(y_test, preds, squared=True)
+                    evaluations.append(evaluation)
+                return sum(evaluations) / len(evaluations)
 
         return _objective

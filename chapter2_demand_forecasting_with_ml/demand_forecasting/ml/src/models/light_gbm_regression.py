@@ -41,6 +41,7 @@ class LightGBMRegressionDemandForecasting(BaseDemandForecastingModel):
         self.eval_metrics = eval_metrics
         self.verbose_eval = verbose_eval
 
+        self.model: LGBMRegressor = None
         self.reset_model(params=self.params)
         self.search_params: List[SearchParams] = []
         self.column_length: int = 0
