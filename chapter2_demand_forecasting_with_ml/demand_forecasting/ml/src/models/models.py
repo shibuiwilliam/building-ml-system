@@ -3,7 +3,7 @@ from enum import Enum
 from typing import Dict, List, Optional
 
 from src.models.base_model import BaseDemandForecastingModel
-from src.models.light_gbm_regression import DEFAULT_PARAMS, LightGBMRegressionDemandForecasting
+from src.models.light_gbm_regression import LGB_REGRESSION_DEFAULT_PARAMS, LightGBMRegressionDemandForecasting
 
 
 @dataclasses.dataclass(frozen=True)
@@ -17,7 +17,7 @@ class MODELS(Enum):
     LIGHT_GBM_REGRESSION = Model(
         name="light_gbm_regression",
         model=LightGBMRegressionDemandForecasting,
-        params=DEFAULT_PARAMS,
+        params=LGB_REGRESSION_DEFAULT_PARAMS,
     )
 
     @staticmethod
@@ -29,8 +29,8 @@ class MODELS(Enum):
         return [v.value for v in MODELS.__members__.values()]
 
     @staticmethod
-    def get_value(name: str) -> Optional[Model]:
+    def get_model(name: str) -> Optional[Model]:
         for model in [v.value for v in MODELS.__members__.values()]:
             if model.name == name:
                 return model
-        return None
+        raise ValueError

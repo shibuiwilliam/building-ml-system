@@ -155,11 +155,15 @@ run_ml: build_ml
 		-d \
 		--name ml_test \
 		-v $(DIR)/data:/opt/data \
-		--network ml \
+		-v $(ML_DIR)/hydra/:/opt/hydra \
+		-v $(ML_DIR)/outputs/:/opt/outputs \
 		$(DOCKER_ML_IMAGE_NAME) \
 		python \
 			-m src.main
 
+.PHONY: rm_ml
+rm_ml:
+	docker rm -f ml_test
 
 ############ DEMAND FORECASTING BI COMMANDS ############
 BI_DIR := $(DIR)/bi

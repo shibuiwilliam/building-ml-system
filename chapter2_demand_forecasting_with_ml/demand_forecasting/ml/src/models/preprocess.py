@@ -1,6 +1,6 @@
 import random
 from abc import ABC, abstractmethod
-from typing import List, Optional, Union, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -8,9 +8,10 @@ from joblib import dump, load
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
+from sklearn.model_selection import BaseCrossValidator
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import FunctionTransformer, MinMaxScaler, OneHotEncoder
-from src.dataset.schema import BASE_SCHEMA, MONTHS, WEEKLY_SCHEMA, WEEKS, YEARS, WEEK_BASED_SPLIT_SCHEMA
+from src.dataset.schema import BASE_SCHEMA, MONTHS, PREPROCESSED_SCHEMA, WEEKLY_SCHEMA, WEEKS, YEARS
 from src.utils.logger import configure_logger
 
 logger = configure_logger(__name__)
@@ -30,50 +31,31 @@ def select_by_store_and_item(
     return df
 
 
-class Log1pTransformer(BaseEstimator, TransformerMixin):
-    def __init__(self):
-        pass
-
-    def fit(self, x, y=None):
-        return self
-
-    def transform(self, x):
-        if x is not None:
-            return np.log1p(x)
-        return None
-
-
-class Expm1Transformer(BaseEstimator, TransformerMixin):
-    def __init__(self):
-        pass
-
-    def fit(self, x, y=None):
-        return self
-
-    def transform(self, x):
-        return np.expm1(x)
-
-
-class WeekBasedSplit:
+class WeekBasedSplit(BaseCrossValidator):
     def __init__(
         self,
         n_splits: int = 3,
         gap: int = 2,
-        min_train_size_rate=0.7,
+        min_train_size_rate: float = 0.7,
+        columns: Dict = None,
+        types: Dict = None,
     ):
         if min_train_size_rate >= 1.0:
             raise ValueError
         self.n_splits = n_splits
         self.gap = gap
         self.min_train_size_rate = min_train_size_rate
+        self.columns = columns
+        self.types = types
 
     def split(
         self,
-        X: pd.DataFrame,
+        X: Union[np.ndarray, pd.DataFrame],
         y=None,
         groups=None,
-    ) -> Tuple[np.ndarray, np.ndarray]:
-        X = WEEK_BASED_SPLIT_SCHEMA.validate(X)
+    ):
+        if isinstance(X, np.ndarray):
+            X = pd.DataFrame(X, columns=self.columns).astype(self.types)
         year_weeks = X.year.astype(str).str.cat(X.week_of_year.astype(str), sep="_").unique()
         year_week_index = [i for i in range(len(year_weeks))]
         x_size = len(year_week_index)
@@ -100,7 +82,7 @@ class WeekBasedSplit:
         X,
         y=None,
         groups=None,
-    ) -> int:
+    ):
         return self.n_splits
 
 
@@ -132,13 +114,6 @@ class BasePreprocessPipeline(ABC, BaseEstimator, TransformerMixin):
         raise NotImplementedError
 
     @abstractmethod
-    def inverse_transform_target(
-        self,
-        y: pd.DataFrame,
-    ) -> pd.DataFrame:
-        raise NotImplementedError
-
-    @abstractmethod
     def dump_pipeline(
         self,
         file_path: str,
@@ -161,18 +136,23 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
         self.month_ohe_transformer: FunctionTransformer = None
         self.year_ohe_transformer: FunctionTransformer = None
 
-        self.lag_columns: List[str] = [f"sales_lag_{i}" for i in range(1, 54, 1)]
+        self.bare_columns = ["store", "item", "year", "week_of_year", "sales"]
+        self.lag_columns: List[str] = [f"sales_lag_{i}" for i in range(2, 54, 1)]
         self.store_categories: List[str] = []
         self.item_categories: List[str] = []
         self.week_of_year_categories: List[str] = []
         self.month_categories: List[str] = []
         self.year_categories: List[str] = []
         self.preprocessed_columns: List[str] = []
+        self.preprocessed_types: Dict[str, str] = {}
+
+        self.define_pipeline()
 
     def define_pipeline(self):
-        week_of_year_ohe = OneHotEncoder(sparse=True, handle_unknown="ignore").fit(WEEKS)
-        month_ohe = OneHotEncoder(sparse=True, handle_unknown="ignore").fit(MONTHS)
-        year_ohe = OneHotEncoder(sparse=True, handle_unknown="ignore").fit(YEARS)
+        logger.info("init pipeline")
+        week_of_year_ohe = OneHotEncoder(sparse=True, handle_unknown="ignore").fit([[i] for i in WEEKS])
+        month_ohe = OneHotEncoder(sparse=True, handle_unknown="ignore").fit([[i] for i in MONTHS])
+        year_ohe = OneHotEncoder(sparse=True, handle_unknown="ignore").fit([[i] for i in YEARS])
 
         self.week_of_year_categories = [f"week_of_year_{c}" for c in week_of_year_ohe.categories_[0].tolist()]
         self.month_categories = [f"month_{c}" for c in month_ohe.categories_[0].tolist()]
@@ -187,18 +167,25 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
                 (
                     "bare",
                     Pipeline(
-                        [("simple_imputer", SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=None))]
+                        [
+                            (
+                                "simple_imputer",
+                                SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=None),
+                            )
+                        ]
                     ),
-                    ["store", "item"],
+                    self.bare_columns,
                 ),
                 (
-                    "sales",
-                    Pipeline([("log1p_transformer", Log1pTransformer())]),
-                    ["sales"],
-                ),
-                (
-                    "lags",
-                    Pipeline([("log1p_transformer", Log1pTransformer())]),
+                    "lag",
+                    Pipeline(
+                        [
+                            (
+                                "simple_imputer",
+                                SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=None),
+                            )
+                        ]
+                    ),
                     self.lag_columns,
                 ),
                 (
@@ -209,7 +196,7 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
                                 "simple_imputer",
                                 SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=None),
                             ),
-                            ("standard_scaler", MinMaxScaler()),
+                            ("scaler", MinMaxScaler()),
                         ]
                     ),
                     ["item_price"],
@@ -269,8 +256,9 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
             ],
             verbose_feature_names_out=True,
         )
+        logger.info(f"pipeline: {self.pipeline}")
 
-    def to_weekly_data(
+    def preprocess(
         self,
         x: pd.DataFrame,
         y=None,
@@ -279,15 +267,8 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
         x["year"] = x.date.dt.year
         x["week_of_year"] = x.date.dt.weekofyear
         x["month"] = x.date.dt.month
-        df_week = (
-            x.groupby(
-                [
-                    "year",
-                    "week_of_year",
-                    "store",
-                    "item",
-                ]
-            )
+        weekly_df = (
+            x.groupby(["year", "week_of_year", "store", "item"])
             .agg(
                 {
                     "month": np.mean,
@@ -305,37 +286,12 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
                 }
             )
         )
-        df_week = df_week.reset_index(level=["year", "week_of_year", "store", "item"])
-        df_week = df_week.sort_values(["year", "month", "week_of_year", "store", "item"])
-        for i in range(1, 54, 1):
-            df_week[f"sales_lag_{i}"] = df_week.groupby(["store", "item"])["sales"].shift(i)
-        df_week = WEEKLY_SCHEMA.validate(df_week)
-        return df_week
-
-    def postprocess(
-        self,
-        x: np.ndarray,
-    ) -> pd.DataFrame:
-        self.store_categories = [
-            f"store_{c}"
-            for c in self.pipelines.named_transformers_["categorical"].steps[-1][-1].categories_[0].tolist()
-        ]
-        self.item_categories = [
-            f"item_{c}" for c in self.pipelines.named_transformers_["categorical"].steps[-1][-1].categories_[1].tolist()
-        ]
-        self.preprocessed_columns = ["store", "item", "sales"]
-        self.preprocessed_columns.extend(self.lag_columns)
-        self.preprocessed_columns.append("item_price")
-        self.preprocessed_columns.extend(self.store_categories)
-        self.preprocessed_columns.extend(self.item_categories)
-        self.preprocessed_columns.extend(self.week_of_year_categories)
-        self.preprocessed_columns.extend(self.month_categories)
-        self.preprocessed_columns.extend(self.year_categories)
-        types = {c: "float64" for c in self.preprocessed_columns}
-        types["store"] = "str"
-        types["item"] = "str"
-        df = pd.DataFrame(x, columns=self.preprocessed_columns).astype(types)
-        return df
+        weekly_df = weekly_df.reset_index(level=["year", "week_of_year", "store", "item"])
+        weekly_df = weekly_df.sort_values(["year", "month", "week_of_year", "store", "item"])
+        for i in range(2, 54, 1):
+            weekly_df[f"sales_lag_{i}"] = weekly_df.groupby(["store", "item"])["sales"].shift(i)
+        weekly_df = WEEKLY_SCHEMA.validate(weekly_df)
+        return weekly_df
 
     def fit(
         self,
@@ -346,6 +302,9 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
             raise AttributeError
         x = WEEKLY_SCHEMA.validate(x)
         self.pipeline.fit(x)
+
+        self.set_categories()
+
         return self
 
     def transform(
@@ -368,14 +327,45 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
             raise AttributeError
         x = WEEKLY_SCHEMA.validate(x)
         _x = self.pipeline.fit_transform(x)
+
+        self.set_categories()
+
         df = self.postprocess(x=_x)
         return df
 
-    def inverse_transform_target(
+    def set_categories(self):
+        self.store_categories = [
+            f"store_{c}" for c in self.pipeline.named_transformers_["categorical"].steps[-1][-1].categories_[0].tolist()
+        ]
+        self.item_categories = [
+            f"item_{c}" for c in self.pipeline.named_transformers_["categorical"].steps[-1][-1].categories_[1].tolist()
+        ]
+        logger.info(f"store_categories: {self.store_categories}")
+        logger.info(f"item_categories: {self.item_categories}")
+
+    def postprocess(
         self,
-        y: pd.DataFrame,
+        x: np.ndarray,
     ) -> pd.DataFrame:
-        return Expm1Transformer().fit_transform(y)
+        self.preprocessed_columns = []
+        self.preprocessed_columns.extend(self.bare_columns)
+        self.preprocessed_columns.extend(self.lag_columns)
+        self.preprocessed_columns.append("item_price")
+        self.preprocessed_columns.extend(self.store_categories)
+        self.preprocessed_columns.extend(self.item_categories)
+        self.preprocessed_columns.extend(self.week_of_year_categories)
+        self.preprocessed_columns.extend(self.month_categories)
+        self.preprocessed_columns.extend(self.year_categories)
+        self.preprocessed_types = {c: "float64" for c in self.preprocessed_columns}
+        self.preprocessed_types["store"] = "str"
+        self.preprocessed_types["item"] = "str"
+        self.preprocessed_types["year"] = "int"
+        self.preprocessed_types["week_of_year"] = "int"
+        logger.info(f"preprocessed_columns: {self.preprocessed_columns}")
+        logger.info(f"preprocessed_types: {self.preprocessed_types}")
+        df = pd.DataFrame(x, columns=self.preprocessed_columns).astype(self.preprocessed_types)
+        df = PREPROCESSED_SCHEMA.validate(df)
+        return df
 
     def dump_pipeline(
         self,

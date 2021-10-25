@@ -38,7 +38,7 @@ WEEKS = [i for i in range(1, 54, 1)]
 
 MONTHS = [i for i in range(1, 13, 1)]
 
-YEARS = [[i] for i in range(2017, 2031, 1)]
+YEARS = [i for i in range(2017, 2031, 1)]
 
 DAYS_OF_WEEK = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
 
@@ -81,7 +81,14 @@ WEEKLY_SCHEMA = DataFrameSchema(
 _PREPROCESSED_SCHEMA = {
     "store": Column(str, checks=Check.isin(STORES)),
     "item": Column(str, checks=Check.isin(ITEMS)),
-    "sales.*": Column(float, checks=Check.greater_than_or_equal_to(0), nullable=True, regex=True),
+    "year": Column(int, checks=Check.isin(YEARS)),
+    "week_of_year": Column(int, checks=Check.isin(WEEKS)),
+    "sales.*": Column(
+        float,
+        checks=Check(lambda x: x >= 0.0 and x <= 5000.0, element_wise=True),
+        nullable=True,
+        regex=True,
+    ),
     "item_price": Column(float, checks=Check(lambda x: x >= 0.0 and x <= 1.0, element_wise=True)),
     "store_.*": Column(float, checks=Check.isin((0, 1)), regex=True),
     "item_.*[^price]": Column(float, checks=Check.isin((0, 1)), regex=True),

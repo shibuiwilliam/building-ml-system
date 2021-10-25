@@ -6,7 +6,6 @@ name = "train"
 version = "0.0.0"
 
 [tool.poetry.dependencies]
-click = "^8.0.1"
 dvc = "^2.7.4"
 lightgbm = "^3.2.1"
 nptyping = "^1.4.4"

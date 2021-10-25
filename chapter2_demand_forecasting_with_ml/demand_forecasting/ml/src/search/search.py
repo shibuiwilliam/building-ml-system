@@ -1,15 +1,49 @@
 from enum import Enum
-from typing import Dict, Iterator, List, Union
+from typing import Dict, Iterator, List, Optional, Union
 
 import mlflow
 import numpy as np
 import optuna
 import pandas as pd
-from sklearn.model_selection import cross_validate
-from src.models.base_model import SUGGEST_TYPE, BaseDemandForecastingModel
+from omegaconf import DictConfig
+from sklearn.model_selection import BaseCrossValidator, cross_validate
+from src.models.base_model import BaseDemandForecastingModel
+from src.search.schema import SUGGEST_TYPE, SearchParams
 from src.utils.logger import configure_logger
 
 logger = configure_logger(name=__name__)
+
+
+def parse_params(params: DictConfig) -> List[SearchParams]:
+    search_params = []
+    for param in params:
+        if param.suggest_type == SUGGEST_TYPE.CATEGORICAL.value:
+            search_params.append(
+                SearchParams(
+                    name=param.name,
+                    suggest_type=SUGGEST_TYPE.CATEGORICAL,
+                    value_range=param.value_range,
+                )
+            )
+        elif param.suggest_type == SUGGEST_TYPE.INT.value:
+            search_params.append(
+                SearchParams(
+                    name=param.name,
+                    suggest_type=SUGGEST_TYPE.INT,
+                    value_range=tuple(param.value_range),
+                )
+            )
+        elif param.suggest_type == SUGGEST_TYPE.UNIFORM.value:
+            search_params.append(
+                SearchParams(
+                    name=param.name,
+                    suggest_type=SUGGEST_TYPE.UNIFORM,
+                    value_range=tuple(param.value_range),
+                )
+            )
+
+    logger.info(f"params: {search_params}")
+    return search_params
 
 
 class DIRECTION(Enum):
@@ -34,18 +68,21 @@ class OptunaRunner(object):
         data: pd.DataFrame,
         target: pd.DataFrame,
         direction: DIRECTION = DIRECTION.MAXIMIZE,
-        cv: int = 5,
-        scorings: Dict[str, str] = {
-            "accuracy": "accuracy",
-            "precision_macro": "precision_macro",
-            "recall_macro": "recall_macro",
-        },
+        cv: Union[int, BaseCrossValidator] = 5,
+        scorings: Optional[Dict[str, str]] = None,
     ):
         self.data = data
         self.target = target
         self.direction = direction
         self.cv = cv
         self.scorings = scorings
+        if self.scorings is None:
+            self.scorings = {
+                "neg_mean_squared_error": "neg_mean_squared_error",
+                "neg_root_mean_squared_error": "neg_root_mean_squared_error",
+                "neg_mean_absolute_error": "neg_mean_absolute_error",
+                "neg_mean_absolute_percentage_error": "neg_mean_absolute_percentage_error",
+            }
 
         optuna.logging.enable_default_handler()
 
@@ -54,12 +91,16 @@ class OptunaRunner(object):
         estimators: List[BaseDemandForecastingModel],
         n_trials: int = 20,
         n_jobs: int = 1,
+        fit_params: Optional[Dict] = None,
+        scoring: str = "test_neg_mean_squared_error",
     ) -> List[Dict[str, Union[str, float]]]:
         return list(
             self._optimize(
                 estimators=estimators,
                 n_jobs=n_jobs,
                 n_trials=n_trials,
+                fit_params=fit_params,
+                scoring=scoring,
             )
         )
 
@@ -68,6 +109,8 @@ class OptunaRunner(object):
         estimators: List[BaseDemandForecastingModel],
         n_trials: int = 20,
         n_jobs: int = 1,
+        fit_params: Optional[Dict] = None,
+        scoring: str = "test_neg_mean_squared_error",
     ) -> Iterator[Dict[str, Union[str, float]]]:
         for estimator in estimators:
             logger.info(f"estimator: {estimator}")
@@ -76,7 +119,11 @@ class OptunaRunner(object):
                 direction=self.direction.value,
             )
             study.optimize(
-                self.objective(estimator=estimator),
+                self.objective(
+                    estimator=estimator,
+                    fit_params=fit_params,
+                    scoring=scoring,
+                ),
                 n_jobs=n_jobs,
                 n_trials=n_trials,
                 callbacks=[mlflow_callback],
@@ -92,6 +139,8 @@ class OptunaRunner(object):
     def objective(
         self,
         estimator: BaseDemandForecastingModel,
+        fit_params: Optional[Dict] = None,
+        scoring: str = "test_neg_mean_squared_error",
     ):
         def _objective(
             trial: optuna.Trial,
@@ -126,8 +175,9 @@ class OptunaRunner(object):
                 cv=self.cv,
                 scoring=self.scorings,
                 error_score=np.nan,
+                fit_params=fit_params,
             )
             logger.debug(f"result: {scores}")
-            return scores["test_accuracy"].mean()
+            return scores[scoring].mean()
 
         return _objective

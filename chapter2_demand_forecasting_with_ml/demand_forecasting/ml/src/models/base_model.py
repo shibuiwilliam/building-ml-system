@@ -1,25 +1,12 @@
 from abc import ABC, abstractmethod
-from enum import Enum
-from typing import Any, Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 import numpy as np
 import pandas as pd
-from pydantic import BaseModel
+from src.search.schema import SearchParams
 from src.utils.logger import configure_logger
 
 logger = configure_logger(__name__)
-
-
-class SUGGEST_TYPE(Enum):
-    CATEGORICAL = "categorical"
-    INT = "int"
-    UNIFORM = "uniform"
-
-
-class SearchParams(BaseModel):
-    name: str
-    suggest_type: SUGGEST_TYPE
-    value_range: Any
 
 
 class BaseDemandForecastingModel(ABC):
@@ -28,6 +15,13 @@ class BaseDemandForecastingModel(ABC):
         self.params: Dict = {}
         self.model = None
         self.search_params: List[SearchParams] = []
+
+    @abstractmethod
+    def reset_model(
+        self,
+        params: Optional[Dict] = None,
+    ):
+        raise NotImplementedError
 
     @abstractmethod
     def define_default_search_params(self):

@@ -1,5 +1,4 @@
-from collections import OrderedDict
-from typing import Any, Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 import lightgbm as lgb
 import numpy as np
@@ -8,24 +7,22 @@ import pandas as pd
 import yaml
 from lightgbm import LGBMRegressor
 from onnxmltools.convert.common.data_types import DoubleTensorType
-from src.models.base_model import SUGGEST_TYPE, BaseDemandForecastingModel, SearchParams
+from src.models.base_model import BaseDemandForecastingModel
+from src.search.schema import SUGGEST_TYPE, SearchParams
 from src.utils.logger import configure_logger
 
 logger = configure_logger(__name__)
 
-DEFAULT_PARAMS = {
+LGB_REGRESSION_DEFAULT_PARAMS = {
     "task": "train",
     "boosting": "gbdt",
     "objective": "regression",
-    "metric": ["mse"],
-    "num_leaves": 3,
+    "num_leaves": 4,
     "learning_rate": 0.01,
     "feature_fraction": 0.8,
     "max_depth": -1,
-    "verbose": 0,
-    "num_boost_round": 200000,
-    "early_stopping_rounds": 200,
-    "num_threads": 0,
+    "num_boost_round": 1000000,
+    "num_threads": 1,
     "seed": 1234,
 }
 
@@ -33,17 +30,30 @@ DEFAULT_PARAMS = {
 class LightGBMRegressionDemandForecasting(BaseDemandForecastingModel):
     def __init__(
         self,
-        params: Dict = DEFAULT_PARAMS,
+        params: Dict = LGB_REGRESSION_DEFAULT_PARAMS,
         early_stopping_rounds: int = 200,
-        verbose_eval: int = 100,
+        eval_metrics: Union[str, List[str]] = "mse",
+        verbose_eval: int = 1000,
     ):
         self.name = "light_gbm_regression"
         self.params = params
         self.early_stopping_rounds = early_stopping_rounds
+        self.eval_metrics = eval_metrics
         self.verbose_eval = verbose_eval
-        self.model: LGBMRegressor = LGBMRegressor(**self.params)
+
+        self.reset_model(params=self.params)
         self.search_params: List[SearchParams] = []
         self.column_length: int = 0
+
+    def reset_model(
+        self,
+        params: Optional[Dict] = None,
+    ):
+        if params is not None:
+            self.params = params
+        logger.info(f"params: {self.params}")
+        self.model = LGBMRegressor(**self.params)
+        logger.info(f"initialized model: {self.model}")
 
     def define_default_search_params(self):
         self.search_params = [
@@ -82,7 +92,7 @@ class LightGBMRegressionDemandForecasting(BaseDemandForecastingModel):
         x_test: Optional[Union[np.ndarray, pd.DataFrame]] = None,
         y_test: Optional[Union[np.ndarray, pd.DataFrame]] = None,
     ):
-        logger.info(f"start train with params: {self.params}")
+        logger.info(f"start train for model: {self.model}")
         eval_set = [(x_train, y_train)]
         if x_test is not None and y_test is not None:
             eval_set.append((x_test, y_test))
@@ -91,7 +101,7 @@ class LightGBMRegressionDemandForecasting(BaseDemandForecastingModel):
             y=y_train,
             eval_set=eval_set,
             early_stopping_rounds=self.early_stopping_rounds,
-            eval_metric=["mse"],
+            eval_metric=self.eval_metrics,
             verbose=self.verbose_eval,
         )
 
