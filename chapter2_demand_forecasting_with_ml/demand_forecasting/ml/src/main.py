@@ -9,7 +9,8 @@ from omegaconf import DictConfig
 from src.dataset.data_retriever import DATA_SOURCE, load_df_from_csv
 from src.dataset.schema import BASE_SCHEMA
 from src.models.models import MODELS
-from src.models.preprocess import DataPreprocessPipeline
+from src.models.preprocess import DataPreprocessPipeline, WeekBasedSplit
+from src.search.search import DIRECTION, OptunaRunner, parse_params
 from src.utils.logger import configure_logger
 
 logger = configure_logger(__name__)
@@ -96,7 +97,49 @@ y_test shape: {y_test.shape}
     )
 
     _model = MODELS.get_model(name=cfg.jobs.model.name)
-    model = _model.model()
+    model = _model.model(
+        early_stopping_rounds=cfg.jobs.model.get("early_stopping_rounds", 200),
+        eval_metrics=cfg.jobs.model.get("eval_metrics", "mse"),
+        verbose_eval=cfg.jobs.model.get("verbose_eval", 1000),
+    )
+    if "params" in cfg.jobs.model.keys():
+        model.reset_model(params=cfg.jobs.model.params)
+
+    if cfg.jobs.search.run:
+        search_params = parse_params(params=cfg.jobs.search.optuna.light_gbm.parameters)
+        model.define_search_params(search_params=search_params)
+        optuna_runner = OptunaRunner(
+            data=x_train,
+            target=y_train,
+            direction=DIRECTION.MINIMIZE,
+            cv=WeekBasedSplit(
+                n_splits=5,
+                gap=2,
+                min_train_size_rate=0.8,
+                columns=data_preprocess_pipeline.preprocessed_columns,
+                types=data_preprocess_pipeline.preprocessed_types,
+            ),
+            scorings={"neg_mean_squared_error": "neg_mean_squared_error"},
+        )
+        results = optuna_runner.optimize(
+            models=[model],
+            n_trials=cfg.jobs.search.optuna.n_trials,
+            n_jobs=cfg.jobs.search.optuna.n_jobs,
+            scoring="test_neg_mean_squared_error",
+            fit_params=dict(
+                eval_set=[(x_test, y_test)],
+                early_stopping_rounds=cfg.jobs.model.get("early_stopping_rounds", 200),
+                eval_metric=cfg.jobs.model.get("eval_metrics", "mse"),
+                verbose=cfg.jobs.model.get("verbose_eval", 1000),
+            ),
+        )
+        logger.info(f"parameter search results: {results}")
+        params = results[0]["best_params"]
+        for k, v in model.params.items():
+            if k not in params.keys():
+                params[k] = v
+        model.reset_model(params=params)
+
     if cfg.jobs.train.run:
         model.train(
             x_train=x_train,

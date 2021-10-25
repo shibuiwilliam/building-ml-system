@@ -88,15 +88,15 @@ class OptunaRunner(object):
 
     def optimize(
         self,
-        estimators: List[BaseDemandForecastingModel],
+        models: List[BaseDemandForecastingModel],
         n_trials: int = 20,
         n_jobs: int = 1,
-        fit_params: Optional[Dict] = None,
         scoring: str = "test_neg_mean_squared_error",
+        fit_params: Optional[Dict] = None,
     ) -> List[Dict[str, Union[str, float]]]:
         return list(
             self._optimize(
-                estimators=estimators,
+                models=models,
                 n_jobs=n_jobs,
                 n_trials=n_trials,
                 fit_params=fit_params,
@@ -106,21 +106,21 @@ class OptunaRunner(object):
 
     def _optimize(
         self,
-        estimators: List[BaseDemandForecastingModel],
+        models: List[BaseDemandForecastingModel],
         n_trials: int = 20,
         n_jobs: int = 1,
-        fit_params: Optional[Dict] = None,
         scoring: str = "test_neg_mean_squared_error",
+        fit_params: Optional[Dict] = None,
     ) -> Iterator[Dict[str, Union[str, float]]]:
-        for estimator in estimators:
-            logger.info(f"estimator: {estimator}")
+        for model in models:
+            logger.info(f"model: {model}")
             study = optuna.create_study(
-                study_name=estimator.name,
+                study_name=model.name,
                 direction=self.direction.value,
             )
             study.optimize(
                 self.objective(
-                    estimator=estimator,
+                    model=model,
                     fit_params=fit_params,
                     scoring=scoring,
                 ),
@@ -129,25 +129,25 @@ class OptunaRunner(object):
                 callbacks=[mlflow_callback],
             )
             result = {
-                "estimator": estimator.name,
+                "model": model.name,
                 "best_score": study.best_value,
                 "best_params": study.best_params,
             }
-            logger.info(f"result for {estimator.name}: {result}")
+            logger.info(f"result for {model.name}: {result}")
             yield result
 
     def objective(
         self,
-        estimator: BaseDemandForecastingModel,
-        fit_params: Optional[Dict] = None,
+        model: BaseDemandForecastingModel,
         scoring: str = "test_neg_mean_squared_error",
+        fit_params: Optional[Dict] = None,
     ):
         def _objective(
             trial: optuna.Trial,
         ) -> float:
 
             params = {}
-            for search_param in estimator.search_params:
+            for search_param in model.search_params:
                 if search_param.suggest_type == SUGGEST_TYPE.CATEGORICAL:
                     params[search_param.name] = trial.suggest_categorical(
                         search_param.name,
@@ -169,7 +169,7 @@ class OptunaRunner(object):
             logger.debug(f"params: {params}")
 
             scores = cross_validate(
-                estimator=estimator.model,
+                estimator=model.model,
                 X=self.data,
                 y=self.target,
                 cv=self.cv,
