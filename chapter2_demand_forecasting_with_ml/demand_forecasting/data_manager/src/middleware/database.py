@@ -1,44 +1,24 @@
-from contextlib import contextmanager
+from abc import ABC, abstractmethod
 
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+import psycopg2
 from src.configurations import DatabaseConfigurations
+from src.middleware.logger import configure_logger
 
-engine = create_engine(
-    DatabaseConfigurations.sql_alchemy_database_url,
-    encoding="utf-8",
-    pool_recycle=3600,
-    echo=False,
-)
-
-Base = declarative_base()
-
-SessionLocal = sessionmaker(
-    autocommit=False,
-    autoflush=False,
-    bind=engine,
-)
+logger = configure_logger(__name__)
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    except:
-        db.rollback()
-        raise
-    finally:
-        db.close()
+class AbstractDBClient(ABC):
+    def __init__(self):
+        pass
+
+    @abstractmethod
+    def get_connection(self):
+        raise NotImplementedError
 
 
-@contextmanager
-def get_context_db():
-    db = SessionLocal()
-    try:
-        yield db
-    except:
-        db.rollback()
-        raise
-    finally:
-        db.close()
+class DBClient(AbstractDBClient):
+    def __init__(self):
+        self.__connection_string = DatabaseConfigurations.connection_string
+
+    def get_connection(self):
+        return psycopg2.connect(self.__connection_string)

@@ -18,7 +18,7 @@ jobs:
       learning_rate: 0.05
       feature_fraction: 0.5
       max_depth: -1
-      num_boost_round: 1000000
+      num_iterations: 1000000
       num_threads: 0
       seed: 1234
     early_stopping_rounds: 200
@@ -26,10 +26,10 @@ jobs:
     verbose_eval: 1000
 
   search:
-    run: true
+    run: false
     optuna:
       cv: 5
-      n_trials: 10
+      n_trials: 20
       n_jobs: 5
       light_gbm:
         parameters:
@@ -46,18 +46,15 @@ jobs:
           - name: learning_rate
             suggest_type: uniform
             value_range:
-              - 0.0005
+              - 0.01
               - 0.1
           - name: feature_fraction
             suggest_type: uniform
             value_range:
-              - 0.01
+              - 0.1
               - 1.0
 
   train:
-    run: true
-
-  evaluate:
     run: true
 
   prediction:

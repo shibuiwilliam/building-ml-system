@@ -75,10 +75,10 @@ class WeekBasedSplit(BaseCrossValidator):
 
             logger.info(
                 f"""
-train_year: {train_year}
-train_week: {train_week}
-test_year: {test_year}
-test_week: {test_week}
+train_year until: {train_year}
+train_week until: {train_week}
+test_year after: {test_year}
+test_week after: {test_week}
                         """
             )
 

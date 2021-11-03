@@ -2,7 +2,7 @@ version: "3"
 
 services:
   postgres:
-    image: postgres:12.7
+    image: postgres:13.4
     container_name: postgres
     volumes:
       - ./postgres/init:/docker-entrypoint-initdb.d
@@ -22,88 +22,42 @@ services:
   data_manager:
     container_name: data_manager
     image: shibui/building-ml-system:demand_forecasting_data_manager_0.0.0
-    restart: always
+    restart: "no"
     networks:
       - default
     environment:
-      - POSTGRES_SERVER=postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=demand_forecasting
-      - PORT=8000
-      - WORKERS=1
+      - POSTGRESQL_HOST=postgres
+      - POSTGRESQL_PORT=5432
+      - POSTGRESQL_USER=user
+      - POSTGRESQL_PASSWORD=password
+      - POSTGRESQL_DBNAME=demand_forecasting
+      - LOG_LEVEL=DEBUG
     entrypoint:
-      - "./run.sh"
-    ports:
-      - "8000:8000"
+      - "python"
+      - "-m"
+      - "src.main"
     volumes:
       - "./master_data:/opt/data"
     depends_on:
       - postgres
 
-  ml:
-    container_name: ml
-    image: shibui/building-ml-system:demand_forecasting_ml_0.0.0
-    restart: "no"
-    networks:
-      - default
-    command:
-      - "python"
-      - "-m"
-      - "src.main"
-      - "--data_file_path"
-      - "/opt/data/item_sale_records_2017_2019.csv"
-      - "--prediction_file_path"
-      - "/opt/data/item_target_20191223_20191229.csv"
-      - "--model_name"
-      - "light_gbm_regression"
-      - "--save_file_directory"
-      - "/opt/data"
-      - "--data_manager_api"
-      - "http://data_manager:8000/v0"
-      - "--train_start_date"
-      - "2017-01-01"
-      - "--train_end_date"
-      - "2019-12-08"
-      - "--test_start_date"
-      - "2019-12-16"
-      - "--test_end_date"
-      - "2019-12-22"
-      - "--predict_start_date"
-      - "2019-12-23"
-      - "--predict_end_date"
-      - "2019-12-29"
-      - "--experiment_param_file_path"
-      - "/opt/data/light_gbm_regression_experiment_params.json"
-      - "--train_param_file_path"
-      - "/opt/data/light_gbm_regression_train_params.json"
-      - "--retrieve_data"
-      - "--run_experiment"
-      - "--run_train"
-      - "--run_prediction"
-    volumes:
-      - "./data:/opt/data"
-    depends_on:
-      - data_manager
-
-  bi:
-    container_name: bi
-    image: shibui/building-ml-system:demand_forecasting_bi_0.0.0
-    restart: always
-    networks:
-      - default
-    environment:
-      - API_ENDPOINT=http://data_manager:8000/v0
-      - WAIT_SECOND=10
-    entrypoint:
-      - "streamlit"
-      - "run"
-      - "src/main.py"
-    ports:
-      - "8501:8501"
-    depends_on:
-      - data_manager
+  # bi:
+  #   container_name: bi
+  #   image: shibui/building-ml-system:demand_forecasting_bi_0.0.0
+  #   restart: always
+  #   networks:
+  #     - default
+  #   environment:
+  #     - API_ENDPOINT=http://data_manager:8000/v0
+  #     - WAIT_SECOND=10
+  #   entrypoint:
+  #     - "streamlit"
+  #     - "run"
+  #     - "src/main.py"
+  #   ports:
+  #     - "8501:8501"
+  #   depends_on:
+  #     - data_manager
 
 networks:
   default:

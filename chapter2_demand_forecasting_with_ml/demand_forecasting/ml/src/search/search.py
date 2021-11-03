@@ -6,7 +6,6 @@ import numpy as np
 import optuna
 import pandas as pd
 from omegaconf import DictConfig
-from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import BaseCrossValidator, cross_validate
 from src.models.base_model import BaseDemandForecastingModel
 from src.search.schema import SUGGEST_TYPE, SearchParams
@@ -79,7 +78,6 @@ class OptunaRunner(object):
         self.scorings = scorings
         if self.scorings is None:
             self.scorings = {
-                "neg_mean_squared_error": "neg_mean_squared_error",
                 "neg_root_mean_squared_error": "neg_root_mean_squared_error",
                 "neg_mean_absolute_error": "neg_mean_absolute_error",
                 "neg_mean_absolute_percentage_error": "neg_mean_absolute_percentage_error",
@@ -92,7 +90,7 @@ class OptunaRunner(object):
         models: List[BaseDemandForecastingModel],
         n_trials: int = 20,
         n_jobs: int = 1,
-        scoring: str = "test_neg_mean_squared_error",
+        scoring: str = "test_neg_mean_absolute_error",
         fit_params: Optional[Dict] = None,
     ) -> List[Dict[str, Union[str, float]]]:
         return list(
@@ -110,7 +108,7 @@ class OptunaRunner(object):
         models: List[BaseDemandForecastingModel],
         n_trials: int = 20,
         n_jobs: int = 1,
-        scoring: str = "test_neg_mean_squared_error",
+        scoring: str = "test_neg_mean_absolute_error",
         fit_params: Optional[Dict] = None,
     ) -> Iterator[Dict[str, Union[str, float]]]:
         for model in models:
@@ -140,7 +138,7 @@ class OptunaRunner(object):
     def objective(
         self,
         model: BaseDemandForecastingModel,
-        scoring: str = "test_neg_mean_squared_error",
+        scoring: str = "test_neg_mean_absolute_error",
         fit_params: Optional[Dict] = None,
     ):
         def _objective(
@@ -169,43 +167,16 @@ class OptunaRunner(object):
 
             logger.info(f"params: {params}")
 
-            if isinstance(self.cv, int):
-                scores = cross_validate(
-                    estimator=model.model,
-                    X=self.data,
-                    y=self.target,
-                    cv=self.cv,
-                    scoring=self.scorings,
-                    error_score=np.nan,
-                    fit_params=fit_params,
-                )
-                logger.debug(f"result: {scores}")
-                return scores[scoring].mean()
-            else:
-                evaluations = []
-                for train_index, test_index in self.cv.split(X=self.data):
-                    model.reset_model(params=params)
-                    if fit_params is not None:
-                        early_stopping_rounds = fit_params.get("early_stopping_rounds", 200)
-                        eval_metrics = fit_params.get("eval_metric", "mse")
-                        verbose_eval = fit_params.get("verbose_eval", 1000)
-                    x_train = self.data.iloc[train_index]
-                    y_train = self.target.iloc[train_index]
-                    x_test = self.data.iloc[test_index]
-                    y_test = self.target.iloc[test_index]
-                    eval_set = [(x_train, y_train), (x_test, y_test)]
-
-                    model.model.fit(
-                        X=x_train,
-                        y=y_train,
-                        eval_set=eval_set,
-                        early_stopping_rounds=early_stopping_rounds,
-                        eval_metric=eval_metrics,
-                        verbose=verbose_eval,
-                    )
-                    preds = model.model.predict(x_test)
-                    evaluation = mean_squared_error(y_test, preds, squared=True)
-                    evaluations.append(evaluation)
-                return sum(evaluations) / len(evaluations)
+            scores = cross_validate(
+                estimator=model.model,
+                X=self.data,
+                y=self.target,
+                cv=self.cv,
+                scoring=self.scorings,
+                error_score=np.nan,
+                fit_params=fit_params,
+            )
+            logger.debug(f"result: {scores}")
+            return scores[scoring].mean()
 
         return _objective

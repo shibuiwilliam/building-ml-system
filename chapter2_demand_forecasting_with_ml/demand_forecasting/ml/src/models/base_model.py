@@ -47,7 +47,7 @@ class BaseDemandForecastingModel(ABC):
     @abstractmethod
     def predict(
         self,
-        x_test: Union[np.ndarray, pd.DataFrame],
+        x: Union[np.ndarray, pd.DataFrame],
     ) -> Union[np.ndarray, pd.DataFrame]:
         raise NotImplementedError
 

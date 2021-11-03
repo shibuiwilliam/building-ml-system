@@ -1,7 +1,5 @@
 import os
 from datetime import datetime
-from typing import Optional, Tuple
-from uuid import uuid4
 
 import hydra
 import pandas as pd
@@ -10,6 +8,7 @@ from src.dataset.data_retriever import DATA_SOURCE, load_df_from_csv
 from src.dataset.schema import BASE_SCHEMA
 from src.models.models import MODELS
 from src.models.preprocess import DataPreprocessPipeline, WeekBasedSplit
+from src.models.trainer import Trainer
 from src.search.search import DIRECTION, OptunaRunner, parse_params
 from src.utils.logger import configure_logger
 
@@ -141,11 +140,18 @@ y_test shape: {y_test.shape}
         model.reset_model(params=params)
 
     if cfg.jobs.train.run:
-        model.train(
+        now = datetime.now().strftime("%Y%m%d_%H%M%S")
+        save_file_path = os.path.join(cwd, f"{model.name}_{now}")
+        onnx_file_path = os.path.join(cwd, f"{model.name}_{now}")
+        trainer = Trainer()
+        trainer.train_and_evaluate(
+            model=model,
             x_train=x_train,
             y_train=y_train,
             x_test=x_test,
             y_test=y_test,
+            save_file_path=save_file_path,
+            onnx_file_path=onnx_file_path,
         )
 
 

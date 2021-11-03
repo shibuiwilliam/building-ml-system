@@ -5,12 +5,12 @@ from src.constants import CONSTANT
 
 
 class DatabaseConfigurations(object):
-    __postgres_username = os.getenv("POSTGRES_USER")
-    __postgres_password = os.getenv("POSTGRES_PASSWORD")
-    __postgres_port = int(os.getenv("POSTGRES_PORT", 5432))
-    __postgres_db = os.getenv("POSTGRES_DB")
-    __postgres_server = os.getenv("POSTGRES_SERVER")
-    sql_alchemy_database_url = f"postgresql://{__postgres_username}:{__postgres_password}@{__postgres_server}:{__postgres_port}/{__postgres_db}?client_encoding=utf8"
+    postgresql_user = os.getenv("POSTGRESQL_USER")
+    postgresql_password = os.getenv("POSTGRESQL_PASSWORD")
+    postgresql_port = int(os.getenv("POSTGRESQL_PORT", 5432))
+    postgresql_dbname = os.getenv("POSTGRESQL_DBNAME")
+    postgresql_host = os.getenv("POSTGRESQL_HOST")
+    connection_string = f"host={postgresql_host} port={postgresql_port} dbname={postgresql_dbname} user={postgresql_user} password={postgresql_password}"
 
 
 class Configurations(object):
@@ -19,6 +19,7 @@ class Configurations(object):
     api_version = os.getenv("API_VERSION", "0")
 
     data_directory = os.getenv("DATA_DIRECTORY", "/opt/data/")
+    create_sql_file_path = os.path.join(data_directory, os.getenv("CREATE_SQL", "create.sql"))
     region_file_path = os.path.join(data_directory, os.getenv("REGION_FILE", "regions.csv"))
     store_file_path = os.path.join(data_directory, os.getenv("STORE_FILE", "stores.csv"))
     item_file_path = os.path.join(data_directory, os.getenv("ITEM_FILE", "items.csv"))

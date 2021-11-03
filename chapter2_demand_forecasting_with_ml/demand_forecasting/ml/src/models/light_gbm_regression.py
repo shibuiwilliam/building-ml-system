@@ -1,3 +1,4 @@
+import os
 from typing import Dict, List, Optional, Union
 
 import lightgbm as lgb
@@ -21,7 +22,7 @@ LGB_REGRESSION_DEFAULT_PARAMS = {
     "learning_rate": 0.01,
     "feature_fraction": 0.8,
     "max_depth": -1,
-    "num_boost_round": 1000000,
+    "num_iterations": 1000000,
     "num_threads": 1,
     "seed": 1234,
 }
@@ -108,25 +109,33 @@ class LightGBMRegressionDemandForecasting(BaseDemandForecastingModel):
 
     def predict(
         self,
-        x_test: Union[np.ndarray, pd.DataFrame],
+        x: Union[np.ndarray, pd.DataFrame],
     ) -> Union[np.ndarray, pd.DataFrame]:
-        predictions = self.model.predict(x_test)
+        predictions = self.model.predict(x)
         return predictions
 
     def save_model_params(
         self,
         file_path: str,
-    ):
+    ) -> str:
+        file, ext = os.path.splitext(file_path)
+        if ext != ".yaml":
+            file_path = f"{file}.yaml"
         logger.info(f"save model params: {file_path}")
         with open(file_path, "w") as f:
             yaml.dump(self.params, f)
+        return file_path
 
     def save(
         self,
         file_path: str,
-    ):
+    ) -> str:
+        file, ext = os.path.splitext(file_path)
+        if ext != ".txt":
+            file_path = f"{file}.txt"
         logger.info(f"save model: {file_path}")
         self.model.booster_.save_model(file_path)
+        return file_path
 
     def load(
         self,
@@ -138,8 +147,12 @@ class LightGBMRegressionDemandForecasting(BaseDemandForecastingModel):
     def save_as_onnx(
         self,
         file_path: str,
-    ):
+    ) -> str:
+        file, ext = os.path.splitext(file_path)
+        if ext != ".onnx":
+            file_path = f"{file}.onnx"
         logger.info(f"save model as onnx: {file_path}")
         initial_types = [["inputs", DoubleTensorType([None, self.column_length])]]
         onnx_model = onnxmltools.convert_lightgbm(self.model, initial_types=initial_types)
         onnxmltools.utils.save_model(onnx_model, file_path)
+        return file_path

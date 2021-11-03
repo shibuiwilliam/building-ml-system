@@ -1,44 +1,26 @@
-from logging import getLogger
+from time import sleep
 
-from fastapi import FastAPI
-from src.api import health, items, stores
-from src.configurations import Configurations
-from src.initialize import initialize_data, initialize_tables
-from src.middleware.database import engine
+from src.middleware.database import DBClient
+from src.middleware.logger import configure_logger
+from src.service.store_service import StoreService
+from src.service.table_service import TableService
 
-logger = getLogger(__name__)
-
-if Configurations.initialize_tables:
-    initialize_tables(
-        engine=engine,
-        checkfirst=True,
-    )
-if Configurations.initialize_data:
-    initialize_data()
-
-base_prefix = f"/v{Configurations.api_version}"
+logger = configure_logger(__name__)
 
 
-app = FastAPI(
-    title=Configurations.api_title,
-    description=Configurations.api_description,
-    version=Configurations.api_version,
-)
+def main():
+    sleep(10)
+    logger.info("start jobs")
+    db_client = DBClient()
+    table_service = TableService(db_client=db_client)
+    store_service = StoreService(db_client=db_client)
+    table_service.register()
+    store_service.register()
 
-app.include_router(
-    health.router,
-    prefix=f"{base_prefix}/health",
-    tags=["health"],
-)
+    while True:
+        logger.info("done...")
+        sleep(120)
 
-app.include_router(
-    stores.router,
-    prefix=f"{base_prefix}/stores",
-    tags=["stores"],
-)
 
-app.include_router(
-    items.router,
-    prefix=f"{base_prefix}/items",
-    tags=["items"],
-)
+if __name__ == "__main__":
+    main()
