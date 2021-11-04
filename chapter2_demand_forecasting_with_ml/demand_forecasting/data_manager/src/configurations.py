@@ -1,7 +1,4 @@
 import os
-from typing import Dict
-
-from src.constants import CONSTANT
 
 
 class DatabaseConfigurations(object):

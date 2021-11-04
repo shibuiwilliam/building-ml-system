@@ -63,48 +63,6 @@ push_data_manager:
 	docker push $(DOCKER_DATA_MANAGER_IMAGE_NAME)
 
 
-############ DEMAND FORECASTING DATA_CLIENT COMMANDS ############
-DATA_CLIENT_DIR := $(DIR)/data_client
-DOCKERFILE_DATA_CLIENT = $(DATA_CLIENT_DIR)/$(DOCKERFILE)
-DOCKER_DATA_CLIENT_TAG = $(TAG)_data_client
-DOCKER_DATA_CLIENT_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_DATA_CLIENT_TAG)_$(VERSION)
-DOCKER_DATA_CLIENT_IMAGE_NAME_TEST = $(DOCKER_REPOSITORY):$(DOCKER_DATA_CLIENT_TAG)_$(VERSION)_$(DOCKER_TEST_TAG)
-
-.PHONY: patch_data_client
-patch_data_client:
-	cd $(DATA_CLIENT_DIR) && \
-	poetry version patch
-
-.PHONY: minor_upgrade_data_client
-minor_upgrade_data_client:
-	cd $(DATA_CLIENT_DIR) && \
-	poetry version minor
-
-.PHONY: major_upgrade_data_client
-major_upgrade_data_client:
-	cd $(DATA_CLIENT_DIR) && \
-	poetry version major
-
-.PHONY: req_data_client
-req_data_client:
-	cd $(DATA_CLIENT_DIR) && \
-	poetry export \
-		--without-hashes \
-		-f requirements.txt \
-		--output requirements.txt
-
-.PHONY: build_data_client
-build_data_client: 
-	docker build \
-		-t $(DOCKER_DATA_CLIENT_IMAGE_NAME) \
-		-f $(DOCKERFILE_DATA_CLIENT) \
-		.
-	 
-.PHONY: push_data_client
-push_data_client: 
-	docker push $(DOCKER_DATA_CLIENT_IMAGE_NAME)
-
-
 ############ DEMAND FORECASTING ML COMMANDS ############
 ML_DIR := $(DIR)/ml
 DOCKERFILE_ML = $(ML_DIR)/$(DOCKERFILE)
@@ -138,7 +96,6 @@ req_ml:
 .PHONY: build_ml
 build_ml: 
 	docker build \
-		--build-arg FROM_IMAGE=$(DOCKER_DATA_CLIENT_IMAGE_NAME) \
 		-t $(DOCKER_ML_IMAGE_NAME) \
 		-f $(DOCKERFILE_ML) \
 		.
@@ -198,7 +155,6 @@ req_bi:
 .PHONY: build_bi
 build_bi: 
 	docker build \
-		--build-arg FROM_IMAGE=$(DOCKER_DATA_CLIENT_IMAGE_NAME) \
 		-t $(DOCKER_BI_IMAGE_NAME) \
 		-f $(DOCKERFILE_BI) \
 		.

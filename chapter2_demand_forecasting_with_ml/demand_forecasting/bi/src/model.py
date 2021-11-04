@@ -1,159 +1,236 @@
-from datetime import date, datetime
-from typing import List, Optional
+from datetime import date
+from typing import Any, Dict, List, Optional, Tuple
 
-from configurations import Configurations
-from data_client.data_client import ItemClient, StoreClient
+from constants import TABLES
+from db_client import AbstractDBClient
 from logger import configure_logger
-from pydantic import BaseModel
+from psycopg2.extras import DictCursor
+from pydantic import BaseModel, Extra
 
 logger = configure_logger(__name__)
 
 
-class StoreMaster(BaseModel):
-    id: str
-    region_id: str
-    name: str
-    region_name: str
-    created_at: datetime
-    updated_at: datetime
-
-
-class ItemMaster(BaseModel):
+class Region(BaseModel):
     id: str
     name: str
-    created_at: datetime
-    updated_at: datetime
+
+    class Config:
+        extra = Extra.forbid
 
 
-class ItemSale(BaseModel):
+class Store(BaseModel):
     id: str
-    item_id: str
-    store_id: str
-    item_price_id: str
-    quantity: int
-    total_sales: int
-    sold_at: date
+    name: str
+    region: str
+
+    class Config:
+        extra = Extra.forbid
+
+
+class Item(BaseModel):
+    id: str
+    name: str
+
+    class Config:
+        extra = Extra.forbid
+
+
+class ItemSales(BaseModel):
+    id: str
+    date: date
     day_of_week: str
-    item_name: str
-    store_name: str
-    price: int
-    created_at: datetime
-    updated_at: datetime
+    store: str
+    item: str
+    item_price: int
+    sales: int
+    total_sales_amount: int
+
+    class Config:
+        extra = Extra.forbid
 
 
 class BaseRepository(object):
     def __init__(
         self,
-        timeout: int = 10,
-        retries: int = 3,
-        api_endpoint: str = Configurations.api_endpoint,
+        db_client: AbstractDBClient,
     ):
-        self.api_endpoint = api_endpoint
-        self.timeout = timeout
-        self.retries = retries
+        self.db_client = db_client
+        self.table_name: str = ""
+
+    def execute_select_query(
+        self,
+        query: str,
+        parameters: Optional[Tuple] = None,
+    ) -> List[Dict[str, Any]]:
+        logger.debug(f"select query: {query}, parameters: {parameters}")
+        with self.db_client.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cursor:
+                cursor.execute(query, parameters)
+                rows = cursor.fetchall()
+        return rows
+
+
+class RegionRepository(BaseRepository):
+    def __init__(
+        self,
+        db_client: AbstractDBClient,
+    ):
+        super().__init__(db_client=db_client)
+        self.table_name = TABLES.REGIONS.value
+
+    def select(self) -> List[Region]:
+        query = f"""
+SELECT
+    id,
+    name
+FROM 
+    {self.table_name}
+;
+        """
+        records = self.execute_select_query(query=query)
+        data = [Region(**r) for r in records]
+        return data
 
 
 class StoreRepository(BaseRepository):
     def __init__(
         self,
-        timeout: int = 10,
-        retries: int = 3,
-        api_endpoint: str = Configurations.api_endpoint,
+        db_client: AbstractDBClient,
     ):
-        super().__init__(
-            timeout=timeout,
-            retries=retries,
-            api_endpoint=api_endpoint,
-        )
-        self.store_client = StoreClient(
-            timeout=self.timeout,
-            retries=self.retries,
-            api_endpoint=self.api_endpoint,
-        )
+        super().__init__(db_client=db_client)
+        self.table_name = TABLES.STORES.value
 
-    def ping(self) -> bool:
-        logger.info("send ping...")
-        response = self.store_client.ping()
-        return response
-
-    def retrieve(
+    def select(
         self,
-        id: Optional[str] = None,
-        region_id: Optional[str] = None,
-        store_name: Optional[str] = None,
-        region_name: Optional[str] = None,
-    ) -> List[StoreMaster]:
-        response = self.store_client.retrieve(
-            id=id,
-            region_id=region_id,
-            store_name=store_name,
-            region_name=region_name,
-        )
-        stores = [StoreMaster(**r.dict()) for r in response]
-        return stores
+        region: Optional[str] = None,
+    ) -> List[Store]:
+        query = f"""
+SELECT
+    {self.table_name}.id,
+    {self.table_name}.name,
+    {TABLES.REGIONS.value}.name AS region
+FROM 
+    {self.table_name}
+LEFT JOIN
+    {TABLES.REGIONS.value}
+ON
+    {self.table_name}.region_id = {TABLES.REGIONS.value}.name
+        """
+        if region is not None:
+            where = f"""
+WHERE
+    {TABLES.REGIONS.value}.name = {region}
+            """
+            query += where
+        query += ";"
+        records = self.execute_select_query(query=query)
+        data = [Store(**r) for r in records]
+        return data
 
 
 class ItemRepository(BaseRepository):
     def __init__(
         self,
-        timeout: int = 10,
-        retries: int = 3,
-        api_endpoint: str = Configurations.api_endpoint,
+        db_client: AbstractDBClient,
     ):
-        super().__init__(
-            timeout=timeout,
-            retries=retries,
-            api_endpoint=api_endpoint,
-        )
-        self.item_client = ItemClient(
-            timeout=self.timeout,
-            retries=self.retries,
-            api_endpoint=self.api_endpoint,
-        )
+        super().__init__(db_client=db_client)
+        self.table_name = TABLES.ITEMS.value
 
-    def ping(self) -> bool:
-        logger.info("send ping...")
-        response = self.item_client.ping()
-        return response
+    def select(self) -> List[Item]:
+        query = f"""
+SELECT
+    id,
+    name
+FROM 
+    {self.table_name}
+;
+        """
+        records = self.execute_select_query(query=query)
+        data = [Item(**r) for r in records]
+        return data
 
-    def retrieve_item_master(
+
+class ItemSalesRepository(BaseRepository):
+    def __init__(
         self,
-        id: Optional[str] = None,
-        item_name: Optional[str] = None,
-    ) -> List[ItemMaster]:
-        response = self.item_client.retrieve_item_master(
-            id=id,
-            item_name=item_name,
-        )
-        item_masters = [ItemMaster(**r.dict()) for r in response]
-        return item_masters
+        db_client: AbstractDBClient,
+    ):
+        super().__init__(db_client=db_client)
+        self.table_name = TABLES.ITEM_SALES_RECORDS.value
 
-    def retrieve_item_sale(
+    def select(
         self,
-        id: Optional[str] = None,
-        item_name: Optional[str] = None,
-        item_id: Optional[str] = None,
-        store_name: Optional[str] = None,
-        store_id: Optional[str] = None,
-        item_price_id: Optional[str] = None,
-        quantity: Optional[int] = None,
-        sold_at: Optional[date] = None,
+        date_from: Optional[date] = None,
+        date_to: Optional[date] = None,
         day_of_week: Optional[str] = None,
-        limit: int = 100,
+        item: Optional[str] = None,
+        store: Optional[str] = None,
+        region: Optional[str] = None,
+        limit: int = 1000,
         offset: int = 0,
-    ) -> List[ItemSale]:
-        response = self.item_client.retrieve_item_sale(
-            id=id,
-            item_name=item_name,
-            item_id=item_id,
-            store_name=store_name,
-            store_id=store_id,
-            item_price_id=item_price_id,
-            quantity=quantity,
-            sold_at=sold_at,
-            day_of_week=day_of_week,
-            limit=limit,
-            offset=offset,
-        )
-        item_masters = [ItemSale(**r.dict()) for r in response]
-        return item_masters
+    ) -> List[ItemSales]:
+        query = f"""
+SELECT
+    {self.table_name}.id,
+    {self.table_name}.date,
+    {self.table_name}.day_of_week,
+    {TABLES.ITEMS.value}.name AS item,
+    {TABLES.ITEM_PRICES.value}.price AS price,
+    {TABLES.STORES.value}.name as store,
+FROM 
+    {self.table_name}
+LEFT JOIN
+    {TABLES.ITEMS.value}
+ON
+    {self.table_name}.item_id = {TABLES.ITEMS.value}.id
+LEFT JOIN
+    {TABLES.ITEM_PRICES.value}
+ON
+    {self.table_name}.item_price_id = {TABLES.ITEM_PRICES.value}.id
+LEFT JOIN
+    {TABLES.STORES.value}
+ON
+    {self.table_name}.store_id = {TABLES.STORES.value}.id
+LEFT JOIN
+    {TABLES.REGIONS.value}
+ON
+    {TABLES.STORES.value}.region_id = {TABLES.REGIONS.value}.id
+        """
+
+        where = ""
+        prefix = "WHERE"
+        parameters = []
+        if date_from is not None:
+            where += f"{prefix} {self.table_name}.date >= {date_from}"
+            parameters.append(date_from)
+            prefix = "AND"
+        if date_to is not None:
+            where += f"{prefix} {self.table_name}.date <= {date_to}"
+            parameters.append(date_to)
+            prefix = "AND"
+        if day_of_week is not None:
+            where += f"{prefix} {self.table_name}.day_of_week = {day_of_week}"
+            parameters.append(day_of_week)
+            prefix = "AND"
+        if item is not None:
+            where += f"{prefix} {TABLES.ITEMS.value}.name = {item}"
+            parameters.append(item)
+            prefix = "AND"
+        if store is not None:
+            where += f"{prefix} {TABLES.STORES.value}.name = {store}"
+            parameters.append(store)
+            prefix = "AND"
+        if region is not None:
+            where += f"{prefix} {TABLES.REGIONS.value}.name = {region}"
+            parameters.append(region)
+        query += where
+        query += f"""
+LIMIT 
+    {limit}
+OFFSET
+    {offset}
+        """
+
+        records = self.execute_select_query(query=query)
+        data = [ItemSales(**r) for r in records]
+        return data
