@@ -3,35 +3,33 @@ from typing import List, Optional
 from src.constants import TABLES
 from src.middleware.database import AbstractDBClient
 from src.middleware.logger import configure_logger
-from src.model.store_model import Store
+from src.model.item_model import Item
 from src.repository.abstract_repository import AbstractQuery, AbstractRepository, BaseRepository
 
 logger = configure_logger(__name__)
 
 
-class StoreQuery(AbstractQuery):
+class ItemQuery(AbstractQuery):
     ids: Optional[List[str]]
     names: Optional[List[str]]
-    region_ids: Optional[List[str]]
 
 
-class StoreRepository(AbstractRepository, BaseRepository):
+class ItemRepository(AbstractRepository, BaseRepository):
     def __init__(
         self,
         db_client: AbstractDBClient,
     ):
         AbstractRepository.__init__(self)
         BaseRepository.__init__(self, db_client=db_client)
-        self.table_name = TABLES.STORES.value
+        self.table_name = TABLES.ITEMS.value
         self.columns = [
             f"{self.table_name}.id",
             f"{self.table_name}.name",
-            f"{self.table_name}.region_id",
         ]
 
     def insert(
         self,
-        record: Store,
+        record: Item,
     ):
         d = record.dict()
         _columns = [c for c, p in d.items() if p is not None]
@@ -56,8 +54,8 @@ DO NOTHING
 
     def select(
         self,
-        condition: Optional[StoreQuery] = None,
-    ) -> List[Store]:
+        condition: Optional[ItemQuery] = None,
+    ) -> List[Item]:
         columns = ",".join(self.columns)
         parameters = []
         query = f"""
@@ -78,16 +76,11 @@ FROM
                 _params = ",".join(["%s" for _ in condition.names])
                 where += f"{prefix} {self.table_name}.name IN {_params}"
                 parameters.extend(condition.names)
-                prefix = "AND"
-            if condition.region_ids is not None and len(condition.region_ids) > 0:
-                _params = ",".join(["%s" for _ in condition.region_ids])
-                where += f"{prefix} {self.table_name}.name IN {_params}"
-                parameters.extend(condition.region_ids)
             query += where
         query += ";"
         records = self.execute_select_query(
             query=query,
             parameters=tuple(parameters),
         )
-        data = [Store(**r) for r in records]
+        data = [Item(**r) for r in records]
         return data
