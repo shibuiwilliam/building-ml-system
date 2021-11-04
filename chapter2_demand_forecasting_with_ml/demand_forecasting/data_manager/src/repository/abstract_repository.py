@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Tuple
 
 import psycopg2
+from psycopg2 import extras
 from psycopg2.extras import DictCursor
 from pydantic import BaseModel
 from src.exceptions.exceptions import DatabaseException
@@ -76,6 +77,25 @@ class BaseRepository(object):
                 conn.rollback()
                 raise DatabaseException(
                     message=f"failed to insert or update query: {e}",
+                    detail=f"{query} {parameters}: {e}",
+                )
+
+    def execute_bulk_insert_or_update_query(
+        self,
+        query: str,
+        parameters: Optional[List[Tuple]] = None,
+    ) -> bool:
+        logger.debug(f"bulk insert or update query: {query}, parameters: {parameters}")
+        with self.db_client.get_connection() as conn:
+            try:
+                with conn.cursor(cursor_factory=DictCursor) as cursor:
+                    extras.execute_values(cursor, query, parameters)
+                conn.commit()
+                return True
+            except psycopg2.Error as e:
+                conn.rollback()
+                raise DatabaseException(
+                    message=f"failed to bulk insert or update query: {e}",
                     detail=f"{query} {parameters}: {e}",
                 )
 

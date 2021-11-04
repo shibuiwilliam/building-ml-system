@@ -104,11 +104,11 @@ FROM
                 parameters.append(condition.applied_from)
                 prefix = "AND"
             if condition.applied_from_before is not None:
-                where += f"{prefix} {self.table_name}.applied_from <= {condition.applied_from_before}"
+                where += f"{prefix} {self.table_name}.applied_from >= {condition.applied_from_before}"
                 parameters.append(condition.applied_from_before)
                 prefix = "AND"
             if condition.applied_from_after is not None:
-                where += f"{prefix} {self.table_name}.applied_from >= {condition.applied_from_after}"
+                where += f"{prefix} {self.table_name}.applied_from <= {condition.applied_from_after}"
                 parameters.append(condition.applied_from_after)
                 prefix = "AND"
             if condition.applied_to is not None:
@@ -116,11 +116,11 @@ FROM
                 parameters.append(condition.applied_to)
                 prefix = "AND"
             if condition.applied_to_before is not None:
-                where += f"{prefix} {self.table_name}.applied_to <= {condition.applied_to_before}"
+                where += f"{prefix} {self.table_name}.applied_to >= {condition.applied_to_before}"
                 parameters.append(condition.applied_to_before)
                 prefix = "AND"
             if condition.applied_to_after is not None:
-                where += f"{prefix} {self.table_name}.applied_to >= {condition.applied_to_after}"
+                where += f"{prefix} {self.table_name}.applied_to <= {condition.applied_to_after}"
                 parameters.append(condition.applied_to_after)
 
             query += where
