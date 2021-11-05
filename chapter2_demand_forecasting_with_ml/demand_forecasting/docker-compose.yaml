@@ -41,23 +41,28 @@ services:
     depends_on:
       - postgres
 
-  # bi:
-  #   container_name: bi
-  #   image: shibui/building-ml-system:demand_forecasting_bi_0.0.0
-  #   restart: always
-  #   networks:
-  #     - default
-  #   environment:
-  #     - API_ENDPOINT=http://data_manager:8000/v0
-  #     - WAIT_SECOND=10
-  #   entrypoint:
-  #     - "streamlit"
-  #     - "run"
-  #     - "src/main.py"
-  #   ports:
-  #     - "8501:8501"
-  #   depends_on:
-  #     - data_manager
+  bi:
+    container_name: bi
+    image: shibui/building-ml-system:demand_forecasting_bi_0.0.0
+    restart: always
+    networks:
+      - default
+    environment:
+      - POSTGRESQL_HOST=postgres
+      - POSTGRESQL_PORT=5432
+      - POSTGRESQL_USER=user
+      - POSTGRESQL_PASSWORD=password
+      - POSTGRESQL_DBNAME=demand_forecasting
+      - LOG_LEVEL=DEBUG
+      - WAIT_SECOND=10
+    entrypoint:
+      - "streamlit"
+      - "run"
+      - "src/main.py"
+    ports:
+      - "8501:8501"
+    depends_on:
+      - data_manager
 
 networks:
   default:

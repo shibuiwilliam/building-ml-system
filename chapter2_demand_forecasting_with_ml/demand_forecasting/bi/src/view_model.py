@@ -2,7 +2,10 @@ from datetime import date
 from typing import List, Optional
 
 from db_client import AbstractDBClient
+from logger import configure_logger
 from model import ItemRepository, ItemSales, ItemSalesRepository, RegionRepository, StoreRepository
+
+logger = configure_logger(__name__)
 
 
 class BaseViewModel(object):
@@ -35,12 +38,10 @@ class StoreViewModel(BaseViewModel):
         super().__init__(db_client=db_client)
         self.store_repository = StoreRepository(db_client=db_client)
 
-    def list_stores(self) -> List[str]:
-        stores = self.store_repository.select()
-        store_names = [r.name for r in stores]
-        return store_names
-
-    def list_stores_in_region(self, region: str) -> List[str]:
+    def list_stores(
+        self,
+        region: Optional[str] = None,
+    ) -> List[str]:
         stores = self.store_repository.select(region=region)
         store_names = [r.name for r in stores]
         return store_names
@@ -78,7 +79,7 @@ class ItemSalesViewModel(BaseViewModel):
         region: Optional[str] = None,
     ) -> List[ItemSales]:
         item_sales = []
-        limit = 1000
+        limit = 10000
         offset = 0
         while True:
             records = self.item_sales_repository.select(
@@ -92,6 +93,9 @@ class ItemSalesViewModel(BaseViewModel):
                 offset=offset,
             )
             if len(records) == 0:
+                logger.info(f"done loading {len(item_sales)} records")
                 break
             item_sales.extend(records)
+            offset += limit
+            logger.info(f"found {len(item_sales)} records...")
         return item_sales

@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 
 import psycopg2
-from src.configurations import DatabaseConfigurations
-from src.middleware.logger import configure_logger
+from configurations import DatabaseConfigurations
+from logger import configure_logger
 
 logger = configure_logger(__name__)
 

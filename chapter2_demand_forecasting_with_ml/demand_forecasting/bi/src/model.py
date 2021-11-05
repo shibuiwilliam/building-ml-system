@@ -41,7 +41,7 @@ class ItemSales(BaseModel):
     day_of_week: str
     store: str
     item: str
-    item_price: int
+    price: int
     sales: int
     total_sales_amount: int
 
@@ -62,7 +62,7 @@ class BaseRepository(object):
         query: str,
         parameters: Optional[Tuple] = None,
     ) -> List[Dict[str, Any]]:
-        logger.debug(f"select query: {query}, parameters: {parameters}")
+        logger.info(f"select query: {query}, parameters: {parameters}")
         with self.db_client.get_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cursor:
                 cursor.execute(query, parameters)
@@ -87,6 +87,7 @@ FROM
     {self.table_name}
 ;
         """
+
         records = self.execute_select_query(query=query)
         data = [Region(**r) for r in records]
         return data
@@ -114,16 +115,24 @@ FROM
 LEFT JOIN
     {TABLES.REGIONS.value}
 ON
-    {self.table_name}.region_id = {TABLES.REGIONS.value}.name
+    {self.table_name}.region_id = {TABLES.REGIONS.value}.id
         """
+        parameters = []
+
         if region is not None:
             where = f"""
 WHERE
-    {TABLES.REGIONS.value}.name = {region}
+    {TABLES.REGIONS.value}.name = %s
             """
+            parameters.append(region)
             query += where
+
         query += ";"
-        records = self.execute_select_query(query=query)
+
+        records = self.execute_select_query(
+            query=query,
+            parameters=tuple(parameters),
+        )
         data = [Store(**r) for r in records]
         return data
 
@@ -145,6 +154,7 @@ FROM
     {self.table_name}
 ;
         """
+
         records = self.execute_select_query(query=query)
         data = [Item(**r) for r in records]
         return data
@@ -177,6 +187,8 @@ SELECT
     {TABLES.ITEMS.value}.name AS item,
     {TABLES.ITEM_PRICES.value}.price AS price,
     {TABLES.STORES.value}.name as store,
+    {self.table_name}.sales,
+    {self.table_name}.total_sales_amount
 FROM 
     {self.table_name}
 LEFT JOIN
@@ -201,27 +213,27 @@ ON
         prefix = "WHERE"
         parameters = []
         if date_from is not None:
-            where += f"{prefix} {self.table_name}.date >= {date_from}"
+            where += f"{prefix} {self.table_name}.date >= %s "
             parameters.append(date_from)
             prefix = "AND"
         if date_to is not None:
-            where += f"{prefix} {self.table_name}.date <= {date_to}"
+            where += f"{prefix} {self.table_name}.date <= %s "
             parameters.append(date_to)
             prefix = "AND"
         if day_of_week is not None:
-            where += f"{prefix} {self.table_name}.day_of_week = {day_of_week}"
+            where += f"{prefix} {self.table_name}.day_of_week = %s "
             parameters.append(day_of_week)
             prefix = "AND"
         if item is not None:
-            where += f"{prefix} {TABLES.ITEMS.value}.name = {item}"
+            where += f"{prefix} {TABLES.ITEMS.value}.name = %s "
             parameters.append(item)
             prefix = "AND"
         if store is not None:
-            where += f"{prefix} {TABLES.STORES.value}.name = {store}"
+            where += f"{prefix} {TABLES.STORES.value}.name = %s "
             parameters.append(store)
             prefix = "AND"
         if region is not None:
-            where += f"{prefix} {TABLES.REGIONS.value}.name = {region}"
+            where += f"{prefix} {TABLES.REGIONS.value}.name = %s "
             parameters.append(region)
         query += where
         query += f"""
@@ -231,6 +243,9 @@ OFFSET
     {offset}
         """
 
-        records = self.execute_select_query(query=query)
+        records = self.execute_select_query(
+            query=query,
+            parameters=tuple(parameters),
+        )
         data = [ItemSales(**r) for r in records]
         return data
