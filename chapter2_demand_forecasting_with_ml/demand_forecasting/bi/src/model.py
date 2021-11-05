@@ -40,6 +40,7 @@ class ItemSales(BaseModel):
     date: date
     day_of_week: str
     store: str
+    region: str
     item: str
     price: int
     sales: int
@@ -187,6 +188,7 @@ SELECT
     {TABLES.ITEMS.value}.name AS item,
     {TABLES.ITEM_PRICES.value}.price AS price,
     {TABLES.STORES.value}.name as store,
+    {TABLES.REGIONS.value}.name as region,
     {self.table_name}.sales,
     {self.table_name}.total_sales_amount
 FROM 

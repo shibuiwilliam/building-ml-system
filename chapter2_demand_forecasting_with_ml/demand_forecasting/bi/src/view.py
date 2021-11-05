@@ -1,10 +1,12 @@
 from enum import Enum
 from typing import Dict, List, Optional, Union
 
+import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 from logger import configure_logger
+from plotly.subplots import make_subplots
 from view_model import ItemSalesViewModel, ItemViewModel, RegionViewModel, StoreViewModel
 
 logger = configure_logger(__name__)
@@ -15,8 +17,14 @@ class BI(Enum):
     ITEM_SALES_PREDICTION_EVALUATION = "item_sales_prediction_evaluation"
 
 
+class TIME_FRAME(Enum):
+    DAILY = "daily"
+    WEEKLY = "weekly"
+    MONTHLY = "monthly"
+
+
 def build_bi_selectbox() -> str:
-    options = [BI.ITEM_SALES.value, BI.ITEM_SALES_PREDICTION_EVALUATION.value]
+    options = [None, BI.ITEM_SALES.value, BI.ITEM_SALES_PREDICTION_EVALUATION.value]
     selected = st.sidebar.selectbox(
         label="BI",
         options=options,
@@ -25,9 +33,8 @@ def build_bi_selectbox() -> str:
 
 
 def build_region_selectbox(region_view_model: RegionViewModel) -> Optional[str]:
-    options = [None]
-    regions = region_view_model.list_regions()
-    options.extend(regions)
+    options = region_view_model.list_regions()
+    options.append("ALL")
     selected = st.sidebar.selectbox(
         label="region",
         options=options,
@@ -39,9 +46,8 @@ def build_store_selectbox(
     store_view_model: StoreViewModel,
     region: Optional[str] = None,
 ) -> Optional[str]:
-    options = [None]
-    stores = store_view_model.list_stores(region=region)
-    options.extend(stores)
+    options = store_view_model.list_stores(region=region)
+    options.append("ALL")
     selected = st.sidebar.selectbox(
         label="store",
         options=options,
@@ -52,14 +58,207 @@ def build_store_selectbox(
 def build_item_selectbox(
     item_view_model: ItemViewModel,
 ) -> Optional[str]:
-    options = [None]
-    items = item_view_model.list_items()
-    options.extend(items)
+    options = item_view_model.list_items()
+    options.append("ALL")
     selected = st.sidebar.selectbox(
         label="item",
         options=options,
     )
     return selected
+
+
+def build_time_frame_selectbox() -> Optional[str]:
+    options = [TIME_FRAME.DAILY.value, TIME_FRAME.WEEKLY.value, TIME_FRAME.MONTHLY.value]
+    selected = st.sidebar.selectbox(
+        label="time frame",
+        options=options,
+    )
+    return selected
+
+
+def show_daily_item_sales(
+    df: pd.DataFrame,
+    stores: List[str],
+    items: List[str],
+):
+    st.markdown("### Daily summary")
+    for s in stores:
+        for i in items:
+            _df = (
+                df[(df.store == s) & (df.item == i)]
+                .drop(["store", "item"], axis=1)
+                .reset_index(drop=True)
+                .sort_values("date")
+            )
+            region = _df.region.unique()[0]
+            _df = _df.drop("region", axis=1)
+            with st.expander(
+                label=f"REGION {region} STORE {s} ITEM {i}",
+                expanded=True,
+            ):
+                st.dataframe(_df)
+
+                fig = go.Figure()
+                sales_trace = go.Bar(
+                    x=_df.date,
+                    y=_df.sales,
+                )
+                fig.add_trace(sales_trace)
+                st.plotly_chart(fig, use_container_width=True)
+                logger.info(f"REGION {region} STORE {s} ITEM {i}")
+
+
+def show_weekly_item_sales(
+    df: pd.DataFrame,
+    stores: List[str],
+    items: List[str],
+):
+    st.markdown("### Weekly summary")
+    df["week_of_year"] = df.date.dt.weekofyear
+    df["month"] = df.date.dt.month
+    df["year"] = df.date.dt.year
+    df = (
+        df.groupby(
+            [
+                "year",
+                "week_of_year",
+                "region",
+                "store",
+                "item",
+            ]
+        )
+        .agg(
+            {
+                "month": np.mean,
+                "price": np.mean,
+                "sales": np.sum,
+                "total_sales_amount": np.sum,
+            }
+        )
+        .astype(
+            {
+                "month": int,
+                "price": int,
+                "sales": int,
+                "total_sales_amount": int,
+            }
+        )
+        .reset_index(
+            level=[
+                "year",
+                "week_of_year",
+                "region",
+                "store",
+                "item",
+            ]
+        )
+    )
+    logger.info(
+        f"""
+df shape: {df.shape}
+df columns: {df.columns}
+                """
+    )
+    for s in stores:
+        for i in items:
+            _df = (
+                df[(df.store == s) & (df.item == i)]
+                .drop(["store", "item"], axis=1)
+                .reset_index(drop=True)
+                .sort_values(["year", "month", "week_of_year"])
+            )
+            region = _df.region.unique()[0]
+            _df = _df.drop("region", axis=1)
+            with st.expander(
+                label=f"REGION {region} STORE {s} ITEM {i}",
+                expanded=True,
+            ):
+                st.dataframe(_df)
+
+                fig = go.Figure()
+                sales_trace = go.Bar(
+                    x=_df.year.astype(str)
+                    .str.cat(_df.month.astype(str), sep="_")
+                    .str.cat(_df.week_of_year.astype(str), sep="_"),
+                    y=_df.sales,
+                )
+                fig.add_trace(sales_trace)
+                st.plotly_chart(fig, use_container_width=True)
+                logger.info(f"REGION {region} STORE {s} ITEM {i}")
+
+
+def show_monthly_item_sales(
+    df: pd.DataFrame,
+    stores: List[str],
+    items: List[str],
+):
+    st.markdown("### Monthly summary")
+    df["month"] = df.date.dt.month
+    df["year"] = df.date.dt.year
+    df = (
+        df.groupby(
+            [
+                "year",
+                "month",
+                "region",
+                "store",
+                "item",
+            ]
+        )
+        .agg(
+            {
+                "price": np.mean,
+                "sales": np.sum,
+                "total_sales_amount": np.sum,
+            }
+        )
+        .astype(
+            {
+                "price": int,
+                "sales": int,
+                "total_sales_amount": int,
+            }
+        )
+        .reset_index(
+            level=[
+                "year",
+                "month",
+                "region",
+                "store",
+                "item",
+            ]
+        )
+    )
+    logger.info(
+        f"""
+df shape: {df.shape}
+df columns: {df.columns}
+                """
+    )
+    for s in stores:
+        for i in items:
+            _df = (
+                df[(df.store == s) & (df.item == i)]
+                .drop(["store", "item"], axis=1)
+                .reset_index(drop=True)
+                .sort_values(["year", "month"])
+            )
+            region = _df.region.unique()[0]
+            _df = _df.drop("region", axis=1)
+            with st.expander(
+                label=f"REGION {region} STORE {s} ITEM {i}",
+                expanded=True,
+            ):
+                st.dataframe(_df)
+
+                fig = go.Figure()
+                sales_trace = go.Bar(
+                    x=_df.year.astype(str).str.cat(_df.month.astype(str), sep="_"),
+                    y=_df.sales,
+                )
+                fig.add_trace(sales_trace)
+                st.plotly_chart(fig, use_container_width=True)
+                logger.info(f"REGION {region} STORE {s} ITEM {i}")
 
 
 def build_item_sales(
@@ -76,13 +275,51 @@ def build_item_sales(
     )
     item = build_item_selectbox(item_view_model=item_view_model)
 
+    time_frame = build_time_frame_selectbox()
+
+    if region == "ALL":
+        region = None
+    if store == "ALL":
+        store = None
+    if item == "ALL":
+        item = None
+
     dataset = item_sales_view_model.list_item_sales(
         item=item,
         store=store,
         region=region,
     )
     df = pd.DataFrame([d.dict() for d in dataset])
-    st.dataframe(df)
+    df["date"] = pd.to_datetime(df["date"])
+    logger.info(
+        f"""
+df shape: {df.shape}
+df columns: {df.columns}
+                """
+    )
+
+    df = df.drop("id", axis=1)
+    stores = df.store.unique()
+    items = df.item.unique()
+
+    if time_frame == TIME_FRAME.DAILY.value:
+        show_daily_item_sales(
+            df=df,
+            stores=stores,
+            items=items,
+        )
+    elif time_frame == TIME_FRAME.WEEKLY.value:
+        show_weekly_item_sales(
+            df=df,
+            stores=stores,
+            items=items,
+        )
+    elif time_frame == TIME_FRAME.MONTHLY.value:
+        show_monthly_item_sales(
+            df=df,
+            stores=stores,
+            items=items,
+        )
 
 
 def build_item_sales_prediction_evaluation(
@@ -105,7 +342,9 @@ def build(
 
     bi = build_bi_selectbox()
 
-    if bi == BI.ITEM_SALES.value:
+    if bi is None:
+        return
+    elif bi == BI.ITEM_SALES.value:
         build_item_sales(
             region_view_model=region_view_model,
             store_view_model=store_view_model,

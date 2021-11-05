@@ -11,7 +11,7 @@ logger = configure_logger(__name__)
 
 def main():
     logger.info("now loading...")
-    sleep(Configurations.wait_second)
+    # sleep(Configurations.wait_second)
     logger.info("start fun time")
     db_client = DBClient()
     region_view_model = RegionViewModel(db_client=db_client)
