@@ -8,9 +8,9 @@ import pandas as pd
 import yaml
 from lightgbm import LGBMRegressor
 from onnxmltools.convert.common.data_types import DoubleTensorType
+from src.middleware.logger import configure_logger
 from src.models.base_model import BaseDemandForecastingModel
-from src.search.schema import SUGGEST_TYPE, SearchParams
-from src.utils.logger import configure_logger
+from src.optimizer.schema import SUGGEST_TYPE, SearchParams
 
 logger = configure_logger(__name__)
 

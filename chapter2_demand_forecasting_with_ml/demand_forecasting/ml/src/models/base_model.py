@@ -3,8 +3,8 @@ from typing import Dict, List, Optional, Union
 
 import numpy as np
 import pandas as pd
-from src.search.schema import SearchParams
-from src.utils.logger import configure_logger
+from src.middleware.logger import configure_logger
+from src.optimizer.schema import SearchParams
 
 logger = configure_logger(__name__)
 

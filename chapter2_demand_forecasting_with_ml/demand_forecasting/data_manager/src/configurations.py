@@ -11,10 +11,6 @@ class DatabaseConfigurations(object):
 
 
 class Configurations(object):
-    api_title = os.getenv("API_TITLE", "demand_forecasting")
-    api_description = os.getenv("API_DESCRIPTION", "demand forecasting data api")
-    api_version = os.getenv("API_VERSION", "0")
-
     data_directory = os.getenv("DATA_DIRECTORY", "/opt/data/")
     create_sql_file_path = os.path.join(data_directory, os.getenv("CREATE_SQL", "create.sql"))
     region_file_path = os.path.join(data_directory, os.getenv("REGION_FILE", "regions.csv"))

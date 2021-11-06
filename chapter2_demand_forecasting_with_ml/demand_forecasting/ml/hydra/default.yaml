@@ -26,10 +26,10 @@ jobs:
     verbose_eval: 1000
 
   search:
-    run: false
+    run: true
     optuna:
       cv: 5
-      n_trials: 20
+      n_trials: 10
       n_jobs: 5
       light_gbm:
         parameters:

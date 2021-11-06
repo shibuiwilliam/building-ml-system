@@ -3,7 +3,7 @@ from typing import Optional
 
 from pandera import Check, Column, DataFrameSchema, Index
 from pydantic import BaseModel
-from src.utils.logger import configure_logger
+from src.middleware.logger import configure_logger
 
 logger = configure_logger(__name__)
 
@@ -49,7 +49,7 @@ _BASE_SCHEMA = {
     "item": Column(str, checks=Check.isin(ITEMS)),
     "item_price": Column(int, checks=Check.greater_than_or_equal_to(0)),
     "sales": Column(int, checks=Check.greater_than_or_equal_to(0)),
-    "total_sales": Column(int, checks=Check.greater_than_or_equal_to(0)),
+    "total_sales_amount": Column(int, checks=Check.greater_than_or_equal_to(0)),
 }
 
 BASE_SCHEMA = DataFrameSchema(
@@ -67,7 +67,7 @@ _WEEKLY_SCHEMA = {
     "item": Column(str, checks=Check.isin(ITEMS)),
     "item_price": Column(int, checks=Check.greater_than_or_equal_to(0)),
     "sales": Column(int, checks=Check.greater_than_or_equal_to(0)),
-    "total_sales": Column(int, checks=Check.greater_than_or_equal_to(0)),
+    "total_sales_amount": Column(int, checks=Check.greater_than_or_equal_to(0)),
     "sales_lag_.*": Column(float, checks=Check.greater_than_or_equal_to(0), nullable=True, regex=True),
 }
 
@@ -156,38 +156,3 @@ UPDATED_PREDICTION_SCHEMA = DataFrameSchema(
     strict=True,
     coerce=True,
 )
-
-
-class ItemSale(BaseModel):
-    id: str
-    item_id: str
-    store_id: str
-    item_price_id: str
-    quantity: int
-    total_sales: int
-    sold_at: date
-    day_of_week: str
-    item_name: str
-    store_name: str
-    price: int
-    created_at: datetime
-    updated_at: datetime
-
-
-class ItemPrice(BaseModel):
-    id: str
-    item_id: str
-    price: int
-    applied_from: date
-    applied_to: Optional[date]
-    item_name: str
-    created_at: datetime
-    updated_at: datetime
-
-
-class PredictionTarget(BaseModel):
-    store_name: str
-    item_name: str
-    date: date
-    day_of_week: str
-    price: int

@@ -12,7 +12,7 @@ from sklearn.model_selection import BaseCrossValidator
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import FunctionTransformer, MinMaxScaler, OneHotEncoder
 from src.dataset.schema import BASE_SCHEMA, MONTHS, PREPROCESSED_SCHEMA, WEEKLY_SCHEMA, WEEKS, YEARS
-from src.utils.logger import configure_logger
+from src.middleware.logger import configure_logger
 
 logger = configure_logger(__name__)
 
@@ -291,7 +291,7 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
                     "month": np.mean,
                     "item_price": np.mean,
                     "sales": np.sum,
-                    "total_sales": np.sum,
+                    "total_sales_amount": np.sum,
                 }
             )
             .astype(
@@ -299,7 +299,7 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
                     "month": int,
                     "item_price": int,
                     "sales": int,
-                    "total_sales": int,
+                    "total_sales_amount": int,
                 }
             )
         )

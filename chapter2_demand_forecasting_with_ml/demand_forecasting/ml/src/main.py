@@ -4,13 +4,14 @@ from datetime import datetime
 import hydra
 import pandas as pd
 from omegaconf import DictConfig
-from src.dataset.data_retriever import DATA_SOURCE, load_df_from_csv
+from src.dataset.data_manager import DATA_SOURCE, load_df_from_csv
 from src.dataset.schema import BASE_SCHEMA
+from src.jobs.optimize import OptimizerRunner
+from src.jobs.train import Trainer
+from src.middleware.logger import configure_logger
 from src.models.models import MODELS
 from src.models.preprocess import DataPreprocessPipeline, WeekBasedSplit
-from src.models.trainer import Trainer
-from src.search.search import DIRECTION, OptunaRunner, parse_params
-from src.utils.logger import configure_logger
+from src.optimizer.optimizer import DIRECTION, Optimizer
 
 logger = configure_logger(__name__)
 
@@ -105,9 +106,7 @@ y_test shape: {y_test.shape}
         model.reset_model(params=cfg.jobs.model.params)
 
     if cfg.jobs.search.run:
-        search_params = parse_params(params=cfg.jobs.search.optuna.light_gbm.parameters)
-        model.define_search_params(search_params=search_params)
-        optuna_runner = OptunaRunner(
+        optimizer = Optimizer(
             data=x_train,
             target=y_train,
             direction=DIRECTION.MINIMIZE,
@@ -120,8 +119,12 @@ y_test shape: {y_test.shape}
             ),
             scorings={"neg_mean_squared_error": "neg_mean_squared_error"},
         )
-        results = optuna_runner.optimize(
-            models=[model],
+        optimize_runner = OptimizerRunner(
+            model=model,
+            optimizer=optimizer,
+        )
+        best_params = optimize_runner.optimize(
+            params=cfg.jobs.search.optuna.light_gbm.parameters,
             n_trials=cfg.jobs.search.optuna.n_trials,
             n_jobs=cfg.jobs.search.optuna.n_jobs,
             scoring="test_neg_mean_squared_error",
@@ -132,12 +135,8 @@ y_test shape: {y_test.shape}
                 verbose=cfg.jobs.model.get("verbose_eval", 1000),
             ),
         )
-        logger.info(f"parameter search results: {results}")
-        params = results[0]["best_params"]
-        for k, v in model.params.items():
-            if k not in params.keys():
-                params[k] = v
-        model.reset_model(params=params)
+        logger.info(f"parameter search results: {best_params}")
+        model.reset_model(params=best_params)
 
     if cfg.jobs.train.run:
         now = datetime.now().strftime("%Y%m%d_%H%M%S")
