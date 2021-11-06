@@ -1,11 +1,36 @@
 from datetime import date, datetime
-from typing import Optional
+from enum import Enum
 
 from pandera import Check, Column, DataFrameSchema, Index
-from pydantic import BaseModel
+from pydantic import BaseModel, Extra
 from src.middleware.logger import configure_logger
 
 logger = configure_logger(__name__)
+
+
+class TABLES(Enum):
+    REGIONS = "regions"
+    STORES = "stores"
+    ITEMS = "items"
+    ITEM_PRICES = "item_prices"
+    ITEM_SALES_RECORDS = "item_sales"
+    ITEM_SALES_PREDICTIONS = "item_sales_predictions"
+    ITEM_SALES_PREDICTION_EVALUATIONS = "item_sales_prediction_evaluations"
+
+
+class ItemSales(BaseModel):
+    id: str
+    date: date
+    day_of_week: str
+    store: str
+    region: str
+    item: str
+    price: int
+    sales: int
+    total_sales_amount: int
+
+    class Config:
+        extra = Extra.forbid
 
 
 STORES = [

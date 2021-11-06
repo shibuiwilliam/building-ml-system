@@ -11,7 +11,8 @@ from src.jobs.train import Trainer
 from src.middleware.logger import configure_logger
 from src.models.models import MODELS
 from src.models.preprocess import DataPreprocessPipeline, WeekBasedSplit
-from src.optimizer.optimizer import DIRECTION, Optimizer
+from src.optimizer.optimizer import Optimizer
+from src.optimizer.schema import DIRECTION, METRICS
 
 logger = configure_logger(__name__)
 
@@ -105,7 +106,8 @@ y_test shape: {y_test.shape}
     if "params" in cfg.jobs.model.keys():
         model.reset_model(params=cfg.jobs.model.params)
 
-    if cfg.jobs.search.run:
+    if cfg.jobs.optimize.run:
+        metrics = METRICS.get_metrics(name=cfg.jobs.optimize.optuna.metrics)
         optimizer = Optimizer(
             data=x_train,
             target=y_train,
@@ -117,25 +119,23 @@ y_test shape: {y_test.shape}
                 columns=data_preprocess_pipeline.preprocessed_columns,
                 types=data_preprocess_pipeline.preprocessed_types,
             ),
-            scorings={"neg_mean_squared_error": "neg_mean_squared_error"},
         )
         optimize_runner = OptimizerRunner(
             model=model,
             optimizer=optimizer,
         )
         best_params = optimize_runner.optimize(
-            params=cfg.jobs.search.optuna.light_gbm.parameters,
-            n_trials=cfg.jobs.search.optuna.n_trials,
-            n_jobs=cfg.jobs.search.optuna.n_jobs,
-            scoring="test_neg_mean_squared_error",
+            params=cfg.jobs.optimize.optuna.light_gbm.parameters,
+            n_trials=cfg.jobs.optimize.optuna.n_trials,
+            n_jobs=cfg.jobs.optimize.optuna.n_jobs,
+            metrics=metrics,
             fit_params=dict(
-                eval_set=[(x_test, y_test)],
                 early_stopping_rounds=cfg.jobs.model.get("early_stopping_rounds", 200),
                 eval_metric=cfg.jobs.model.get("eval_metrics", "mse"),
                 verbose=cfg.jobs.model.get("verbose_eval", 1000),
             ),
         )
-        logger.info(f"parameter search results: {best_params}")
+        logger.info(f"parameter optimize results: {best_params}")
         model.reset_model(params=best_params)
 
     if cfg.jobs.train.run:

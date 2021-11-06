@@ -4,7 +4,7 @@ from omegaconf import DictConfig
 from src.middleware.logger import configure_logger
 from src.models.base_model import BaseDemandForecastingModel
 from src.optimizer.optimizer import Optimizer
-from src.optimizer.schema import SUGGEST_TYPE, SearchParams
+from src.optimizer.schema import METRICS, SUGGEST_TYPE, EvalutionMetrics, SearchParams
 
 logger = configure_logger(name=__name__)
 
@@ -21,9 +21,9 @@ class OptimizerRunner(object):
     def optimize(
         self,
         params: DictConfig,
-        scoring: str = "test_neg_mean_squared_error",
         n_trials: int = 20,
         n_jobs: int = 1,
+        metrics: EvalutionMetrics = METRICS.MEAN_ABSOLUTE_ERROR.value,
         fit_params: Optional[Dict] = None,
     ) -> Dict[str, Any]:
         search_params = self.parse_params(params=params)
@@ -32,7 +32,7 @@ class OptimizerRunner(object):
             model=self.model,
             n_trials=n_trials,
             n_jobs=n_jobs,
-            scoring=scoring,
+            metrics=metrics,
             fit_params=fit_params,
         )
 

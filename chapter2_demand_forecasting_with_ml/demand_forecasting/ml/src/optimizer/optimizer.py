@@ -1,21 +1,16 @@
-from enum import Enum
-from typing import Dict, Iterator, List, Optional, Union
+from copy import deepcopy
+from typing import Dict, Optional, Union
 
 import mlflow
 import numpy as np
 import optuna
 import pandas as pd
-from sklearn.model_selection import BaseCrossValidator, cross_validate
+from sklearn.model_selection import BaseCrossValidator
 from src.middleware.logger import configure_logger
 from src.models.base_model import BaseDemandForecastingModel
-from src.optimizer.schema import SUGGEST_TYPE
+from src.optimizer.schema import DIRECTION, METRICS, SUGGEST_TYPE, EvalutionMetrics
 
 logger = configure_logger(name=__name__)
-
-
-class DIRECTION(Enum):
-    MINIMIZE = "minimize"
-    MAXIMIZE = "maximize"
 
 
 def mlflow_callback(
@@ -34,21 +29,13 @@ class Optimizer(object):
         self,
         data: pd.DataFrame,
         target: pd.DataFrame,
+        cv=BaseCrossValidator,
         direction: DIRECTION = DIRECTION.MAXIMIZE,
-        cv: Union[int, BaseCrossValidator] = 5,
-        scorings: Optional[Dict[str, str]] = None,
     ):
         self.data = data
         self.target = target
         self.direction = direction
         self.cv = cv
-        self.scorings = scorings
-        if self.scorings is None:
-            self.scorings = {
-                "neg_root_mean_squared_error": "neg_root_mean_squared_error",
-                "neg_mean_absolute_error": "neg_mean_absolute_error",
-                "neg_mean_absolute_percentage_error": "neg_mean_absolute_percentage_error",
-            }
 
         optuna.logging.enable_default_handler()
 
@@ -57,7 +44,7 @@ class Optimizer(object):
         model: BaseDemandForecastingModel,
         n_trials: int = 20,
         n_jobs: int = 1,
-        scoring: str = "test_neg_mean_absolute_error",
+        metrics: EvalutionMetrics = METRICS.MEAN_ABSOLUTE_ERROR.value,
         fit_params: Optional[Dict] = None,
     ) -> Dict[str, Union[str, float]]:
         logger.info(f"model: {model}")
@@ -68,8 +55,8 @@ class Optimizer(object):
         study.optimize(
             self.objective(
                 model=model,
+                metrics=metrics,
                 fit_params=fit_params,
-                scoring=scoring,
             ),
             n_jobs=n_jobs,
             n_trials=n_trials,
@@ -86,7 +73,7 @@ class Optimizer(object):
     def objective(
         self,
         model: BaseDemandForecastingModel,
-        scoring: str = "test_neg_mean_absolute_error",
+        metrics: EvalutionMetrics = METRICS.MEAN_ABSOLUTE_ERROR.value,
         fit_params: Optional[Dict] = None,
     ):
         def _objective(
@@ -115,16 +102,25 @@ class Optimizer(object):
 
             logger.info(f"params: {params}")
 
-            scores = cross_validate(
-                estimator=model.model,
-                X=self.data,
-                y=self.target,
-                cv=self.cv,
-                scoring=self.scorings,
-                error_score=np.nan,
-                fit_params=fit_params,
-            )
-            logger.debug(f"result: {scores}")
-            return scores[scoring].mean()
+            evaluations = []
+            for train_index, test_index in self.cv.split(X=self.data):
+                model.reset_model(params=params)
+                _model = deepcopy(model.model)
+                x_train = self.data.iloc[train_index]
+                y_train = self.target.iloc[train_index]
+                x_test = self.data.iloc[test_index]
+                y_test = self.target.iloc[test_index]
+                eval_set = [(x_train, y_train), (x_test, y_test)]
+
+                _model.fit(
+                    X=x_train,
+                    y=y_train,
+                    eval_set=eval_set,
+                    **fit_params,
+                )
+                preds = _model.predict(x_test)
+                evaluation = metrics.function(y_test, preds)
+                evaluations.append(evaluation)
+            return sum(evaluations) / len(evaluations)
 
         return _objective

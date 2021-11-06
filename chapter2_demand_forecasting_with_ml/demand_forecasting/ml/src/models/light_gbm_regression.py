@@ -18,12 +18,12 @@ LGB_REGRESSION_DEFAULT_PARAMS = {
     "task": "train",
     "boosting": "gbdt",
     "objective": "regression",
-    "num_leaves": 4,
-    "learning_rate": 0.01,
-    "feature_fraction": 0.8,
+    "num_leaves": 3,
+    "learning_rate": 0.05,
+    "feature_fraction": 0.5,
     "max_depth": -1,
     "num_iterations": 1000000,
-    "num_threads": 1,
+    "num_threads": 0,
     "seed": 1234,
 }
 

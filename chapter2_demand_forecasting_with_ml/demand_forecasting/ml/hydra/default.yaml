@@ -2,6 +2,12 @@ jobs:
   data:
     source: local
     path: /opt/data/item_sale_records_2017_2019.csv
+    target_data:
+      date_from: 2017-01-01
+      date_to: 2019-12-31
+      item: ALL
+      store: ALL
+      region: ALL
     train:
       year_from: 2017
     test:
@@ -25,23 +31,18 @@ jobs:
     eval_metrics: mse
     verbose_eval: 1000
 
-  search:
-    run: true
+  optimize:
+    run: false
     optuna:
-      cv: 5
-      n_trials: 10
+      n_trials: 50
       n_jobs: 5
+      metrics: mean_absolute_error
       light_gbm:
         parameters:
           - name: num_leaves
             suggest_type: int
             value_range:
               - 2
-              - 10
-          - name: max_depth
-            suggest_type: int
-            value_range:
-              - -1
               - 10
           - name: learning_rate
             suggest_type: uniform
