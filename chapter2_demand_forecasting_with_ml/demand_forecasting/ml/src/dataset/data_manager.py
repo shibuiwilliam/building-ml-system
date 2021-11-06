@@ -73,6 +73,8 @@ class DBDataManager(object):
                 item=item,
                 store=store,
                 region=region,
+                limit=limit,
+                offset=offset,
             )
             if len(records) == 0:
                 logger.info(f"done loading {len(item_sales)} records")
@@ -113,7 +115,7 @@ SELECT
     {TABLES.ITEM_SALES_RECORDS.value}.date,
     {TABLES.ITEM_SALES_RECORDS.value}.day_of_week,
     {TABLES.ITEMS.value}.name AS item,
-    {TABLES.ITEM_PRICES.value}.price AS price,
+    {TABLES.ITEM_PRICES.value}.price AS item_price,
     {TABLES.STORES.value}.name as store,
     {TABLES.ITEM_SALES_RECORDS.value}.sales,
     {TABLES.ITEM_SALES_RECORDS.value}.total_sales_amount
@@ -135,7 +137,7 @@ LEFT JOIN
     {TABLES.REGIONS.value}
 ON
     {TABLES.STORES.value}.region_id = {TABLES.REGIONS.value}.id
-        """
+"""
 
         where = ""
         prefix = "WHERE"

@@ -130,7 +130,7 @@ def show_weekly_item_sales(
         .agg(
             {
                 "month": np.mean,
-                "price": np.mean,
+                "item_price": np.mean,
                 "sales": np.sum,
                 "total_sales_amount": np.sum,
             }
@@ -138,7 +138,7 @@ def show_weekly_item_sales(
         .astype(
             {
                 "month": int,
-                "price": int,
+                "item_price": int,
                 "sales": int,
                 "total_sales_amount": int,
             }
@@ -207,14 +207,14 @@ def show_monthly_item_sales(
         )
         .agg(
             {
-                "price": np.mean,
+                "item_price": np.mean,
                 "sales": np.sum,
                 "total_sales_amount": np.sum,
             }
         )
         .astype(
             {
-                "price": int,
+                "item_price": int,
                 "sales": int,
                 "total_sales_amount": int,
             }

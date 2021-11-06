@@ -32,10 +32,7 @@ services:
       - POSTGRESQL_PASSWORD=password
       - POSTGRESQL_DBNAME=demand_forecasting
       - LOG_LEVEL=DEBUG
-    entrypoint:
-      - "python"
-      - "-m"
-      - "src.main"
+    command: /bin/sh -c "sleep 10s && python -m src.main"
     volumes:
       - "./master_data:/opt/data"
     depends_on:
@@ -54,13 +51,30 @@ services:
       - POSTGRESQL_PASSWORD=password
       - POSTGRESQL_DBNAME=demand_forecasting
       - LOG_LEVEL=DEBUG
-      - WAIT_SECOND=10
-    entrypoint:
-      - "streamlit"
-      - "run"
-      - "src/main.py"
+    command: /bin/sh -c "sleep 30s && streamlit run src/main.py"
     ports:
       - "8501:8501"
+    depends_on:
+      - data_manager
+
+  ml:
+    container_name: ml
+    image: shibui/building-ml-system:demand_forecasting_ml_0.0.0
+    restart: "no"
+    volumes:
+      - ./data:/opt/data
+      - ./ml/hydra:/opt/hydra
+      - ./ml/outputs:/opt/outputs
+    networks:
+      - default
+    environment:
+      - POSTGRESQL_HOST=postgres
+      - POSTGRESQL_PORT=5432
+      - POSTGRESQL_USER=user
+      - POSTGRESQL_PASSWORD=password
+      - POSTGRESQL_DBNAME=demand_forecasting
+      - LOG_LEVEL=DEBUG
+    command: /bin/sh -c "sleep 30s && python -m src.main"
     depends_on:
       - data_manager
 

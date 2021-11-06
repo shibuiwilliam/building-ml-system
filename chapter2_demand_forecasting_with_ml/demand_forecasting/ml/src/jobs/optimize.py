@@ -26,6 +26,7 @@ class OptimizerRunner(object):
         metrics: EvalutionMetrics = METRICS.MEAN_ABSOLUTE_ERROR.value,
         fit_params: Optional[Dict] = None,
     ) -> Dict[str, Any]:
+        logger.info("start optimize")
         search_params = self.parse_params(params=params)
         self.model.define_search_params(search_params=search_params)
         result = self.optimizer.optimize(
@@ -41,6 +42,7 @@ class OptimizerRunner(object):
         for k, v in self.model.params.items():
             if k not in best_params.keys():
                 best_params[k] = v
+        logger.info("done optimize")
         return best_params
 
     def parse_params(

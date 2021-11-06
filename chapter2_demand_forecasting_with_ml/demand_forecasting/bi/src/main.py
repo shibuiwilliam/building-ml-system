@@ -1,6 +1,3 @@
-from time import sleep
-
-from configurations import Configurations
 from db_client import DBClient
 from logger import configure_logger
 from view import build
@@ -11,7 +8,6 @@ logger = configure_logger(__name__)
 
 def main():
     logger.info("now loading...")
-    # sleep(Configurations.wait_second)
     logger.info("start fun time")
     db_client = DBClient()
     region_view_model = RegionViewModel(db_client=db_client)

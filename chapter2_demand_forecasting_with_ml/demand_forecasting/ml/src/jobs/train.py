@@ -81,6 +81,7 @@ rmse: {evaluation.root_mean_squared_error}
         save_file_path: Optional[str] = None,
         onnx_file_path: Optional[str] = None,
     ) -> Evaluation:
+        logger.info("start training and evaluation")
         with mlflow.start_run(run_name=model.name):
             self.train(
                 model=model,
@@ -106,4 +107,5 @@ rmse: {evaluation.root_mean_squared_error}
                 f = model.save_as_onnx(file_path=onnx_file_path)
                 mlflow.log_artifact(f)
 
+        logger.info("done training and evaluation")
         return evaluation

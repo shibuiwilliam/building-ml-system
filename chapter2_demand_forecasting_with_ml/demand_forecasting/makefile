@@ -8,18 +8,6 @@ DOCKER_REPOSITORY := shibui/building-ml-system
 DIR := $(ABSOLUTE_PATH)
 TAG = demand_forecasting
 
-############ COMMON COMMANDS ############
-.PHONY: download_kaggle
-download_kaggle:
-	cd $(DIR)/data && \
-	kaggle competitions download -c demand-forecasting-kernels-only && \
-	unzip demand-forecasting-kernels-only.zip
-
-.PHONY: dvc_init
-dvc_init:
-	cd $(DIR) && \
-	dvc init --subdir
-	
 
 ############ DEMAND FORECASTING DATA_MANAGER COMMANDS ############
 DATA_MANAGER_DIR := $(DIR)/data_manager
@@ -111,6 +99,7 @@ run_ml: build_ml
 		-it \
 		-d \
 		--name ml_test \
+		--net ml \
 		-v $(DIR)/data:/opt/data \
 		-v $(ML_DIR)/hydra/:/opt/hydra \
 		-v $(ML_DIR)/outputs/:/opt/outputs \
@@ -167,37 +156,31 @@ push_bi:
 ############ ALL COMMANDS ############
 .PHONY: patch_all
 patch_all: patch_data_manager \
-	patch_data_client \
 	patch_ml \
 	patch_bi
 
 .PHONY: minor_upgrade_all
 minor_upgrade_all: minor_upgrade_data_manager \
-	minor_upgrade_data_client \
 	minor_upgrade_ml \
 	minor_upgrade_bi
 
 .PHONY: major_upgrade_all
 major_upgrade_all: major_upgrade_data_manager \
-	major_upgrade_data_client \
 	major_upgrade_ml \
 	major_upgrade_bi
 
 .PHONY: req_all
 req_all: req_data_manager \
-	req_data_client \
 	req_ml \
 	req_bi
 
 .PHONY: build_all
 build_all: build_data_manager \
-	build_data_client \
 	build_ml \
 	build_bi
 	 
 .PHONY: push_all
 push_all: push_data_manager \
-	push_data_client \
 	push_ml \
 	push_bi
 

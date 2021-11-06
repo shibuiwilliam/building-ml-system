@@ -10,7 +10,6 @@ logger = configure_logger(__name__)
 
 
 def main():
-    sleep(10)
     logger.info("start jobs")
     db_client = DBClient()
     table_service = TableService(db_client=db_client)

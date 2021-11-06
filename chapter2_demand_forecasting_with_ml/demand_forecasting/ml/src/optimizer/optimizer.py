@@ -2,7 +2,6 @@ from copy import deepcopy
 from typing import Dict, Optional, Union
 
 import mlflow
-import numpy as np
 import optuna
 import pandas as pd
 from sklearn.model_selection import BaseCrossValidator
