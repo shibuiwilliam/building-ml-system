@@ -14,6 +14,11 @@ jobs:
     test:
       year: 2019
       week: 50
+    predict:
+      year: 2019
+      week: 50
+      items: ALL
+      stores: ALL
 
   model:
     name: light_gbm_regression
@@ -29,14 +34,13 @@ jobs:
       num_threads: 0
       seed: 1234
     early_stopping_rounds: 200
-    eval_metrics: mse
     verbose_eval: 1000
 
   optimize:
-    run: true
+    run: false
     optuna:
       n_trials: 50
-      n_jobs: 5
+      n_jobs: 1
       metrics: mean_absolute_error
       light_gbm:
         parameters:
@@ -59,5 +63,5 @@ jobs:
   train:
     run: true
 
-  prediction:
-    run: false
+  predict:
+    run: true

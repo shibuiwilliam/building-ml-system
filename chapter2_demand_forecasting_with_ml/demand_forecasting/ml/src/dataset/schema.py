@@ -42,7 +42,7 @@ MONTHS = [i for i in range(1, 13, 1)]
 
 YEARS = [i for i in range(2017, 2031, 1)]
 
-DAYS_OF_WEEK = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
+DAYS_OF_WEEK = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
 
 _BASE_SCHEMA = {
     "date": Column(datetime),

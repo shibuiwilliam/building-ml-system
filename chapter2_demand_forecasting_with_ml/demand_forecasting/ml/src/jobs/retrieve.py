@@ -19,11 +19,8 @@ class DataRetriever(object):
     def retrieve_dataset(
         self,
         cfg: DictConfig,
-        train_year_and_week: YearAndWeek,
-        test_year_and_week: YearAndWeek,
-        data_preprocess_pipeline: DataPreprocessPipeline,
         data_source: DATA_SOURCE = DATA_SOURCE.LOCAL,
-    ) -> Tuple[XY, XY]:
+    ) -> pd.DataFrame:
         logger.info("start retrieve data")
         if data_source == DATA_SOURCE.LOCAL:
             raw_df = load_df_from_csv(file_path=cfg.jobs.data.path)
@@ -65,7 +62,15 @@ raw_df columns: {raw_df.columns}
 raw_df shape: {raw_df.shape}
     """
         )
+        return raw_df
 
+    def train_test_split(
+        self,
+        raw_df: pd.DataFrame,
+        train_year_and_week: YearAndWeek,
+        test_year_and_week: YearAndWeek,
+        data_preprocess_pipeline: DataPreprocessPipeline,
+    ) -> Tuple[XY, XY]:
         logger.info(
             f"""
 train from {train_year_and_week.year} of {train_year_and_week.week_of_year} to {test_year_and_week.year} {test_year_and_week.week_of_year-2}

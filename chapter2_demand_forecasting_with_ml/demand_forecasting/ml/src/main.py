@@ -6,6 +6,7 @@ from omegaconf import DictConfig
 from src.dataset.data_manager import DATA_SOURCE
 from src.dataset.schema import YearAndWeek
 from src.jobs.optimize import OptimizerRunner
+from src.jobs.predict import Predictor
 from src.jobs.retrieve import DataRetriever
 from src.jobs.train import Trainer
 from src.middleware.logger import configure_logger
@@ -41,12 +42,15 @@ def main(cfg: DictConfig):
     data_preprocess_pipeline = DataPreprocessPipeline()
     data_retriever = DataRetriever()
 
-    xy_train, xy_test = data_retriever.retrieve_dataset(
+    raw_df = data_retriever.retrieve_dataset(
         cfg=cfg,
+        data_source=data_source,
+    )
+    xy_train, xy_test = data_retriever.train_test_split(
+        raw_df=raw_df,
         train_year_and_week=train_year_and_week,
         test_year_and_week=test_year_and_week,
         data_preprocess_pipeline=data_preprocess_pipeline,
-        data_source=data_source,
     )
     x_train = xy_train.x
     y_train = xy_train.y
@@ -56,7 +60,6 @@ def main(cfg: DictConfig):
     _model = MODELS.get_model(name=cfg.jobs.model.name)
     model = _model.model(
         early_stopping_rounds=cfg.jobs.model.get("early_stopping_rounds", 200),
-        eval_metrics=cfg.jobs.model.get("eval_metrics", "mse"),
         verbose_eval=cfg.jobs.model.get("verbose_eval", 1000),
     )
     if "params" in cfg.jobs.model.keys():
@@ -108,6 +111,27 @@ def main(cfg: DictConfig):
             save_file_path=save_file_path,
             onnx_file_path=onnx_file_path,
         )
+
+    if cfg.jobs.predict.run:
+        predictor = Predictor()
+        target_items = cfg.jobs.data.predict.get("items", "ALL")
+        if target_items == "ALL":
+            target_items = None
+
+        target_stores = cfg.jobs.data.predict.get("stores", "ALL")
+        if target_stores == "ALL":
+            target_stores = None
+
+        predictions = predictor.predict(
+            model=model,
+            data_preprocess_pipeline=data_preprocess_pipeline,
+            raw_df=raw_df,
+            target_year=cfg.jobs.data.predict.get("year", 2019),
+            target_week=cfg.jobs.data.predict.get("week", 50),
+            target_items=target_items,
+            target_stores=target_stores,
+        )
+        logger.info(f"predictions: {predictions}")
 
 
 if __name__ == "__main__":
