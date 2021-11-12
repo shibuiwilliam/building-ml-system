@@ -1,0 +1,83 @@
+version: "3"
+
+services:
+  postgres:
+    image: postgres:13.4
+    container_name: postgres
+    volumes:
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    networks:
+      - default
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=beverage_sales_forecasting
+      - POSTGRES_INITDB_ARGS="--encoding=UTF-8"
+    ports:
+      - 5432:5432
+    hostname: postgres
+    restart: always
+    stdin_open: true
+
+  data_registration:
+    container_name: data_registration
+    image: shibui/building-ml-system:beverage_sales_forecasting_data_registration_0.0.0
+    restart: "no"
+    networks:
+      - default
+    environment:
+      - POSTGRESQL_HOST=postgres
+      - POSTGRESQL_PORT=5432
+      - POSTGRESQL_USER=user
+      - POSTGRESQL_PASSWORD=password
+      - POSTGRESQL_DBNAME=beverage_sales_forecasting
+      - LOG_LEVEL=DEBUG
+    command: /bin/sh -c "sleep 10s && python -m src.main"
+    volumes:
+      - "./master_data:/opt/data"
+    depends_on:
+      - postgres
+
+  bi:
+    container_name: bi
+    image: shibui/building-ml-system:beverage_sales_forecasting_bi_0.0.0
+    restart: always
+    networks:
+      - default
+    environment:
+      - POSTGRESQL_HOST=postgres
+      - POSTGRESQL_PORT=5432
+      - POSTGRESQL_USER=user
+      - POSTGRESQL_PASSWORD=password
+      - POSTGRESQL_DBNAME=beverage_sales_forecasting
+      - LOG_LEVEL=DEBUG
+    command: /bin/sh -c "sleep 30s && streamlit run src/main.py"
+    ports:
+      - "8501:8501"
+    depends_on:
+      - data_registration
+
+  # ml:
+  #   container_name: ml
+  #   image: shibui/building-ml-system:beverage_sales_forecasting_ml_0.0.0
+  #   restart: "no"
+  #   volumes:
+  #     - ./data:/opt/data
+  #     - ./ml/hydra:/opt/hydra
+  #     - ./ml/outputs:/opt/outputs
+  #   networks:
+  #     - default
+  #   environment:
+  #     - POSTGRESQL_HOST=postgres
+  #     - POSTGRESQL_PORT=5432
+  #     - POSTGRESQL_USER=user
+  #     - POSTGRESQL_PASSWORD=password
+  #     - POSTGRESQL_DBNAME=beverage_sales_forecasting
+  #     - LOG_LEVEL=DEBUG
+  #   command: /bin/sh -c "sleep 30s && python -m src.main"
+  #   depends_on:
+  #     - data_registration
+
+networks:
+  default:
+    name: ml
