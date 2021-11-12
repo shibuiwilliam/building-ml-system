@@ -1,4 +1,3 @@
-from src.configurations import Configurations
 from src.middleware.database import AbstractDBClient
 from src.middleware.file_reader import read_csv_to_list
 from src.middleware.logger import configure_logger
@@ -20,18 +19,28 @@ class StoreService(AbstractService):
         self.region_repository = RegionRepository(db_client=self.db_client)
         self.store_repository = StoreRepository(db_client=self.db_client)
 
-    def register(self):
-        self.__register_region()
-        self.__register_store()
+    def register(
+        self,
+        region_file_path: str,
+        store_file_path: str,
+    ):
+        self.__register_region(region_file_path=region_file_path)
+        self.__register_store(store_file_path=store_file_path)
 
-    def __register_region(self):
-        data = read_csv_to_list(csv_file=Configurations.region_file_path)
+    def __register_region(
+        self,
+        region_file_path: str,
+    ):
+        data = read_csv_to_list(csv_file=region_file_path)
         records = [Region(**d) for d in data]
         for record in records:
             self.region_repository.insert(record=record)
 
-    def __register_store(self):
-        data = read_csv_to_list(csv_file=Configurations.store_file_path)
+    def __register_store(
+        self,
+        store_file_path: str,
+    ):
+        data = read_csv_to_list(csv_file=store_file_path)
         regions = self.region_repository.select()
         region_dict = {r.name: r.id for r in regions}
         for d in data:

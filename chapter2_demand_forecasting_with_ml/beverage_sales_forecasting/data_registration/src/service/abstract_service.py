@@ -9,7 +9,3 @@ class AbstractService(ABC):
         db_client: AbstractDBClient,
     ):
         self.db_client = db_client
-
-    @abstractmethod
-    def register(self):
-        raise NotImplementedError

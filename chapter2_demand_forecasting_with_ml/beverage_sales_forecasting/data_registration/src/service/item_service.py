@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta, date
-from src.configurations import Configurations
 from src.middleware.database import AbstractDBClient
 from src.middleware.file_reader import read_csv_to_list
 from src.middleware.logger import configure_logger
@@ -27,19 +26,34 @@ class ItemService(AbstractService):
         self.item_sales_repository = ItemSalesRepository(db_client=self.db_client)
         self.store_repository = StoreRepository(db_client=self.db_client)
 
-    def register(self):
-        self.__register_item()
-        self.__register_item_price()
-        self.__register_item_sales()
+    def register(
+        self,
+        item_file_path: str,
+        item_price_path: str,
+    ):
+        self.__register_item(item_file_path=item_file_path)
+        self.__register_item_price(item_price_path=item_price_path)
 
-    def __register_item(self):
-        data = read_csv_to_list(csv_file=Configurations.item_file_path)
+    def register_records(
+        self,
+        item_sales_records_path: str,
+    ):
+        self.__register_item_sales(item_sales_records_path=item_sales_records_path)
+
+    def __register_item(
+        self,
+        item_file_path: str,
+    ):
+        data = read_csv_to_list(csv_file=item_file_path)
         records = [Item(**d) for d in data]
         for record in records:
             self.item_repository.insert(record=record)
 
-    def __register_item_price(self):
-        data = read_csv_to_list(csv_file=Configurations.item_price_path)
+    def __register_item_price(
+        self,
+        item_price_path: str,
+    ):
+        data = read_csv_to_list(csv_file=item_price_path)
         items = self.item_repository.select()
         item_dict = {i.name: i.id for i in items}
         for d in data:
@@ -52,8 +66,11 @@ class ItemService(AbstractService):
             )
             self.item_price_repository.insert(record=record)
 
-    def __register_item_sales(self):
-        data = read_csv_to_list(csv_file=Configurations.item_sale_records_2017_2019_path)
+    def __register_item_sales(
+        self,
+        item_sales_records_path: str,
+    ):
+        data = read_csv_to_list(csv_file=item_sales_records_path)
 
         stores = self.store_repository.select()
         store_dict = {s.name: s.id for s in stores}
