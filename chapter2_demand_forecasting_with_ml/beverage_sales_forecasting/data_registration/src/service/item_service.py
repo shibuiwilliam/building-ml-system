@@ -1,4 +1,5 @@
-from datetime import datetime, date
+from datetime import date, datetime
+
 from src.middleware.database import AbstractDBClient
 from src.middleware.file_reader import read_csv_to_list
 from src.middleware.logger import configure_logger

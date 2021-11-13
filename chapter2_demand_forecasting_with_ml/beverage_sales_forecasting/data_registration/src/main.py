@@ -1,5 +1,6 @@
 from time import sleep
 from typing import Optional, Tuple
+
 import click
 from src.middleware.database import DBClient
 from src.middleware.logger import configure_logger
