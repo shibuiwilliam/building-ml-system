@@ -55,32 +55,33 @@ CREATE TABLE IF NOT EXISTS item_sales (
 	id VARCHAR(32) NOT NULL,
     store_id VARCHAR(32) NOT NULL,
 	item_id VARCHAR(32) NOT NULL,
-    item_price_id VARCHAR(32) NOT NULL,
     date DATE NOT NULL,
     day_of_week VARCHAR(3) NOT NULL,
+	week_of_year INTEGER NOT NULL,
     sales INTEGER NOT NULL,
     total_sales_amount INTEGER NOT NULL,
 	created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	PRIMARY KEY (id),
     FOREIGN KEY(store_id) REFERENCES stores(id),
-    FOREIGN KEY(item_id) REFERENCES items(id),
-    FOREIGN KEY(item_price_id) REFERENCES item_prices(id)
+    FOREIGN KEY(item_id) REFERENCES items(id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_item_sales_item_id ON item_sales(item_id);
-CREATE INDEX IF NOT EXISTS idx_item_sales_item_price_id ON item_sales(item_price_id);
 CREATE INDEX IF NOT EXISTS idx_item_sales_sales ON item_sales(sales);
 CREATE INDEX IF NOT EXISTS idx_item_sales_date ON item_sales(date);
 CREATE INDEX IF NOT EXISTS idx_item_sales_day_of_week ON item_sales(day_of_week);
+CREATE INDEX IF NOT EXISTS idx_item_sales_week_of_year ON item_sales(week_of_year);
 CREATE INDEX IF NOT EXISTS idx_item_sales_store_id ON item_sales(store_id);
 
 CREATE TABLE IF NOT EXISTS item_sales_predictions (
 	id VARCHAR(32) NOT NULL,
+    store_id VARCHAR(32) NOT NULL,
+	item_id VARCHAR(32) NOT NULL,
+	week_of_year INTEGER NOT NULL,
 	prediction NUMERIC NOT NULL,
 	predicted_at DATE NOT NULL,
 	created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	PRIMARY KEY (id),
-    FOREIGN KEY(id) REFERENCES item_sales(id)
+	PRIMARY KEY (id)
 );

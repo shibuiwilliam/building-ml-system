@@ -47,6 +47,7 @@ DAYS_OF_WEEK = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
 _BASE_SCHEMA = {
     "date": Column(datetime),
     "day_of_week": Column(str, checks=Check.isin(DAYS_OF_WEEK)),
+    "week_of_year": Column(int, checks=Check.isin(WEEKS)),
     "store": Column(str, checks=Check.isin(STORES)),
     "item": Column(str, checks=Check.isin(ITEMS)),
     "item_price": Column(int, checks=Check.greater_than_or_equal_to(0)),
@@ -161,6 +162,7 @@ class TABLES(Enum):
 class ItemSales(BaseModel):
     date: date
     day_of_week: str
+    week_of_year: int
     store: str
     item: str
     item_price: int

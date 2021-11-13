@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, date
+from datetime import datetime, date
 from src.middleware.database import AbstractDBClient
 from src.middleware.file_reader import read_csv_to_list
 from src.middleware.logger import configure_logger
@@ -78,15 +78,6 @@ class ItemService(AbstractService):
         items = self.item_repository.select()
         item_dict = {i.name: i.id for i in items}
 
-        item_prices = self.item_price_repository.select()
-        item_price_dict = {
-            i.item_id: {
-                d: i.id
-                for d in [i.applied_from + timedelta(days=x) for x in range((i.applied_to - i.applied_from).days + 1)]
-            }
-            for i in item_prices
-        }
-
         limit = 1000
         i = 0
         records = []
@@ -94,15 +85,14 @@ class ItemService(AbstractService):
             d = data[i]
             sales_date = datetime.strptime(d["date"], "%Y-%m-%d").date()
             item_id = item_dict[d["item"]]
-            item_price_id = item_price_dict[item_id][sales_date]
             records.append(
                 ItemSales(
                     id=get_uuid(),
                     date=sales_date,
                     day_of_week=d["day_of_week"],
+                    week_of_year=d["week_of_year"],
                     store_id=store_dict[d["store"]],
                     item_id=item_id,
-                    item_price_id=item_price_id,
                     sales=int(d["sales"]),
                     total_sales_amount=int(d["total_sales_amount"]),
                 )

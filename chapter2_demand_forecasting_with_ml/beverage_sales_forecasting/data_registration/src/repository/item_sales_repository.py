@@ -14,10 +14,8 @@ class ItemSalesQuery(AbstractQuery):
     ids: Optional[List[str]]
     date_from: Optional[date]
     date_to: Optional[date]
-    day_of_weeks: Optional[List[str]]
     store_ids: Optional[List[str]]
     item_ids: Optional[List[str]]
-    item_price_ids: Optional[List[str]]
     sales_below: Optional[int]
     sales_over: Optional[int]
 
@@ -34,9 +32,9 @@ class ItemSalesRepository(AbstractRepository, BaseRepository):
             f"{self.table_name}.id",
             f"{self.table_name}.date",
             f"{self.table_name}.day_of_week",
+            f"{self.table_name}.week_of_year",
             f"{self.table_name}.store_id",
             f"{self.table_name}.item_id",
-            f"{self.table_name}.item_price_id",
             f"{self.table_name}.sales",
             f"{self.table_name}.total_sales_amount",
             f"{self.table_name}.created_at",
@@ -76,9 +74,9 @@ DO NOTHING
             "id",
             "date",
             "day_of_week",
+            "week_of_year",
             "store_id",
             "item_id",
-            "item_price_id",
             "sales",
             "total_sales_amount",
         ]
@@ -99,9 +97,9 @@ VALUES
                     d.id,
                     d.date,
                     d.day_of_week,
+                    d.week_of_year,
                     d.store_id,
                     d.item_id,
-                    d.item_price_id,
                     d.sales,
                     d.total_sales_amount,
                 ]
@@ -124,6 +122,7 @@ SELECT
 FROM
     {self.table_name}
         """
+
         if condition is not None:
             where = ""
             prefix = "WHERE"
@@ -140,11 +139,6 @@ FROM
                 where += f"{prefix} {self.table_name}.date <= {condition.date_to}"
                 parameters.append(condition.date_to)
                 prefix = "AND"
-            if condition.day_of_weeks is not None and len(condition.day_of_weeks) > 0:
-                _params = ",".join(["%s" for _ in condition.day_of_weeks])
-                where += f"{prefix} {self.table_name}.name IN {_params}"
-                parameters.extend(condition.day_of_weeks)
-                prefix = "AND"
             if condition.store_ids is not None and len(condition.store_ids) > 0:
                 _params = ",".join(["%s" for _ in condition.store_ids])
                 where += f"{prefix} {self.table_name}.name IN {_params}"
@@ -154,11 +148,6 @@ FROM
                 _params = ",".join(["%s" for _ in condition.item_ids])
                 where += f"{prefix} {self.table_name}.name IN {_params}"
                 parameters.extend(condition.item_ids)
-                prefix = "AND"
-            if condition.item_price_ids is not None and len(condition.item_price_ids) > 0:
-                _params = ",".join(["%s" for _ in condition.item_price_ids])
-                where += f"{prefix} {self.table_name}.name IN {_params}"
-                parameters.extend(condition.item_price_ids)
                 prefix = "AND"
             if condition.sales_below is not None:
                 where += f"{prefix} {self.table_name}.sales >= {condition.sales_below}"

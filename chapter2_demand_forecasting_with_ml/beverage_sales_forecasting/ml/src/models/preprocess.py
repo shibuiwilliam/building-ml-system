@@ -282,7 +282,6 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
     ) -> pd.DataFrame:
         x = BASE_SCHEMA.validate(x)
         x["year"] = x.date.dt.year
-        x["week_of_year"] = x.date.dt.weekofyear
         x["month"] = x.date.dt.month
         weekly_df = (
             x.groupby(["year", "week_of_year", "store", "item"])

@@ -39,6 +39,7 @@ class ItemSales(BaseModel):
     id: str
     date: date
     day_of_week: str
+    week_of_year: int
     store: str
     region: str
     item: str
@@ -185,6 +186,7 @@ SELECT
     {self.table_name}.id,
     {self.table_name}.date,
     {self.table_name}.day_of_week,
+    {self.table_name}.week_of_year,
     {TABLES.ITEMS.value}.name AS item,
     {TABLES.ITEM_PRICES.value}.price AS item_price,
     {TABLES.STORES.value}.name as store,
@@ -194,13 +196,19 @@ SELECT
 FROM 
     {self.table_name}
 LEFT JOIN
+    {TABLES.ITEM_PRICES.value}
+ON
+    {TABLES.ITEM_PRICES.value}.item_id = {TABLES.ITEM_SALES_RECORDS.value}.item_id
+AND
+    (
+        {TABLES.ITEM_PRICES.value}.applied_from <= {TABLES.ITEM_SALES_RECORDS.value}.date
+        AND
+        {TABLES.ITEM_PRICES.value}.applied_to >= {TABLES.ITEM_SALES_RECORDS.value}.date
+    )
+LEFT JOIN
     {TABLES.ITEMS.value}
 ON
     {self.table_name}.item_id = {TABLES.ITEMS.value}.id
-LEFT JOIN
-    {TABLES.ITEM_PRICES.value}
-ON
-    {self.table_name}.item_price_id = {TABLES.ITEM_PRICES.value}.id
 LEFT JOIN
     {TABLES.STORES.value}
 ON

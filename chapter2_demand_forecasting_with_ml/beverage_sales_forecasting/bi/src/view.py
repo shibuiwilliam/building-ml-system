@@ -104,6 +104,7 @@ def show_daily_item_sales(
                     y=_df.sales,
                 )
                 fig.add_trace(sales_trace)
+                fig.update_yaxes(range=[0, 150])
                 st.plotly_chart(fig, use_container_width=True)
                 logger.info(f"REGION {region} STORE {s} ITEM {i}")
 
@@ -114,7 +115,6 @@ def show_weekly_item_sales(
     items: List[str],
 ):
     st.markdown("### Weekly summary")
-    df["week_of_year"] = df.date.dt.weekofyear
     df["month"] = df.date.dt.month
     df["year"] = df.date.dt.year
     df = (
@@ -183,6 +183,7 @@ df columns: {df.columns}
                     y=_df.sales,
                 )
                 fig.add_trace(sales_trace)
+                fig.update_yaxes(range=[0, 1000])
                 st.plotly_chart(fig, use_container_width=True)
                 logger.info(f"REGION {region} STORE {s} ITEM {i}")
 
@@ -257,6 +258,7 @@ df columns: {df.columns}
                     y=_df.sales,
                 )
                 fig.add_trace(sales_trace)
+                fig.update_yaxes(range=[0, 5000])
                 st.plotly_chart(fig, use_container_width=True)
                 logger.info(f"REGION {region} STORE {s} ITEM {i}")
 
