@@ -1,3 +1,4 @@
+import os
 import random
 from abc import ABC, abstractmethod
 from typing import Dict, List, Optional, Union
@@ -386,9 +387,13 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
     def dump_pipeline(
         self,
         file_path: str,
-    ):
+    ) -> str:
+        file, ext = os.path.splitext(file_path)
+        if ext != ".pkl":
+            file_path = f"{file}.pkl"
         logger.info(f"save preprocess pipeline: {file_path}")
         dump(self.pipeline, file_path)
+        return file_path
 
     def load_pipeline(
         self,

@@ -7,6 +7,7 @@ from src.dataset.data_manager import DATA_SOURCE
 from src.dataset.schema import YearAndWeek
 from src.jobs.optimize import OptimizerRunner
 from src.jobs.predict import Predictor
+from src.jobs.register import DataRegister
 from src.jobs.retrieve import DataRetriever
 from src.jobs.train import Trainer
 from src.middleware.logger import configure_logger
@@ -99,6 +100,7 @@ def main(cfg: DictConfig):
 
     if cfg.jobs.train.run:
         now = datetime.now().strftime("%Y%m%d_%H%M%S")
+        preprocess_pipeline_file_path = os.path.join(cwd, f"{model.name}_{now}")
         save_file_path = os.path.join(cwd, f"{model.name}_{now}")
         onnx_file_path = os.path.join(cwd, f"{model.name}_{now}")
         trainer = Trainer()
@@ -108,6 +110,8 @@ def main(cfg: DictConfig):
             y_train=y_train,
             x_test=x_test,
             y_test=y_test,
+            data_preprocess_pipeline=data_preprocess_pipeline,
+            preprocess_pipeline_file_path=preprocess_pipeline_file_path,
             save_file_path=save_file_path,
             onnx_file_path=onnx_file_path,
         )
@@ -132,6 +136,14 @@ def main(cfg: DictConfig):
             target_stores=target_stores,
         )
         logger.info(f"predictions: {predictions}")
+        if cfg.jobs.predict.register:
+            data_register = DataRegister()
+            prediction_file_path = os.path.join(cwd, f"{model.name}_{now}")
+            data_register.register(
+                predictions=predictions,
+                data_source=data_source,
+                prediction_file_path=prediction_file_path,
+            )
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 jobs:
   data:
-    source: db
+    source: local
     path: /opt/data/item_sale_records_2017_2019.csv
     target_data:
       date_from: 2017-01-01
@@ -65,3 +65,4 @@ jobs:
 
   predict:
     run: true
+    register: true

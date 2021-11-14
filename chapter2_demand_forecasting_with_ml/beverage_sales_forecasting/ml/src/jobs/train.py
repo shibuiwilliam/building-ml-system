@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error, mean_squared_error
 from src.middleware.logger import configure_logger
 from src.models.base_model import BaseDemandForecastingModel
+from src.models.preprocess import DataPreprocessPipeline
 
 logger = configure_logger(name=__name__)
 
@@ -78,6 +79,8 @@ rmse: {evaluation.root_mean_squared_error}
         y_train: Union[np.ndarray, pd.DataFrame],
         x_test: Optional[Union[np.ndarray, pd.DataFrame]] = None,
         y_test: Optional[Union[np.ndarray, pd.DataFrame]] = None,
+        data_preprocess_pipeline: Optional[DataPreprocessPipeline] = None,
+        preprocess_pipeline_file_path: Optional[str] = None,
         save_file_path: Optional[str] = None,
         onnx_file_path: Optional[str] = None,
     ) -> Evaluation:
@@ -98,6 +101,10 @@ rmse: {evaluation.root_mean_squared_error}
             mlflow.log_param("model", model.name)
             mlflow.log_params(model.params)
             mlflow.log_metrics(evaluation.dict())
+
+            if data_preprocess_pipeline is not None and preprocess_pipeline_file_path is not None:
+                f = data_preprocess_pipeline.dump_pipeline(file_path=preprocess_pipeline_file_path)
+                mlflow.log_artifact(f)
 
             if save_file_path is not None:
                 f = model.save(file_path=save_file_path)

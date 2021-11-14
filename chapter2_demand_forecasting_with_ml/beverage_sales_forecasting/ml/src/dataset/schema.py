@@ -46,6 +46,7 @@ DAYS_OF_WEEK = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
 
 _BASE_SCHEMA = {
     "date": Column(datetime),
+    "year": Column(int, required=False),
     "day_of_week": Column(str, checks=Check.isin(DAYS_OF_WEEK)),
     "week_of_year": Column(int, checks=Check.isin(WEEKS)),
     "store": Column(str, checks=Check.isin(STORES)),
@@ -135,6 +136,21 @@ _Y_SCHEMA = {
 }
 Y_SCHEMA = DataFrameSchema(
     _Y_SCHEMA,
+    index=Index(int),
+    strict=True,
+    coerce=True,
+)
+
+_WEEKLY_PREDICTION_SCHEMA = {
+    "year": Column(int),
+    "week_of_year": Column(int, checks=Check.isin(WEEKS)),
+    "store": Column(str, checks=Check.isin(STORES)),
+    "item": Column(str, checks=Check.isin(ITEMS)),
+    "item_price": Column(int, checks=Check.greater_than_or_equal_to(0)),
+    "prediction": Column(float, checks=Check.greater_than_or_equal_to(0)),
+}
+WEEKLY_PREDICTION_SCHEMA = DataFrameSchema(
+    _WEEKLY_PREDICTION_SCHEMA,
     index=Index(int),
     strict=True,
     coerce=True,

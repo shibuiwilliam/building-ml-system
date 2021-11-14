@@ -78,10 +78,19 @@ CREATE TABLE IF NOT EXISTS item_sales_predictions (
 	id VARCHAR(32) NOT NULL,
     store_id VARCHAR(32) NOT NULL,
 	item_id VARCHAR(32) NOT NULL,
+	year INTEGER NOT NULL,
 	week_of_year INTEGER NOT NULL,
 	prediction NUMERIC NOT NULL,
 	predicted_at DATE NOT NULL,
+	version INTEGER NOT NULL DEFAULT 0,
 	created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	PRIMARY KEY (id)
+	PRIMARY KEY (id),
+    FOREIGN KEY(store_id) REFERENCES stores(id),
+    FOREIGN KEY(item_id) REFERENCES items(id)
 );
+CREATE INDEX IF NOT EXISTS idx_item_sales_predictions_item_id ON item_sales_predictions(item_id);
+CREATE INDEX IF NOT EXISTS idx_item_sales_predictions_store_id ON item_sales_predictions(store_id);
+CREATE INDEX IF NOT EXISTS idx_item_sales_predictions_year ON item_sales_predictions(year);
+CREATE INDEX IF NOT EXISTS idx_item_sales_predictions_week_of_year ON item_sales_predictions(week_of_year);
+CREATE INDEX IF NOT EXISTS idx_item_sales_predictions_version ON item_sales_predictions(version);

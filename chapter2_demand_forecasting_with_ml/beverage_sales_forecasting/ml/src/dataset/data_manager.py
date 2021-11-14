@@ -1,12 +1,14 @@
-from datetime import date
+from datetime import date, datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import pandas as pd
+import psycopg2
 from psycopg2.extras import DictCursor
-from src.dataset.schema import BASE_SCHEMA, TABLES, ItemSales
+from src.dataset.schema import BASE_SCHEMA, TABLES, WEEKLY_PREDICTION_SCHEMA, ItemSales
 from src.middleware.db_client import AbstractDBClient
 from src.middleware.logger import configure_logger
+from src.middleware.strings import get_uuid
 
 logger = configure_logger(__name__)
 
@@ -99,6 +101,21 @@ class DBDataManager(object):
                 rows = cursor.fetchall()
         return rows
 
+    def execute_insert_or_update_query(
+        self,
+        query: str,
+        parameters: Optional[Tuple] = None,
+    ):
+        logger.info(f"insert or update query: {query}, parameters: {parameters}")
+        with self.db_client.get_connection() as conn:
+            try:
+                with conn.cursor(cursor_factory=DictCursor) as cursor:
+                    cursor.execute(query, parameters)
+                conn.commit()
+            except psycopg2.Error as e:
+                conn.rollback()
+                raise e
+
     def select_item_sales(
         self,
         date_from: Optional[date] = None,
@@ -186,3 +203,92 @@ OFFSET
         )
         data = [ItemSales(**r) for r in records]
         return data
+
+    def insert_item_sales_predictions(
+        self,
+        predictions: pd.DataFrame,
+    ):
+        predictions = WEEKLY_PREDICTION_SCHEMA.validate(predictions)
+        records = predictions.to_dict(orient="records")
+        for record in records:
+            select_query = f"""
+SELECT
+    MAX(version) AS version
+FROM
+    {TABLES.ITEM_SALES_PREDICTIONS.value}
+LEFT JOIN
+    {TABLES.STORES.value}
+ON
+    {TABLES.ITEM_SALES_PREDICTIONS.value}.store_id = {TABLES.STORES.value}.id
+LEFT JOIN
+    {TABLES.ITEMS.value}
+ON
+    {TABLES.ITEM_SALES_PREDICTIONS.value}.item_id = {TABLES.ITEMS.value}.id
+WHERE
+    {TABLES.STORES.value}.name = %s
+AND
+    {TABLES.ITEMS.value}.name = %s
+AND
+    {TABLES.ITEM_SALES_PREDICTIONS.value}.year = %s
+AND
+    {TABLES.ITEM_SALES_PREDICTIONS.value}.week_of_year = %s
+;
+            """
+
+            version = self.execute_select_query(
+                query=select_query,
+                parameters=(record["store"], record["item"], record["year"], record["week_of_year"]),
+            )
+            logger.info(f"current version: {version}")
+            if len(version) == 0 or version[0][0] is None:
+                latest_version = 0
+            else:
+                latest_version = version[0]["version"] + 1
+
+            insert_query = f"""
+INSERT INTO
+    {TABLES.ITEM_SALES_PREDICTIONS.value}
+    (id,store_id,item_id,year,week_of_year,prediction,predicted_at,version)
+VALUES
+    (
+        %s,
+        (
+            SELECT
+                id
+            FROM
+                {TABLES.STORES.value}
+            WHERE
+                name = %s
+        ),
+        (
+            SELECT
+                id
+            FROM
+                {TABLES.ITEMS.value}
+            WHERE
+                name = %s
+        ),
+        %s,
+        %s,
+        %s,
+        %s,
+        %s
+    )
+ON CONFLICT
+    (id)
+DO NOTHING
+;
+            """
+            self.execute_insert_or_update_query(
+                query=insert_query,
+                parameters=(
+                    get_uuid(),
+                    record["store"],
+                    record["item"],
+                    record["year"],
+                    record["week_of_year"],
+                    record["prediction"],
+                    datetime.now().date(),
+                    latest_version,
+                ),
+            )
