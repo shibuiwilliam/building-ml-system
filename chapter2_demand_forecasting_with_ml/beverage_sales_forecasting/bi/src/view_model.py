@@ -1,6 +1,8 @@
 from datetime import date
 from typing import List, Optional
 
+import numpy as np
+import pandas as pd
 from db_client import AbstractDBClient
 from logger import configure_logger
 from model import ItemRepository, ItemSales, ItemSalesRepository, RegionRepository, StoreRepository
@@ -99,3 +101,140 @@ class ItemSalesViewModel(BaseViewModel):
             offset += limit
             logger.info(f"found {len(item_sales)} records...")
         return item_sales
+
+    def retrieve_item_sales(
+        self,
+        date_from: Optional[date] = None,
+        date_to: Optional[date] = None,
+        day_of_week: Optional[str] = None,
+        item: Optional[str] = None,
+        store: Optional[str] = None,
+        region: Optional[str] = None,
+    ) -> pd.DataFrame:
+        dataset = self.list_item_sales(
+            date_from=date_from,
+            date_to=date_to,
+            day_of_week=day_of_week,
+            item=item,
+            store=store,
+            region=region,
+        )
+        df = pd.DataFrame([d.dict() for d in dataset])
+        df["date"] = pd.to_datetime(df["date"])
+        df["month"] = df.date.dt.month
+        df["year"] = df.date.dt.year
+        df = df.drop("id", axis=1)
+        return df
+
+    def retrieve_daily_item_sales(
+        self,
+        date_from: Optional[date] = None,
+        date_to: Optional[date] = None,
+        day_of_week: Optional[str] = None,
+        item: Optional[str] = None,
+        store: Optional[str] = None,
+        region: Optional[str] = None,
+    ) -> pd.DataFrame:
+        df = self.retrieve_item_sales(
+            date_from=date_from,
+            date_to=date_to,
+            day_of_week=day_of_week,
+            item=item,
+            store=store,
+            region=region,
+        )
+        logger.info(
+            f"""
+df shape: {df.shape}
+df columns: {df.columns}
+                """
+        )
+        return df
+
+    def retrieve_weekly_item_sales(daily_df: pd.DataFrame) -> pd.DataFrame:
+        weekly_df = (
+            daily_df.groupby(
+                [
+                    "year",
+                    "week_of_year",
+                    "region",
+                    "store",
+                    "item",
+                ]
+            )
+            .agg(
+                {
+                    "month": np.mean,
+                    "item_price": np.mean,
+                    "sales": np.sum,
+                    "total_sales_amount": np.sum,
+                }
+            )
+            .astype(
+                {
+                    "month": int,
+                    "item_price": int,
+                    "sales": int,
+                    "total_sales_amount": int,
+                }
+            )
+            .reset_index(
+                level=[
+                    "year",
+                    "week_of_year",
+                    "region",
+                    "store",
+                    "item",
+                ]
+            )
+        )
+        logger.info(
+            f"""
+df shape: {weekly_df.shape}
+df columns: {weekly_df.columns}
+                """
+        )
+        return weekly_df
+
+    def retrieve_monthly_item_sales(daily_df: pd.DataFrame) -> pd.DataFrame:
+        monthly_df = (
+            daily_df.groupby(
+                [
+                    "year",
+                    "month",
+                    "region",
+                    "store",
+                    "item",
+                ]
+            )
+            .agg(
+                {
+                    "item_price": np.mean,
+                    "sales": np.sum,
+                    "total_sales_amount": np.sum,
+                }
+            )
+            .astype(
+                {
+                    "item_price": int,
+                    "sales": int,
+                    "total_sales_amount": int,
+                }
+            )
+            .reset_index(
+                level=[
+                    "year",
+                    "month",
+                    "region",
+                    "store",
+                    "item",
+                ]
+            )
+        )
+        logger.info(
+            f"""
+df shape: {monthly_df.shape}
+df columns: {monthly_df.columns}
+                """
+        )
+        return monthly_df

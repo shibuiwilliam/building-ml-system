@@ -115,50 +115,6 @@ def show_weekly_item_sales(
     items: List[str],
 ):
     st.markdown("### Weekly summary")
-    df["month"] = df.date.dt.month
-    df["year"] = df.date.dt.year
-    df = (
-        df.groupby(
-            [
-                "year",
-                "week_of_year",
-                "region",
-                "store",
-                "item",
-            ]
-        )
-        .agg(
-            {
-                "month": np.mean,
-                "item_price": np.mean,
-                "sales": np.sum,
-                "total_sales_amount": np.sum,
-            }
-        )
-        .astype(
-            {
-                "month": int,
-                "item_price": int,
-                "sales": int,
-                "total_sales_amount": int,
-            }
-        )
-        .reset_index(
-            level=[
-                "year",
-                "week_of_year",
-                "region",
-                "store",
-                "item",
-            ]
-        )
-    )
-    logger.info(
-        f"""
-df shape: {df.shape}
-df columns: {df.columns}
-                """
-    )
     for s in stores:
         for i in items:
             _df = (
@@ -194,48 +150,6 @@ def show_monthly_item_sales(
     items: List[str],
 ):
     st.markdown("### Monthly summary")
-    df["month"] = df.date.dt.month
-    df["year"] = df.date.dt.year
-    df = (
-        df.groupby(
-            [
-                "year",
-                "month",
-                "region",
-                "store",
-                "item",
-            ]
-        )
-        .agg(
-            {
-                "item_price": np.mean,
-                "sales": np.sum,
-                "total_sales_amount": np.sum,
-            }
-        )
-        .astype(
-            {
-                "item_price": int,
-                "sales": int,
-                "total_sales_amount": int,
-            }
-        )
-        .reset_index(
-            level=[
-                "year",
-                "month",
-                "region",
-                "store",
-                "item",
-            ]
-        )
-    )
-    logger.info(
-        f"""
-df shape: {df.shape}
-df columns: {df.columns}
-                """
-    )
     for s in stores:
         for i in items:
             _df = (
@@ -286,39 +200,32 @@ def build_item_sales(
     if item == "ALL":
         item = None
 
-    dataset = item_sales_view_model.list_item_sales(
+    daily_df = item_sales_view_model.retrieve_daily_item_sales(
         item=item,
         store=store,
         region=region,
     )
-    df = pd.DataFrame([d.dict() for d in dataset])
-    df["date"] = pd.to_datetime(df["date"])
-    logger.info(
-        f"""
-df shape: {df.shape}
-df columns: {df.columns}
-                """
-    )
 
-    df = df.drop("id", axis=1)
-    stores = df.store.unique()
-    items = df.item.unique()
+    stores = daily_df.store.unique()
+    items = daily_df.item.unique()
 
     if time_frame == TIME_FRAME.DAILY.value:
         show_daily_item_sales(
-            df=df,
+            df=daily_df,
             stores=stores,
             items=items,
         )
     elif time_frame == TIME_FRAME.WEEKLY.value:
+        weekly_df = item_sales_view_model.retrieve_weekly_item_sales(daily_df=daily_df)
         show_weekly_item_sales(
-            df=df,
+            df=weekly_df,
             stores=stores,
             items=items,
         )
     elif time_frame == TIME_FRAME.MONTHLY.value:
+        monthly_df = item_sales_view_model.retrieve_monthly_item_sales(daily_df=daily_df)
         show_monthly_item_sales(
-            df=df,
+            df=monthly_df,
             stores=stores,
             items=items,
         )
