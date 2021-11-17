@@ -62,9 +62,28 @@ services:
       /bin/sh -c "sleep 30s && 
       streamlit run src/main.py"
     ports:
-      - "8501:8501"
+      - 8501:8501
     depends_on:
       - data_registration
+
+  mlflow:
+    container_name: mlflow
+    image: shibui/building-ml-system:beverage_sales_forecasting_mlflow_0.0.0
+    volumes:
+      - ./ml/outputs/mlruns:/opt/outputs/mlruns
+    command:
+      - "mlflow"
+      - "server"
+      - "--backend-store-uri"
+      - "/opt/outputs/mlruns"
+      - "--default-artifact-root"
+      - "/opt/outputs/mlruns"
+      - "--host"
+      - "0.0.0.0"
+    ports:
+      - 15000:5000
+    restart: always
+    hostname: mlflow
 
   ml:
     container_name: ml
@@ -83,9 +102,11 @@ services:
       - POSTGRESQL_PASSWORD=password
       - POSTGRESQL_DBNAME=beverage_sales_forecasting
       - LOG_LEVEL=DEBUG
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
     command: /bin/sh -c "sleep 30s && python -m src.main"
     depends_on:
       - data_registration
+      - mlflow
 
 networks:
   default:

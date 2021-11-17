@@ -1,6 +1,5 @@
-from typing import Optional, Union
+from typing import Optional, Tuple, Union
 
-import mlflow
 import numpy as np
 import pandas as pd
 from pydantic import BaseModel
@@ -16,6 +15,12 @@ class Evaluation(BaseModel):
     mean_absolute_error: float
     mean_absolute_percentage_error: float
     root_mean_squared_error: float
+
+
+class Artifact(BaseModel):
+    preprocess_file_path: Optional[str]
+    model_file_path: Optional[str]
+    onnx_file_path: Optional[str]
 
 
 class Trainer(object):
@@ -83,36 +88,32 @@ rmse: {evaluation.root_mean_squared_error}
         preprocess_pipeline_file_path: Optional[str] = None,
         save_file_path: Optional[str] = None,
         onnx_file_path: Optional[str] = None,
-    ) -> Evaluation:
+    ) -> Tuple[Evaluation, Artifact]:
         logger.info("start training and evaluation")
-        with mlflow.start_run(run_name=model.name):
-            self.train(
-                model=model,
-                x_train=x_train,
-                y_train=y_train,
-                x_test=x_test,
-                y_test=y_test,
+        self.train(
+            model=model,
+            x_train=x_train,
+            y_train=y_train,
+            x_test=x_test,
+            y_test=y_test,
+        )
+        evaluation = self.evaluate(
+            model=model,
+            x=x_test,
+            y=y_test,
+        )
+
+        artifact = Artifact()
+        if data_preprocess_pipeline is not None and preprocess_pipeline_file_path is not None:
+            artifact.preprocess_file_path = data_preprocess_pipeline.dump_pipeline(
+                file_path=preprocess_pipeline_file_path
             )
-            evaluation = self.evaluate(
-                model=model,
-                x=x_test,
-                y=y_test,
-            )
-            mlflow.log_param("model", model.name)
-            mlflow.log_params(model.params)
-            mlflow.log_metrics(evaluation.dict())
 
-            if data_preprocess_pipeline is not None and preprocess_pipeline_file_path is not None:
-                f = data_preprocess_pipeline.dump_pipeline(file_path=preprocess_pipeline_file_path)
-                mlflow.log_artifact(f)
+        if save_file_path is not None:
+            artifact.model_file_path = model.save(file_path=save_file_path)
 
-            if save_file_path is not None:
-                f = model.save(file_path=save_file_path)
-                mlflow.log_artifact(f)
-
-            if onnx_file_path is not None:
-                f = model.save_as_onnx(file_path=onnx_file_path)
-                mlflow.log_artifact(f)
+        if onnx_file_path is not None:
+            artifact.onnx_file_path = model.save_as_onnx(file_path=onnx_file_path)
 
         logger.info("done training and evaluation")
-        return evaluation
+        return evaluation, artifact

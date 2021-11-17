@@ -1,3 +1,4 @@
+name: beverage_sales_forecasting
 jobs:
   data:
     source: db
@@ -33,8 +34,9 @@ jobs:
       num_iterations: 1000000
       num_threads: 0
       seed: 1234
-    early_stopping_rounds: 200
-    verbose_eval: 1000
+      early_stopping_rounds: 200
+      eval_metrics: mse
+      verbose_eval: 1000
 
   optimize:
     run: false

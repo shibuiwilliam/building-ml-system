@@ -1,5 +1,5 @@
-from datetime import datetime
-from typing import Tuple
+from datetime import date, datetime
+from typing import Optional, Tuple
 
 import pandas as pd
 from omegaconf import DictConfig
@@ -18,29 +18,25 @@ class DataRetriever(object):
 
     def retrieve_dataset(
         self,
-        cfg: DictConfig,
+        file_path: str,
+        date_from: Optional[date] = None,
+        date_to: Optional[date] = None,
+        item: str = "ALL",
+        store: str = "ALL",
+        region: str = "ALL",
         data_source: DATA_SOURCE = DATA_SOURCE.LOCAL,
     ) -> pd.DataFrame:
         logger.info("start retrieve data")
         if data_source == DATA_SOURCE.LOCAL:
-            raw_df = load_df_from_csv(file_path=cfg.jobs.data.path)
+            raw_df = file_path
         elif data_source == DATA_SOURCE.DB:
             db_client = DBClient()
             db_data_manager = DBDataManager(db_client=db_client)
 
-            date_from = cfg.jobs.data.target_data.get("date_from", None)
-            if date_from is not None:
-                date_from = datetime.strptime(date_from, "%Y-%m-%d").date()
-            date_to = cfg.jobs.data.target_data.get("date_to", None)
-            if date_to is not None:
-                date_to = datetime.strptime(date_to, "%Y-%m-%d").date()
-            item = cfg.jobs.data.target_data.get("item", None)
             if item == "ALL":
                 item = None
-            store = cfg.jobs.data.target_data.get("store", None)
             if store == "ALL":
                 store = None
-            region = cfg.jobs.data.target_data.get("region", None)
             if region == "ALL":
                 region = None
 
