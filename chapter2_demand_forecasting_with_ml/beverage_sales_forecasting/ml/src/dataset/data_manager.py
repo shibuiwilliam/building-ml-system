@@ -1,11 +1,11 @@
-from datetime import date, datetime
+from datetime import date
 from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import pandas as pd
 import psycopg2
 from psycopg2.extras import DictCursor
-from src.dataset.schema import BASE_SCHEMA, TABLES, WEEKLY_PREDICTION_SCHEMA, ItemSales, ItemSalesPredictions
+from src.dataset.schema import BASE_SCHEMA, TABLES, ItemSales, ItemSalesPredictions
 from src.middleware.db_client import AbstractDBClient
 from src.middleware.logger import configure_logger
 from src.middleware.strings import get_uuid
