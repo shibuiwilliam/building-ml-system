@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import pandas as pd
 import psycopg2
 from psycopg2.extras import DictCursor
-from src.dataset.schema import BASE_SCHEMA, TABLES, WEEKLY_PREDICTION_SCHEMA, ItemSales
+from src.dataset.schema import BASE_SCHEMA, TABLES, WEEKLY_PREDICTION_SCHEMA, ItemSales, ItemSalesPredictions
 from src.middleware.db_client import AbstractDBClient
 from src.middleware.logger import configure_logger
 from src.middleware.strings import get_uuid
@@ -206,11 +206,9 @@ OFFSET
 
     def insert_item_sales_predictions(
         self,
-        predictions: pd.DataFrame,
+        item_sales_predictions: List[ItemSalesPredictions],
     ):
-        predictions = WEEKLY_PREDICTION_SCHEMA.validate(predictions)
-        records = predictions.to_dict(orient="records")
-        for record in records:
+        for record in item_sales_predictions:
             select_query = f"""
 SELECT
     MAX(version) AS version
@@ -237,7 +235,12 @@ AND
 
             version = self.execute_select_query(
                 query=select_query,
-                parameters=(record["store"], record["item"], record["year"], record["week_of_year"]),
+                parameters=(
+                    record.store,
+                    record.item,
+                    record.year,
+                    record.week_of_year,
+                ),
             )
             logger.info(f"current version: {version}")
             if len(version) == 0 or version[0][0] is None:
@@ -283,12 +286,12 @@ DO NOTHING
                 query=insert_query,
                 parameters=(
                     get_uuid(),
-                    record["store"],
-                    record["item"],
-                    record["year"],
-                    record["week_of_year"],
-                    record["prediction"],
-                    datetime.now().date(),
+                    record.store,
+                    record.item,
+                    record.year,
+                    record.week_of_year,
+                    record.prediction,
+                    record.predicted_at,
                     latest_version,
                 ),
             )

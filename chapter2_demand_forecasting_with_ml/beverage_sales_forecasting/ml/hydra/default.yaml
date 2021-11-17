@@ -1,6 +1,6 @@
 jobs:
   data:
-    source: local
+    source: db
     path: /opt/data/item_sale_records_2017_2019.csv
     target_data:
       date_from: 2017-01-01

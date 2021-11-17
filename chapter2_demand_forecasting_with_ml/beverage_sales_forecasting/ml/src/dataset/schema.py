@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import date, datetime
 from enum import Enum
+from typing import Optional
 
 import pandas as pd
 from pandera import Check, Column, DataFrameSchema, Index
@@ -184,6 +185,18 @@ class ItemSales(BaseModel):
     item_price: int
     sales: int
     total_sales_amount: int
+
+    class Config:
+        extra = Extra.forbid
+
+
+class ItemSalesPredictions(BaseModel):
+    store: str
+    item: str
+    year: int
+    week_of_year: int
+    prediction: float
+    predicted_at: date
 
     class Config:
         extra = Extra.forbid
