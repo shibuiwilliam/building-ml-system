@@ -51,6 +51,36 @@ class ItemSales(BaseModel):
         extra = Extra.forbid
 
 
+class ItemWeeklySalesPredictions(BaseModel):
+    id: str
+    store: str
+    region: str
+    item: str
+    year: int
+    week_of_year: int
+    prediction: float
+    predicted_at: date
+    version: int
+
+    class Config:
+        extra = Extra.forbid
+
+
+class ItemWeeklySales(BaseModel):
+    id: str
+    store: str
+    region: str
+    item: str
+    year: int
+    week_of_year: int
+    item_price: int
+    sales: int
+    total_sales_amount: int
+
+    class Config:
+        extra = Extra.forbid
+
+
 class BaseRepository(object):
     def __init__(
         self,
@@ -258,4 +288,92 @@ OFFSET
             parameters=tuple(parameters),
         )
         data = [ItemSales(**r) for r in records]
+        return data
+
+
+class ItemWeeklySalesPredictionsRepository(BaseRepository):
+    def __init__(
+        self,
+        db_client: AbstractDBClient,
+    ):
+        super().__init__(db_client=db_client)
+        self.table_name = TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value
+
+    def select(
+        self,
+        item: Optional[str] = None,
+        store: Optional[str] = None,
+        region: Optional[str] = None,
+        year: Optional[int] = None,
+        week_of_year: Optional[int] = None,
+        version: int = 0,
+        limit: int = 1000,
+        offset: int = 0,
+    ) -> List[ItemSales]:
+        query = f"""
+SELECT
+    {self.table_name}.id,
+    {TABLES.STORES.value}.name as store,
+    {TABLES.REGIONS.value}.name as region,
+    {TABLES.ITEMS.value}.name AS item,
+    {self.table_name}.year,
+    {self.table_name}.week_of_year,
+    {self.table_name}.prediction,
+    {self.table_name}.predicted_at,
+    {self.table_name}.version
+FROM 
+    {self.table_name}
+LEFT JOIN
+    {TABLES.ITEMS.value}
+ON
+    {self.table_name}.item_id = {TABLES.ITEMS.value}.id
+LEFT JOIN
+    {TABLES.STORES.value}
+ON
+    {self.table_name}.store_id = {TABLES.STORES.value}.id
+LEFT JOIN
+    {TABLES.REGIONS.value}
+ON
+    {TABLES.STORES.value}.region_id = {TABLES.REGIONS.value}.id
+        """
+
+        where = ""
+        prefix = "WHERE"
+        parameters = []
+        if item is not None:
+            where += f"{prefix} {TABLES.ITEMS.value}.name = %s "
+            parameters.append(item)
+            prefix = "AND"
+        if store is not None:
+            where += f"{prefix} {TABLES.STORES.value}.name = %s "
+            parameters.append(store)
+            prefix = "AND"
+        if region is not None:
+            where += f"{prefix} {TABLES.REGIONS.value}.name = %s "
+            parameters.append(region)
+        if year is not None:
+            where += f"{prefix} {self.table_name}.year = %s "
+            parameters.append(year)
+            prefix = "AND"
+        if week_of_year is not None:
+            where += f"{prefix} {self.table_name}.week_of_year = %s "
+            parameters.append(week_of_year)
+            prefix = "AND"
+        if version is not None:
+            where += f"{prefix} {self.table_name}.version = %s "
+            parameters.append(version)
+            prefix = "AND"
+        query += where
+        query += f"""
+LIMIT 
+    {limit}
+OFFSET
+    {offset}
+        """
+
+        records = self.execute_select_query(
+            query=query,
+            parameters=tuple(parameters),
+        )
+        data = [ItemWeeklySalesPredictions(**r) for r in records]
         return data

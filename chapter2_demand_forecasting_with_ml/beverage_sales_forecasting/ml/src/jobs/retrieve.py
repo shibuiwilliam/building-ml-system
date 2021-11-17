@@ -1,9 +1,8 @@
-from datetime import date, datetime
+from datetime import date
 from typing import Optional, Tuple
 
 import pandas as pd
-from omegaconf import DictConfig
-from src.dataset.data_manager import DATA_SOURCE, DBDataManager, load_df_from_csv
+from src.dataset.data_manager import DATA_SOURCE, DBDataManager
 from src.dataset.schema import BASE_SCHEMA, X_SCHEMA, XY, Y_SCHEMA, YearAndWeek
 from src.middleware.db_client import DBClient
 from src.middleware.logger import configure_logger

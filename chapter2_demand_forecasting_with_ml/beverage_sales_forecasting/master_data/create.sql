@@ -74,7 +74,7 @@ CREATE INDEX IF NOT EXISTS idx_item_sales_day_of_week ON item_sales(day_of_week)
 CREATE INDEX IF NOT EXISTS idx_item_sales_week_of_year ON item_sales(week_of_year);
 CREATE INDEX IF NOT EXISTS idx_item_sales_store_id ON item_sales(store_id);
 
-CREATE TABLE IF NOT EXISTS item_sales_predictions (
+CREATE TABLE IF NOT EXISTS item_weekly_sales_predictions (
 	id VARCHAR(32) NOT NULL,
     store_id VARCHAR(32) NOT NULL,
 	item_id VARCHAR(32) NOT NULL,
@@ -89,8 +89,8 @@ CREATE TABLE IF NOT EXISTS item_sales_predictions (
     FOREIGN KEY(store_id) REFERENCES stores(id),
     FOREIGN KEY(item_id) REFERENCES items(id)
 );
-CREATE INDEX IF NOT EXISTS idx_item_sales_predictions_item_id ON item_sales_predictions(item_id);
-CREATE INDEX IF NOT EXISTS idx_item_sales_predictions_store_id ON item_sales_predictions(store_id);
-CREATE INDEX IF NOT EXISTS idx_item_sales_predictions_year ON item_sales_predictions(year);
-CREATE INDEX IF NOT EXISTS idx_item_sales_predictions_week_of_year ON item_sales_predictions(week_of_year);
-CREATE INDEX IF NOT EXISTS idx_item_sales_predictions_version ON item_sales_predictions(version);
+CREATE INDEX IF NOT EXISTS idx_item_weekly_sales_predictions_item_id ON item_weekly_sales_predictions(item_id);
+CREATE INDEX IF NOT EXISTS idx_item_weekly_sales_predictions_store_id ON item_weekly_sales_predictions(store_id);
+CREATE INDEX IF NOT EXISTS idx_item_weekly_sales_predictions_year ON item_weekly_sales_predictions(year);
+CREATE INDEX IF NOT EXISTS idx_item_weekly_sales_predictions_week_of_year ON item_weekly_sales_predictions(week_of_year);
+CREATE INDEX IF NOT EXISTS idx_item_weekly_sales_predictions_version ON item_weekly_sales_predictions(version);

@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import pandas as pd
 import psycopg2
 from psycopg2.extras import DictCursor
-from src.dataset.schema import BASE_SCHEMA, TABLES, ItemSales, ItemSalesPredictions
+from src.dataset.schema import BASE_SCHEMA, TABLES, ItemSales, ItemWeeklySalesPredictions
 from src.middleware.db_client import AbstractDBClient
 from src.middleware.logger import configure_logger
 from src.middleware.strings import get_uuid
@@ -204,32 +204,32 @@ OFFSET
         data = [ItemSales(**r) for r in records]
         return data
 
-    def insert_item_sales_predictions(
+    def insert_item_weekly_sales_predictions(
         self,
-        item_sales_predictions: List[ItemSalesPredictions],
+        item_weekly_sales_predictions: List[ItemWeeklySalesPredictions],
     ):
-        for record in item_sales_predictions:
+        for record in item_weekly_sales_predictions:
             select_query = f"""
 SELECT
     MAX(version) AS version
 FROM
-    {TABLES.ITEM_SALES_PREDICTIONS.value}
+    {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}
 LEFT JOIN
     {TABLES.STORES.value}
 ON
-    {TABLES.ITEM_SALES_PREDICTIONS.value}.store_id = {TABLES.STORES.value}.id
+    {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.store_id = {TABLES.STORES.value}.id
 LEFT JOIN
     {TABLES.ITEMS.value}
 ON
-    {TABLES.ITEM_SALES_PREDICTIONS.value}.item_id = {TABLES.ITEMS.value}.id
+    {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.item_id = {TABLES.ITEMS.value}.id
 WHERE
     {TABLES.STORES.value}.name = %s
 AND
     {TABLES.ITEMS.value}.name = %s
 AND
-    {TABLES.ITEM_SALES_PREDICTIONS.value}.year = %s
+    {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.year = %s
 AND
-    {TABLES.ITEM_SALES_PREDICTIONS.value}.week_of_year = %s
+    {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.week_of_year = %s
 ;
             """
 
@@ -250,7 +250,7 @@ AND
 
             insert_query = f"""
 INSERT INTO
-    {TABLES.ITEM_SALES_PREDICTIONS.value}
+    {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}
     (id,store_id,item_id,year,week_of_year,prediction,predicted_at,version)
 VALUES
     (
