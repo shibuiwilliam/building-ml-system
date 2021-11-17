@@ -41,7 +41,7 @@ jobs:
   optimize:
     run: false
     optuna:
-      n_trials: 50
+      n_trials: 100
       n_jobs: 1
       metrics: mean_absolute_error
       light_gbm:

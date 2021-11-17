@@ -17,7 +17,10 @@ def mlflow_callback(
     trial: optuna.Trial,
 ):
     trial_value = trial.value if trial.value is not None else float("nan")
-    with mlflow.start_run(run_name=study.study_name):
+    with mlflow.start_run(
+        run_name=study.study_name,
+        nested=True,
+    ):
         mlflow.log_params(trial.params)
         mlflow.log_param("model", study.study_name)
         mlflow.log_metrics({"accuracy": trial_value})

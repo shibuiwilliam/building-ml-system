@@ -131,12 +131,16 @@ mlflow_ui:
 		-d \
 		--name mlflow \
 		-v $(ML_DIR)/outputs/mlruns:/opt/outputs/mlruns \
-		-p 5000:5000 \
+		-p 15000:5000 \
 		$(DOCKER_MLFLOW_IMAGE_NAME) \
 		mlflow server \
 			--backend-store-uri /opt/outputs/mlruns \
 			--default-artifact-root /opt/outputs/mlruns \
 			--host 0.0.0.0
+
+.PHONY: rm_mlflow
+rm_mlflow:
+	docker rm -f mlflow
 
 ############ DEMAND FORECASTING BI COMMANDS ############
 BI_DIR := $(DIR)/bi
