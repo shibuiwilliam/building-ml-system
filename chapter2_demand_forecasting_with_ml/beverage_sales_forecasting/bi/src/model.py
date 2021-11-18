@@ -280,6 +280,7 @@ ON
         if region is not None:
             where += f"{prefix} {TABLES.REGIONS.value}.name = %s "
             parameters.append(region)
+            prefix = "AND"
         if year is not None:
             where += f"{prefix} {self.table_name}.year = %s "
             parameters.append(year)

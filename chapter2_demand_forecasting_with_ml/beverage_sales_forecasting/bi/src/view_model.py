@@ -262,7 +262,6 @@ class ItemSalesPredictionEvaluationViewModel(BaseViewModel):
         db_client: AbstractDBClient,
     ):
         super().__init__(db_client=db_client)
-        self.item_sales_repository = ItemSalesRepository(db_client=db_client)
         self.item_weekly_sales_predicitons_repository = ItemWeeklySalesPredictionsRepository(db_client=db_client)
 
     def list_item_weekly_sales_predictions(
@@ -278,7 +277,7 @@ class ItemSalesPredictionEvaluationViewModel(BaseViewModel):
         limit = 10000
         offset = 0
         while True:
-            records = self.item_sales_predicitons_repository.select(
+            records = self.item_weekly_sales_predicitons_repository.select(
                 item=item,
                 store=store,
                 region=region,
@@ -314,7 +313,14 @@ class ItemSalesPredictionEvaluationViewModel(BaseViewModel):
             week_of_year=week_of_year,
             version=version,
         )
-        weekly_sales_predictions_df = pd.DataFrame([d.dict() for d in item_weekly_sales_predictions]).drop("id", axis=1)
+        weekly_sales_predictions_df = pd.DataFrame([d.dict() for d in item_weekly_sales_predictions])
+        logger.info(
+            f"""
+weekly prediction df
+    df shape: {weekly_sales_predictions_df.shape}
+    df columns: {weekly_sales_predictions_df.columns}
+                """
+        )
         weekly_sales_evaluation_df = pd.merge(
             weekly_sales_df,
             weekly_sales_predictions_df,
@@ -327,4 +333,21 @@ class ItemSalesPredictionEvaluationViewModel(BaseViewModel):
         weekly_sales_evaluation_df["error_rate"] = weekly_sales_evaluation_df["diff"] / weekly_sales_evaluation_df[
             "sales"
         ].astype("float")
+        weekly_sales_evaluation_df = weekly_sales_evaluation_df[
+            [
+                "year",
+                "month",
+                "week_of_year",
+                "region",
+                "store",
+                "item",
+                "item_price",
+                "sales",
+                "prediction",
+                "diff",
+                "error_rate",
+                "predicted_at",
+                "version",
+            ]
+        ]
         return weekly_sales_evaluation_df

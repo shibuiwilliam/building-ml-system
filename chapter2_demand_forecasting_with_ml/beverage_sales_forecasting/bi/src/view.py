@@ -186,15 +186,13 @@ def build_base(
     store_view_model: StoreViewModel,
     item_view_model: ItemViewModel,
     item_sales_view_model: ItemSalesViewModel,
-) -> Tuple[Optional[str], str, str, str, List[str], List[str], pd.DataFrame]:
+) -> Tuple[Optional[str], Optional[str], Optional[str], List[str], List[str], pd.DataFrame]:
     region = build_region_selectbox(region_view_model=region_view_model)
     store = build_store_selectbox(
         store_view_model=store_view_model,
         region=region,
     )
     item = build_item_selectbox(item_view_model=item_view_model)
-
-    time_frame = build_time_frame_selectbox()
 
     if region == "ALL":
         region = None
@@ -211,7 +209,7 @@ def build_base(
 
     stores = daily_sales_df.store.unique()
     items = daily_sales_df.item.unique()
-    return time_frame, region, store, item, stores, items, daily_sales_df
+    return region, store, item, stores, items, daily_sales_df
 
 
 def build_item_sales(
@@ -221,12 +219,13 @@ def build_item_sales(
     item_sales_view_model: ItemSalesViewModel,
 ):
     logger.info("build item sales BI...")
-    time_frame, _, _, _, stores, items, daily_sales_df = build_base(
+    _, _, _, stores, items, daily_sales_df = build_base(
         region_view_model=region_view_model,
         store_view_model=store_view_model,
         item_view_model=item_view_model,
         item_sales_view_model=item_sales_view_model,
     )
+    time_frame = build_time_frame_selectbox()
 
     if time_frame == TIME_FRAME.DAILY.value:
         show_daily_item_sales(
@@ -258,7 +257,7 @@ def build_item_sales_prediction_evaluation(
     item_sales_prediction_evaluation_view_model: ItemSalesPredictionEvaluationViewModel,
 ):
     logger.info("build item sales prediction evaluation BI...")
-    time_frame, region, store, item, stores, items, daily_sales_df = build_base(
+    region, store, item, stores, items, daily_sales_df = build_base(
         region_view_model=region_view_model,
         store_view_model=store_view_model,
         item_view_model=item_view_model,
@@ -271,6 +270,7 @@ def build_item_sales_prediction_evaluation(
         store=store,
         item=item,
     )
+    st.dataframe(weekly_sales_evaluation_df)
 
 
 def build(

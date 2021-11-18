@@ -94,7 +94,7 @@ class DBDataManager(object):
         query: str,
         parameters: Optional[Tuple] = None,
     ) -> List[Dict[str, Any]]:
-        logger.info(f"select query: {query}, parameters: {parameters}")
+        logger.debug(f"select query: {query}, parameters: {parameters}")
         with self.db_client.get_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cursor:
                 cursor.execute(query, parameters)
@@ -106,7 +106,7 @@ class DBDataManager(object):
         query: str,
         parameters: Optional[Tuple] = None,
     ):
-        logger.info(f"insert or update query: {query}, parameters: {parameters}")
+        logger.debug(f"insert or update query: {query}, parameters: {parameters}")
         with self.db_client.get_connection() as conn:
             try:
                 with conn.cursor(cursor_factory=DictCursor) as cursor:
@@ -242,7 +242,7 @@ AND
                     record.week_of_year,
                 ),
             )
-            logger.info(f"current version: {version}")
+            logger.debug(f"current version: {version}")
             if len(version) == 0 or version[0][0] is None:
                 latest_version = 0
             else:

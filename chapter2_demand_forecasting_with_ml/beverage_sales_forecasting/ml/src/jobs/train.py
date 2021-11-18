@@ -49,6 +49,11 @@ class Trainer(object):
         y: Union[np.ndarray, pd.DataFrame],
     ) -> Evaluation:
         predictions = model.predict(x=x)
+        eval_df = pd.DataFrame({"y_true": y.sales, "y_pred": predictions})
+        eval_df["diff"] = eval_df["y_true"] - eval_df["y_pred"]
+        eval_df["error_rate"] = eval_df["diff"] / eval_df["y_true"]
+        logger.info(f"{eval_df}")
+
         rmse = mean_squared_error(
             y_true=y,
             y_pred=predictions,

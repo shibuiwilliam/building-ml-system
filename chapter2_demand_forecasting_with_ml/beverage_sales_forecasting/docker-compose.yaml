@@ -101,7 +101,7 @@ services:
       - POSTGRESQL_USER=user
       - POSTGRESQL_PASSWORD=password
       - POSTGRESQL_DBNAME=beverage_sales_forecasting
-      - LOG_LEVEL=DEBUG
+      - LOG_LEVEL=INFO
       - MLFLOW_TRACKING_URI=http://mlflow:5000
     command: /bin/sh -c "sleep 30s && python -m src.main"
     depends_on:
