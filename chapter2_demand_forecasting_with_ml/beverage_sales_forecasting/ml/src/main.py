@@ -47,8 +47,6 @@ def main(cfg: DictConfig):
             year=cfg.jobs.data.test.year,
             week_of_year=cfg.jobs.data.test.week,
         )
-        data_preprocess_pipeline = DataPreprocessPipeline()
-        data_retriever = DataRetriever()
 
         date_from = cfg.jobs.data.target_data.get("date_from", None)
         if date_from is not None:
@@ -57,17 +55,15 @@ def main(cfg: DictConfig):
         if date_to is not None:
             date_to = datetime.strptime(date_to, "%Y-%m-%d").date()
 
-        item = cfg.jobs.data.target_data.get("item", "ALL")
-        store = cfg.jobs.data.target_data.get("store", "ALL")
-        region = cfg.jobs.data.target_data.get("region", "ALL")
-
+        data_preprocess_pipeline = DataPreprocessPipeline()
+        data_retriever = DataRetriever()
         raw_df = data_retriever.retrieve_dataset(
             file_path=cfg.jobs.data.path,
             date_from=date_from,
             date_to=date_to,
-            item=item,
-            store=store,
-            region=region,
+            item=cfg.jobs.data.target_data.item,
+            store=cfg.jobs.data.target_data.store,
+            region=cfg.jobs.data.target_data.region,
             data_source=data_source,
         )
         xy_train, xy_test = data_retriever.train_test_split(
@@ -76,22 +72,18 @@ def main(cfg: DictConfig):
             test_year_and_week=test_year_and_week,
             data_preprocess_pipeline=data_preprocess_pipeline,
         )
-        x_train = xy_train.x
-        y_train = xy_train.y
-        x_test = xy_test.x
-        y_test = xy_test.y
 
         mlflow.log_param("target_date_date_from", date_from)
         mlflow.log_param("target_date_date_to", date_to)
-        mlflow.log_param("target_date_item", item)
-        mlflow.log_param("target_date_store", store)
-        mlflow.log_param("target_date_region", region)
+        mlflow.log_param("target_date_item", cfg.jobs.data.target_data.item)
+        mlflow.log_param("target_date_store", cfg.jobs.data.target_data.store)
+        mlflow.log_param("target_date_region", cfg.jobs.data.target_data.region)
 
         _model = MODELS.get_model(name=cfg.jobs.model.name)
         model = _model.model(
-            early_stopping_rounds=cfg.jobs.model.params.get("early_stopping_rounds", 200),
-            eval_metrics=cfg.jobs.model.params.get("eval_metrics", "mse"),
-            verbose_eval=cfg.jobs.model.params.get("verbose_eval", 1000),
+            early_stopping_rounds=cfg.jobs.model.params.early_stopping_rounds,
+            eval_metrics=cfg.jobs.model.params.eval_metrics,
+            verbose_eval=cfg.jobs.model.params.verbose_eval,
         )
         if "params" in cfg.jobs.model.keys():
             model.reset_model(params=cfg.jobs.model.params)
@@ -99,8 +91,8 @@ def main(cfg: DictConfig):
         if cfg.jobs.optimize.run:
             metrics = METRICS.get_metrics(name=cfg.jobs.optimize.optuna.metrics)
             optimizer = Optimizer(
-                data=x_train,
-                target=y_train,
+                data=xy_train.x,
+                target=xy_train.y,
                 direction=DIRECTION.MINIMIZE,
                 cv=WeekBasedSplit(
                     n_splits=5,
@@ -120,9 +112,9 @@ def main(cfg: DictConfig):
                 n_jobs=cfg.jobs.optimize.optuna.n_jobs,
                 metrics=metrics,
                 fit_params=dict(
-                    early_stopping_rounds=cfg.jobs.model.params.get("early_stopping_rounds", 200),
-                    eval_metric=cfg.jobs.model.params.get("eval_metrics", "mse"),
-                    verbose=cfg.jobs.model.params.get("verbose_eval", 1000),
+                    early_stopping_rounds=cfg.jobs.model.params.early_stopping_rounds,
+                    eval_metric=cfg.jobs.model.params.eval_metrics,
+                    verbose=cfg.jobs.model.params.verbose_eval,
                 ),
             )
             logger.info(f"parameter optimize results: {best_params}")
@@ -136,10 +128,10 @@ def main(cfg: DictConfig):
             trainer = Trainer()
             evaluation, artifact = trainer.train_and_evaluate(
                 model=model,
-                x_train=x_train,
-                y_train=y_train,
-                x_test=x_test,
-                y_test=y_test,
+                x_train=xy_train.x,
+                y_train=xy_train.y,
+                x_test=xy_test.x,
+                y_test=xy_test.y,
                 data_preprocess_pipeline=data_preprocess_pipeline,
                 preprocess_pipeline_file_path=preprocess_pipeline_file_path,
                 save_file_path=save_file_path,
@@ -152,23 +144,21 @@ def main(cfg: DictConfig):
 
         if cfg.jobs.predict.run:
             predictor = Predictor()
-            target_items = cfg.jobs.data.predict.get("items", "ALL")
+
+            target_items = cfg.jobs.data.predict.items
             if target_items == "ALL":
                 target_items = None
 
-            target_stores = cfg.jobs.data.predict.get("stores", "ALL")
+            target_stores = cfg.jobs.data.predict.stores
             if target_stores == "ALL":
                 target_stores = None
-
-            target_year = cfg.jobs.data.predict.get("year", 2019)
-            target_week = cfg.jobs.data.predict.get("week", 50)
 
             predictions = predictor.predict(
                 model=model,
                 data_preprocess_pipeline=data_preprocess_pipeline,
                 raw_df=raw_df,
-                target_year=target_year,
-                target_week=target_week,
+                target_year=cfg.jobs.data.predict.year,
+                target_week=cfg.jobs.data.predict.week,
                 target_items=target_items,
                 target_stores=target_stores,
             )
@@ -181,8 +171,8 @@ def main(cfg: DictConfig):
                     data_source=data_source,
                     prediction_file_path=prediction_file_path,
                 )
-            mlflow.log_param("predict_year", target_year)
-            mlflow.log_param("predict_week", target_week)
+            mlflow.log_param("predict_year", cfg.jobs.data.predict.year)
+            mlflow.log_param("predict_week", cfg.jobs.data.predict.week)
             mlflow.log_param("predict_items", target_items)
             mlflow.log_param("predict_stores", target_stores)
 

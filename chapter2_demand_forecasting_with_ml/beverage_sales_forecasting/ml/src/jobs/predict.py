@@ -22,7 +22,6 @@ class Predictor(object):
         target_items: Optional[List[str]] = None,
         target_stores: Optional[List[str]] = None,
     ) -> pd.DataFrame:
-        raw_df["year"] = raw_df.date.dt.year
         raw_df = raw_df[(raw_df.year == target_year) & (raw_df.week_of_year == target_week)]
         if target_stores is not None and len(target_stores) > 0:
             raw_df = raw_df[raw_df.store.isin(target_stores)]
@@ -35,28 +34,6 @@ filtered df shape: {raw_df.shape}
     """
         )
         return raw_df
-
-    def preprocess(
-        self,
-        data_preprocess_pipeline: DataPreprocessPipeline,
-        df: pd.DataFrame,
-    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
-        logger.info(
-            f"""
-weekly df columns: {df.columns}
-weekly df shape: {df.shape}
-    """
-        )
-
-        weekly_df = data_preprocess_pipeline.preprocess(x=df)
-        x = data_preprocess_pipeline.transform(x=weekly_df)
-        logger.info(
-            f"""
-preprocessed df columns: {x.columns}
-preprocessed df shape: {x.shape}
-    """
-        )
-        return weekly_df, x
 
     def postprocess(
         self,
@@ -91,16 +68,15 @@ raw df columns: {raw_df.columns}
 raw df shape: {raw_df.shape}
     """
         )
-        df = self.filter(
-            raw_df=raw_df,
+        weekly_df = data_preprocess_pipeline.preprocess(x=raw_df)
+        x = data_preprocess_pipeline.transform(x=weekly_df)
+
+        x = self.filter(
+            raw_df=x,
             target_year=target_year,
             target_week=target_week,
             target_stores=target_stores,
             target_items=target_items,
-        )
-        weekly_df, x = self.preprocess(
-            data_preprocess_pipeline=data_preprocess_pipeline,
-            df=df,
         )
         x_test = (
             x[data_preprocess_pipeline.preprocessed_columns]
@@ -109,6 +85,14 @@ raw df shape: {raw_df.shape}
         )
         x_test = X_SCHEMA.validate(x_test)
         predictions = model.predict(x=x_test)
+
+        weekly_df = self.filter(
+            raw_df=weekly_df,
+            target_year=target_year,
+            target_week=target_week,
+            target_stores=target_stores,
+            target_items=target_items,
+        )
         weekly_prediction = self.postprocess(
             df=weekly_df,
             predictions=predictions,
