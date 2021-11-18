@@ -1,13 +1,17 @@
 from enum import Enum
-from typing import Dict, List, Optional, Union
+from typing import List, Optional, Tuple
 
-import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 from logger import configure_logger
-from plotly.subplots import make_subplots
-from view_model import ItemSalesViewModel, ItemViewModel, RegionViewModel, StoreViewModel
+from view_model import (
+    ItemSalesPredictionEvaluationViewModel,
+    ItemSalesViewModel,
+    ItemViewModel,
+    RegionViewModel,
+    StoreViewModel,
+)
 
 logger = configure_logger(__name__)
 
@@ -177,13 +181,12 @@ def show_monthly_item_sales(
                 logger.info(f"REGION {region} STORE {s} ITEM {i}")
 
 
-def build_item_sales(
+def build_base(
     region_view_model: RegionViewModel,
     store_view_model: StoreViewModel,
     item_view_model: ItemViewModel,
     item_sales_view_model: ItemSalesViewModel,
-):
-    logger.info("build item sales BI...")
+) -> Tuple[Optional[str], str, str, str, List[str], List[str], pd.DataFrame]:
     region = build_region_selectbox(region_view_model=region_view_model)
     store = build_store_selectbox(
         store_view_model=store_view_model,
@@ -200,32 +203,48 @@ def build_item_sales(
     if item == "ALL":
         item = None
 
-    daily_df = item_sales_view_model.retrieve_daily_item_sales(
+    daily_sales_df = item_sales_view_model.retrieve_daily_item_sales(
         item=item,
         store=store,
         region=region,
     )
 
-    stores = daily_df.store.unique()
-    items = daily_df.item.unique()
+    stores = daily_sales_df.store.unique()
+    items = daily_sales_df.item.unique()
+    return time_frame, region, store, item, stores, items, daily_sales_df
+
+
+def build_item_sales(
+    region_view_model: RegionViewModel,
+    store_view_model: StoreViewModel,
+    item_view_model: ItemViewModel,
+    item_sales_view_model: ItemSalesViewModel,
+):
+    logger.info("build item sales BI...")
+    time_frame, _, _, _, stores, items, daily_sales_df = build_base(
+        region_view_model=region_view_model,
+        store_view_model=store_view_model,
+        item_view_model=item_view_model,
+        item_sales_view_model=item_sales_view_model,
+    )
 
     if time_frame == TIME_FRAME.DAILY.value:
         show_daily_item_sales(
-            df=daily_df,
+            df=daily_sales_df,
             stores=stores,
             items=items,
         )
     elif time_frame == TIME_FRAME.WEEKLY.value:
-        weekly_df = item_sales_view_model.retrieve_weekly_item_sales(daily_df=daily_df)
+        weekly_sales_df = item_sales_view_model.retrieve_weekly_item_sales(daily_sales_df=daily_sales_df)
         show_weekly_item_sales(
-            df=weekly_df,
+            df=weekly_sales_df,
             stores=stores,
             items=items,
         )
     elif time_frame == TIME_FRAME.MONTHLY.value:
-        monthly_df = item_sales_view_model.retrieve_monthly_item_sales(daily_df=daily_df)
+        monthly_sales_df = item_sales_view_model.retrieve_monthly_item_sales(daily_sales_df=daily_sales_df)
         show_monthly_item_sales(
-            df=monthly_df,
+            df=monthly_sales_df,
             stores=stores,
             items=items,
         )
@@ -236,8 +255,22 @@ def build_item_sales_prediction_evaluation(
     store_view_model: StoreViewModel,
     item_view_model: ItemViewModel,
     item_sales_view_model: ItemSalesViewModel,
+    item_sales_prediction_evaluation_view_model: ItemSalesPredictionEvaluationViewModel,
 ):
     logger.info("build item sales prediction evaluation BI...")
+    time_frame, region, store, item, stores, items, daily_sales_df = build_base(
+        region_view_model=region_view_model,
+        store_view_model=store_view_model,
+        item_view_model=item_view_model,
+        item_sales_view_model=item_sales_view_model,
+    )
+    weekly_sales_df = item_sales_view_model.retrieve_weekly_item_sales(daily_sales_df=daily_sales_df)
+    weekly_sales_evaluation_df = item_sales_prediction_evaluation_view_model.aggregate_item_weekly_sales_evaluation(
+        weekly_sales_df=weekly_sales_df,
+        region=region,
+        store=store,
+        item=item,
+    )
 
 
 def build(
@@ -245,6 +278,7 @@ def build(
     store_view_model: StoreViewModel,
     item_view_model: ItemViewModel,
     item_sales_view_model: ItemSalesViewModel,
+    item_sales_prediction_evaluation_view_model: ItemSalesPredictionEvaluationViewModel,
 ):
     st.markdown("# Hi, I am BI by streamlit; Let's have a fun!")
     st.markdown("# Item sales record")
@@ -266,6 +300,7 @@ def build(
             store_view_model=store_view_model,
             item_view_model=item_view_model,
             item_sales_view_model=item_sales_view_model,
+            item_sales_prediction_evaluation_view_model=item_sales_prediction_evaluation_view_model,
         )
     else:
         raise ValueError()

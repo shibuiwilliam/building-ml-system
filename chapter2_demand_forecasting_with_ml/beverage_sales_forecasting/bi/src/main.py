@@ -1,7 +1,13 @@
 from db_client import DBClient
 from logger import configure_logger
 from view import build
-from view_model import ItemSalesViewModel, ItemViewModel, RegionViewModel, StoreViewModel
+from view_model import (
+    ItemSalesPredictionEvaluationViewModel,
+    ItemSalesViewModel,
+    ItemViewModel,
+    RegionViewModel,
+    StoreViewModel,
+)
 
 logger = configure_logger(__name__)
 
@@ -14,11 +20,13 @@ def main():
     store_view_model = StoreViewModel(db_client=db_client)
     item_view_model = ItemViewModel(db_client=db_client)
     item_sales_view_model = ItemSalesViewModel(db_client=db_client)
+    item_sales_prediction_evaluation_view_model = ItemSalesPredictionEvaluationViewModel(db_client=db_client)
     build(
         region_view_model=region_view_model,
         store_view_model=store_view_model,
         item_view_model=item_view_model,
         item_sales_view_model=item_sales_view_model,
+        item_sales_prediction_evaluation_view_model=item_sales_prediction_evaluation_view_model,
     )
 
 

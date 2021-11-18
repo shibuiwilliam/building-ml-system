@@ -5,7 +5,14 @@ import numpy as np
 import pandas as pd
 from db_client import AbstractDBClient
 from logger import configure_logger
-from model import ItemRepository, ItemSales, ItemSalesRepository, RegionRepository, StoreRepository
+from model import (
+    ItemRepository,
+    ItemSalesRepository,
+    ItemWeeklySalesPredictionsRepository,
+    RegionRepository,
+    StoreRepository,
+)
+from schema import ItemSales, ItemWeeklySalesPredictions
 
 logger = configure_logger(__name__)
 
@@ -145,15 +152,19 @@ class ItemSalesViewModel(BaseViewModel):
         )
         logger.info(
             f"""
-df shape: {df.shape}
-df columns: {df.columns}
+daily df
+    df shape: {df.shape}
+    df columns: {df.columns}
                 """
         )
         return df
 
-    def retrieve_weekly_item_sales(daily_df: pd.DataFrame) -> pd.DataFrame:
-        weekly_df = (
-            daily_df.groupby(
+    def retrieve_weekly_item_sales(
+        self,
+        daily_sales_df: pd.DataFrame,
+    ) -> pd.DataFrame:
+        weekly_sales_df = (
+            daily_sales_df.groupby(
                 [
                     "year",
                     "week_of_year",
@@ -190,15 +201,19 @@ df columns: {df.columns}
         )
         logger.info(
             f"""
-df shape: {weekly_df.shape}
-df columns: {weekly_df.columns}
+weekly df
+    df shape: {weekly_sales_df.shape}
+    df columns: {weekly_sales_df.columns}
                 """
         )
-        return weekly_df
+        return weekly_sales_df
 
-    def retrieve_monthly_item_sales(daily_df: pd.DataFrame) -> pd.DataFrame:
-        monthly_df = (
-            daily_df.groupby(
+    def retrieve_monthly_item_sales(
+        self,
+        daily_sales_df: pd.DataFrame,
+    ) -> pd.DataFrame:
+        monthly_sales_df = (
+            daily_sales_df.groupby(
                 [
                     "year",
                     "month",
@@ -233,8 +248,83 @@ df columns: {weekly_df.columns}
         )
         logger.info(
             f"""
-df shape: {monthly_df.shape}
-df columns: {monthly_df.columns}
+monthly df
+    df shape: {monthly_sales_df.shape}
+    df columns: {monthly_sales_df.columns}
                 """
         )
-        return monthly_df
+        return monthly_sales_df
+
+
+class ItemSalesPredictionEvaluationViewModel(BaseViewModel):
+    def __init__(
+        self,
+        db_client: AbstractDBClient,
+    ):
+        super().__init__(db_client=db_client)
+        self.item_sales_repository = ItemSalesRepository(db_client=db_client)
+        self.item_weekly_sales_predicitons_repository = ItemWeeklySalesPredictionsRepository(db_client=db_client)
+
+    def list_item_weekly_sales_predictions(
+        self,
+        item: Optional[str] = None,
+        store: Optional[str] = None,
+        region: Optional[str] = None,
+        year: Optional[int] = None,
+        week_of_year: Optional[int] = None,
+        version: int = 0,
+    ) -> List[ItemWeeklySalesPredictions]:
+        item_weekly_sales_predictions = []
+        limit = 10000
+        offset = 0
+        while True:
+            records = self.item_sales_predicitons_repository.select(
+                item=item,
+                store=store,
+                region=region,
+                year=year,
+                week_of_year=week_of_year,
+                version=version,
+                limit=limit,
+                offset=offset,
+            )
+            if len(records) == 0:
+                logger.info(f"done loading {len(item_weekly_sales_predictions)} records")
+                break
+            item_weekly_sales_predictions.extend(records)
+            offset += limit
+            logger.info(f"found {len(item_weekly_sales_predictions)} records...")
+        return item_weekly_sales_predictions
+
+    def aggregate_item_weekly_sales_evaluation(
+        self,
+        weekly_sales_df: pd.DataFrame,
+        item: Optional[str] = None,
+        store: Optional[str] = None,
+        region: Optional[str] = None,
+        year: Optional[int] = None,
+        week_of_year: Optional[int] = None,
+        version: int = 0,
+    ) -> pd.DataFrame:
+        item_weekly_sales_predictions = self.list_item_weekly_sales_predictions(
+            item=item,
+            store=store,
+            region=region,
+            year=year,
+            week_of_year=week_of_year,
+            version=version,
+        )
+        weekly_sales_predictions_df = pd.DataFrame([d.dict() for d in item_weekly_sales_predictions]).drop("id", axis=1)
+        weekly_sales_evaluation_df = pd.merge(
+            weekly_sales_df,
+            weekly_sales_predictions_df,
+            on=["year", "week_of_year", "region", "store", "item"],
+            how="inner",
+        )
+        weekly_sales_evaluation_df["diff"] = (
+            weekly_sales_evaluation_df["sales"].astype("float") - weekly_sales_evaluation_df["prediction"]
+        )
+        weekly_sales_evaluation_df["error_rate"] = weekly_sales_evaluation_df["diff"] / weekly_sales_evaluation_df[
+            "sales"
+        ].astype("float")
+        return weekly_sales_evaluation_df

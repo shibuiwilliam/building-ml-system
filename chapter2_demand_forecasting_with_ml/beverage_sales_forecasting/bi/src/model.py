@@ -5,80 +5,9 @@ from constants import TABLES
 from db_client import AbstractDBClient
 from logger import configure_logger
 from psycopg2.extras import DictCursor
-from pydantic import BaseModel, Extra
+from schema import Item, ItemSales, ItemWeeklySalesPredictions, Region, Store
 
 logger = configure_logger(__name__)
-
-
-class Region(BaseModel):
-    id: str
-    name: str
-
-    class Config:
-        extra = Extra.forbid
-
-
-class Store(BaseModel):
-    id: str
-    name: str
-    region: str
-
-    class Config:
-        extra = Extra.forbid
-
-
-class Item(BaseModel):
-    id: str
-    name: str
-
-    class Config:
-        extra = Extra.forbid
-
-
-class ItemSales(BaseModel):
-    id: str
-    date: date
-    day_of_week: str
-    week_of_year: int
-    store: str
-    region: str
-    item: str
-    item_price: int
-    sales: int
-    total_sales_amount: int
-
-    class Config:
-        extra = Extra.forbid
-
-
-class ItemWeeklySalesPredictions(BaseModel):
-    id: str
-    store: str
-    region: str
-    item: str
-    year: int
-    week_of_year: int
-    prediction: float
-    predicted_at: date
-    version: int
-
-    class Config:
-        extra = Extra.forbid
-
-
-class ItemWeeklySales(BaseModel):
-    id: str
-    store: str
-    region: str
-    item: str
-    year: int
-    week_of_year: int
-    item_price: int
-    sales: int
-    total_sales_amount: int
-
-    class Config:
-        extra = Extra.forbid
 
 
 class BaseRepository(object):
@@ -309,7 +238,7 @@ class ItemWeeklySalesPredictionsRepository(BaseRepository):
         version: int = 0,
         limit: int = 1000,
         offset: int = 0,
-    ) -> List[ItemSales]:
+    ) -> List[ItemWeeklySalesPredictions]:
         query = f"""
 SELECT
     {self.table_name}.id,
