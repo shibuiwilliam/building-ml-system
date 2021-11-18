@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import date, datetime
 from enum import Enum
+from typing import Optional
 
 import pandas as pd
 from pandera import Check, Column, DataFrameSchema, Index
@@ -141,6 +142,24 @@ Y_SCHEMA = DataFrameSchema(
     coerce=True,
 )
 
+_RAW_PREDICTION_SCHEMA = {
+    "date": Column(datetime),
+    "year": Column(int, required=False),
+    "day_of_week": Column(str, checks=Check.isin(DAYS_OF_WEEK)),
+    "week_of_year": Column(int, checks=Check.isin(WEEKS)),
+    "store": Column(str, checks=Check.isin(STORES)),
+    "item": Column(str, checks=Check.isin(ITEMS)),
+    "item_price": Column(int, checks=Check.greater_than_or_equal_to(0)),
+    "sales": Column(int, checks=Check.equal_to(0), nullable=True),
+    "total_sales_amount": Column(int, checks=Check.equal_to(0), nullable=True),
+}
+RAW_PREDICTION_SCHEMA = DataFrameSchema(
+    _RAW_PREDICTION_SCHEMA,
+    index=Index(int),
+    strict=True,
+    coerce=True,
+)
+
 _WEEKLY_PREDICTION_SCHEMA = {
     "year": Column(int),
     "week_of_year": Column(int, checks=Check.isin(WEEKS)),
@@ -183,6 +202,20 @@ class ItemSales(BaseModel):
     item_price: int
     sales: int
     total_sales_amount: int
+
+    class Config:
+        extra = Extra.forbid
+
+
+class DataToBePredicted(BaseModel):
+    date: date
+    day_of_week: str
+    week_of_year: int
+    store: str
+    item: str
+    item_price: int
+    sales: Optional[int]
+    total_sales_amount: Optional[int]
 
     class Config:
         extra = Extra.forbid

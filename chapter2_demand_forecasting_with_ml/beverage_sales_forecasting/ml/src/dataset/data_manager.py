@@ -5,7 +5,17 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import pandas as pd
 import psycopg2
 from psycopg2.extras import DictCursor
-from src.dataset.schema import BASE_SCHEMA, TABLES, ItemSales, ItemWeeklySalesPredictions
+from src.dataset.schema import (
+    BASE_SCHEMA,
+    DAYS_OF_WEEK,
+    ITEMS,
+    STORES,
+    TABLES,
+    DataToBePredicted,
+    ItemSales,
+    ItemWeeklySalesPredictions,
+)
+from src.middleware.dates import dates_in_between_dates
 from src.middleware.db_client import AbstractDBClient
 from src.middleware.logger import configure_logger
 from src.middleware.strings import get_uuid
@@ -202,6 +212,68 @@ OFFSET
             parameters=tuple(parameters),
         )
         data = [ItemSales(**r) for r in records]
+        return data
+
+    def select_prediction_data(
+        self,
+        date_from: date,
+        date_to: date,
+    ) -> List[DataToBePredicted]:
+        dates = dates_in_between_dates(
+            date_from=date_from,
+            date_to=date_to,
+        )
+        logger.info(f"dates: {dates}")
+
+        dates = [f"'{d.strftime('%Y-%m-%d')}'" for d in dates]
+        dates = [f"TO_DATE({d}, 'YYYY-MM-DD')" for d in dates]
+        dates = f"UNNEST(ARRAY[{','.join(dates)}])"
+        stores = [f"'{s}'" for s in STORES]
+        stores = f"UNNEST(ARRAY[{','.join(stores)}])"
+        items = [f"'{i}'" for i in ITEMS]
+        items = f"UNNEST(ARRAY[{','.join(items)}])"
+
+        query = f"""
+SELECT
+    date,
+    store,
+    item,
+    {TABLES.ITEM_PRICES.value}.price AS item_price
+FROM
+    {TABLES.ITEM_PRICES.value}
+LEFT JOIN
+    {TABLES.ITEMS.value}
+ON
+    {TABLES.ITEM_PRICES.value}.item_id = {TABLES.ITEMS.value}.id,
+    {dates} as date,
+    {stores} as store,
+    {items} as item
+WHERE
+    {TABLES.ITEM_PRICES.value}.applied_from <= date
+AND
+    {TABLES.ITEM_PRICES.value}.applied_to >= date
+AND
+    {TABLES.ITEMS.value}.name = item
+;
+        """
+        records = self.execute_select_query(
+            query=query,
+            parameters=None,
+        )
+        data = []
+        for record in records:
+            data.append(
+                DataToBePredicted(
+                    date=record["date"],
+                    day_of_week=DAYS_OF_WEEK[record["date"].weekday()],
+                    week_of_year=record["date"].isocalendar().week,
+                    store=record["store"],
+                    item=record["item"],
+                    item_price=record["item_price"],
+                    sales=0,
+                    total_sales_amount=0,
+                ),
+            )
         return data
 
     def insert_item_weekly_sales_predictions(

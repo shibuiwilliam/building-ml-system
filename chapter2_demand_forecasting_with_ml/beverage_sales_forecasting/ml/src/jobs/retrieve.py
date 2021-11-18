@@ -3,7 +3,7 @@ from typing import Optional, Tuple
 
 import pandas as pd
 from src.dataset.data_manager import DATA_SOURCE, DBDataManager
-from src.dataset.schema import BASE_SCHEMA, X_SCHEMA, XY, Y_SCHEMA, YearAndWeek
+from src.dataset.schema import BASE_SCHEMA, RAW_PREDICTION_SCHEMA, X_SCHEMA, XY, Y_SCHEMA, YearAndWeek
 from src.middleware.db_client import DBClient
 from src.middleware.logger import configure_logger
 from src.models.preprocess import DataPreprocessPipeline
@@ -85,8 +85,7 @@ test from {test_year_and_week.year} {test_year_and_week.week_of_year}
         ].reset_index(drop=True)
 
         weekly_test_df = weekly_df[
-            (weekly_df.year == test_year_and_week.year) & (weekly_df.week_of_year >= test_year_and_week.week_of_year)
-            | (weekly_df.year > test_year_and_week.year)
+            (weekly_df.year == test_year_and_week.year) & (weekly_df.week_of_year == test_year_and_week.week_of_year)
         ].reset_index(drop=True)
         logger.info(
             f"""
@@ -137,3 +136,32 @@ y_test shape: {y_test.shape}
 
         logger.info("done retrieve data")
         return XY(x=x_train, y=y_train), XY(x=x_test, y=y_test)
+
+    def retrieve_prediction_data(
+        self,
+        file_path: str,
+        date_from: date,
+        date_to: date,
+        data_source: DATA_SOURCE = DATA_SOURCE.LOCAL,
+    ) -> pd.DataFrame:
+        logger.info("start retrieve data")
+        if data_source == DATA_SOURCE.LOCAL:
+            data_to_be_predicted = file_path
+        elif data_source == DATA_SOURCE.DB:
+            db_client = DBClient()
+            db_data_manager = DBDataManager(db_client=db_client)
+            data_to_be_predicted = db_data_manager.select_prediction_data(
+                date_from=date_from,
+                date_to=date_to,
+            )
+            data_to_be_predicted_df = pd.DataFrame([d.dict() for d in data_to_be_predicted])
+            data_to_be_predicted_df["date"] = pd.to_datetime(data_to_be_predicted_df["date"])
+            data_to_be_predicted_df = RAW_PREDICTION_SCHEMA.validate(data_to_be_predicted_df)
+
+            logger.info(
+                f"""
+data_to_be_predicted columns: {data_to_be_predicted_df.columns}
+data_to_be_predicted shape: {data_to_be_predicted_df.shape}
+        """
+            )
+            return data_to_be_predicted_df

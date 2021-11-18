@@ -1,8 +1,8 @@
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
 import numpy as np
 import pandas as pd
-from src.dataset.schema import BASE_SCHEMA, WEEKLY_PREDICTION_SCHEMA, X_SCHEMA
+from src.dataset.schema import BASE_SCHEMA, RAW_PREDICTION_SCHEMA, WEEKLY_PREDICTION_SCHEMA, X_SCHEMA
 from src.middleware.logger import configure_logger
 from src.models.base_model import BaseDemandForecastingModel
 from src.models.preprocess import DataPreprocessPipeline
@@ -16,24 +16,24 @@ class Predictor(object):
 
     def filter(
         self,
-        raw_df: pd.DataFrame,
-        target_year: Optional[int] = None,
-        target_week: Optional[int] = None,
+        df: pd.DataFrame,
+        target_year: int,
+        target_week: int,
         target_items: Optional[List[str]] = None,
         target_stores: Optional[List[str]] = None,
     ) -> pd.DataFrame:
-        raw_df = raw_df[(raw_df.year == target_year) & (raw_df.week_of_year == target_week)]
+        df = df[(df.year == target_year) & (df.week_of_year == target_week)]
         if target_stores is not None and len(target_stores) > 0:
-            raw_df = raw_df[raw_df.store.isin(target_stores)]
+            df = df[df.store.isin(target_stores)]
         if target_items is not None and len(target_items) > 0:
-            raw_df = raw_df[raw_df.item.isin(target_items)]
+            df = df[df.item.isin(target_items)]
         logger.info(
             f"""
-filtered df columns: {raw_df.columns}
-filtered df shape: {raw_df.shape}
+filtered df columns: {df.columns}
+filtered df shape: {df.shape}
     """
         )
-        return raw_df
+        return df
 
     def postprocess(
         self,
@@ -55,39 +55,45 @@ predicted df shape: {df.shape}
         self,
         model: BaseDemandForecastingModel,
         data_preprocess_pipeline: DataPreprocessPipeline,
-        raw_df: pd.DataFrame,
-        target_year: Optional[int] = None,
-        target_week: Optional[int] = None,
+        previous_df: pd.DataFrame,
+        data_to_be_predicted_df: pd.DataFrame,
+        target_year: int,
+        target_week: int,
         target_items: Optional[List[str]] = None,
         target_stores: Optional[List[str]] = None,
     ) -> pd.DataFrame:
-        raw_df = BASE_SCHEMA.validate(raw_df)
+        previous_df = BASE_SCHEMA.validate(previous_df)
+        data_to_be_predicted_df = RAW_PREDICTION_SCHEMA.validate(data_to_be_predicted_df)
         logger.info(
             f"""
-raw df columns: {raw_df.columns}
-raw df shape: {raw_df.shape}
+target_year: {target_year}
+target_week: {target_week}
+target_items: {target_items}
+target_stores: {target_stores}
     """
         )
-        weekly_df = data_preprocess_pipeline.preprocess(x=raw_df)
+        df = pd.concat([previous_df, data_to_be_predicted_df])
+
+        weekly_df = data_preprocess_pipeline.preprocess(x=df)
         x = data_preprocess_pipeline.transform(x=weekly_df)
 
         x = self.filter(
-            raw_df=x,
+            df=x,
             target_year=target_year,
             target_week=target_week,
             target_stores=target_stores,
             target_items=target_items,
         )
-        x_test = (
+        x = (
             x[data_preprocess_pipeline.preprocessed_columns]
             .drop(["sales", "store", "item"], axis=1)
             .reset_index(drop=True)
         )
-        x_test = X_SCHEMA.validate(x_test)
-        predictions = model.predict(x=x_test)
+        x = X_SCHEMA.validate(x)
+        predictions = model.predict(x=x)
 
         weekly_df = self.filter(
-            raw_df=weekly_df,
+            df=weekly_df,
             target_year=target_year,
             target_week=target_week,
             target_stores=target_stores,

@@ -5,7 +5,7 @@ jobs:
     path: /opt/data/item_sale_records_2017_2019.csv
     target_data:
       date_from: 2017-01-01
-      date_to: 2019-12-31
+      date_to: 2019-12-15
       item: ALL
       store: ALL
       region: ALL
@@ -17,7 +17,7 @@ jobs:
       week: 50
     predict:
       year: 2019
-      week: 50
+      week: 52
       items: ALL
       stores: ALL
 

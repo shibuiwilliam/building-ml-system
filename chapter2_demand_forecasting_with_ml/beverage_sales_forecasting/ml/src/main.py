@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import date, datetime, timedelta
 
 import hydra
 import mlflow
@@ -144,8 +144,23 @@ def main(cfg: DictConfig):
 
         if cfg.jobs.predict.run:
             predictor = Predictor()
+            latest_date = max(raw_df.date)
+            next_date = latest_date + timedelta(days=1)
+            next_date = next_date.date()
+            target_date = date.fromisocalendar(
+                year=cfg.jobs.data.predict.year,
+                week=cfg.jobs.data.predict.week,
+                day=7,
+            )
 
-            target_items = cfg.jobs.data.predict.items
+            data_to_be_predicted_df = data_retriever.retrieve_prediction_data(
+                file_path=cfg.jobs.data.path,
+                date_from=next_date,
+                date_to=target_date,
+                data_source=data_source,
+            )
+
+            target_items = cfg.jobs.data.predict["items"]
             if target_items == "ALL":
                 target_items = None
 
@@ -156,7 +171,8 @@ def main(cfg: DictConfig):
             predictions = predictor.predict(
                 model=model,
                 data_preprocess_pipeline=data_preprocess_pipeline,
-                raw_df=raw_df,
+                previous_df=raw_df,
+                data_to_be_predicted_df=data_to_be_predicted_df,
                 target_year=cfg.jobs.data.predict.year,
                 target_week=cfg.jobs.data.predict.week,
                 target_items=target_items,
