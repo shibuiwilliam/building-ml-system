@@ -27,7 +27,7 @@ class DataRetriever(object):
     ) -> pd.DataFrame:
         logger.info("start retrieve data")
         if data_source == DATA_SOURCE.LOCAL:
-            raw_df = file_path
+            raw_df = pd.read_csv(file_path)
         elif data_source == DATA_SOURCE.DB:
             db_client = DBClient()
             db_data_manager = DBDataManager(db_client=db_client)
