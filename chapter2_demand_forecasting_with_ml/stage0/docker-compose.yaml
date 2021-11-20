@@ -1,0 +1,42 @@
+version: "3"
+
+services:
+  mlflow:
+    container_name: mlflow
+    image: shibui/building-ml-system:beverage_sales_forecasting_mlflow_0.0.0
+    volumes:
+      - ./ml/outputs/mlruns:/opt/outputs/mlruns
+    command:
+      - "mlflow"
+      - "server"
+      - "--backend-store-uri"
+      - "/opt/outputs/mlruns"
+      - "--default-artifact-root"
+      - "/opt/outputs/mlruns"
+      - "--host"
+      - "0.0.0.0"
+    ports:
+      - 15000:5000
+    restart: always
+    hostname: mlflow
+
+  ml:
+    container_name: ml
+    image: shibui/building-ml-system:beverage_sales_forecasting_ml_0.0.0
+    restart: "no"
+    volumes:
+      - ./data:/opt/data
+      - ./ml/hydra:/opt/hydra
+      - ./ml/outputs:/opt/outputs
+    networks:
+      - default
+    environment:
+      - LOG_LEVEL=INFO
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    command: /bin/sh -c "sleep 10s && python -m src.main"
+    depends_on:
+      - mlflow
+
+networks:
+  default:
+    name: ml
