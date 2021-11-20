@@ -2,7 +2,7 @@ from datetime import date
 from typing import List, Optional, Tuple
 
 import pandas as pd
-from src.dataset.data_manager import DATA_SOURCE, load_df_from_csv
+from src.dataset.data_manager import load_df_from_csv
 from src.dataset.schema import (
     BASE_SCHEMA,
     DAYS_OF_WEEK,
@@ -33,22 +33,18 @@ class DataRetriever(object):
         date_to: Optional[date] = None,
         item: str = "ALL",
         store: str = "ALL",
-        data_source: DATA_SOURCE = DATA_SOURCE.LOCAL,
     ) -> pd.DataFrame:
         logger.info("start retrieve data")
-        if data_source == DATA_SOURCE.LOCAL:
-            raw_df = load_df_from_csv(file_path=file_path)
-            raw_df["date"] = pd.to_datetime(raw_df["date"]).dt.date
-            if date_from is not None:
-                raw_df = raw_df[raw_df.date >= date_from]
-            if date_to is not None:
-                raw_df = raw_df[raw_df.date <= date_to]
-            if item is not None and item != "ALL":
-                raw_df = raw_df[raw_df.item == item]
-            if store is not None and store != "ALL":
-                raw_df = raw_df[raw_df.store == store]
-        else:
-            raise ValueError
+        raw_df = load_df_from_csv(file_path=file_path)
+        raw_df["date"] = pd.to_datetime(raw_df["date"]).dt.date
+        if date_from is not None:
+            raw_df = raw_df[raw_df.date >= date_from]
+        if date_to is not None:
+            raw_df = raw_df[raw_df.date <= date_to]
+        if item is not None and item != "ALL":
+            raw_df = raw_df[raw_df.item == item]
+        if store is not None and store != "ALL":
+            raw_df = raw_df[raw_df.store == store]
 
         raw_df = BASE_SCHEMA.validate(raw_df)
         logger.info(
@@ -141,32 +137,28 @@ y_test shape: {y_test.shape}
         self,
         date_from: date,
         date_to: date,
-        data_source: DATA_SOURCE = DATA_SOURCE.LOCAL,
     ) -> pd.DataFrame:
         logger.info("start retrieve data")
-        if data_source == DATA_SOURCE.LOCAL:
-            data: List[DataToBePredicted] = []
-            dates = dates_in_between_dates(
-                date_from=date_from,
-                date_to=date_to,
-            )
-            for d in dates:
-                for s in STORES:
-                    for i in ITEMS:
-                        isocalendar = d.isocalendar()
-                        data.append(
-                            DataToBePredicted(
-                                date=d,
-                                day_of_week=DAYS_OF_WEEK[isocalendar.weekday - 1],
-                                week_of_year=isocalendar.week,
-                                store=s,
-                                item=i,
-                                item_price=ITEM_PRICES[i],
-                                sales=0,
-                                total_sales_amount=0,
-                            ),
-                        )
-            data_to_be_predicted_df = pd.DataFrame([d.dict() for d in data])
-        else:
-            raise ValueError
+        data: List[DataToBePredicted] = []
+        dates = dates_in_between_dates(
+            date_from=date_from,
+            date_to=date_to,
+        )
+        for d in dates:
+            for s in STORES:
+                for i in ITEMS:
+                    isocalendar = d.isocalendar()
+                    data.append(
+                        DataToBePredicted(
+                            date=d,
+                            day_of_week=DAYS_OF_WEEK[isocalendar.weekday - 1],
+                            week_of_year=isocalendar.week,
+                            store=s,
+                            item=i,
+                            item_price=ITEM_PRICES[i],
+                            sales=0,
+                            total_sales_amount=0,
+                        ),
+                    )
+        data_to_be_predicted_df = pd.DataFrame([d.dict() for d in data])
         return data_to_be_predicted_df

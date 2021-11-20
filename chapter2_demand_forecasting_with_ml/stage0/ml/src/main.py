@@ -4,7 +4,6 @@ from datetime import date, datetime, timedelta
 import hydra
 import mlflow
 from omegaconf import DictConfig
-from src.dataset.data_manager import DATA_SOURCE
 from src.dataset.schema import YearAndWeek
 from src.jobs.optimize import OptimizerRunner
 from src.jobs.predict import Predictor
@@ -38,7 +37,6 @@ def main(cfg: DictConfig):
     mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000"))
     mlflow.set_experiment(cfg.name)
     with mlflow.start_run(run_name=run_name):
-        data_source = DATA_SOURCE.value_to_enum(value=cfg.jobs.data.source)
         train_year_and_week = YearAndWeek(
             year=cfg.jobs.data.train.year,
             week_of_year=cfg.jobs.data.train.week,
@@ -63,7 +61,6 @@ def main(cfg: DictConfig):
             date_to=date_to,
             item=cfg.jobs.data.target_data.item,
             store=cfg.jobs.data.target_data.store,
-            data_source=data_source,
         )
         xy_train, xy_test = data_retriever.train_test_split(
             raw_df=raw_df,
@@ -135,8 +132,8 @@ def main(cfg: DictConfig):
                 save_file_path=save_file_path,
             )
             mlflow.log_metrics(evaluation.dict())
-            mlflow.log_artifact(artifact.preprocess_file_path)
-            mlflow.log_artifact(artifact.model_file_path)
+            mlflow.log_artifact(artifact.preprocess_file_path, "preprocess")
+            mlflow.log_artifact(artifact.model_file_path, "model")
 
         if cfg.jobs.predict.run:
             predictor = Predictor()
@@ -152,7 +149,6 @@ def main(cfg: DictConfig):
             data_to_be_predicted_df = data_retriever.retrieve_prediction_data(
                 date_from=next_date,
                 date_to=target_date,
-                data_source=data_source,
             )
 
             target_items = cfg.jobs.data.predict["items"]
@@ -177,19 +173,19 @@ def main(cfg: DictConfig):
             if cfg.jobs.predict.register:
                 data_register = DataRegister()
                 prediction_file_path = os.path.join(cwd, f"{model.name}_{now}")
-                data_register.register(
+                prediction_file_path = data_register.register(
                     predictions=predictions,
-                    data_source=data_source,
                     prediction_file_path=prediction_file_path,
                 )
+            mlflow.log_artifact(prediction_file_path, "prediction")
             mlflow.log_param("predict_year", cfg.jobs.data.predict.year)
             mlflow.log_param("predict_week", cfg.jobs.data.predict.week)
             mlflow.log_param("predict_items", target_items)
             mlflow.log_param("predict_stores", target_stores)
 
-        mlflow.log_artifact(os.path.join(cwd, ".hydra/config.yaml"))
-        mlflow.log_artifact(os.path.join(cwd, ".hydra/hydra.yaml"))
-        mlflow.log_artifact(os.path.join(cwd, ".hydra/overrides.yaml"))
+        mlflow.log_artifact(os.path.join(cwd, ".hydra/config.yaml"), "hydra_config.yaml")
+        mlflow.log_artifact(os.path.join(cwd, ".hydra/hydra.yaml"), "hydra_hydra.yaml")
+        mlflow.log_artifact(os.path.join(cwd, ".hydra/overrides.yaml"), "hydra_overrides.yaml")
 
         mlflow.log_param("train_year", cfg.jobs.data.train.year)
         mlflow.log_param("train_week", cfg.jobs.data.train.week)
