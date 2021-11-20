@@ -2,7 +2,7 @@ name: beverage_sales_forecasting
 jobs:
   data:
     source: local
-    path: /opt/data/item_sales_records_train.csv
+    path: /opt/data/item_sales_records_dev_train.csv
     target_data:
       date_from: 2017-01-01
       date_to: 2020-12-13
