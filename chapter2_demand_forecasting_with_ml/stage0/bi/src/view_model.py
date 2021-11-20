@@ -3,7 +3,6 @@ from typing import List, Optional
 
 import numpy as np
 import pandas as pd
-from db_client import AbstractDBClient
 from logger import configure_logger
 from model import (
     ItemRepository,
@@ -18,20 +17,14 @@ logger = configure_logger(__name__)
 
 
 class BaseViewModel(object):
-    def __init__(
-        self,
-        db_client: AbstractDBClient,
-    ):
-        self.db_client = db_client
+    def __init__(self):
+        pass
 
 
 class RegionViewModel(BaseViewModel):
-    def __init__(
-        self,
-        db_client: AbstractDBClient,
-    ):
-        super().__init__(db_client=db_client)
-        self.region_repository = RegionRepository(db_client=db_client)
+    def __init__(self):
+        super().__init__()
+        self.region_repository = RegionRepository()
 
     def list_regions(self) -> List[str]:
         regions = self.region_repository.select()
@@ -40,12 +33,9 @@ class RegionViewModel(BaseViewModel):
 
 
 class StoreViewModel(BaseViewModel):
-    def __init__(
-        self,
-        db_client: AbstractDBClient,
-    ):
-        super().__init__(db_client=db_client)
-        self.store_repository = StoreRepository(db_client=db_client)
+    def __init__(self):
+        super().__init__()
+        self.store_repository = StoreRepository()
 
     def list_stores(
         self,
@@ -57,12 +47,9 @@ class StoreViewModel(BaseViewModel):
 
 
 class ItemViewModel(BaseViewModel):
-    def __init__(
-        self,
-        db_client: AbstractDBClient,
-    ):
-        super().__init__(db_client=db_client)
-        self.item_repository = ItemRepository(db_client=db_client)
+    def __init__(self):
+        super().__init__()
+        self.item_repository = ItemRepository()
 
     def list_items(self) -> List[str]:
         items = self.item_repository.select()
@@ -71,12 +58,9 @@ class ItemViewModel(BaseViewModel):
 
 
 class ItemSalesViewModel(BaseViewModel):
-    def __init__(
-        self,
-        db_client: AbstractDBClient,
-    ):
-        super().__init__(db_client=db_client)
-        self.item_sales_repository = ItemSalesRepository(db_client=db_client)
+    def __init__(self):
+        super().__init__()
+        self.item_sales_repository = ItemSalesRepository()
 
     def list_item_sales(
         self,
@@ -257,12 +241,9 @@ monthly df
 
 
 class ItemSalesPredictionEvaluationViewModel(BaseViewModel):
-    def __init__(
-        self,
-        db_client: AbstractDBClient,
-    ):
-        super().__init__(db_client=db_client)
-        self.item_weekly_sales_predicitons_repository = ItemWeeklySalesPredictionsRepository(db_client=db_client)
+    def __init__(self):
+        super().__init__()
+        self.item_weekly_sales_predicitons_repository = ItemWeeklySalesPredictionsRepository()
 
     def list_item_weekly_sales_predictions(
         self,

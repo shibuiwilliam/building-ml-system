@@ -1,65 +1,61 @@
 from datetime import date
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
+import pandas as pd
 from constants import TABLES
-from db_client import AbstractDBClient
 from logger import configure_logger
-from psycopg2.extras import DictCursor
-from schema import Item, ItemSales, ItemWeeklySalesPredictions, Region, Store
+from schema import Item, ItemSales, ItemWeeklySalesPredictions, Region, Store, BASE_SCHEMA
 
 logger = configure_logger(__name__)
 
 
-class BaseRepository(object):
-    def __init__(
+class Container(object):
+    def __init__(self):
+        self.sales_df: pd.DataFrame = None
+        self.prediction_dict: Dict[int, Dict[int, pd.DataFrame]] = {}
+
+    def load_df(
         self,
-        db_client: AbstractDBClient,
+        file_path: str,
+    ) -> pd.DataFrame:
+        return pd.read_csv(file_path)
+
+    def load_sales_df(
+        self,
+        file_path: str,
     ):
-        self.db_client = db_client
-        self.table_name: str = ""
+        self.sales_df = self.load_df(file_path=file_path)
+        self.sales_df["date"] = pd.to_datetime(self.sales_df["date"]).dt.date
+        self.sales_df["year"] = self.sales_df.date.dt.year
+        self.sales_df = BASE_SCHEMA.validate(self.sales_df)
 
-    def execute_select_query(
+    def load_prediction_df(
         self,
-        query: str,
-        parameters: Optional[Tuple] = None,
-    ) -> List[Dict[str, Any]]:
-        logger.info(f"select query: {query}, parameters: {parameters}")
-        with self.db_client.get_connection() as conn:
-            with conn.cursor(cursor_factory=DictCursor) as cursor:
-                cursor.execute(query, parameters)
-                rows = cursor.fetchall()
-        return rows
-
-
-class RegionRepository(BaseRepository):
-    def __init__(
-        self,
-        db_client: AbstractDBClient,
+        file_path: str,
+        year: int,
+        week_of_year: int,
     ):
-        super().__init__(db_client=db_client)
-        self.table_name = TABLES.REGIONS.value
+        self.prediction_dict[year] = {
+            week_of_year: self.load_df(file_path=file_path),
+        }
 
-    def select(self) -> List[Region]:
-        query = f"""
-SELECT
-    id,
-    name
-FROM 
-    {self.table_name}
-;
-        """
 
-        records = self.execute_select_query(query=query)
+class RegionRepository(object):
+    def __init__(self):
+        pass
+
+    def select(
+        self,
+        container: Container,
+    ) -> List[Region]:
+
         data = [Region(**r) for r in records]
         return data
 
 
-class StoreRepository(BaseRepository):
-    def __init__(
-        self,
-        db_client: AbstractDBClient,
-    ):
-        super().__init__(db_client=db_client)
+class StoreRepository(object):
+    def __init__(self):
+        pass
         self.table_name = TABLES.STORES.value
 
     def select(
@@ -98,12 +94,9 @@ WHERE
         return data
 
 
-class ItemRepository(BaseRepository):
-    def __init__(
-        self,
-        db_client: AbstractDBClient,
-    ):
-        super().__init__(db_client=db_client)
+class ItemRepository(object):
+    def __init__(self):
+        pass
         self.table_name = TABLES.ITEMS.value
 
     def select(self) -> List[Item]:
@@ -121,12 +114,9 @@ FROM
         return data
 
 
-class ItemSalesRepository(BaseRepository):
-    def __init__(
-        self,
-        db_client: AbstractDBClient,
-    ):
-        super().__init__(db_client=db_client)
+class ItemSalesRepository(object):
+    def __init__(self):
+        pass
         self.table_name = TABLES.ITEM_SALES_RECORDS.value
 
     def select(
@@ -220,12 +210,9 @@ OFFSET
         return data
 
 
-class ItemWeeklySalesPredictionsRepository(BaseRepository):
-    def __init__(
-        self,
-        db_client: AbstractDBClient,
-    ):
-        super().__init__(db_client=db_client)
+class ItemWeeklySalesPredictionsRepository(object):
+    def __init__(self):
+        pass
         self.table_name = TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value
 
     def select(
