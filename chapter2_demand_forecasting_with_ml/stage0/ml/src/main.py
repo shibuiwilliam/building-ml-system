@@ -23,7 +23,7 @@ DATE_FORMAT = "%Y-%m-%d"
 
 @hydra.main(
     config_path="/opt/hydra",
-    config_name="default",
+    config_name="2020_52",
 )
 def main(cfg: DictConfig):
     logger.info("start ml...")

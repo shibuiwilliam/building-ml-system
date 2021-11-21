@@ -8,10 +8,8 @@ from model import (
     ItemRepository,
     ItemSalesRepository,
     ItemWeeklySalesPredictionsRepository,
-    RegionRepository,
     StoreRepository,
 )
-from schema import ItemSales, ItemWeeklySalesPredictions
 
 logger = configure_logger(__name__)
 
@@ -21,27 +19,13 @@ class BaseViewModel(object):
         pass
 
 
-class RegionViewModel(BaseViewModel):
-    def __init__(self):
-        super().__init__()
-        self.region_repository = RegionRepository()
-
-    def list_regions(self) -> List[str]:
-        regions = self.region_repository.select()
-        region_names = [r.name for r in regions]
-        return region_names
-
-
 class StoreViewModel(BaseViewModel):
     def __init__(self):
         super().__init__()
         self.store_repository = StoreRepository()
 
-    def list_stores(
-        self,
-        region: Optional[str] = None,
-    ) -> List[str]:
-        stores = self.store_repository.select(region=region)
+    def list_stores(self) -> List[str]:
+        stores = self.store_repository.select()
         store_names = [r.name for r in stores]
         return store_names
 
@@ -62,37 +46,6 @@ class ItemSalesViewModel(BaseViewModel):
         super().__init__()
         self.item_sales_repository = ItemSalesRepository()
 
-    def list_item_sales(
-        self,
-        date_from: Optional[date] = None,
-        date_to: Optional[date] = None,
-        day_of_week: Optional[str] = None,
-        item: Optional[str] = None,
-        store: Optional[str] = None,
-        region: Optional[str] = None,
-    ) -> List[ItemSales]:
-        item_sales = []
-        limit = 10000
-        offset = 0
-        while True:
-            records = self.item_sales_repository.select(
-                date_from=date_from,
-                date_to=date_to,
-                day_of_week=day_of_week,
-                item=item,
-                store=store,
-                region=region,
-                limit=limit,
-                offset=offset,
-            )
-            if len(records) == 0:
-                logger.info(f"done loading {len(item_sales)} records")
-                break
-            item_sales.extend(records)
-            offset += limit
-            logger.info(f"found {len(item_sales)} records...")
-        return item_sales
-
     def retrieve_item_sales(
         self,
         date_from: Optional[date] = None,
@@ -100,15 +53,13 @@ class ItemSalesViewModel(BaseViewModel):
         day_of_week: Optional[str] = None,
         item: Optional[str] = None,
         store: Optional[str] = None,
-        region: Optional[str] = None,
     ) -> pd.DataFrame:
-        dataset = self.list_item_sales(
+        dataset = self.item_sales_repository.select(
             date_from=date_from,
             date_to=date_to,
             day_of_week=day_of_week,
             item=item,
             store=store,
-            region=region,
         )
         df = pd.DataFrame([d.dict() for d in dataset])
         df["date"] = pd.to_datetime(df["date"])
@@ -124,7 +75,6 @@ class ItemSalesViewModel(BaseViewModel):
         day_of_week: Optional[str] = None,
         item: Optional[str] = None,
         store: Optional[str] = None,
-        region: Optional[str] = None,
     ) -> pd.DataFrame:
         df = self.retrieve_item_sales(
             date_from=date_from,
@@ -132,7 +82,6 @@ class ItemSalesViewModel(BaseViewModel):
             day_of_week=day_of_week,
             item=item,
             store=store,
-            region=region,
         )
         logger.info(
             f"""
@@ -152,7 +101,6 @@ daily df
                 [
                     "year",
                     "week_of_year",
-                    "region",
                     "store",
                     "item",
                 ]
@@ -177,7 +125,6 @@ daily df
                 level=[
                     "year",
                     "week_of_year",
-                    "region",
                     "store",
                     "item",
                 ]
@@ -201,7 +148,6 @@ weekly df
                 [
                     "year",
                     "month",
-                    "region",
                     "store",
                     "item",
                 ]
@@ -224,7 +170,6 @@ weekly df
                 level=[
                     "year",
                     "month",
-                    "region",
                     "store",
                     "item",
                 ]
@@ -245,54 +190,19 @@ class ItemSalesPredictionEvaluationViewModel(BaseViewModel):
         super().__init__()
         self.item_weekly_sales_predicitons_repository = ItemWeeklySalesPredictionsRepository()
 
-    def list_item_weekly_sales_predictions(
-        self,
-        item: Optional[str] = None,
-        store: Optional[str] = None,
-        region: Optional[str] = None,
-        year: Optional[int] = None,
-        week_of_year: Optional[int] = None,
-        version: int = 0,
-    ) -> List[ItemWeeklySalesPredictions]:
-        item_weekly_sales_predictions = []
-        limit = 10000
-        offset = 0
-        while True:
-            records = self.item_weekly_sales_predicitons_repository.select(
-                item=item,
-                store=store,
-                region=region,
-                year=year,
-                week_of_year=week_of_year,
-                version=version,
-                limit=limit,
-                offset=offset,
-            )
-            if len(records) == 0:
-                logger.info(f"done loading {len(item_weekly_sales_predictions)} records")
-                break
-            item_weekly_sales_predictions.extend(records)
-            offset += limit
-            logger.info(f"found {len(item_weekly_sales_predictions)} records...")
-        return item_weekly_sales_predictions
-
     def aggregate_item_weekly_sales_evaluation(
         self,
         weekly_sales_df: pd.DataFrame,
         item: Optional[str] = None,
         store: Optional[str] = None,
-        region: Optional[str] = None,
         year: Optional[int] = None,
         week_of_year: Optional[int] = None,
-        version: int = 0,
     ) -> pd.DataFrame:
-        item_weekly_sales_predictions = self.list_item_weekly_sales_predictions(
+        item_weekly_sales_predictions = self.item_weekly_sales_predicitons_repository.select(
             item=item,
             store=store,
-            region=region,
             year=year,
             week_of_year=week_of_year,
-            version=version,
         )
         weekly_sales_predictions_df = pd.DataFrame([d.dict() for d in item_weekly_sales_predictions])
         logger.info(
@@ -305,7 +215,7 @@ weekly prediction df
         weekly_sales_evaluation_df = pd.merge(
             weekly_sales_df,
             weekly_sales_predictions_df,
-            on=["year", "week_of_year", "region", "store", "item"],
+            on=["year", "week_of_year", "store", "item"],
             how="inner",
         )
         weekly_sales_evaluation_df["diff"] = (
@@ -319,7 +229,6 @@ weekly prediction df
                 "year",
                 "month",
                 "week_of_year",
-                "region",
                 "store",
                 "item",
                 "item_price",
@@ -328,7 +237,6 @@ weekly prediction df
                 "diff",
                 "error_rate",
                 "predicted_at",
-                "version",
             ]
         ]
         return weekly_sales_evaluation_df

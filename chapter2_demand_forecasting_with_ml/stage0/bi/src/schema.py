@@ -65,17 +65,24 @@ BASE_SCHEMA = DataFrameSchema(
     coerce=True,
 )
 
-
-class Region(BaseModel):
-    name: str
-
-    class Config:
-        extra = Extra.forbid
+_WEEKLY_PREDICTION_SCHEMA = {
+    "year": Column(int),
+    "week_of_year": Column(int, checks=Check.isin(WEEKS)),
+    "store": Column(str, checks=Check.isin(STORES)),
+    "item": Column(str, checks=Check.isin(ITEMS)),
+    "item_price": Column(int, checks=Check.greater_than_or_equal_to(0)),
+    "prediction": Column(float, checks=Check.greater_than_or_equal_to(0)),
+}
+WEEKLY_PREDICTION_SCHEMA = DataFrameSchema(
+    _WEEKLY_PREDICTION_SCHEMA,
+    index=Index(int),
+    strict=True,
+    coerce=True,
+)
 
 
 class Store(BaseModel):
     name: str
-    region: str
 
     class Config:
         extra = Extra.forbid
@@ -83,49 +90,6 @@ class Store(BaseModel):
 
 class Item(BaseModel):
     name: str
-
-    class Config:
-        extra = Extra.forbid
-
-
-class ItemSales(BaseModel):
-    date: date
-    day_of_week: str
-    week_of_year: int
-    store: str
-    region: str
-    item: str
-    item_price: int
-    sales: int
-    total_sales_amount: int
-
-    class Config:
-        extra = Extra.forbid
-
-
-class ItemWeeklySalesPredictions(BaseModel):
-    store: str
-    region: str
-    item: str
-    year: int
-    week_of_year: int
-    prediction: float
-    predicted_at: date
-    version: int
-
-    class Config:
-        extra = Extra.forbid
-
-
-class ItemWeeklySales(BaseModel):
-    store: str
-    region: str
-    item: str
-    year: int
-    week_of_year: int
-    item_price: int
-    sales: int
-    total_sales_amount: int
 
     class Config:
         extra = Extra.forbid
