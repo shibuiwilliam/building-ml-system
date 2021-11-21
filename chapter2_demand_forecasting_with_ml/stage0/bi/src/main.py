@@ -1,11 +1,6 @@
 from logger import configure_logger
 from view import build
-from view_model import (
-    ItemSalesPredictionEvaluationViewModel,
-    ItemSalesViewModel,
-    ItemViewModel,
-    StoreViewModel,
-)
+from view_model import ItemSalesPredictionEvaluationViewModel, ItemSalesViewModel, ItemViewModel, StoreViewModel
 
 logger = configure_logger(__name__)
 

@@ -1,8 +1,8 @@
 from datetime import date, datetime
 
-from pydantic import BaseModel, Extra
 import pandas as pd
 from pandera import Check, Column, DataFrameSchema, Index
+from pydantic import BaseModel, Extra
 
 STORES = [
     "nagoya",

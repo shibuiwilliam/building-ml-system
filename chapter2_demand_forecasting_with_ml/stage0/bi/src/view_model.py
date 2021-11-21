@@ -4,12 +4,7 @@ from typing import List, Optional
 import numpy as np
 import pandas as pd
 from logger import configure_logger
-from model import (
-    ItemRepository,
-    ItemSalesRepository,
-    ItemWeeklySalesPredictionsRepository,
-    StoreRepository,
-)
+from model import Container, ItemRepository, ItemSalesRepository, ItemWeeklySalesPredictionsRepository, StoreRepository
 
 logger = configure_logger(__name__)
 
@@ -24,8 +19,11 @@ class StoreViewModel(BaseViewModel):
         super().__init__()
         self.store_repository = StoreRepository()
 
-    def list_stores(self) -> List[str]:
-        stores = self.store_repository.select()
+    def list_stores(
+        self,
+        container: Container,
+    ) -> List[str]:
+        stores = self.store_repository.select(container=container)
         store_names = [r.name for r in stores]
         return store_names
 
@@ -35,8 +33,11 @@ class ItemViewModel(BaseViewModel):
         super().__init__()
         self.item_repository = ItemRepository()
 
-    def list_items(self) -> List[str]:
-        items = self.item_repository.select()
+    def list_items(
+        self,
+        container: Container,
+    ) -> List[str]:
+        items = self.item_repository.select(container=container)
         item_names = [r.name for r in items]
         return item_names
 
@@ -48,28 +49,29 @@ class ItemSalesViewModel(BaseViewModel):
 
     def retrieve_item_sales(
         self,
+        container: Container,
         date_from: Optional[date] = None,
         date_to: Optional[date] = None,
         day_of_week: Optional[str] = None,
         item: Optional[str] = None,
         store: Optional[str] = None,
     ) -> pd.DataFrame:
-        dataset = self.item_sales_repository.select(
+        df = self.item_sales_repository.select(
+            container=container,
             date_from=date_from,
             date_to=date_to,
             day_of_week=day_of_week,
             item=item,
             store=store,
         )
-        df = pd.DataFrame([d.dict() for d in dataset])
         df["date"] = pd.to_datetime(df["date"])
         df["month"] = df.date.dt.month
         df["year"] = df.date.dt.year
-        df = df.drop("id", axis=1)
         return df
 
     def retrieve_daily_item_sales(
         self,
+        container: Container,
         date_from: Optional[date] = None,
         date_to: Optional[date] = None,
         day_of_week: Optional[str] = None,
@@ -77,6 +79,7 @@ class ItemSalesViewModel(BaseViewModel):
         store: Optional[str] = None,
     ) -> pd.DataFrame:
         df = self.retrieve_item_sales(
+            container=container,
             date_from=date_from,
             date_to=date_to,
             day_of_week=day_of_week,
@@ -96,6 +99,7 @@ daily df
         self,
         daily_sales_df: pd.DataFrame,
     ) -> pd.DataFrame:
+        daily_sales_df["month"] = daily_sales_df.date.dt.month
         weekly_sales_df = (
             daily_sales_df.groupby(
                 [
@@ -192,19 +196,17 @@ class ItemSalesPredictionEvaluationViewModel(BaseViewModel):
 
     def aggregate_item_weekly_sales_evaluation(
         self,
+        container: Container,
         weekly_sales_df: pd.DataFrame,
         item: Optional[str] = None,
         store: Optional[str] = None,
-        year: Optional[int] = None,
-        week_of_year: Optional[int] = None,
     ) -> pd.DataFrame:
-        item_weekly_sales_predictions = self.item_weekly_sales_predicitons_repository.select(
+        weekly_sales_predictions_df = self.item_weekly_sales_predicitons_repository.select(
+            container=container,
             item=item,
             store=store,
-            year=year,
-            week_of_year=week_of_year,
         )
-        weekly_sales_predictions_df = pd.DataFrame([d.dict() for d in item_weekly_sales_predictions])
+        weekly_sales_predictions_df = weekly_sales_predictions_df.drop("item_price", axis=1)
         logger.info(
             f"""
 weekly prediction df
@@ -236,7 +238,6 @@ weekly prediction df
                 "prediction",
                 "diff",
                 "error_rate",
-                "predicted_at",
             ]
         ]
         return weekly_sales_evaluation_df

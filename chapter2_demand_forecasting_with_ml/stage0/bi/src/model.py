@@ -3,7 +3,7 @@ from typing import Dict, List, Optional
 
 import pandas as pd
 from logger import configure_logger
-from schema import Item, Store, BASE_SCHEMA, WEEKLY_PREDICTION_SCHEMA
+from schema import BASE_SCHEMA, WEEKLY_PREDICTION_SCHEMA, Item, Store
 
 logger = configure_logger(__name__)
 
@@ -11,32 +11,66 @@ logger = configure_logger(__name__)
 class Container(object):
     def __init__(self):
         self.sales_df: pd.DataFrame = None
-        self.prediction_dict: Dict[int, Dict[int, pd.DataFrame]] = {}
+        self.prediction_df: pd.DataFrame = None
+        self.prediction_record_df: pd.DataFrame = None
 
     def load_df(
         self,
         file_path: str,
     ) -> pd.DataFrame:
-        return pd.read_csv(file_path)
+        logger.info(f"read {file_path}")
+        df = pd.read_csv(file_path)
+        logger.info(
+            f"""
+read {file_path}
+shape: {df.shape}
+columns: {df.columns}
+        """
+        )
+        return df
 
     def load_sales_df(
         self,
         file_path: str,
     ):
         self.sales_df = self.load_df(file_path=file_path)
-        self.sales_df["date"] = pd.to_datetime(self.sales_df["date"]).dt.date
+        self.sales_df["date"] = pd.to_datetime(self.sales_df["date"])
         self.sales_df["year"] = self.sales_df.date.dt.year
         self.sales_df = BASE_SCHEMA.validate(self.sales_df)
+        logger.info(
+            f"""
+formatted {file_path}
+shape: {self.sales_df.shape}
+columns: {self.sales_df.columns}
+        """
+        )
 
     def load_prediction_df(
         self,
-        file_path: str,
-        year: int,
-        week_of_year: int,
+        prediction_file_path: str,
+        prediction_record_file_path: str,
     ):
-        df = self.load_df(file_path=file_path)
-        df = WEEKLY_PREDICTION_SCHEMA.validate(df)
-        self.prediction_dict[year] = {week_of_year: df}
+        self.prediction_df = self.load_df(file_path=prediction_file_path)
+        self.prediction_df = WEEKLY_PREDICTION_SCHEMA.validate(self.prediction_df)
+        logger.info(
+            f"""
+formatted {prediction_file_path}
+shape: {self.prediction_df.shape}
+columns: {self.prediction_df.columns}
+        """
+        )
+
+        self.prediction_record_df = self.load_df(file_path=prediction_record_file_path)
+        self.prediction_record_df["date"] = pd.to_datetime(self.prediction_record_df.date)
+        self.prediction_record_df["year"] = self.prediction_record_df.date.dt.year
+        self.prediction_record_df = BASE_SCHEMA.validate(self.prediction_record_df)
+        logger.info(
+            f"""
+formatted {prediction_record_file_path}
+shape: {self.prediction_record_df.shape}
+columns: {self.prediction_record_df.columns}
+        """
+        )
 
 
 class StoreRepository(object):
@@ -102,12 +136,10 @@ class ItemWeeklySalesPredictionsRepository(object):
     def select(
         self,
         container: Container,
-        year: int,
-        week_of_year: int,
         item: Optional[str] = None,
         store: Optional[str] = None,
     ) -> pd.DataFrame:
-        df = container.prediction_dict[year][week_of_year]
+        df = container.prediction_df
         if item is not None:
             df = df[df.item == item]
         if store is not None:
