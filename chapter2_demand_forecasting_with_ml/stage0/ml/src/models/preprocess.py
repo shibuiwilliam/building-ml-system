@@ -180,97 +180,52 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
         self.month_ohe_transformer = FunctionTransformer(month_ohe.transform)
         self.year_ohe_transformer = FunctionTransformer(year_ohe.transform)
 
+        base_pipeline = Pipeline(
+            [("simple_imputer", SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=None))]
+        )
+        lag_pipeline = Pipeline(
+            [("simple_imputer", SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=None))]
+        )
+        numerical_pipeline = Pipeline(
+            [
+                ("simple_imputer", SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=None)),
+                ("scaler", MinMaxScaler()),
+            ]
+        )
+        categorical_pipeline = Pipeline(
+            [
+                ("simple_imputer", SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=None)),
+                ("one_hot_encoder", OneHotEncoder(sparse=True, handle_unknown="ignore")),
+            ]
+        )
+        week_of_year_pipeline = Pipeline(
+            [
+                ("simple_imputer", SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=None)),
+                ("one_hot_encoder", FunctionTransformer(week_of_year_ohe.transform)),
+            ]
+        )
+        month_pipeline = Pipeline(
+            [
+                ("simple_imputer", SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=None)),
+                ("one_hot_encoder", FunctionTransformer(month_ohe.transform)),
+            ]
+        )
+        year_pipeline = Pipeline(
+            [
+                ("simple_imputer", SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=None)),
+                ("one_hot_encoder", FunctionTransformer(year_ohe.transform)),
+            ]
+        )
+
         self.pipeline = ColumnTransformer(
             [
-                (
-                    "bare",
-                    Pipeline(
-                        [
-                            (
-                                "simple_imputer",
-                                SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=None),
-                            )
-                        ]
-                    ),
-                    self.bare_columns,
-                ),
-                (
-                    "lag",
-                    Pipeline(
-                        [
-                            (
-                                "simple_imputer",
-                                SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=None),
-                            )
-                        ]
-                    ),
-                    self.lag_columns,
-                ),
-                (
-                    "numerical",
-                    Pipeline(
-                        [
-                            (
-                                "simple_imputer",
-                                SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=None),
-                            ),
-                            ("scaler", MinMaxScaler()),
-                        ]
-                    ),
-                    ["item_price"],
-                ),
-                (
-                    "categorical",
-                    Pipeline(
-                        [
-                            (
-                                "simple_imputer",
-                                SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=None),
-                            ),
-                            ("one_hot_encoder", OneHotEncoder(sparse=True, handle_unknown="ignore")),
-                        ]
-                    ),
-                    ["store", "item"],
-                ),
-                (
-                    "week_of_year",
-                    Pipeline(
-                        [
-                            (
-                                "simple_imputer",
-                                SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=None),
-                            ),
-                            ("one_hot_encoder", FunctionTransformer(week_of_year_ohe.transform)),
-                        ]
-                    ),
-                    ["week_of_year"],
-                ),
-                (
-                    "month",
-                    Pipeline(
-                        [
-                            (
-                                "simple_imputer",
-                                SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=None),
-                            ),
-                            ("one_hot_encoder", FunctionTransformer(month_ohe.transform)),
-                        ]
-                    ),
-                    ["month"],
-                ),
-                (
-                    "year",
-                    Pipeline(
-                        [
-                            (
-                                "simple_imputer",
-                                SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=None),
-                            ),
-                            ("one_hot_encoder", FunctionTransformer(year_ohe.transform)),
-                        ]
-                    ),
-                    ["year"],
-                ),
+                ("bare", base_pipeline, self.bare_columns),
+                ("lag", lag_pipeline, self.lag_columns),
+                ("numerical", numerical_pipeline, ["item_price"]),
+                ("categorical", categorical_pipeline, ["store", "item"]),
+                ("week_of_year", week_of_year_pipeline, ["week_of_year"]),
+                ("month", month_pipeline, ["month"]),
+                ("year", year_pipeline, ["year"]),
             ],
             verbose_feature_names_out=True,
         )
