@@ -1,6 +1,6 @@
 import os
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -8,6 +8,7 @@ import streamlit as st
 from configurations import Configurations
 from logger import configure_logger
 from model import Container
+from plotly.subplots import make_subplots
 from view_model import ItemSalesPredictionEvaluationViewModel, ItemSalesViewModel, ItemViewModel, StoreViewModel
 
 logger = configure_logger(__name__)
@@ -30,12 +31,12 @@ def init_container() -> Container:
     return container
 
 
-def build_sales_prediction_target_selectbox(container: Container) -> Optional[Container]:
+def build_sales_prediction_target_selectbox(container: Container) -> Tuple[Optional[Container], Optional[str]]:
     options = [None]
     _options = os.listdir(Configurations.item_sales_prediction_dir)
     options.extend(_options)
     selected = st.sidebar.selectbox(
-        label="Predictions",
+        label="Predictions Year_Week",
         options=options,
     )
     if selected is not None:
@@ -51,9 +52,9 @@ def build_sales_prediction_target_selectbox(container: Container) -> Optional[Co
                 "sales.csv",
             ),
         )
-        return container
+        return container, selected
     else:
-        return None
+        return None, None
 
 
 def build_bi_selectbox() -> str:
@@ -100,6 +101,24 @@ def build_time_frame_selectbox() -> Optional[str]:
     return selected
 
 
+def build_aggregation_selectbox() -> str:
+    options = ["store", "item"]
+    selected = st.sidebar.selectbox(
+        label="aggregate by",
+        options=options,
+    )
+    return selected
+
+
+def build_sort_selectbox() -> str:
+    options = ["store", "item", "sales", "prediction", "diff", "error_rate"]
+    selected = st.sidebar.selectbox(
+        label="sort by",
+        options=options,
+    )
+    return selected
+
+
 def show_daily_item_sales(
     df: pd.DataFrame,
     stores: List[str],
@@ -128,7 +147,7 @@ def show_daily_item_sales(
                 fig.add_trace(sales_trace)
                 fig.update_yaxes(range=[0, 150])
                 st.plotly_chart(fig, use_container_width=True)
-                logger.info(f"STORE {s} ITEM {i}")
+                logger.info(f"Daily STORE {s} ITEM {i}")
 
 
 def show_weekly_item_sales(
@@ -161,7 +180,7 @@ def show_weekly_item_sales(
                 fig.add_trace(sales_trace)
                 fig.update_yaxes(range=[0, 1000])
                 st.plotly_chart(fig, use_container_width=True)
-                logger.info(f"STORE {s} ITEM {i}")
+                logger.info(f"Weekly STORE {s} ITEM {i}")
 
 
 def show_monthly_item_sales(
@@ -192,7 +211,79 @@ def show_monthly_item_sales(
                 fig.add_trace(sales_trace)
                 fig.update_yaxes(range=[0, 5000])
                 st.plotly_chart(fig, use_container_width=True)
-                logger.info(f"STORE {s} ITEM {i}")
+                logger.info(f"Monthly STORE {s} ITEM {i}")
+
+
+def show_weekly_item_sales_evaluation(
+    df: pd.DataFrame,
+    year_week: str,
+    aggregate_by: str,
+    sort_by: str,
+):
+    st.markdown(f"### Weekly evaluation for {year_week}")
+    if aggregate_by == "store":
+        loop_in = df.store.unique()
+        not_aggregated = "item"
+    else:
+        loop_in = df.item.unique()
+        not_aggregated = "store"
+    for li in loop_in:
+        _df = df[df[aggregate_by] == li].reset_index(drop=True).sort_values(["year", "month", "week_of_year", sort_by])
+        with st.expander(
+            label=f"{aggregate_by} {li}",
+            expanded=True,
+        ):
+            st.dataframe(_df)
+
+            fig = make_subplots(specs=[[{"secondary_y": True}]])
+            sales_trace = go.Bar(
+                x=_df[not_aggregated],
+                y=_df.sales,
+                name="sales",
+            )
+            prediction_trace = go.Bar(
+                x=_df[not_aggregated],
+                y=_df.prediction,
+                name="prediction",
+            )
+            diff_trace = go.Bar(
+                x=_df[not_aggregated],
+                y=_df["diff"],
+                name="diff",
+            )
+            error_rate_trace = go.Scatter(
+                x=_df[not_aggregated],
+                y=_df["error_rate"],
+                name="error_rate",
+            )
+            fig.add_trace(
+                sales_trace,
+                secondary_y=False,
+            )
+            fig.add_trace(
+                prediction_trace,
+                secondary_y=False,
+            )
+            fig.add_trace(
+                diff_trace,
+                secondary_y=False,
+            )
+            fig.add_trace(
+                error_rate_trace,
+                secondary_y=True,
+            )
+            fig.update_yaxes(
+                title_text="numeric",
+                range=[-100, 1000],
+                secondary_y=False,
+            )
+            fig.update_yaxes(
+                title_text="rate",
+                range=[-1, 1],
+                secondary_y=True,
+            )
+            st.plotly_chart(fig, use_container_width=True)
+            logger.info(f"{aggregate_by} {li}")
 
 
 def build_item_sales(
@@ -265,13 +356,17 @@ def build_item_sales_prediction_evaluation(
         container=container,
         item_view_model=item_view_model,
     )
+
+    aggregate_by = build_aggregation_selectbox()
+    sort_by = build_sort_selectbox()
+
     if store == "ALL":
         store = None
     if item == "ALL":
         item = None
 
-    container = build_sales_prediction_target_selectbox(container=container)
-    if container is None:
+    container, year_week = build_sales_prediction_target_selectbox(container=container)
+    if container is None or year_week is None:
         return
 
     weekly_sales_df = item_sales_view_model.retrieve_weekly_item_sales(daily_sales_df=container.prediction_record_df)
@@ -281,7 +376,12 @@ def build_item_sales_prediction_evaluation(
         store=store,
         item=item,
     )
-    st.dataframe(weekly_sales_evaluation_df)
+    show_weekly_item_sales_evaluation(
+        df=weekly_sales_evaluation_df,
+        year_week=year_week,
+        aggregate_by=aggregate_by,
+        sort_by=sort_by,
+    )
 
 
 def build(
