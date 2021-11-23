@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">AIAnimals</string>
+    <string name="action_refresh">Refresh</string>
+
+    <string name="failure_network_connection">No Network Connection.</string>
+    <string name="failure_server_error">Server Error</string>
+    <string name="failure_animals_list_unavailable">Animals Unavailable.</string>
+    <string name="failure_animal_non_existent">Animal Not Existent.</string>
+
+    <string name="content_description_empty">No content description.</string>
+    <string name="login_screen_title">Login</string>
+    <string name="animals_screen_title">Animals</string>
+    <string name="animal_details_screen_title">Animal Details</string>
+    <string name="animal_details_summary">Summary</string>
+    <string name="animal_details_cast">Cast</string>
+    <string name="animal_details_director">Director</string>
+    <string name="animal_details_year">Year</string>
+
+    <!-- Animations -->
+    <string name="animal_transition_poster">animalPosterTransition</string>
+</resources>
