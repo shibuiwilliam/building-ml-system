@@ -36,14 +36,14 @@
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="PetPoster">
+    <style name="AnimalPoster">
         <item name="android:layout_width">match_parent</item>
         <item name="android:scaleType">centerCrop</item>
         <item name="android:transitionName">@string/animal_transition_poster</item>
         <item name="android:background">@color/white</item>
     </style>
 
-    <style name="PetDetailsTitle">
+    <style name="AnimalDetailsTitle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/black</item>
@@ -53,7 +53,7 @@
         <item name="android:paddingLeft">20dp</item>
     </style>
 
-    <style name="PetDetailsText" parent="PetDetailsTitle">
+    <style name="AnimalDetailsText" parent="AnimalDetailsTitle">
         <item name="android:textColor">@color/black</item>
         <item name="android:textSize">@dimen/animal_details_text</item>
         <item name="android:paddingBottom">25dp</item>
