@@ -10,6 +10,7 @@
         <entry key="app/src/main/res/layout/fragment_animals.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_login.xml" value="0.1" />
         <entry key="app/src/main/res/layout/row_animal.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/toolbar.xml" value="0.1" />
       </map>
     </option>
   </component>
