@@ -7,11 +7,12 @@
 
     <application
         android:allowBackup="true"
+        android:name=".App"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AIAnimals" >
+        android:theme="@style/AppTheme" >
 
         <activity
             android:name="com.example.aianimals.core.navigation.RouteActivity"
