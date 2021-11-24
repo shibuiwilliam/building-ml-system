@@ -13,6 +13,36 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AIAnimals" >
 
+        <activity
+            android:name="com.example.aianimals.core.navigation.RouteActivity"
+            android:exported="true"
+            android:noHistory="true"
+            android:theme="@style/AppTheme.Translucent">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".services.login.LoginActivity"
+            android:exported="false"
+            android:label="@string/login_screen_title">
+        </activity>
+
+        <activity
+            android:name=".services.animal.listing.AnimalsActivity"
+            android:exported="false"
+            android:label="@string/animals_screen_title">
+        </activity>
+
+        <activity
+            android:name=".services.animal.listing.AnimalDetailsActivity"
+            android:exported="false"
+            android:label="@string/animal_details_screen_title"
+            android:theme="@style/AppTheme.Translucent">
+        </activity>
+
 
     </application>
 

@@ -71,7 +71,6 @@ class AnimalDetailsFragment : BaseFragment() {
                 animalCast.text = cast
                 animalDirector.text = director
                 animalYear.text = year.toString()
-                animalPlay.setOnClickListener { animalDetailsViewModel.playAnimal(trailer) }
             }
         }
         animalDetailsAnimator.fadeVisible(scrollView, animalDetails)
