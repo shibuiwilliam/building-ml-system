@@ -38,7 +38,7 @@ def cleanup(res):
     print(f"cleanup {res}")
 
 
-with Flow("test") as flow:
+with Flow("local_flow") as flow:
     flow.run_config = LocalRun()
 
     num = Parameter("num")
@@ -54,5 +54,3 @@ with Flow("test") as flow:
     with case(cond, "c"):
         res_c = proc_c()
         print_c = cleanup(res_c)
-
-flow.run(num=6)

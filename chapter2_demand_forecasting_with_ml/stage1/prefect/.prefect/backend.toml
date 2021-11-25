@@ -1,0 +1,9 @@
+backend = "server"
+
+[server]
+host = "http://localhost:4200"
+endpoint = "${server.host}"
+
+[cloud]
+api = "${${backend}.endpoint}"
+graphql = "${cloud.api}/graphql"
