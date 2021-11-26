@@ -32,7 +32,7 @@ spec:
 
 @task
 def load():
-    # with open("./samples/manifest/job_sample.yaml", "r") as f:
+    # with open("./samples/manifests/job_sample.yaml", "r") as f:
     #     job_sample = yaml.load(f, Loader=yaml.FullLoader)
     job_sample = yaml.load(job_yaml, Loader=yaml.FullLoader)
     job_sample["spec"]["template"]["spec"]["containers"][0]["image"] = f"{REGISTRY_URL}/{IMAGE_NAME}:{TAG}"
@@ -50,7 +50,7 @@ with Flow("playground") as flow:
     r = job(body=job_sample)
 
 flow.run_config = KubernetesRun(
-    job_template_path="./samples/manifest/job_template.yaml",
+    job_template_path="./samples/manifests/job_template.yaml",
     image_pull_policy="Always",
 )
 flow.storage = Docker(

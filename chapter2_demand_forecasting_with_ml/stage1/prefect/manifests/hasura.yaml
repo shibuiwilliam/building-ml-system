@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hasura
+  namespace: prefect
+  labels:
+    app: hasura
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hasura
+  template:
+    metadata:
+      labels:
+        app: hasura
+    spec:
+      containers:
+        - image: hasura/graphql-engine:v1.3.3
+          name: hasura
+          ports:
+            - containerPort: 3000
+          env:
+            - name: HASURA_GRAPHQL_DATABASE_URL
+              value: "postgresql://prefect:test-password@postgres:5432/prefect_server"
+            - name: HASURA_GRAPHQL_ENABLE_CONSOLE
+              value: "true"
+            - name: HASURA_GRAPHQL_SERVER_PORT
+              value: "3000"
+            - name: HASURA_GRAPHQL_QUERY_PLAN_CACHE_SIZE
+              value: "100"
+            - name: HASURA_GRAPHQL_LOG_LEVEL
+              value: "warn"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hasura
+  namespace: prefect
+spec:
+  type: ClusterIP
+  selector:
+    app: hasura
+  ports:
+    - name: "hasura-port"
+      port: 3000

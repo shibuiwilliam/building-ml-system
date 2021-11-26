@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: towel
+  namespace: prefect
+  labels:
+    app: towel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: towel
+  template:
+    metadata:
+      labels:
+        app: towel
+    spec:
+      containers:
+        - image: prefecthq/server:core-0.15.9
+          name: towel
+          command:
+            - "python"
+          args: ["src/prefect_server/services/towel/__main__.py"]
+          env:
+            - name: PREFECT_SERVER__HASURA__ADMIN_SECRET
+              value: "hasura-secret-admin-secret"
+            - name: PREFECT_SERVER__HASURA__HOST
+              value: "hasura"

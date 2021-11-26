@@ -2,7 +2,7 @@
 
 set -eu
 
-AGENT_MANIFEST=manifest/agent.yaml
+AGENT_MANIFEST=manifests/agent.yaml
 
 prefect agent kubernetes install \
     --api http://apollo.prefect.svc.cluster.local:4200 \

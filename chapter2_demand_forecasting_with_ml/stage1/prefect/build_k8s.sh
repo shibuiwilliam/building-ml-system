@@ -2,7 +2,7 @@
 
 set -eu
 
-MANIFEST="./manifest"
+MANIFEST="./manifests"
 
 kubectl apply -f ${MANIFEST}/namespace.yaml
 kubectl apply -f ${MANIFEST}/postgresql.yaml

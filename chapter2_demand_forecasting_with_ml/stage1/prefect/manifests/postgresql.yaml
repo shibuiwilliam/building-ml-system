@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: prefect
+  labels:
+    app: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - image: postgres:11
+          name: postgres
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: "prefect"
+            - name: POSTGRES_PASSWORD
+              value: "test-password"
+            - name: POSTGRES_DB
+              value: "prefect_server"
+          args:
+            - "-c"
+            - "max_connections=150"
+          # livenessProbe:
+          #   exec:
+          #     command:
+          #       - "pg_isready"
+          #       - "-q"
+          #       - "-d"
+          #       - "prefect_server"
+          #       - "-U"
+          #       - "prefect"
+          #       - "||"
+          #       - "exit"
+          #       - "1"
+          #   initialDelaySeconds: 10
+          #   periodSeconds: 10
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: prefect
+spec:
+  type: ClusterIP
+  selector:
+    app: postgres
+  ports:
+    - name: "postgres-port"
+      port: 5432
