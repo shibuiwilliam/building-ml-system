@@ -1,6 +1,6 @@
-from prefect import task, Flow, Parameter
-from prefect.tasks.control_flow.case import case
+from prefect import Flow, Parameter, task
 from prefect.run_configs import LocalRun
+from prefect.tasks.control_flow.case import case
 
 
 @task

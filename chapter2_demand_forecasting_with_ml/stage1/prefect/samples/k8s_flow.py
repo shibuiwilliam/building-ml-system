@@ -1,9 +1,9 @@
 import prefect
 import yaml
-from prefect import task, Flow, Parameter
-from prefect.tasks.control_flow.case import case
-from prefect.storage import Docker
+from prefect import Flow, Parameter, task
 from prefect.run_configs import KubernetesRun
+from prefect.storage import Docker
+from prefect.tasks.control_flow.case import case
 from prefect.tasks.kubernetes.job import RunNamespacedJob
 
 REGISTRY_URL = "shibui"
