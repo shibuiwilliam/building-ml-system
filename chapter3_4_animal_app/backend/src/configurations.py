@@ -10,3 +10,7 @@ class Configurations:
     sql_alchemy_database_url = (
         f"postgresql://{postgres_username}:{postgres_password}@{postgres_server}:{postgres_port}/{postgres_db}"
     )
+
+    api_title = os.getenv("API_TITLE", "aianimal_api")
+    api_description = os.getenv("API_DESCRIPTION", "")
+    version = os.getenv("VERSION", "0.0.0")

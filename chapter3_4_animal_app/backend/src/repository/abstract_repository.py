@@ -24,6 +24,8 @@ class AbstractRepository(ABC):
         self,
         session: Session,
         query: Optional[AbstractQuery],
+        limit: Optional[int] = 100,
+        offset: Optional[int] = 0,
     ) -> List[AbstractModel]:
         raise NotImplementedError
 
