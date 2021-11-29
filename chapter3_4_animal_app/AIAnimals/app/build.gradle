@@ -57,6 +57,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.4.0'
     implementation 'com.google.android.material:material:1.4.0'
     implementation 'com.google.dagger:hilt-android:2.39.1'
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
     kapt 'com.google.dagger:hilt-compiler:2.39.1'
     kapt 'androidx.lifecycle:lifecycle-compiler:2.4.0'
     kapt 'com.google.dagger:hilt-android-compiler:2.35.1'

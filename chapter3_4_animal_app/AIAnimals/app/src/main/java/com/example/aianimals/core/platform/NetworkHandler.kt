@@ -2,7 +2,6 @@ package com.example.aianimals.core.platform
 
 import android.content.Context
 import android.net.NetworkCapabilities
-import android.os.Build
 import com.example.aianimals.core.extension.connectivityManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject

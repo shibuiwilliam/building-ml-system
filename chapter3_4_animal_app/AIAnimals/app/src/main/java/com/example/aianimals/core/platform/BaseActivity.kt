@@ -15,6 +15,7 @@ abstract class BaseActivity : AppCompatActivity() {
         setContentView(R.layout.activity_layout)
         setSupportActionBar(toolbar)
         addFragment(savedInstanceState)
+
     }
 
     override fun onBackPressed() {

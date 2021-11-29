@@ -1,5 +1,6 @@
 package com.example.aianimals.core.di
 
+import com.example.aianimals.Constants.Companion.BASE_URL
 import com.example.aianimals.services.animal.listing.AnimalsRepository
 import dagger.Module
 import dagger.Provides
@@ -19,7 +20,7 @@ class ApplicationModule {
     @Singleton
     fun provideRetrofit(): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://raw.githubusercontent.com/android10/Sample-Data/master/Android-CleanArchitecture-Kotlin/")
+            .baseUrl(BASE_URL)
             .client(createClient())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -35,5 +36,6 @@ class ApplicationModule {
 
     @Provides
     @Singleton
-    fun provideAnimalsRepository(dataSource: AnimalsRepository.Network): AnimalsRepository = dataSource
+    fun provideAnimalsRepository(dataSource: AnimalsRepository.Network): AnimalsRepository =
+        dataSource
 }
