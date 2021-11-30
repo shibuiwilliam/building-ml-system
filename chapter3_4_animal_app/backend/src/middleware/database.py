@@ -31,6 +31,8 @@ def get_session():
     db = SessionLocal()
     try:
         yield db
+    except:
+        db.rollback()
     finally:
         db.close()
 
