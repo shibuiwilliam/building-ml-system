@@ -87,6 +87,17 @@ class UserRepository(AbstractRepository):
         data = [UserModel(**(self.model_to_dict(d))) for d in results]
         return data
 
+    def select_by_ids(
+        self,
+        session: Session,
+        user_ids: List[str],
+        limit=100,
+        offset=0,
+    ) -> List[UserModel]:
+        results = session.query(User).filter(User.id.in_(user_ids)).order_by(User.id).limit(limit).offset(offset)
+        data = [UserModel(**(self.model_to_dict(d))) for d in results]
+        return data
+
     def insert(
         self,
         session: Session,

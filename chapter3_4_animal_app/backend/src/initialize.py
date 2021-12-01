@@ -2,11 +2,11 @@ from logging import getLogger
 
 from sqlalchemy import Column, Index
 from sqlalchemy.engine import Engine
-from sqlalchemy.orm import Session
 from src.middleware.database import Base
 from src.repository.animal_category_repository import AnimalCategory
 from src.repository.animal_repository import Animal
 from src.repository.animal_subcategory_repository import AnimalSubcategory
+from src.repository.like_repository import Like
 from src.repository.user_repository import User
 
 logger = getLogger(__name__)
@@ -139,6 +139,20 @@ def create_indices(
     create_index(
         table=Animal,
         column=Animal.deactivated,
+        engine=engine,
+        checkfirst=checkfirst,
+        unique=False,
+    )
+    create_index(
+        table=Like,
+        column=Like.animal_id,
+        engine=engine,
+        checkfirst=checkfirst,
+        unique=False,
+    )
+    create_index(
+        table=Like,
+        column=Like.user_id,
         engine=engine,
         checkfirst=checkfirst,
         unique=False,

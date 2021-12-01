@@ -115,6 +115,21 @@ class AnimalRepository(AbstractRepository):
                 Animal.created_at.label("created_at"),
                 Animal.updated_at.label("updated_at"),
             )
+            .join(
+                AnimalCategory,
+                AnimalCategory.id == Animal.animal_category_id,
+                isouter=True,
+            )
+            .join(
+                AnimalSubcategory,
+                AnimalSubcategory.id == Animal.animal_subcategory_id,
+                isouter=True,
+            )
+            .join(
+                User,
+                User.id == Animal.user_id,
+                isouter=True,
+            )
             .filter(and_(*filters))
             .order_by(Animal.id)
             .limit(limit)

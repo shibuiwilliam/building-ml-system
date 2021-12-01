@@ -7,3 +7,5 @@ class TABLES(Enum):
     ANIMAL = "animals"
 
     USER = "users"
+
+    LIKE = "likes"

@@ -5,14 +5,14 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from src.middleware.database import get_session
 from src.registry.container import container
-from src.schema.animal import AnimalCreate, AnimalModel
+from src.schema.animal import AnimalCreate, AnimalModel, AnimalModelWithLike
 
 logger = getLogger(__name__)
 
 router = APIRouter()
 
 
-@router.get("", response_model=List[AnimalModel])
+@router.get("", response_model=List[AnimalModelWithLike])
 async def get_animal(
     id: Optional[str] = None,
     name: Optional[str] = None,
