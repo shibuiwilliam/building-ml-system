@@ -10,7 +10,7 @@ from src.schema.table import TABLES
 logger = getLogger(__name__)
 
 
-class AbstractAnimalSubcategoryRepository(ABC, BaseRepository):
+class AnimalSubcategoryRepository(ABC, BaseRepository):
     def __init__(self):
         super().__init__()
         self.table_name: str = TABLES.ANIMAL_SUBCATEGORY.value

@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
-from src.repository.animal_category_repository import AbstractAnimalCategoryRepository
+from src.repository.animal_category_repository import AnimalCategoryRepository
 from src.entities.animal_category import AnimalCategoryQuery, AnimalCategoryModel, AnimalCategoryCreate
 from src.schema.animal_category import AnimalCategory
 from src.schema.table import TABLES
@@ -11,7 +11,7 @@ from src.schema.table import TABLES
 logger = getLogger(__name__)
 
 
-class AnimalCategoryRepository(AbstractAnimalCategoryRepository):
+class DBAnimalCategoryRepository(AnimalCategoryRepository):
     def __init__(self):
         super().__init__()
         self.table_name = TABLES.ANIMAL_CATEGORY.value
@@ -30,7 +30,7 @@ class AnimalCategoryRepository(AbstractAnimalCategoryRepository):
             if query.is_deleted is not None:
                 filters.append(AnimalCategory.is_deleted == query.is_deleted)
         results = session.query(AnimalCategory).filter(and_(*filters)).order_by(AnimalCategory.id).all()
-        data = [AnimalCategoryModel(**(self.model_to_dict(d))) for d in results]
+        data = [AnimalCategoryModel(**(DBAnimalCategoryRepository.model_to_dict(d))) for d in results]
         return data
 
     def insert(

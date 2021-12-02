@@ -10,7 +10,7 @@ class BaseRepository(object):
         pass
 
     @classmethod
-    def model_to_dict(row: Base) -> Dict:
+    def model_to_dict(cls, row: Base) -> Dict:
         d = {}
         for column in row.__table__.columns:
             d[column.name] = str(getattr(row, column.name))
