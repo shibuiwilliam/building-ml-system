@@ -1,27 +1,43 @@
-from datetime import datetime
-from typing import Optional
+from logging import getLogger
 
-from src.schema.abstract_schema import AbstractCreate, AbstractModel, AbstractQuery
+from sqlalchemy import Boolean, Column, DateTime, String, ForeignKey
+from sqlalchemy.sql.functions import current_timestamp
+from src.middleware.database import Base
+from src.schema.table import TABLES
 
-
-class AnimalSubcategoryQuery(AbstractQuery):
-    id: Optional[str]
-    animal_category_id: Optional[str]
-    name: Optional[str]
-    is_deleted: Optional[bool] = False
+logger = getLogger(__name__)
 
 
-class AnimalSubcategoryCreate(AbstractCreate):
-    id: str
-    animal_category_id: str
-    name: str
-
-
-class AnimalSubcategoryModel(AbstractModel):
-    id: str
-    animal_category_id: str
-    animal_category_name: str
-    name: str
-    is_deleted: bool
-    created_at: datetime
-    updated_at: datetime
+class AnimalSubcategory(Base):
+    __tablename__ = TABLES.ANIMAL_SUBCATEGORY.value
+    id = Column(
+        String(32),
+        primary_key=True,
+    )
+    animal_category_id = Column(
+        String(32),
+        ForeignKey(f"{TABLES.ANIMAL_CATEGORY.value}.id"),
+        nullable=False,
+        unique=False,
+    )
+    name = Column(
+        String(128),
+        nullable=False,
+        unique=False,
+    )
+    is_deleted = Column(
+        Boolean,
+        default=False,
+        nullable=False,
+        unique=False,
+    )
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=current_timestamp(),
+        nullable=False,
+    )
+    updated_at = Column(
+        DateTime(timezone=True),
+        server_default=current_timestamp(),
+        nullable=False,
+    )
