@@ -3,17 +3,16 @@ from logging import getLogger
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
-from src.entities.animal_category import AnimalCategoryQuery, AnimalCategoryModel, AnimalCategoryCreate
+from src.entities.animal_category import AnimalCategoryCreate, AnimalCategoryModel, AnimalCategoryQuery
 from src.repository.base_repository import BaseRepository
-from src.schema.table import TABLES
 
 logger = getLogger(__name__)
 
 
-class AnimalCategoryRepository(ABC, BaseRepository):
+class AbstractAnimalCategoryRepository(ABC, BaseRepository):
     def __init__(self):
         super().__init__()
-        self.table_name: str = TABLES.ANIMAL_CATEGORY.value
+        pass
 
     @abstractmethod
     def select(

@@ -1,5 +1,6 @@
 from logging import getLogger
 from typing import Dict
+
 from src.middleware.database import Base
 
 logger = getLogger(__name__)

@@ -3,16 +3,16 @@ from typing import List, Optional
 
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
-from src.entities.animal_subcategory import AnimalSubcategoryModel, AnimalSubcategoryCreate, AnimalSubcategoryQuery
+from src.entities.animal_subcategory import AnimalSubcategoryCreate, AnimalSubcategoryModel, AnimalSubcategoryQuery
 from src.repository.animal_subcategory_repository import AnimalSubcategoryRepository
-from src.schema.table import TABLES
-from src.schema.animal_subcategory import AnimalSubcategory
 from src.schema.animal_category import AnimalCategory
+from src.schema.animal_subcategory import AnimalSubcategory
+from src.schema.table import TABLES
 
 logger = getLogger(__name__)
 
 
-class DBAnimalSubcategoryRepository(AnimalSubcategoryRepository):
+class AnimalSubcategoryRepository(AnimalSubcategoryRepository):
     def __init__(self):
         super().__init__()
         self.table_name = TABLES.ANIMAL_SUBCATEGORY.value
@@ -51,7 +51,7 @@ class DBAnimalSubcategoryRepository(AnimalSubcategoryRepository):
             .order_by(AnimalSubcategory.id)
             .all()
         )
-        data = [AnimalSubcategoryModel(**(DBAnimalSubcategoryRepository.model_to_dict(d))) for d in results]
+        data = [AnimalSubcategoryModel(**(AnimalSubcategoryRepository.model_to_dict(d))) for d in results]
         return data
 
     def insert(

@@ -1,67 +1,37 @@
+from abc import ABC, abstractmethod
 from logging import getLogger
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
-from src.repository.animal_category_repository import AnimalCategoryRepository
-from src.repository.animal_subcategory_repository import AnimalSubcategoryRepository
-from src.schema.animal_category import AnimalCategoryQuery
-from src.schema.animal_subcategory import AnimalSubcategoryCreate, AnimalSubcategoryModel, AnimalSubcategoryQuery
-from src.usecase.abstract_usecase import AbstractUsecase
+from src.repository.animal_category_repository import AbstractAnimalCategoryRepository
+from src.repository.animal_subcategory_repository import AbstractAnimalSubcategoryRepository
+from src.request_object.animal_subcategory import AnimalSubcategoryCreateRequest, AnimalSubcategoryRequest
+from src.response_object.animal_subcategory import AnimalSubcategoryResponse
 
 logger = getLogger(__name__)
 
 
-class AnimalSubcategoryUsecase(AbstractUsecase):
+class AbstractAnimalSubcategoryUsecase(ABC):
     def __init__(
         self,
-        animal_subcategory_repository: AnimalSubcategoryRepository,
-        animal_category_repository: AnimalCategoryRepository,
+        animal_category_repository: AbstractAnimalCategoryRepository,
+        animal_subcategory_repository: AbstractAnimalSubcategoryRepository,
     ):
-        super().__init__()
-        self.animal_subcategory_repository = animal_subcategory_repository
         self.animal_category_repository = animal_category_repository
+        self.animal_subcategory_repository = animal_subcategory_repository
 
+    @abstractmethod
     def retrieve(
         self,
         session: Session,
-        id: Optional[str],
-        name: Optional[str] = None,
-        animal_category_name: Optional[str] = None,
-        is_deleted: Optional[bool] = False,
-        limit: Optional[int] = 100,
-        offset: Optional[int] = 0,
-    ) -> List[AnimalSubcategoryModel]:
-        animal_category_id: Optional[str] = None
-        if animal_category_name is not None:
-            animal_category = self.animal_category_repository.select(
-                session=session,
-                query=AnimalCategoryQuery(name=animal_category_name),
-                limit=1,
-                offset=0,
-            )
-            animal_category_id = animal_category[0].id
+        request: Optional[AnimalSubcategoryRequest] = None,
+    ) -> List[AnimalSubcategoryResponse]:
+        raise NotImplementedError
 
-        data = self.animal_subcategory_repository.select(
-            session=session,
-            query=AnimalSubcategoryQuery(
-                id=id,
-                animal_category_id=animal_category_id,
-                name=name,
-                is_deleted=is_deleted,
-            ),
-            limit=limit,
-            offset=offset,
-        )
-        return data
-
+    @abstractmethod
     def register(
         self,
         session: Session,
-        record: AnimalSubcategoryCreate,
-    ) -> Optional[AnimalSubcategoryModel]:
-        data = self.animal_subcategory_repository.insert(
-            session=session,
-            record=record,
-            commit=True,
-        )
-        return data
+        request: AnimalSubcategoryCreateRequest,
+    ) -> Optional[AnimalSubcategoryResponse]:
+        raise NotImplementedError

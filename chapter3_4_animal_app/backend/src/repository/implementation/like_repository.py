@@ -1,50 +1,19 @@
 from logging import getLogger
 from typing import Dict, List, Optional
 
-from sqlalchemy import Column, DateTime, ForeignKey, String, and_
+from sqlalchemy import and_
 from sqlalchemy.func import count
 from sqlalchemy.orm import Session
-from sqlalchemy.sql.functions import current_timestamp
-from src.middleware.database import Base
-from src.repository.abstract_repository import AbstractRepository
-from src.schema.like import LikeCreate, LikeModel, LikeQuery
-from src.schema.schema import Count
+from src.entities.common import Count
+from src.entities.like import LikeCreate, LikeModel, LikeQuery
+from src.repository.like_repository import AbstractLikeRepository
+from src.schema.like import Like
 from src.schema.table import TABLES
 
 logger = getLogger(__name__)
 
 
-class Like(Base):
-    __tablename__ = TABLES.LIKE.value
-    id = Column(
-        String(32),
-        primary_key=True,
-    )
-    animal_id = Column(
-        String(32),
-        ForeignKey(f"{TABLES.ANIMAL.value}.id"),
-        nullable=False,
-        unique=False,
-    )
-    user_id = Column(
-        String(32),
-        ForeignKey(f"{TABLES.USER.value}.id"),
-        nullable=False,
-        unique=False,
-    )
-    created_at = Column(
-        DateTime(timezone=True),
-        server_default=current_timestamp(),
-        nullable=False,
-    )
-    updated_at = Column(
-        DateTime(timezone=True),
-        server_default=current_timestamp(),
-        nullable=False,
-    )
-
-
-class LikeRepository(AbstractRepository):
+class LikeRepository(AbstractLikeRepository):
     def __init__(self) -> None:
         super().__init__()
         self.table_name = TABLES.LIKE.value
@@ -65,7 +34,7 @@ class LikeRepository(AbstractRepository):
             if query.user_id is not None:
                 filters.append(Like.id == query.user_id)
         results = session.query(Like).filter(and_(*filters)).order_by(Like.id).limit(limit).offset(offset)
-        data = [LikeModel(**(self.model_to_dict(d))) for d in results]
+        data = [LikeModel(**(LikeRepository.model_to_dict(d))) for d in results]
         return data
 
     def count(

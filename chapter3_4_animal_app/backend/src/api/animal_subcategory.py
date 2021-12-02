@@ -5,14 +5,15 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from src.middleware.database import get_session
 from src.registry.container import container
-from src.schema.animal_subcategory import AnimalSubcategoryModel
+from src.request_object.animal_subcategory import AnimalSubcategoryRequest
+from src.response_object.animal_subcategory import AnimalSubcategoryResponse
 
 logger = getLogger(__name__)
 
 router = APIRouter()
 
 
-@router.get("", response_model=List[AnimalSubcategoryModel])
+@router.get("", response_model=List[AnimalSubcategoryResponse])
 async def get_animal_subcategory(
     id: Optional[str] = None,
     name: Optional[str] = None,
@@ -22,9 +23,11 @@ async def get_animal_subcategory(
 ):
     data = container.animal_subcategory_usecase.retrieve(
         session=session,
-        id=id,
-        name=name,
-        animal_category_name=animal_category_name,
-        is_deleted=is_deleted,
+        request=AnimalSubcategoryRequest(
+            id=id,
+            name=name,
+            animal_category_name=animal_category_name,
+            is_deleted=is_deleted,
+        ),
     )
     return data

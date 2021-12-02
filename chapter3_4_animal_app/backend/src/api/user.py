@@ -5,14 +5,15 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from src.middleware.database import get_session
 from src.registry.container import container
-from src.schema.user import UserCreate, UserModel
+from src.request_object.user import UserCreateRequest, UserRequest
+from src.response_object.user import UserResponse
 
 logger = getLogger(__name__)
 
 router = APIRouter()
 
 
-@router.get("", response_model=List[UserModel])
+@router.get("", response_model=List[UserResponse])
 async def get_user(
     id: Optional[str] = None,
     handle_name: Optional[str] = None,
@@ -20,23 +21,29 @@ async def get_user(
     age: Optional[int] = None,
     gender: Optional[int] = None,
     deactivated: Optional[bool] = False,
+    limit: Optional[int] = 100,
+    offset: Optional[int] = 0,
     session: Session = Depends(get_session),
 ):
     data = container.user_usecase.retrieve(
         session=session,
-        id=id,
-        handle_name=handle_name,
-        email_address=email_address,
-        age=age,
-        gender=gender,
-        deactivated=deactivated,
+        request=UserRequest(
+            id=id,
+            handle_name=handle_name,
+            email_address=email_address,
+            age=age,
+            gender=gender,
+            deactivated=deactivated,
+        ),
+        limit=limit,
+        offset=offset,
     )
     return data
 
 
-@router.post("", response_model=Optional[UserModel])
+@router.post("", response_model=Optional[UserResponse])
 async def create_user(
-    user: UserCreate,
+    user: UserCreateRequest,
     session: Session = Depends(get_session),
 ):
     data = container.user_usecase.register(

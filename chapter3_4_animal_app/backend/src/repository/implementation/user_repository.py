@@ -1,63 +1,16 @@
 from logging import getLogger
 from typing import List, Optional
 
-from sqlalchemy import Boolean, Column, DateTime, String, and_
+from sqlalchemy import and_
 from sqlalchemy.orm import Session
-from sqlalchemy.sql.functions import current_timestamp
-from sqlalchemy.sql.sqltypes import INT
-from src.middleware.database import Base
-from src.repository.abstract_repository import AbstractRepository
+from src.repository.user_repository import AbstractUserRepository
 from src.schema.table import TABLES
-from src.schema.user import UserCreate, UserModel, UserQuery
+from src.schema.user import User, UserCreate, UserModel, UserQuery
 
 logger = getLogger(__name__)
 
 
-class User(Base):
-    __tablename__ = TABLES.USER.value
-    id = Column(
-        String(32),
-        primary_key=True,
-    )
-    handle_name = Column(
-        String(128),
-        nullable=False,
-        unique=False,
-    )
-    email_address = Column(
-        String(128),
-        nullable=False,
-        unique=True,
-    )
-    age = Column(
-        INT,
-        nullable=False,
-        unique=False,
-    )
-    gender = Column(
-        INT,
-        nullable=False,
-        unique=False,
-    )
-    deactivated = Column(
-        Boolean,
-        default=False,
-        nullable=False,
-        unique=False,
-    )
-    created_at = Column(
-        DateTime(timezone=True),
-        server_default=current_timestamp(),
-        nullable=False,
-    )
-    updated_at = Column(
-        DateTime(timezone=True),
-        server_default=current_timestamp(),
-        nullable=False,
-    )
-
-
-class UserRepository(AbstractRepository):
+class UserRepository(AbstractUserRepository):
     def __init__(self) -> None:
         super().__init__()
         self.table_name = TABLES.USER.value
@@ -84,7 +37,7 @@ class UserRepository(AbstractRepository):
             if query.deactivated is not None:
                 filters.append(User.deactivated == query.deactivated)
         results = session.query(User).filter(and_(*filters)).order_by(User.id).limit(limit).offset(offset)
-        data = [UserModel(**(self.model_to_dict(d))) for d in results]
+        data = [UserModel(**(UserRepository.model_to_dict(d))) for d in results]
         return data
 
     def select_by_ids(
@@ -95,7 +48,7 @@ class UserRepository(AbstractRepository):
         offset=0,
     ) -> List[UserModel]:
         results = session.query(User).filter(User.id.in_(user_ids)).order_by(User.id).limit(limit).offset(offset)
-        data = [UserModel(**(self.model_to_dict(d))) for d in results]
+        data = [UserModel(**(UserRepository.model_to_dict(d))) for d in results]
         return data
 
     def insert(

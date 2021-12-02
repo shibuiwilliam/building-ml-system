@@ -3,13 +3,13 @@ from logging import getLogger
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
-from src.entities.animal_subcategory import AnimalSubcategoryCreate, AnimalSubcategoryModel, AnimalSubcategoryQuery
+from src.entities.user import UserCreate, UserModel, UserQuery
 from src.repository.base_repository import BaseRepository
 
 logger = getLogger(__name__)
 
 
-class AbstractAnimalSubcategoryRepository(ABC, BaseRepository):
+class AbstractUserRepository(ABC, BaseRepository):
     def __init__(self):
         super().__init__()
         pass
@@ -18,15 +18,27 @@ class AbstractAnimalSubcategoryRepository(ABC, BaseRepository):
     def select(
         self,
         session: Session,
-        query: Optional[AnimalSubcategoryQuery],
-    ) -> List[AnimalSubcategoryModel]:
+        query: Optional[UserQuery],
+        limit: Optional[int] = 100,
+        offset: Optional[int] = 0,
+    ) -> List[UserModel]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def select_by_ids(
+        self,
+        session: Session,
+        user_ids: List[str],
+        limit=100,
+        offset=0,
+    ) -> List[UserModel]:
         raise NotImplementedError
 
     @abstractmethod
     def insert(
         self,
         session: Session,
-        record: AnimalSubcategoryCreate,
+        record: UserCreate,
         commit: bool = True,
-    ) -> Optional[AnimalSubcategoryModel]:
+    ) -> Optional[UserModel]:
         raise NotImplementedError
