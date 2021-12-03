@@ -5,6 +5,7 @@ from sqlalchemy import and_
 from sqlalchemy.func import count
 from sqlalchemy.orm import Session
 from src.entities.animal import AnimalCreate, AnimalModel, AnimalModelWithLike, AnimalQuery
+from src.entities.user import UserModel
 from src.repository.animal_repository import AbstractAnimalRepository
 from src.schema.animal import Animal
 from src.schema.animal_category import AnimalCategory
@@ -147,6 +148,30 @@ class AnimalRepository(AbstractAnimalRepository):
             .offset(offset)
         )
         data = [AnimalModelWithLike(**(AnimalRepository.model_to_dict(d))) for d in results]
+        return data
+
+    def liked_by(
+        self,
+        session: Session,
+        animal_id: str,
+    ) -> List[UserModel]:
+        results = (
+            session.query(User)
+            .join(
+                Like,
+                Like.user_id == User.id,
+                isouter=True,
+            )
+            .join(
+                Animal,
+                Animal.id == Like.animal_id,
+                isouter=True,
+            )
+            .filter(Animal.id == animal_id)
+            .order_by(User.id)
+            .all()
+        )
+        data = [UserModel(**(AnimalRepository.model_to_dict(d))) for d in results]
         return data
 
     def insert(

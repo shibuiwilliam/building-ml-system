@@ -25,6 +25,12 @@ class UserUsecase(AbstractUserUsecase):
         limit: Optional[int] = 100,
         offset: Optional[int] = 0,
     ) -> List[UserResponse]:
+        if limit is None:
+            limit = 100
+        if offset is None:
+            offset = 0
+        if limit > 200:
+            raise ValueError("limit cannot be more than 200")
         query: Optional[UserQuery] = None
         if request is not None:
             query = UserQuery(**request.dict())

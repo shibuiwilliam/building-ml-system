@@ -4,6 +4,7 @@ from typing import List, Optional
 
 from sqlalchemy.orm import Session
 from src.entities.animal import AnimalCreate, AnimalModel, AnimalModelWithLike, AnimalQuery
+from src.entities.user import UserModel
 from src.repository.base_repository import BaseRepository
 
 logger = getLogger(__name__)
@@ -33,6 +34,14 @@ class AbstractAnimalRepository(ABC, BaseRepository):
         limit: Optional[int] = 100,
         offset: Optional[int] = 0,
     ) -> List[AnimalModelWithLike]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def liked_by(
+        self,
+        session: Session,
+        animal_id: str,
+    ) -> List[UserModel]:
         raise NotImplementedError
 
     @abstractmethod
