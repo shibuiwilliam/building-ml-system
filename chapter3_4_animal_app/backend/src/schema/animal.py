@@ -1,8 +1,8 @@
 from logging import getLogger
 
-from sqlalchemy import Column, DateTime, ForeignKey, String, Text
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String, Text
 from sqlalchemy.sql.functions import current_timestamp
-from sqlalchemy.sql.sqltypes import Boolean
+from sqlalchemy.sql.sqltypes import INT
 from src.schema.base import Base
 from src.schema.table import TABLES
 
@@ -21,13 +21,13 @@ class Animal(Base):
         unique=False,
     )
     animal_category_id = Column(
-        String(32),
+        INT,
         ForeignKey(f"{TABLES.ANIMAL_CATEGORY.value}.id"),
         nullable=False,
         unique=False,
     )
     animal_subcategory_id = Column(
-        String(32),
+        INT,
         ForeignKey(f"{TABLES.ANIMAL_SUBCATEGORY.value}.id"),
         nullable=False,
         unique=False,

@@ -1,4 +1,7 @@
 {
+    "other": {
+        "category": 0
+    },
     "cat": {
         "category": 1
     },

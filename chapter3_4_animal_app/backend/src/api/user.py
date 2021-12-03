@@ -3,7 +3,6 @@ from typing import List, Optional
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from src.middleware.database import get_session
 from src.registry.container import container
 from src.request_object.user import UserCreateRequest, UserRequest
 from src.response_object.user import UserResponse
@@ -23,7 +22,7 @@ async def get_user(
     deactivated: Optional[bool] = False,
     limit: Optional[int] = 100,
     offset: Optional[int] = 0,
-    session: Session = Depends(get_session),
+    session: Session = Depends(container.database.get_session),
 ):
     data = container.user_usecase.retrieve(
         session=session,
@@ -44,7 +43,7 @@ async def get_user(
 @router.post("", response_model=Optional[UserResponse])
 async def post_user(
     user: UserCreateRequest,
-    session: Session = Depends(get_session),
+    session: Session = Depends(container.database.get_session),
 ):
     data = container.user_usecase.register(
         session=session,

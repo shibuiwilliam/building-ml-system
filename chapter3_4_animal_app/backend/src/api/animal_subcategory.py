@@ -3,7 +3,6 @@ from typing import List, Optional
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from src.middleware.database import get_session
 from src.registry.container import container
 from src.request_object.animal_subcategory import AnimalSubcategoryRequest
 from src.response_object.animal_subcategory import AnimalSubcategoryResponse
@@ -15,11 +14,11 @@ router = APIRouter()
 
 @router.get("", response_model=List[AnimalSubcategoryResponse])
 async def get_animal_subcategory(
-    id: Optional[str] = None,
+    id: Optional[int] = None,
     name: Optional[str] = None,
     animal_category_name: Optional[str] = None,
     is_deleted: Optional[bool] = False,
-    session: Session = Depends(get_session),
+    session: Session = Depends(container.database.get_session),
 ):
     data = container.animal_subcategory_usecase.retrieve(
         session=session,

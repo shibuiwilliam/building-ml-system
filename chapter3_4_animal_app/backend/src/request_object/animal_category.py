@@ -4,7 +4,7 @@ from pydantic import BaseModel, Extra
 
 
 class AnimalCategoryRequest(BaseModel):
-    id: Optional[str]
+    id: Optional[int]
     name: Optional[str]
     is_deleted: Optional[bool] = False
 

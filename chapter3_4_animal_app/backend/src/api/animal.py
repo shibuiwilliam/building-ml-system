@@ -5,7 +5,6 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, File, UploadFile
 from sqlalchemy.orm import Session
 from src.configurations import Configurations
-from src.middleware.database import get_session
 from src.middleware.strings import random_str
 from src.registry.container import container
 from src.request_object.animal import AnimalCreateRequest, AnimalRequest
@@ -21,21 +20,21 @@ router = APIRouter()
 async def get_animal(
     id: Optional[str] = None,
     name: Optional[str] = None,
-    animal_category_name: Optional[str] = None,
-    animal_subcategory_name: Optional[str] = None,
+    animal_category_id: Optional[str] = None,
+    animal_subcategory_id: Optional[str] = None,
     user_id: Optional[str] = None,
     deactivated: Optional[bool] = False,
     limit: Optional[int] = 100,
     offset: Optional[int] = 0,
-    session: Session = Depends(get_session),
+    session: Session = Depends(container.database.get_session),
 ):
     data = container.animal_usecase.retrieve(
         session=session,
         request=AnimalRequest(
             id=id,
             name=name,
-            animal_category_name=animal_category_name,
-            animal_subcategory_name=animal_subcategory_name,
+            animal_category_id=animal_category_id,
+            animal_subcategory_id=animal_subcategory_id,
             user_id=user_id,
             deactivated=deactivated,
         ),
@@ -50,7 +49,7 @@ async def liked_by(
     animal_id: str,
     limit: Optional[int] = 100,
     offset: Optional[int] = 0,
-    session: Session = Depends(get_session),
+    session: Session = Depends(container.database.get_session),
 ):
     data = container.animal_usecase.liked_by(
         session=session,
@@ -65,7 +64,7 @@ async def liked_by(
 async def post_animal(
     request: AnimalCreateRequest,
     file: UploadFile = File(...),
-    session: Session = Depends(get_session),
+    session: Session = Depends(container.database.get_session),
 ):
     os.makedirs(Configurations.work_directory, exist_ok=True)
     local_file_path = os.path.join(Configurations.work_directory, f"{random_str()}.jpg")

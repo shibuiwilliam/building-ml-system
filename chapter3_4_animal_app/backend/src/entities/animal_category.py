@@ -5,7 +5,7 @@ from pydantic import BaseModel, Extra
 
 
 class AnimalCategoryQuery(BaseModel):
-    id: Optional[str]
+    id: Optional[int]
     name: Optional[str]
     is_deleted: Optional[bool] = False
 
@@ -14,7 +14,7 @@ class AnimalCategoryQuery(BaseModel):
 
 
 class AnimalCategoryCreate(BaseModel):
-    id: str
+    id: int
     name: str
 
     class Config:
@@ -22,7 +22,7 @@ class AnimalCategoryCreate(BaseModel):
 
 
 class AnimalCategoryModel(BaseModel):
-    id: str
+    id: int
     name: str
     is_deleted: bool
     created_at: datetime

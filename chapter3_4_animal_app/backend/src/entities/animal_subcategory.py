@@ -5,8 +5,8 @@ from pydantic import BaseModel, Extra
 
 
 class AnimalSubcategoryQuery(BaseModel):
-    id: Optional[str]
-    animal_category_id: Optional[str]
+    id: Optional[int]
+    animal_category_id: Optional[int]
     name: Optional[str]
     is_deleted: Optional[bool] = False
 
@@ -15,8 +15,8 @@ class AnimalSubcategoryQuery(BaseModel):
 
 
 class AnimalSubcategoryCreate(BaseModel):
-    id: str
-    animal_category_id: str
+    id: int
+    animal_category_id: int
     name: str
 
     class Config:
@@ -24,8 +24,8 @@ class AnimalSubcategoryCreate(BaseModel):
 
 
 class AnimalSubcategoryModel(BaseModel):
-    id: str
-    animal_category_id: str
+    id: int
+    animal_category_id: int
     animal_category_name: str
     name: str
     is_deleted: bool

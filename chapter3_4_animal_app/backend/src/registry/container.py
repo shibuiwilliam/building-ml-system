@@ -7,11 +7,16 @@ from src.infrastructure.client.local_storage import LocalStorage
 from src.infrastructure.client.postgresql_database import PostgreSQLDatabase
 from src.infrastructure.database import AbstractDatabase
 from src.infrastructure.storage import AbstractStorage
+from src.repository.animal_category_repository import AbstractAnimalCategoryRepository
+from src.repository.animal_repository import AbstractAnimalRepository
+from src.repository.animal_subcategory_repository import AbstractAnimalSubcategoryRepository
 from src.repository.implementation.animal_category_repository import AnimalCategoryRepository
 from src.repository.implementation.animal_repository import AnimalRepository
 from src.repository.implementation.animal_subcategory_repository import AnimalSubcategoryRepository
 from src.repository.implementation.like_repository import LikeRepository
 from src.repository.implementation.user_repository import UserRepository
+from src.repository.like_repository import AbstractLikeRepository
+from src.repository.user_repository import AbstractUserRepository
 from src.usecase.animal_category_usecase import AbstractAnimalCategoryUsecase
 from src.usecase.animal_subcategory_usecase import AbstractAnimalSubcategoryUsecase
 from src.usecase.animal_usecase import AbstractAnimalUsecase
@@ -29,19 +34,39 @@ logger = getLogger(__name__)
 class Container(object):
     def __init__(
         self,
-        animal_category_usecase: AbstractAnimalCategoryUsecase,
-        animal_subcategory_usecase: AbstractAnimalSubcategoryUsecase,
-        user_usecase: AbstractUserUsecase,
-        animal_usecase: AbstractAnimalUsecase,
-        like_usecase: AbstractLikeUsecase,
+        storage_client: AbstractStorage,
         database: AbstractDatabase,
     ):
-        self.animal_category_usecase = animal_category_usecase
-        self.animal_subcategory_usecase = animal_subcategory_usecase
-        self.user_usecase = user_usecase
-        self.animal_usecase = animal_usecase
-        self.like_usecase = like_usecase
         self.database = database
+        self.storage_client = storage_client
+
+        self.animal_category_repository: AbstractAnimalCategoryRepository = AnimalCategoryRepository()
+        self.animal_subcategory_repository: AbstractAnimalSubcategoryRepository = AnimalSubcategoryRepository()
+        self.animal_reposigory: AbstractAnimalRepository = AnimalRepository()
+        self.user_repository: AbstractUserRepository = UserRepository()
+        self.like_repository: AbstractLikeRepository = LikeRepository()
+
+        self.animal_category_usecase: AbstractAnimalCategoryUsecase = AnimalCategoryUsecase(
+            animal_category_repository=self.animal_category_repository,
+        )
+        self.animal_subcategory_usecase: AbstractAnimalSubcategoryUsecase = AnimalSubcategoryUsecase(
+            animal_category_repository=self.animal_category_repository,
+            animal_subcategory_repository=self.animal_subcategory_repository,
+        )
+        self.user_usecase: AbstractUserUsecase = UserUsecase(
+            user_repository=self.user_repository,
+        )
+        self.animal_usecase: AbstractAnimalUsecase = AnimalUsecase(
+            like_repository=self.like_repository,
+            user_repository=self.user_repository,
+            animal_category_repository=self.animal_category_repository,
+            animal_subcategory_repository=self.animal_subcategory_repository,
+            animal_repository=self.animal_reposigory,
+            storage_client=self.storage_client,
+        )
+        self.like_usecase: AbstractLikeUsecase = LikeUsecase(
+            like_repository=self.like_repository,
+        )
 
 
 if Configurations.run_environment == RUN_ENVIRONMENT.LOCAL.value:
@@ -50,26 +75,6 @@ elif Configurations.run_environment == RUN_ENVIRONMENT.LOCAL.value:
     storage_client = GoogleCloudStorage()
 
 container = Container(
-    animal_category_usecase=AnimalCategoryUsecase(
-        animal_category_repository=AnimalCategoryRepository(),
-    ),
-    animal_subcategory_usecase=AnimalSubcategoryUsecase(
-        animal_category_repository=AnimalCategoryRepository(),
-        animal_subcategory_repository=AnimalSubcategoryRepository(),
-    ),
-    user_usecase=UserUsecase(
-        user_repository=UserRepository(),
-    ),
-    animal_usecase=AnimalUsecase(
-        like_repository=LikeRepository(),
-        user_repository=UserRepository(),
-        animal_category_repository=AnimalCategoryRepository(),
-        animal_subcategory_repository=AnimalSubcategoryRepository(),
-        animal_repository=AnimalRepository(),
-        storage_client=storage_client,
-    ),
-    like_usecase=LikeUsecase(
-        like_repository=LikeRepository(),
-    ),
+    storage_client=storage_client,
     database=PostgreSQLDatabase(),
 )

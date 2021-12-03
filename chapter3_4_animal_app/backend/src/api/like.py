@@ -3,7 +3,6 @@ from typing import List, Optional
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from src.middleware.database import get_session
 from src.registry.container import container
 from src.request_object.like import LikeCreateRequest, LikeDeleteRequest, LikeRequest
 from src.response_object.like import LikeResponse
@@ -18,7 +17,7 @@ async def get_like(
     id: Optional[str] = None,
     animal_id: Optional[str] = None,
     user_id: Optional[str] = None,
-    session: Session = Depends(get_session),
+    session: Session = Depends(container.database.get_session),
 ):
     data = container.like_usecase.retrieve(
         session=session,
@@ -34,7 +33,7 @@ async def get_like(
 @router.post("", response_model=Optional[LikeResponse])
 async def post_like(
     request: LikeCreateRequest,
-    session: Session = Depends(get_session),
+    session: Session = Depends(container.database.get_session),
 ):
     data = container.like_usecase.register(
         session=session,
@@ -46,7 +45,7 @@ async def post_like(
 @router.delete("", response_model=None)
 async def delete_like(
     like_id: str,
-    session: Session = Depends(get_session),
+    session: Session = Depends(container.database.get_session),
 ):
     container.like_usecase.delete(
         session=session,

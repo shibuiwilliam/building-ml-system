@@ -18,10 +18,11 @@ class UserQuery(BaseModel):
 
 class UserCreate(BaseModel):
     id: str
-    handle_name: Optional[str]
-    email_address: Optional[str]
-    age: Optional[int]
-    gender: Optional[int]
+    handle_name: str
+    email_address: str
+    age: int
+    gender: int
+    created_at: Optional[datetime]
 
     class Config:
         extra = Extra.forbid

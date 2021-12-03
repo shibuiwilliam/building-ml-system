@@ -2,6 +2,7 @@ from logging import getLogger
 
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String
 from sqlalchemy.sql.functions import current_timestamp
+from sqlalchemy.sql.sqltypes import INT
 from src.schema.base import Base
 from src.schema.table import TABLES
 
@@ -11,11 +12,11 @@ logger = getLogger(__name__)
 class AnimalSubcategory(Base):
     __tablename__ = TABLES.ANIMAL_SUBCATEGORY.value
     id = Column(
-        String(32),
+        INT,
         primary_key=True,
     )
     animal_category_id = Column(
-        String(32),
+        INT,
         ForeignKey(f"{TABLES.ANIMAL_CATEGORY.value}.id"),
         nullable=False,
         unique=False,

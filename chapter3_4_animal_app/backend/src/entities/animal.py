@@ -7,8 +7,8 @@ from pydantic import BaseModel, Extra
 class AnimalQuery(BaseModel):
     id: Optional[str]
     name: Optional[str]
-    animal_category_id: Optional[str]
-    animal_subcategory_id: Optional[str]
+    animal_category_id: Optional[int]
+    animal_subcategory_id: Optional[int]
     user_id: Optional[str]
     deactivated: Optional[bool] = False
 
@@ -18,12 +18,13 @@ class AnimalQuery(BaseModel):
 
 class AnimalCreate(BaseModel):
     id: str
-    animal_category_id: str
-    animal_subcategory_id: str
+    animal_category_id: int
+    animal_subcategory_id: int
     user_id: str
     name: str
     description: str
     photo_url: str
+    created_at: Optional[datetime]
 
     class Config:
         extra = Extra.forbid
@@ -31,9 +32,9 @@ class AnimalCreate(BaseModel):
 
 class AnimalModelBase(BaseModel):
     id: str
-    animal_category_id: str
+    animal_category_id: int
     animal_category_name: str
-    animal_subcategory_id: str
+    animal_subcategory_id: int
     animal_subcategory_name: str
     user_id: str
     user_handle_name: str

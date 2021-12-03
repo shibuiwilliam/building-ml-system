@@ -1,4 +1,8 @@
 {
+    "other": {
+        "category": 0,
+        "subcategory": 0
+    },
     "abyssinian": {
         "category": 1,
         "subcategory": 1

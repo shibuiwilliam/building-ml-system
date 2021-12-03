@@ -4,7 +4,7 @@ from pydantic import BaseModel, Extra
 
 
 class AnimalCategoryResponse(BaseModel):
-    id: str
+    id: int
     name: str
     is_deleted: bool
     created_at: datetime
