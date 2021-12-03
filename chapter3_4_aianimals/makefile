@@ -6,7 +6,7 @@ VERSION := 0.0.0
 DOCKER_REPOSITORY := shibui/building-ml-system
 
 DIR := $(ABSOLUTE_PATH)
-TAG = ai_animal
+TAG = ai_animals
 
 ############ BACKEND COMMANDS ############
 BACKEND_DIR := $(DIR)/backend
