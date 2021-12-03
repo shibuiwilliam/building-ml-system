@@ -45,6 +45,8 @@ class AbstractAnimalUsecase(ABC):
         self,
         session: Session,
         animal_id: str,
+        limit: Optional[int] = 100,
+        offset: Optional[int] = 0,
     ) -> List[UserResponse]:
         raise NotImplementedError
 

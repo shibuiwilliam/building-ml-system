@@ -16,7 +16,6 @@ class UserRequest(BaseModel):
 
 
 class UserCreateRequest(BaseModel):
-    id: str
     handle_name: Optional[str]
     email_address: Optional[str]
     age: Optional[int]

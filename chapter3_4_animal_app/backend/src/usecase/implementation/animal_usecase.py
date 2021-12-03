@@ -2,7 +2,8 @@ from logging import getLogger
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
-from src.entities.animal import AnimalQuery
+from src.entities.animal import AnimalCreate, AnimalQuery
+from src.middleware.strings import get_uuid
 from src.repository.animal_category_repository import AbstractAnimalCategoryRepository
 from src.repository.animal_repository import AbstractAnimalRepository
 from src.repository.animal_subcategory_repository import AbstractAnimalSubcategoryRepository
@@ -62,10 +63,20 @@ class AnimalUsecase(AbstractAnimalUsecase):
         self,
         session: Session,
         animal_id: str,
+        limit: Optional[int] = 100,
+        offset: Optional[int] = 0,
     ) -> List[UserResponse]:
+        if limit is None:
+            limit = 100
+        if offset is None:
+            offset = 0
+        if limit > 200:
+            raise ValueError("limit cannot be more than 200")
         data = self.animal_repository.liked_by(
             session=session,
             animal_id=animal_id,
+            limit=limit,
+            offset=offset,
         )
         response = [UserResponse(**d.dict()) for d in data]
         return response
@@ -75,9 +86,19 @@ class AnimalUsecase(AbstractAnimalUsecase):
         session: Session,
         record: AnimalCreateRequest,
     ) -> Optional[AnimalResponse]:
+        animal_id = get_uuid()
+        create = AnimalCreate(
+            id=animal_id,
+            animal_category_id=record.animal_category_id,
+            animal_subcategory_id=record.animal_subcategory_id,
+            user_id=record.user_id,
+            name=record.name,
+            description=record.description,
+            photo_url=record.photo_url,
+        )
         data = self.animal_repository.insert(
             session=session,
-            record=record,
+            record=create,
             commit=True,
         )
         if data is not None:

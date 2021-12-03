@@ -16,7 +16,6 @@ class AnimalRequest(BaseModel):
 
 
 class AnimalCreateRequest(BaseModel):
-    id: str
     animal_category_id: str
     animal_subcategory_id: str
     user_id: str

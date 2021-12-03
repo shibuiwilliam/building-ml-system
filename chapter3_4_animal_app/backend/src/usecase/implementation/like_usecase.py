@@ -2,64 +2,84 @@ from logging import getLogger
 from typing import Dict, List, Optional
 
 from sqlalchemy.orm import Session
-from src.repository.like_repository import LikeRepository
-from src.schema.like import LikeCreate, LikeModel, LikeQuery
-from src.schema.schema import Count
-from src.usecase.abstract_usecase import AbstractUsecase
+from src.entities.like import LikeCreate, LikeDelete
+from src.middleware.strings import get_uuid
+from src.repository.like_repository import AbstractLikeRepository
+from src.request_object.like import LikeCreateRequest, LikeDeleteRequest, LikeRequest
+from src.response_object.like import LikeResponse
+from src.usecase.like_usecase import AbstractLikeUsecase
 
 logger = getLogger(__name__)
 
 
-class LikeUsecase(AbstractUsecase):
+class LikeUsecase(AbstractLikeUsecase):
     def __init__(
         self,
-        like_repository: LikeRepository,
+        like_repository: AbstractLikeRepository,
     ):
-        super().__init__()
-        self.like_repository = like_repository
+        super().__init__(like_repository=like_repository)
 
     def retrieve(
         self,
         session: Session,
-        id: Optional[str] = None,
-        animal_id: Optional[str] = None,
-        user_id: Optional[str] = None,
-        animal_name: Optional[str] = None,
+        request: Optional[LikeRequest] = None,
         limit: Optional[int] = 100,
         offset: Optional[int] = 0,
-    ) -> List[LikeModel]:
+    ) -> List[LikeResponse]:
+        query: Optional[LikeRequest] = None
+        if request is not None:
+            query = LikeRequest(**request.dict())
         data = self.like_repository.select(
             session=session,
-            query=LikeQuery(
-                id=id,
-                animal_id=animal_id,
-                user_id=user_id,
-                animal_name=animal_name,
-            ),
+            query=query,
             limit=limit,
             offset=offset,
         )
-        return data
-
-    def count(
-        self,
-        session: Session,
-        animal_ids: List[str],
-    ) -> Dict[str, Count]:
-        data = self.like_repository.count(
-            session=session,
-            animal_ids=animal_ids,
-        )
-        return data
+        response = [LikeResponse(**d.dict()) for d in data]
+        return response
 
     def register(
         self,
         session: Session,
-        record: LikeCreate,
-    ) -> Optional[LikeModel]:
+        record: LikeCreateRequest,
+    ) -> Optional[LikeResponse]:
+        query = LikeRequest(
+            animal_id=record.animal_id,
+            user_id=record.user_id,
+        )
+        exist = self.like_repository.select(
+            session=session,
+            query=query,
+            limit=1,
+            offset=0,
+        )
+        if len(exist) > 0:
+            return None
+
+        like_id = get_uuid()
+        create = LikeCreate(
+            id=like_id,
+            animal_id=record.animal_id,
+            user_id=record.user_id,
+        )
         data = self.like_repository.insert(
             session=session,
-            record=record,
+            record=create,
             commit=True,
         )
-        return data
+        if data is not None:
+            response = LikeResponse(**data.dict())
+            return response
+        return None
+
+    def delete(
+        self,
+        session: Session,
+        record: LikeDeleteRequest,
+    ):
+        like_delete = LikeDelete(**record.dict())
+        self.like_repository.delete(
+            session=session,
+            record=like_delete,
+            commit=True,
+        )

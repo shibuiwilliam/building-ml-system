@@ -3,7 +3,6 @@ from typing import List, Optional
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from sqlalchemy.sql.functions import session_user
 from src.middleware.database import get_session
 from src.registry.container import container
 from src.request_object.animal import AnimalCreateRequest, AnimalRequest
@@ -46,11 +45,15 @@ async def get_animal(
 @router.get("/liked_by", response_model=List[UserResponse])
 async def liked_by(
     animal_id: str,
+    limit: Optional[int] = 100,
+    offset: Optional[int] = 0,
     session: Session = Depends(get_session),
 ):
     data = container.animal_usecase.liked_by(
         session=session,
         animal_id=animal_id,
+        limit=limit,
+        offset=offset,
     )
     return data
 

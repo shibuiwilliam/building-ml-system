@@ -41,6 +41,8 @@ class AbstractAnimalRepository(ABC, BaseRepository):
         self,
         session: Session,
         animal_id: str,
+        limit: Optional[int] = 100,
+        offset: Optional[int] = 0,
     ) -> List[UserModel]:
         raise NotImplementedError
 

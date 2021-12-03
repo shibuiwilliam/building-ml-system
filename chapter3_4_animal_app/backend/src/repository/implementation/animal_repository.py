@@ -154,6 +154,8 @@ class AnimalRepository(AbstractAnimalRepository):
         self,
         session: Session,
         animal_id: str,
+        limit: Optional[int] = 100,
+        offset: Optional[int] = 0,
     ) -> List[UserModel]:
         results = (
             session.query(User)
@@ -169,7 +171,8 @@ class AnimalRepository(AbstractAnimalRepository):
             )
             .filter(Animal.id == animal_id)
             .order_by(User.id)
-            .all()
+            .limit(limit)
+            .offset(offset)
         )
         data = [UserModel(**(AnimalRepository.model_to_dict(d))) for d in results]
         return data

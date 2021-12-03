@@ -2,7 +2,8 @@ from logging import getLogger
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
-from src.entities.user import UserQuery
+from src.entities.user import UserCreate, UserQuery
+from src.middleware.strings import get_uuid
 from src.repository.user_repository import AbstractUserRepository
 from src.request_object.user import UserCreateRequest, UserRequest
 from src.response_object.user import UserResponse
@@ -48,9 +49,17 @@ class UserUsecase(AbstractUserUsecase):
         session: Session,
         record: UserCreateRequest,
     ) -> Optional[UserResponse]:
+        user_id = get_uuid()
+        create = UserCreate(
+            id=user_id,
+            handle_name=record.handle_name,
+            email_address=record.email_address,
+            age=record.age,
+            gender=record.gender,
+        )
         data = self.user_repository.insert(
             session=session,
-            record=record,
+            record=create,
             commit=True,
         )
         if data is not None:

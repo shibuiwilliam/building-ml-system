@@ -4,7 +4,7 @@ from typing import Dict, List, Optional
 
 from sqlalchemy.orm import Session
 from src.entities.common import Count
-from src.entities.like import LikeCreate, LikeModel, LikeQuery
+from src.entities.like import LikeCreate, LikeDelete, LikeModel, LikeQuery
 from src.repository.base_repository import BaseRepository
 
 logger = getLogger(__name__)
@@ -40,4 +40,13 @@ class AbstractLikeRepository(ABC, BaseRepository):
         record: LikeCreate,
         commit: bool = True,
     ) -> Optional[LikeModel]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def delete(
+        self,
+        session: Session,
+        record: LikeDelete,
+        commit: bool = True,
+    ):
         raise NotImplementedError

@@ -5,7 +5,7 @@ from sqlalchemy import and_
 from sqlalchemy.func import count
 from sqlalchemy.orm import Session
 from src.entities.common import Count
-from src.entities.like import LikeCreate, LikeModel, LikeQuery
+from src.entities.like import LikeCreate, LikeDelete, LikeModel, LikeQuery
 from src.repository.like_repository import AbstractLikeRepository
 from src.schema.like import Like
 from src.schema.table import TABLES
@@ -76,3 +76,15 @@ class LikeRepository(AbstractLikeRepository):
             )
             return result[0]
         return None
+
+    def delete(
+        self,
+        session: Session,
+        record: LikeDelete,
+        commit: bool = True,
+    ):
+        results = session.query(Like).filter(Like.id == record.id).all()
+        for r in results:
+            session.delete(r)
+            if commit:
+                session.commit()
