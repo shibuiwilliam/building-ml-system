@@ -84,21 +84,20 @@ class AnimalUsecase(AbstractAnimalUsecase):
     def register(
         self,
         session: Session,
-        record: AnimalCreateRequest,
+        request: AnimalCreateRequest,
     ) -> Optional[AnimalResponse]:
-        animal_id = get_uuid()
-        create = AnimalCreate(
-            id=animal_id,
-            animal_category_id=record.animal_category_id,
-            animal_subcategory_id=record.animal_subcategory_id,
-            user_id=record.user_id,
-            name=record.name,
-            description=record.description,
-            photo_url=record.photo_url,
+        record = AnimalCreate(
+            id=get_uuid(),
+            animal_category_id=request.animal_category_id,
+            animal_subcategory_id=request.animal_subcategory_id,
+            user_id=request.user_id,
+            name=request.name,
+            description=request.description,
+            photo_url=request.photo_url,
         )
         data = self.animal_repository.insert(
             session=session,
-            record=create,
+            record=record,
             commit=True,
         )
         if data is not None:

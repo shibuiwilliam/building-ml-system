@@ -9,6 +9,7 @@ from src.repository.animal_subcategory_repository import AbstractAnimalSubcatego
 from src.request_object.animal_subcategory import AnimalSubcategoryCreateRequest, AnimalSubcategoryRequest
 from src.response_object.animal_subcategory import AnimalSubcategoryResponse
 from src.usecase.animal_subcategory_usecase import AbstractAnimalSubcategoryUsecase
+from src.middleware.strings import get_uuid
 
 logger = getLogger(__name__)
 
@@ -58,7 +59,11 @@ class AnimalSubcategoryUsecase(AbstractAnimalSubcategoryUsecase):
         session: Session,
         request: AnimalSubcategoryCreateRequest,
     ) -> Optional[AnimalSubcategoryResponse]:
-        record = AnimalSubcategoryCreate(**request)
+        record = AnimalSubcategoryCreate(
+            id=get_uuid(),
+            animal_category_id=request.animal_category_id,
+            name=request.name,
+        )
         data = self.animal_subcategory_repository.insert(
             session=session,
             record=record,

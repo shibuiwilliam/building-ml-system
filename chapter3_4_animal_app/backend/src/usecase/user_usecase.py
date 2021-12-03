@@ -31,6 +31,6 @@ class AbstractUserUsecase(ABC):
     def register(
         self,
         session: Session,
-        record: UserCreateRequest,
+        request: UserCreateRequest,
     ) -> Optional[UserResponse]:
         raise NotImplementedError

@@ -29,6 +29,6 @@ class AbstractAnimalCategoryUsecase(ABC):
     def register(
         self,
         session: Session,
-        record: AnimalCategoryCreateRequest,
+        request: AnimalCategoryCreateRequest,
     ) -> Optional[AnimalCategoryResponse]:
         raise NotImplementedError

@@ -41,11 +41,11 @@ class LikeUsecase(AbstractLikeUsecase):
     def register(
         self,
         session: Session,
-        record: LikeCreateRequest,
+        request: LikeCreateRequest,
     ) -> Optional[LikeResponse]:
         query = LikeRequest(
-            animal_id=record.animal_id,
-            user_id=record.user_id,
+            animal_id=request.animal_id,
+            user_id=request.user_id,
         )
         exist = self.like_repository.select(
             session=session,
@@ -56,15 +56,14 @@ class LikeUsecase(AbstractLikeUsecase):
         if len(exist) > 0:
             return None
 
-        like_id = get_uuid()
-        create = LikeCreate(
-            id=like_id,
-            animal_id=record.animal_id,
-            user_id=record.user_id,
+        record = LikeCreate(
+            id=get_uuid(),
+            animal_id=request.animal_id,
+            user_id=request.user_id,
         )
         data = self.like_repository.insert(
             session=session,
-            record=create,
+            record=record,
             commit=True,
         )
         if data is not None:
@@ -75,11 +74,11 @@ class LikeUsecase(AbstractLikeUsecase):
     def delete(
         self,
         session: Session,
-        record: LikeDeleteRequest,
+        request: LikeDeleteRequest,
     ):
-        like_delete = LikeDelete(**record.dict())
+        record = LikeDelete(**request.dict())
         self.like_repository.delete(
             session=session,
-            record=like_delete,
+            record=record,
             commit=True,
         )

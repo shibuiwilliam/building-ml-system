@@ -42,12 +42,12 @@ async def get_user(
 
 
 @router.post("", response_model=Optional[UserResponse])
-async def create_user(
+async def post_user(
     user: UserCreateRequest,
     session: Session = Depends(get_session),
 ):
     data = container.user_usecase.register(
         session=session,
-        record=user,
+        request=user,
     )
     return data

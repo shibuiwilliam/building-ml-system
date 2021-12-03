@@ -54,6 +54,6 @@ class AbstractAnimalUsecase(ABC):
     def register(
         self,
         session: Session,
-        record: AnimalCreateRequest,
+        request: AnimalCreateRequest,
     ) -> Optional[AnimalResponse]:
         raise NotImplementedError

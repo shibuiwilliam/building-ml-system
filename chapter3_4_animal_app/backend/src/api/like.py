@@ -33,12 +33,12 @@ async def get_like(
 
 @router.post("", response_model=Optional[LikeResponse])
 async def post_like(
-    like: LikeCreateRequest,
+    request: LikeCreateRequest,
     session: Session = Depends(get_session),
 ):
     data = container.like_usecase.register(
         session=session,
-        record=like,
+        request=request,
     )
     return data
 
@@ -50,7 +50,7 @@ async def delete_like(
 ):
     container.like_usecase.delete(
         session=session,
-        record=LikeDeleteRequest(
+        request=LikeDeleteRequest(
             id=like_id,
         ),
     )

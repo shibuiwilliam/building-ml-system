@@ -2,11 +2,12 @@ from logging import getLogger
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
-from src.entities.animal_category import AnimalCategoryQuery
+from src.entities.animal_category import AnimalCategoryQuery, AnimalCategoryCreate
 from src.repository.animal_category_repository import AbstractAnimalCategoryRepository
 from src.request_object.animal_category import AnimalCategoryCreateRequest, AnimalCategoryRequest
 from src.response_object.animal_category import AnimalCategoryResponse
 from src.usecase.animal_category_usecase import AbstractAnimalCategoryUsecase
+from src.middleware.strings import get_uuid
 
 logger = getLogger(__name__)
 
@@ -37,8 +38,12 @@ class AnimalCategoryUsecase(AbstractAnimalCategoryUsecase):
     def register(
         self,
         session: Session,
-        record: AnimalCategoryCreateRequest,
+        request: AnimalCategoryCreateRequest,
     ) -> Optional[AnimalCategoryResponse]:
+        record = AnimalCategoryCreate(
+            id=get_uuid(),
+            name=request.name,
+        )
         data = self.animal_category_repository.insert(
             session=session,
             record=record,

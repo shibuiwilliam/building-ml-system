@@ -32,7 +32,7 @@ class AbstractLikeUsecase(ABC):
     def register(
         self,
         session: Session,
-        record: LikeCreateRequest,
+        request: LikeCreateRequest,
     ) -> Optional[LikeResponse]:
         raise NotImplementedError
 
@@ -40,6 +40,6 @@ class AbstractLikeUsecase(ABC):
     def delete(
         self,
         session: Session,
-        record: LikeDeleteRequest,
+        request: LikeDeleteRequest,
     ):
         raise NotImplementedError

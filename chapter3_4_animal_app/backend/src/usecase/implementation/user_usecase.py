@@ -47,19 +47,18 @@ class UserUsecase(AbstractUserUsecase):
     def register(
         self,
         session: Session,
-        record: UserCreateRequest,
+        request: UserCreateRequest,
     ) -> Optional[UserResponse]:
-        user_id = get_uuid()
-        create = UserCreate(
-            id=user_id,
-            handle_name=record.handle_name,
-            email_address=record.email_address,
-            age=record.age,
-            gender=record.gender,
+        record = UserCreate(
+            id=get_uuid(),
+            handle_name=request.handle_name,
+            email_address=request.email_address,
+            age=request.age,
+            gender=request.gender,
         )
         data = self.user_repository.insert(
             session=session,
-            record=create,
+            record=record,
             commit=True,
         )
         if data is not None:

@@ -59,12 +59,12 @@ async def liked_by(
 
 
 @router.post("", response_model=Optional[AnimalResponse])
-async def create_animal(
-    animal: AnimalCreateRequest,
+async def post_animal(
+    request: AnimalCreateRequest,
     session: Session = Depends(get_session),
 ):
     data = container.animal_usecase.register(
         session=session,
-        record=animal,
+        request=request,
     )
     return data
