@@ -1,6 +1,7 @@
 import os
 
 from sqlalchemy import create_engine
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker
 from src.infrastructure.database import AbstractDatabase
 
@@ -17,7 +18,7 @@ class PostgreSQLDatabase(AbstractDatabase):
 
         self.__sql_alchemy_database_url = f"postgresql://{self.__postgres_username}:{self.__postgres_password}@{self.__postgres_server}:{self.__postgres_port}/{self.__postgres_db}?client_encoding=utf8"
 
-        self.engine = create_engine(
+        self.engine: Engine = create_engine(
             self.__sql_alchemy_database_url,
             encoding="utf-8",
             pool_recycle=3600,

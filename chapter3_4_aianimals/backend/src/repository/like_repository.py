@@ -5,12 +5,11 @@ from typing import Dict, List, Optional
 from sqlalchemy.orm import Session
 from src.entities.common import Count
 from src.entities.like import LikeCreate, LikeDelete, LikeModel, LikeQuery
-from src.repository.base_repository import BaseRepository
 
 logger = getLogger(__name__)
 
 
-class AbstractLikeRepository(ABC, BaseRepository):
+class AbstractLikeRepository(ABC):
     def __init__(self):
         super().__init__()
         pass

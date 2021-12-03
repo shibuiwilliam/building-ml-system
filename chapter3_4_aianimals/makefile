@@ -8,6 +8,7 @@ DOCKER_REPOSITORY := shibui/building-ml-system
 DIR := $(ABSOLUTE_PATH)
 TAG = ai_animals
 
+
 ############ BACKEND COMMANDS ############
 BACKEND_DIR := $(DIR)/backend
 DOCKERFILE_BACKEND = $(BACKEND_DIR)/$(DOCKERFILE)
@@ -48,3 +49,19 @@ build_backend:
 .PHONY: push_backend
 push_backend: 
 	docker push $(DOCKER_BACKEND_IMAGE_NAME)
+
+
+############ DOCKER COMPOSE COMMANDS ############
+.PHONY: up
+up:
+	docker-compose \
+		-f $(DOCKER_COMPOSE) \
+		up -d
+
+.PHONY: down
+down:
+	docker-compose \
+		-f $(DOCKER_COMPOSE) \
+		down
+
+

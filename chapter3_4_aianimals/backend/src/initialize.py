@@ -20,11 +20,9 @@ from src.schema.user import User
 logger = getLogger(__name__)
 
 
-def create_tables(
-    engine: Engine,
-    checkfirst: bool = True,
-):
+def create_tables(checkfirst: bool = True):
     logger.info("create tables")
+    engine = container.database.engine
     Base.metadata.create_all(
         engine,
         checkfirst=checkfirst,
@@ -33,6 +31,7 @@ def create_tables(
             AnimalSubcategory.__table__,
             User.__table__,
             Animal.__table__,
+            Like.__table__,
         ],
     )
     logger.info("done create tables")
@@ -59,11 +58,9 @@ def create_index(
     return index
 
 
-def create_indices(
-    engine: Engine,
-    checkfirst: bool = True,
-):
+def create_indices(checkfirst: bool = True):
     logger.info("create indices")
+    engine = container.database.engine
     create_index(
         table=AnimalCategory,
         column=AnimalCategory.name,
@@ -172,24 +169,24 @@ def initialize_category():
     logger.info(f"initialize category: {Configurations.animal_category_file}")
     with open(Configurations.animal_category_file, "r") as f:
         data = json.load(f)
-    with container.database.get_session() as session:
-        for k, v in data.items():
-            query = AnimalCategoryQuery(id=v["category"])
-            exist = container.animal_category_repository.select(
-                session=session,
-                query=query,
-            )
-            if len(exist) > 0:
-                continue
-            record = AnimalCategoryCreate(
-                id=v["category"],
-                name=k,
-            )
-            container.animal_category_repository.insert(
-                session=session,
-                record=record,
-                commit=True,
-            )
+    session = container.database.get_session().__next__()
+    for k, v in data.items():
+        query = AnimalCategoryQuery(id=v["category"])
+        exist = container.animal_category_repository.select(
+            session=session,
+            query=query,
+        )
+        if len(exist) > 0:
+            continue
+        record = AnimalCategoryCreate(
+            id=v["category"],
+            name=k,
+        )
+        container.animal_category_repository.insert(
+            session=session,
+            record=record,
+            commit=True,
+        )
     logger.info("done initialize category")
 
 
@@ -197,25 +194,25 @@ def initialize_subcategory():
     logger.info(f"initialize subcategory: {Configurations.animal_subcategory_file}")
     with open(Configurations.animal_subcategory_file, "r") as f:
         data = json.load(f)
-    with container.database.get_session() as session:
-        for k, v in data.items():
-            query = AnimalSubcategoryQuery(id=v["subcategory"])
-            exist = container.animal_subcategory_repository.select(
-                session=session,
-                query=query,
-            )
-            if len(exist) > 0:
-                continue
-            record = AnimalSubcategoryCreate(
-                id=v["subcategory"],
-                animal_category_id=v["category"],
-                name=k,
-            )
-            container.animal_subcategory_repository.insert(
-                session=session,
-                record=record,
-                commit=True,
-            )
+    session = container.database.get_session().__next__()
+    for k, v in data.items():
+        query = AnimalSubcategoryQuery(id=v["subcategory"])
+        exist = container.animal_subcategory_repository.select(
+            session=session,
+            query=query,
+        )
+        if len(exist) > 0:
+            continue
+        record = AnimalSubcategoryCreate(
+            id=v["subcategory"],
+            animal_category_id=v["category"],
+            name=k,
+        )
+        container.animal_subcategory_repository.insert(
+            session=session,
+            record=record,
+            commit=True,
+        )
     logger.info("done initialize subcategory")
 
 
@@ -223,30 +220,30 @@ def initialize_user():
     logger.info(f"initialize user: {Configurations.user_file}")
     with open(Configurations.user_file, "r") as f:
         data = json.load(f)
-    with container.database.get_session() as session:
-        for k, v in data.items():
-            query = UserQuery(id=k)
-            exist = container.user_repository.select(
-                session=session,
-                query=query,
-                limit=1,
-                offset=0,
-            )
-            if len(exist) > 0:
-                continue
-            record = UserCreate(
-                id=k,
-                handle_name=v["handle_name"],
-                email_address=v["email_address"],
-                age=v["age"],
-                gender=v["gender"],
-                created_at=datetime.strptime(v["created_at"], "%Y-%m-%dT%H:%M:%S.%f"),
-            )
-            container.user_repository.insert(
-                session=session,
-                record=record,
-                commit=True,
-            )
+    session = container.database.get_session().__next__()
+    for k, v in data.items():
+        query = UserQuery(id=k)
+        exist = container.user_repository.select(
+            session=session,
+            query=query,
+            limit=1,
+            offset=0,
+        )
+        if len(exist) > 0:
+            continue
+        record = UserCreate(
+            id=k,
+            handle_name=v["handle_name"],
+            email_address=v["email_address"],
+            age=v["age"],
+            gender=v["gender"],
+            created_at=datetime.strptime(v["created_at"], "%Y-%m-%dT%H:%M:%S.%f"),
+        )
+        container.user_repository.insert(
+            session=session,
+            record=record,
+            commit=True,
+        )
     logger.info("done initialize user")
 
 
@@ -254,32 +251,32 @@ def initialize_animal():
     logger.info(f"initialize animal: {Configurations.animal_file}")
     with open(Configurations.animal_file, "r") as f:
         data = json.load(f)
-    with container.database.get_session() as session:
-        for k, v in data.items():
-            query = AnimalQuery(id=k)
-            exist = container.animal_reposigory.select(
-                session=session,
-                query=query,
-                limit=1,
-                offset=0,
-            )
-            if len(exist) > 0:
-                continue
-            record = AnimalCreate(
-                id=k,
-                animal_category_id=v["category"],
-                animal_subcategory_id=v["subcategory"],
-                user_id=v["user_id"],
-                photo_url=v["photo_url"],
-                name=v["filename"],
-                description="",
-                created_at=datetime.strptime(v["created_at"], "%Y-%m-%dT%H:%M:%S.%f"),
-            )
-            container.animal_reposigory.insert(
-                session=session,
-                record=record,
-                commit=True,
-            )
+    session = container.database.get_session().__next__()
+    for k, v in data.items():
+        query = AnimalQuery(id=k)
+        exist = container.animal_reposigory.select(
+            session=session,
+            query=query,
+            limit=1,
+            offset=0,
+        )
+        if len(exist) > 0:
+            continue
+        record = AnimalCreate(
+            id=k,
+            animal_category_id=v["category"],
+            animal_subcategory_id=v["subcategory"],
+            user_id=v["user_id"],
+            photo_url=v["photo_url"],
+            name=v["filename"],
+            description="",
+            created_at=datetime.strptime(v["created_at"], "%Y-%m-%dT%H:%M:%S.%f"),
+        )
+        container.animal_reposigory.insert(
+            session=session,
+            record=record,
+            commit=True,
+        )
     logger.info("done initialize user")
 
 

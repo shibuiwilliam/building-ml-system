@@ -4,12 +4,11 @@ from typing import List, Optional
 
 from sqlalchemy.orm import Session
 from src.entities.user import UserCreate, UserModel, UserQuery
-from src.repository.base_repository import BaseRepository
 
 logger = getLogger(__name__)
 
 
-class AbstractUserRepository(ABC, BaseRepository):
+class AbstractUserRepository(ABC):
     def __init__(self):
         super().__init__()
         pass

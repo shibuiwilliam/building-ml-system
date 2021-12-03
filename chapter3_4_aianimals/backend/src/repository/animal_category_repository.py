@@ -4,12 +4,11 @@ from typing import List, Optional
 
 from sqlalchemy.orm import Session
 from src.entities.animal_category import AnimalCategoryCreate, AnimalCategoryModel, AnimalCategoryQuery
-from src.repository.base_repository import BaseRepository
 
 logger = getLogger(__name__)
 
 
-class AbstractAnimalCategoryRepository(ABC, BaseRepository):
+class AbstractAnimalCategoryRepository(ABC):
     def __init__(self):
         super().__init__()
         pass

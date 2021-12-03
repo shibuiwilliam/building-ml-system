@@ -41,6 +41,7 @@ class UserUsecase(AbstractUserUsecase):
             limit=limit,
             offset=offset,
         )
+
         response = [UserResponse(**d.dict()) for d in data]
         return response
 

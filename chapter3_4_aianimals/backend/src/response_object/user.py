@@ -5,7 +5,6 @@ from pydantic import BaseModel, Extra
 
 class UserResponse(BaseModel):
     id: str
-    name: str
     handle_name: str
     email_address: str
     age: int

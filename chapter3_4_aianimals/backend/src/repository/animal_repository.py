@@ -5,12 +5,11 @@ from typing import List, Optional
 from sqlalchemy.orm import Session
 from src.entities.animal import AnimalCreate, AnimalModel, AnimalModelWithLike, AnimalQuery
 from src.entities.user import UserModel
-from src.repository.base_repository import BaseRepository
 
 logger = getLogger(__name__)
 
 
-class AbstractAnimalRepository(ABC, BaseRepository):
+class AbstractAnimalRepository(ABC):
     def __init__(self):
         super().__init__()
         pass

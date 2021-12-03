@@ -1,8 +1,7 @@
 from logging import getLogger
 from typing import List, Optional
 
-from sqlalchemy import and_
-from sqlalchemy.func import count
+from sqlalchemy import and_, func
 from sqlalchemy.orm import Session
 from src.entities.animal import AnimalCreate, AnimalModel, AnimalModelWithLike, AnimalQuery
 from src.entities.user import UserModel
@@ -79,7 +78,25 @@ class AnimalRepository(AbstractAnimalRepository):
             .limit(limit)
             .offset(offset)
         )
-        data = [AnimalModel(**(AnimalRepository.model_to_dict(d))) for d in results]
+        logger.info(f"AAAAAAAAAAAAAAAAAAAAA {results}")
+        data = [
+            AnimalModel(
+                id=d[0],
+                animal_category_id=d[1],
+                animal_category_name=d[2],
+                animal_subcategory_id=d[3],
+                animal_subcategory_name=d[4],
+                user_id=d[5],
+                user_handle_name=d[6],
+                name=d[7],
+                description=d[8],
+                photo_url=d[9],
+                deactivated=d[10],
+                created_at=d[11],
+                updated_at=d[12],
+            )
+            for d in results
+        ]
         return data
 
     def select_with_like(
@@ -119,7 +136,7 @@ class AnimalRepository(AbstractAnimalRepository):
                 Animal.deactivated.label("deactivated"),
                 Animal.created_at.label("created_at"),
                 Animal.updated_at.label("updated_at"),
-                count(Like.id).label("like"),
+                func.count(Like.id).label("like"),
             )
             .join(
                 AnimalCategory,
@@ -142,12 +159,46 @@ class AnimalRepository(AbstractAnimalRepository):
                 isouter=True,
             )
             .filter(and_(*filters))
-            .group_by(Like.animal_id)
+            .group_by(
+                Animal.id,
+                AnimalCategory.id,
+                AnimalCategory.name,
+                AnimalSubcategory.id,
+                AnimalSubcategory.name,
+                User.id,
+                User.handle_name,
+                Animal.name,
+                Animal.description,
+                Animal.photo_url,
+                Animal.deactivated,
+                Animal.created_at,
+                Animal.updated_at,
+                Like.animal_id,
+            )
             .order_by("like" if order_by_like else Animal.id)
             .limit(limit)
             .offset(offset)
         )
-        data = [AnimalModelWithLike(**(AnimalRepository.model_to_dict(d))) for d in results]
+
+        data = [
+            AnimalModelWithLike(
+                id=d[0],
+                animal_category_id=d[1],
+                animal_category_name=d[2],
+                animal_subcategory_id=d[3],
+                animal_subcategory_name=d[4],
+                user_id=d[5],
+                user_handle_name=d[6],
+                name=d[7],
+                description=d[8],
+                photo_url=d[9],
+                deactivated=d[10],
+                created_at=d[11],
+                updated_at=d[12],
+                like=d[13],
+            )
+            for d in results
+        ]
         return data
 
     def liked_by(
@@ -174,7 +225,19 @@ class AnimalRepository(AbstractAnimalRepository):
             .limit(limit)
             .offset(offset)
         )
-        data = [UserModel(**(AnimalRepository.model_to_dict(d))) for d in results]
+        data = [
+            UserModel(
+                id=d.id,
+                handle_name=d.handle_name,
+                email_address=d.email_address,
+                age=d.age,
+                gender=d.gender,
+                deactivated=d.deactivated,
+                created_at=d.created_at,
+                updated_at=d.updated_at,
+            )
+            for d in results
+        ]
         return data
 
     def insert(
@@ -190,11 +253,9 @@ class AnimalRepository(AbstractAnimalRepository):
             session.refresh(data)
             result = self.select(
                 session=session,
-                query=AnimalQuery(
-                    id=data.id,
-                    limit=1,
-                    offset=0,
-                ),
+                query=AnimalQuery(id=data.id),
+                limit=1,
+                offset=0,
             )
             return result[0]
         return None

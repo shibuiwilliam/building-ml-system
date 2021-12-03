@@ -5,8 +5,14 @@ from fastapi.responses import JSONResponse
 from src.api import animal, animal_category, animal_subcategory, health_check, like, user
 from src.configurations import Configurations
 from src.exceptions.custom_exceptions import APINotAllowedException, DatabaseException, StorageClientException
+from src.initialize import create_indices, create_tables, initialize_data
 
 logger = getLogger(__name__)
+
+if Configurations.initialize:
+    create_tables(checkfirst=True)
+    create_indices(checkfirst=True)
+    initialize_data()
 
 
 base_prefix = f"/v{Configurations.version.split('.')[0]}"

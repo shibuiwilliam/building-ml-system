@@ -30,7 +30,6 @@ class UserCreate(BaseModel):
 
 class UserModel(BaseModel):
     id: str
-    name: str
     handle_name: str
     email_address: str
     age: int

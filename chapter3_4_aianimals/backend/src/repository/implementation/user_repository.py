@@ -3,9 +3,10 @@ from typing import List, Optional
 
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
+from src.entities.user import UserCreate, UserModel, UserQuery
 from src.repository.user_repository import AbstractUserRepository
 from src.schema.table import TABLES
-from src.schema.user import User, UserCreate, UserModel, UserQuery
+from src.schema.user import User
 
 logger = getLogger(__name__)
 
@@ -37,7 +38,19 @@ class UserRepository(AbstractUserRepository):
             if query.deactivated is not None:
                 filters.append(User.deactivated == query.deactivated)
         results = session.query(User).filter(and_(*filters)).order_by(User.id).limit(limit).offset(offset)
-        data = [UserModel(**(UserRepository.model_to_dict(d))) for d in results]
+        data = [
+            UserModel(
+                id=d.id,
+                handle_name=d.handle_name,
+                email_address=d.email_address,
+                age=d.age,
+                gender=d.gender,
+                deactivated=d.deactivated,
+                created_at=d.created_at,
+                updated_at=d.updated_at,
+            )
+            for d in results
+        ]
         return data
 
     def select_by_ids(
@@ -48,7 +61,19 @@ class UserRepository(AbstractUserRepository):
         offset=0,
     ) -> List[UserModel]:
         results = session.query(User).filter(User.id.in_(user_ids)).order_by(User.id).limit(limit).offset(offset)
-        data = [UserModel(**(UserRepository.model_to_dict(d))) for d in results]
+        data = [
+            UserModel(
+                id=d.id,
+                handle_name=d.handle_name,
+                email_address=d.email_address,
+                age=d.age,
+                gender=d.gender,
+                deactivated=d.deactivated,
+                created_at=d.created_at,
+                updated_at=d.updated_at,
+            )
+            for d in results
+        ]
         return data
 
     def insert(
@@ -64,11 +89,9 @@ class UserRepository(AbstractUserRepository):
             session.refresh(data)
             result = self.select(
                 session=session,
-                query=UserQuery(
-                    id=data.id,
-                    limit=1,
-                    offset=0,
-                ),
+                query=UserQuery(id=data.id),
+                limit=1,
+                offset=0,
             )
             return result[0]
         return None

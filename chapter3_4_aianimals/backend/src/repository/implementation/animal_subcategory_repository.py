@@ -4,7 +4,7 @@ from typing import List, Optional
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from src.entities.animal_subcategory import AnimalSubcategoryCreate, AnimalSubcategoryModel, AnimalSubcategoryQuery
-from src.repository.animal_subcategory_repository import AnimalSubcategoryRepository
+from src.repository.animal_subcategory_repository import AbstractAnimalSubcategoryRepository
 from src.schema.animal_category import AnimalCategory
 from src.schema.animal_subcategory import AnimalSubcategory
 from src.schema.table import TABLES
@@ -12,7 +12,7 @@ from src.schema.table import TABLES
 logger = getLogger(__name__)
 
 
-class AnimalSubcategoryRepository(AnimalSubcategoryRepository):
+class AnimalSubcategoryRepository(AbstractAnimalSubcategoryRepository):
     def __init__(self):
         super().__init__()
         self.table_name = TABLES.ANIMAL_SUBCATEGORY.value
@@ -51,7 +51,18 @@ class AnimalSubcategoryRepository(AnimalSubcategoryRepository):
             .order_by(AnimalSubcategory.id)
             .all()
         )
-        data = [AnimalSubcategoryModel(**(AnimalSubcategoryRepository.model_to_dict(d))) for d in results]
+        data = [
+            AnimalSubcategoryModel(
+                id=d[0],
+                name=d[1],
+                animal_category_id=d[2],
+                animal_category_name=d[3],
+                is_deleted=d[4],
+                created_at=d[5],
+                updated_at=d[6],
+            )
+            for d in results
+        ]
         return data
 
     def insert(

@@ -1,8 +1,7 @@
 from logging import getLogger
 from typing import Dict, List, Optional
 
-from sqlalchemy import and_
-from sqlalchemy.func import count
+from sqlalchemy import and_, func
 from sqlalchemy.orm import Session
 from src.entities.common import Count
 from src.entities.like import LikeCreate, LikeDelete, LikeModel, LikeQuery
@@ -34,7 +33,16 @@ class LikeRepository(AbstractLikeRepository):
             if query.user_id is not None:
                 filters.append(Like.id == query.user_id)
         results = session.query(Like).filter(and_(*filters)).order_by(Like.id).limit(limit).offset(offset)
-        data = [LikeModel(**(LikeRepository.model_to_dict(d))) for d in results]
+        data = [
+            LikeModel(
+                id=d[0],
+                animal_id=d[1],
+                user_id=d[2],
+                created_at=d[3],
+                updated_at=d[4],
+            )
+            for d in results
+        ]
         return data
 
     def count(
@@ -44,7 +52,7 @@ class LikeRepository(AbstractLikeRepository):
     ) -> Dict[str, Count]:
         results = (
             session.query(
-                count(Like.id).label("count"),
+                func.count(Like.id).label("count"),
                 Like.animal_id.label("animal_id"),
             )
             .filter(Like.animal_id.in_(animal_ids))
@@ -68,11 +76,9 @@ class LikeRepository(AbstractLikeRepository):
             session.refresh(data)
             result = self.select(
                 session=session,
-                query=LikeQuery(
-                    id=data.id,
-                    limit=1,
-                    offset=0,
-                ),
+                query=LikeQuery(id=data.id),
+                limit=1,
+                offset=0,
             )
             return result[0]
         return None
