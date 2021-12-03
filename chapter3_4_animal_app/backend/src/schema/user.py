@@ -3,7 +3,7 @@ from logging import getLogger
 from sqlalchemy import Boolean, Column, DateTime, String
 from sqlalchemy.sql.functions import current_timestamp
 from sqlalchemy.sql.sqltypes import INT
-from src.middleware.database import Base
+from src.schema.base import Base
 from src.schema.table import TABLES
 
 logger = getLogger(__name__)

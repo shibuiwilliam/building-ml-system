@@ -1,9 +1,12 @@
+import os
 from logging import getLogger
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, File, UploadFile
 from sqlalchemy.orm import Session
+from src.configurations import Configurations
 from src.middleware.database import get_session
+from src.middleware.strings import random_str
 from src.registry.container import container
 from src.request_object.animal import AnimalCreateRequest, AnimalRequest
 from src.response_object.animal import AnimalResponse, AnimalResponseWithLike
@@ -61,10 +64,16 @@ async def liked_by(
 @router.post("", response_model=Optional[AnimalResponse])
 async def post_animal(
     request: AnimalCreateRequest,
+    file: UploadFile = File(...),
     session: Session = Depends(get_session),
 ):
+    os.makedirs(Configurations.work_directory, exist_ok=True)
+    local_file_path = os.path.join(Configurations.work_directory, f"{random_str()}.jpg")
+    with open(local_file_path, "wb+") as f:
+        f.write(file.file.read())
     data = container.animal_usecase.register(
         session=session,
         request=request,
+        local_file_path=local_file_path,
     )
     return data

@@ -1,5 +1,12 @@
 from logging import getLogger
 
+from src.configurations import Configurations
+from src.constants import RUN_ENVIRONMENT
+from src.infrastructure.client.google_cloud_storage import GoogleCloudStorage
+from src.infrastructure.client.local_storage import LocalStorage
+from src.infrastructure.client.postgresql_database import PostgreSQLDatabase
+from src.infrastructure.database import AbstractDatabase
+from src.infrastructure.storage import AbstractStorage
 from src.repository.implementation.animal_category_repository import AnimalCategoryRepository
 from src.repository.implementation.animal_repository import AnimalRepository
 from src.repository.implementation.animal_subcategory_repository import AnimalSubcategoryRepository
@@ -27,13 +34,20 @@ class Container(object):
         user_usecase: AbstractUserUsecase,
         animal_usecase: AbstractAnimalUsecase,
         like_usecase: AbstractLikeUsecase,
+        database: AbstractDatabase,
     ):
         self.animal_category_usecase = animal_category_usecase
         self.animal_subcategory_usecase = animal_subcategory_usecase
         self.user_usecase = user_usecase
         self.animal_usecase = animal_usecase
         self.like_usecase = like_usecase
+        self.database = database
 
+
+if Configurations.run_environment == RUN_ENVIRONMENT.LOCAL.value:
+    storage_client: AbstractStorage = LocalStorage()
+elif Configurations.run_environment == RUN_ENVIRONMENT.LOCAL.value:
+    storage_client = GoogleCloudStorage()
 
 container = Container(
     animal_category_usecase=AnimalCategoryUsecase(
@@ -52,8 +66,10 @@ container = Container(
         animal_category_repository=AnimalCategoryRepository(),
         animal_subcategory_repository=AnimalSubcategoryRepository(),
         animal_repository=AnimalRepository(),
+        storage_client=storage_client,
     ),
     like_usecase=LikeUsecase(
         like_repository=LikeRepository(),
     ),
+    database=PostgreSQLDatabase(),
 )

@@ -2,12 +2,12 @@ from logging import getLogger
 
 from sqlalchemy import Column, Index
 from sqlalchemy.engine import Engine
-from src.middleware.database import Base
-from src.repository.animal_category_repository import AnimalCategory
-from src.repository.animal_repository import Animal
-from src.repository.animal_subcategory_repository import AnimalSubcategory
-from src.repository.like_repository import Like
-from src.repository.user_repository import User
+from src.schema.animal import Animal
+from src.schema.animal_category import AnimalCategory
+from src.schema.animal_subcategory import AnimalSubcategory
+from src.schema.base import Base
+from src.schema.like import Like
+from src.schema.user import User
 
 logger = getLogger(__name__)
 

@@ -3,6 +3,7 @@ from typing import List, Optional
 
 from sqlalchemy.orm import Session
 from src.entities.animal import AnimalCreate, AnimalQuery
+from src.infrastructure.storage import AbstractStorage
 from src.middleware.strings import get_uuid
 from src.repository.animal_category_repository import AbstractAnimalCategoryRepository
 from src.repository.animal_repository import AbstractAnimalRepository
@@ -25,6 +26,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
         animal_category_repository: AbstractAnimalCategoryRepository,
         animal_subcategory_repository: AbstractAnimalSubcategoryRepository,
         animal_repository: AbstractAnimalRepository,
+        storage_client: AbstractStorage,
     ):
         super().__init__(
             like_repository=like_repository,
@@ -32,6 +34,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
             animal_repository=animal_repository,
             animal_subcategory_repository=animal_subcategory_repository,
             animal_category_repository=animal_category_repository,
+            storage_client=storage_client,
         )
 
     def retrieve(
@@ -85,15 +88,21 @@ class AnimalUsecase(AbstractAnimalUsecase):
         self,
         session: Session,
         request: AnimalCreateRequest,
+        local_file_path: str,
     ) -> Optional[AnimalResponse]:
+        id = get_uuid()
+        photo_url = self.storage_client.upload_image(
+            uuid=id,
+            source_file_path=local_file_path,
+        )
         record = AnimalCreate(
-            id=get_uuid(),
+            id=id,
             animal_category_id=request.animal_category_id,
             animal_subcategory_id=request.animal_subcategory_id,
             user_id=request.user_id,
             name=request.name,
             description=request.description,
-            photo_url=request.photo_url,
+            photo_url=photo_url,
         )
         data = self.animal_repository.insert(
             session=session,

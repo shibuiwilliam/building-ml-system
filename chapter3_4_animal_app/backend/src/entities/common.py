@@ -1,4 +1,4 @@
-from typing import BaseModel
+from pydantic import BaseModel
 
 
 class Count(BaseModel):

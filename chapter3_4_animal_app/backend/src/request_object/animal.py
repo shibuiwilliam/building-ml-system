@@ -21,7 +21,6 @@ class AnimalCreateRequest(BaseModel):
     user_id: str
     name: str
     description: str
-    photo_url: str
 
     class Config:
         extra = Extra.forbid
