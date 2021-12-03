@@ -2,12 +2,12 @@ from logging import getLogger
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
-from src.entities.animal_category import AnimalCategoryQuery, AnimalCategoryCreate
+from src.entities.animal_category import AnimalCategoryCreate, AnimalCategoryQuery
+from src.middleware.strings import get_uuid
 from src.repository.animal_category_repository import AbstractAnimalCategoryRepository
 from src.request_object.animal_category import AnimalCategoryCreateRequest, AnimalCategoryRequest
 from src.response_object.animal_category import AnimalCategoryResponse
 from src.usecase.animal_category_usecase import AbstractAnimalCategoryUsecase
-from src.middleware.strings import get_uuid
 
 logger = getLogger(__name__)
 

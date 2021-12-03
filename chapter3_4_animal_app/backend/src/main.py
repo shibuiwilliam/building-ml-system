@@ -2,7 +2,7 @@ from logging import getLogger
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from src.api import animal, animal_category, animal_subcategory, health_check, user, like
+from src.api import animal, animal_category, animal_subcategory, health_check, like, user
 from src.configurations import Configurations
 from src.exceptions.custom_exceptions import APINotAllowedException, DatabaseException, StorageClientException
 
