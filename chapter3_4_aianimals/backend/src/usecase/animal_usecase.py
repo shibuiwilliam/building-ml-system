@@ -38,8 +38,8 @@ class AbstractAnimalUsecase(ABC):
         self,
         session: Session,
         request: Optional[AnimalRequest] = None,
-        limit: Optional[int] = 100,
-        offset: Optional[int] = 0,
+        limit: int = 100,
+        offset: int = 0,
     ) -> List[AnimalResponseWithLike]:
         raise NotImplementedError
 
@@ -48,8 +48,8 @@ class AbstractAnimalUsecase(ABC):
         self,
         session: Session,
         animal_id: str,
-        limit: Optional[int] = 100,
-        offset: Optional[int] = 0,
+        limit: int = 100,
+        offset: int = 0,
     ) -> List[UserResponse]:
         raise NotImplementedError
 

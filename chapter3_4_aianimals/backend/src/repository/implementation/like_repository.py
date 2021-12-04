@@ -21,8 +21,8 @@ class LikeRepository(AbstractLikeRepository):
         self,
         session: Session,
         query: Optional[LikeQuery],
-        limit: Optional[int] = 100,
-        offset: Optional[int] = 0,
+        limit: int = 100,
+        offset: int = 0,
     ) -> List[LikeModel]:
         filters = []
         if query is not None:
@@ -31,15 +31,15 @@ class LikeRepository(AbstractLikeRepository):
             if query.animal_id is not None:
                 filters.append(Like.animal_id == query.animal_id)
             if query.user_id is not None:
-                filters.append(Like.id == query.user_id)
+                filters.append(Like.user_id == query.user_id)
         results = session.query(Like).filter(and_(*filters)).order_by(Like.id).limit(limit).offset(offset)
         data = [
             LikeModel(
-                id=d[0],
-                animal_id=d[1],
-                user_id=d[2],
-                created_at=d[3],
-                updated_at=d[4],
+                id=d.id,
+                animal_id=d.animal_id,
+                user_id=d.user_id,
+                created_at=d.created_at,
+                updated_at=d.updated_at,
             )
             for d in results
         ]

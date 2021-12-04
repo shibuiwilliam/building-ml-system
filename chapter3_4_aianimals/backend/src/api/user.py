@@ -20,8 +20,8 @@ async def get_user(
     age: Optional[int] = None,
     gender: Optional[int] = None,
     deactivated: Optional[bool] = False,
-    limit: Optional[int] = 100,
-    offset: Optional[int] = 0,
+    limit: int = 100,
+    offset: int = 0,
     session: Session = Depends(container.database.get_session),
 ):
     data = container.user_usecase.retrieve(

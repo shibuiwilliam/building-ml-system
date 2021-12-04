@@ -35,9 +35,9 @@ class AnimalRepository(AbstractAnimalRepository):
             if query.name is not None:
                 filters.append(Animal.name == query.name)
             if query.animal_category_id is not None:
-                filters.append(AnimalCategory.id == query.animal_category_id)
+                filters.append(Animal.animal_category_id == query.animal_category_id)
             if query.animal_subcategory_id is not None:
-                filters.append(AnimalSubcategory.id == query.animal_subcategory_id)
+                filters.append(Animal.animal_subcategory_id == query.animal_subcategory_id)
             if query.user_id is not None:
                 filters.append(User.id == query.user_id)
             if query.deactivated is not None:
@@ -78,7 +78,6 @@ class AnimalRepository(AbstractAnimalRepository):
             .limit(limit)
             .offset(offset)
         )
-        logger.info(f"AAAAAAAAAAAAAAAAAAAAA {results}")
         data = [
             AnimalModel(
                 id=d[0],

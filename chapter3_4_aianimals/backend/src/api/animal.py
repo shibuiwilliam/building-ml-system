@@ -2,7 +2,7 @@ import os
 from logging import getLogger
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi import APIRouter, Depends, File, Form, UploadFile
 from sqlalchemy.orm import Session
 from src.configurations import Configurations
 from src.middleware.strings import random_str
@@ -24,8 +24,8 @@ async def get_animal(
     animal_subcategory_id: Optional[str] = None,
     user_id: Optional[str] = None,
     deactivated: Optional[bool] = False,
-    limit: Optional[int] = 100,
-    offset: Optional[int] = 0,
+    limit: int = 100,
+    offset: int = 0,
     session: Session = Depends(container.database.get_session),
 ):
     data = container.animal_usecase.retrieve(
@@ -47,8 +47,8 @@ async def get_animal(
 @router.get("/liked_by", response_model=List[UserResponse])
 async def liked_by(
     animal_id: str,
-    limit: Optional[int] = 100,
-    offset: Optional[int] = 0,
+    limit: int = 100,
+    offset: int = 0,
     session: Session = Depends(container.database.get_session),
 ):
     data = container.animal_usecase.liked_by(
@@ -62,14 +62,16 @@ async def liked_by(
 
 @router.post("", response_model=Optional[AnimalResponse])
 async def post_animal(
-    request: AnimalCreateRequest,
+    request: AnimalCreateRequest = Form(...),
     file: UploadFile = File(...),
     session: Session = Depends(container.database.get_session),
 ):
+    logger.info(f"register animal: {request}")
     os.makedirs(Configurations.work_directory, exist_ok=True)
     local_file_path = os.path.join(Configurations.work_directory, f"{random_str()}.jpg")
     with open(local_file_path, "wb+") as f:
         f.write(file.file.read())
+    logger.info(f"temporarily saved file on {local_file_path}")
     data = container.animal_usecase.register(
         session=session,
         request=request,

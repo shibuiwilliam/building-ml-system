@@ -41,15 +41,11 @@ class AnimalUsecase(AbstractAnimalUsecase):
         self,
         session: Session,
         request: Optional[AnimalRequest] = None,
-        limit: Optional[int] = 100,
-        offset: Optional[int] = 0,
+        limit: int = 100,
+        offset: int = 0,
     ) -> List[AnimalResponseWithLike]:
-        if limit is None:
-            limit = 100
-        if offset is None:
-            offset = 0
         if limit > 200:
-            raise ValueError("limit cannot be more than 200")
+            raise ValueError
         query: Optional[AnimalQuery] = None
         if request is not None:
             query = AnimalQuery(**request.dict())
@@ -66,15 +62,11 @@ class AnimalUsecase(AbstractAnimalUsecase):
         self,
         session: Session,
         animal_id: str,
-        limit: Optional[int] = 100,
-        offset: Optional[int] = 0,
+        limit: int = 100,
+        offset: int = 0,
     ) -> List[UserResponse]:
-        if limit is None:
-            limit = 100
-        if offset is None:
-            offset = 0
         if limit > 200:
-            raise ValueError("limit cannot be more than 200")
+            raise ValueError
         data = self.animal_repository.liked_by(
             session=session,
             animal_id=animal_id,
@@ -95,6 +87,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
             uuid=id,
             source_file_path=local_file_path,
         )
+        logger.info(f"uploaded image to {photo_url}")
         record = AnimalCreate(
             id=id,
             animal_category_id=request.animal_category_id,

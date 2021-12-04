@@ -23,8 +23,8 @@ class AbstractLikeUsecase(ABC):
         self,
         session: Session,
         request: Optional[LikeRequest] = None,
-        limit: Optional[int] = 100,
-        offset: Optional[int] = 0,
+        limit: int = 100,
+        offset: int = 0,
     ) -> List[LikeResponse]:
         raise NotImplementedError
 

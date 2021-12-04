@@ -23,9 +23,11 @@ class LikeUsecase(AbstractLikeUsecase):
         self,
         session: Session,
         request: Optional[LikeRequest] = None,
-        limit: Optional[int] = 100,
-        offset: Optional[int] = 0,
+        limit: int = 100,
+        offset: int = 0,
     ) -> List[LikeResponse]:
+        if limit > 200:
+            raise ValueError
         query: Optional[LikeRequest] = None
         if request is not None:
             query = LikeRequest(**request.dict())
@@ -53,6 +55,7 @@ class LikeUsecase(AbstractLikeUsecase):
             limit=1,
             offset=0,
         )
+        logger.info(f"exist: {exist}")
         if len(exist) > 0:
             return None
 
@@ -61,11 +64,13 @@ class LikeUsecase(AbstractLikeUsecase):
             animal_id=request.animal_id,
             user_id=request.user_id,
         )
+        logger.info(f"record: {record}")
         data = self.like_repository.insert(
             session=session,
             record=record,
             commit=True,
         )
+        logger.info(f"registered: {data}")
         if data is not None:
             response = LikeResponse(**data.dict())
             return response

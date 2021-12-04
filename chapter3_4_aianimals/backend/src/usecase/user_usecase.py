@@ -22,8 +22,8 @@ class AbstractUserUsecase(ABC):
         self,
         session: Session,
         request: Optional[UserRequest] = None,
-        limit: Optional[int] = 100,
-        offset: Optional[int] = 0,
+        limit: int = 100,
+        offset: int = 0,
     ) -> List[UserResponse]:
         raise NotImplementedError
 

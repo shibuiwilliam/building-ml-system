@@ -17,15 +17,21 @@ async def get_like(
     id: Optional[str] = None,
     animal_id: Optional[str] = None,
     user_id: Optional[str] = None,
+    limit: int = 100,
+    offset: int = 0,
     session: Session = Depends(container.database.get_session),
 ):
+    request = LikeRequest(
+        id=id,
+        animal_id=animal_id,
+        user_id=user_id,
+    )
+    logger.info(f"get like for {request}")
     data = container.like_usecase.retrieve(
         session=session,
-        request=LikeRequest(
-            id=id,
-            animal_id=animal_id,
-            user_id=user_id,
-        ),
+        request=request,
+        limit=limit,
+        offset=offset,
     )
     return data
 
@@ -35,6 +41,7 @@ async def post_like(
     request: LikeCreateRequest,
     session: Session = Depends(container.database.get_session),
 ):
+    logger.info(f"add like for {request}")
     data = container.like_usecase.register(
         session=session,
         request=request,
@@ -42,15 +49,16 @@ async def post_like(
     return data
 
 
-@router.delete("", response_model=None)
+@router.delete("", response_model=str)
 async def delete_like(
     like_id: str,
     session: Session = Depends(container.database.get_session),
 ):
+    logger.info(f"unlike for {like_id}")
     container.like_usecase.delete(
         session=session,
         request=LikeDeleteRequest(
             id=like_id,
         ),
     )
-    return None
+    return like_id
