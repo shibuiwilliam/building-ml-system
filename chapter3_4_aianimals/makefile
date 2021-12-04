@@ -42,6 +42,7 @@ req_backend:
 .PHONY: build_backend
 build_backend: 
 	docker build \
+		--platform linux/amd64 \
 		-t $(DOCKER_BACKEND_IMAGE_NAME) \
 		-f $(DOCKERFILE_BACKEND) \
 		.
