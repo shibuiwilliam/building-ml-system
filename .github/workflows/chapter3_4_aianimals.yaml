@@ -1,0 +1,28 @@
+name: chapter3_4_aianimals
+
+on:
+  push:
+    branches:
+      - test/*
+      - build/*
+      - all/*
+      - develop
+      - main
+
+jobs:
+  test-build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USER }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+      - name: Build and push api image
+        working-directory: ./chapter3_4_aianimals
+        env:
+          DOCKER_BUILDKIT: 1
+        run: |
+          make build_backend
+          make push_backend
