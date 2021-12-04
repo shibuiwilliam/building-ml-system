@@ -77,7 +77,7 @@ class Container(object):
 
 if Configurations.run_environment == RUN_ENVIRONMENT.LOCAL.value:
     storage_client: AbstractStorage = LocalStorage()
-elif Configurations.run_environment == RUN_ENVIRONMENT.LOCAL.value:
+elif Configurations.run_environment == RUN_ENVIRONMENT.CLOUD.value:
     storage_client = GoogleCloudStorage()
 
 container = Container(
