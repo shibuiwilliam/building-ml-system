@@ -39,7 +39,7 @@ services:
       - WORKERS=1
       - INITIALIZE=1
       - PORT=8000
-    command: /bin/sh -c "sleep 10s && ./run.sh"
+    command: ./run.sh
     depends_on:
       - postgres
 

@@ -24,8 +24,10 @@ from src.usecase.implementation.animal_category_usecase import AnimalCategoryUse
 from src.usecase.implementation.animal_subcategory_usecase import AnimalSubcategoryUsecase
 from src.usecase.implementation.animal_usecase import AnimalUsecase
 from src.usecase.implementation.like_usecase import LikeUsecase
+from src.usecase.implementation.metadata_usecase import MetadataUsecase
 from src.usecase.implementation.user_usecase import UserUsecase
 from src.usecase.like_usecase import AbstractLikeUsecase
+from src.usecase.metadata_usecase import AbstractMetadataUsecase
 from src.usecase.user_usecase import AbstractUserUsecase
 
 logger = getLogger(__name__)
@@ -66,6 +68,10 @@ class Container(object):
         )
         self.like_usecase: AbstractLikeUsecase = LikeUsecase(
             like_repository=self.like_repository,
+        )
+        self.metadata_usecase: AbstractMetadataUsecase = MetadataUsecase(
+            animal_category_repository=self.animal_category_repository,
+            animal_subcategory_repository=self.animal_subcategory_repository,
         )
 
 
