@@ -3,10 +3,10 @@ from datetime import datetime
 from pydantic import BaseModel, Extra
 
 
-class LikeResponse(BaseModel):
-    id: str
-    animal_id: str
-    user_id: str
+class AnimalCategoryResponse(BaseModel):
+    id: int
+    name: str
+    is_deleted: bool
     created_at: datetime
     updated_at: datetime
 

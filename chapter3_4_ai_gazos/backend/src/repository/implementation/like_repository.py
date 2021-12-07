@@ -28,15 +28,15 @@ class LikeRepository(AbstractLikeRepository):
         if query is not None:
             if query.id is not None:
                 filters.append(Like.id == query.id)
-            if query.content_id is not None:
-                filters.append(Like.content_id == query.content_id)
+            if query.animal_id is not None:
+                filters.append(Like.animal_id == query.animal_id)
             if query.user_id is not None:
                 filters.append(Like.user_id == query.user_id)
         results = session.query(Like).filter(and_(*filters)).order_by(Like.id).limit(limit).offset(offset)
         data = [
             LikeModel(
                 id=d.id,
-                content_id=d.content_id,
+                animal_id=d.animal_id,
                 user_id=d.user_id,
                 created_at=d.created_at,
                 updated_at=d.updated_at,
@@ -48,19 +48,19 @@ class LikeRepository(AbstractLikeRepository):
     def count(
         self,
         session: Session,
-        content_ids: List[str],
+        animal_ids: List[str],
     ) -> Dict[str, Count]:
         results = (
             session.query(
                 func.count(Like.id).label("count"),
-                Like.content_id.label("content_id"),
+                Like.animal_id.label("animal_id"),
             )
-            .filter(Like.content_id.in_(content_ids))
-            .group_by(Like.content_id)
-            .order_by(Like.content_id)
+            .filter(Like.animal_id.in_(animal_ids))
+            .group_by(Like.animal_id)
+            .order_by(Like.animal_id)
             .all()
         )
-        data = {r["content_id"]: Count(count=r["count"]) for r in results}
+        data = {r["animal_id"]: Count(count=r["count"]) for r in results}
         return data
 
     def insert(

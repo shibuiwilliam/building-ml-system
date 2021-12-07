@@ -2,7 +2,7 @@ from logging import getLogger
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from src.api import content, health_check, like, metadata, user
+from src.api import animal, animal_category, animal_subcategory, health_check, like, metadata, user
 from src.configurations import Configurations
 from src.exceptions.custom_exceptions import APINotAllowedException, DatabaseException, StorageClientException
 from src.initialize import create_indices, create_tables, initialize_data
@@ -70,15 +70,27 @@ app.include_router(
 )
 
 app.include_router(
-    content.router,
-    prefix=f"{base_prefix}/content",
-    tags=["content"],
+    animal_category.router,
+    prefix=f"{base_prefix}/animal_category",
+    tags=["animal_category"],
+)
+
+app.include_router(
+    animal_subcategory.router,
+    prefix=f"{base_prefix}/animal_subcategory",
+    tags=["animal_subcategory"],
 )
 
 app.include_router(
     user.router,
     prefix=f"{base_prefix}/user",
     tags=["user"],
+)
+
+app.include_router(
+    animal.router,
+    prefix=f"{base_prefix}/animal",
+    tags=["animal"],
 )
 
 app.include_router(

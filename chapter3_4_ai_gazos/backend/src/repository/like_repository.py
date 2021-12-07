@@ -28,7 +28,7 @@ class AbstractLikeRepository(ABC):
     def count(
         self,
         session: Session,
-        content_ids: List[str],
+        animal_ids: List[str],
     ) -> Dict[str, Count]:
         raise NotImplementedError
 

@@ -5,7 +5,7 @@ from pydantic import BaseModel, Extra
 
 class LikeRequest(BaseModel):
     id: Optional[str]
-    content_id: Optional[str]
+    animal_id: Optional[str]
     user_id: Optional[str]
 
     class Config:
@@ -13,7 +13,7 @@ class LikeRequest(BaseModel):
 
 
 class LikeCreateRequest(BaseModel):
-    content_id: str
+    animal_id: str
     user_id: str
 
     class Config:

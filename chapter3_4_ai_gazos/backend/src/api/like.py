@@ -15,7 +15,7 @@ router = APIRouter()
 @router.get("", response_model=List[LikeResponse])
 async def get_like(
     id: Optional[str] = None,
-    content_id: Optional[str] = None,
+    animal_id: Optional[str] = None,
     user_id: Optional[str] = None,
     limit: int = 100,
     offset: int = 0,
@@ -23,7 +23,7 @@ async def get_like(
 ):
     request = LikeRequest(
         id=id,
-        content_id=content_id,
+        animal_id=animal_id,
         user_id=user_id,
     )
     logger.info(f"get like for {request}")

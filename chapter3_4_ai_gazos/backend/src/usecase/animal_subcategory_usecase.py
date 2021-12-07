@@ -1,15 +1,17 @@
 from abc import ABC, abstractmethod
 from logging import getLogger
+from typing import List, Optional
 
 from sqlalchemy.orm import Session
 from src.repository.animal_category_repository import AbstractAnimalCategoryRepository
 from src.repository.animal_subcategory_repository import AbstractAnimalSubcategoryRepository
-from src.response_object.metadata import MetadataResponse
+from src.request_object.animal_subcategory import AnimalSubcategoryCreateRequest, AnimalSubcategoryRequest
+from src.response_object.animal_subcategory import AnimalSubcategoryResponse
 
 logger = getLogger(__name__)
 
 
-class AbstractMetadataUsecase(ABC):
+class AbstractAnimalSubcategoryUsecase(ABC):
     def __init__(
         self,
         animal_category_repository: AbstractAnimalCategoryRepository,
@@ -22,5 +24,14 @@ class AbstractMetadataUsecase(ABC):
     def retrieve(
         self,
         session: Session,
-    ) -> MetadataResponse:
+        request: Optional[AnimalSubcategoryRequest] = None,
+    ) -> List[AnimalSubcategoryResponse]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def register(
+        self,
+        session: Session,
+        request: AnimalSubcategoryCreateRequest,
+    ) -> Optional[AnimalSubcategoryResponse]:
         raise NotImplementedError

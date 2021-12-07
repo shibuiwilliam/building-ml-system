@@ -6,10 +6,14 @@ from sqlalchemy import Column, Index
 from sqlalchemy.engine import Engine
 from src.configurations import Configurations
 from src.entities.animal import AnimalCreate, AnimalQuery
+from src.entities.animal_category import AnimalCategoryCreate, AnimalCategoryQuery
+from src.entities.animal_subcategory import AnimalSubcategoryCreate, AnimalSubcategoryQuery
 from src.entities.user import UserCreate, UserQuery
 from src.registry.container import container
+from src.schema.animal import Animal
+from src.schema.animal_category import AnimalCategory
+from src.schema.animal_subcategory import AnimalSubcategory
 from src.schema.base import Base
-from src.schema.content import Content
 from src.schema.like import Like
 from src.schema.user import User
 
@@ -159,6 +163,57 @@ def create_indices(checkfirst: bool = True):
         unique=False,
     )
     logger.info("done create indices")
+
+
+def initialize_category():
+    logger.info(f"initialize category: {Configurations.animal_category_file}")
+    with open(Configurations.animal_category_file, "r") as f:
+        data = json.load(f)
+    session = container.database.get_session().__next__()
+    for k, v in data.items():
+        query = AnimalCategoryQuery(id=v["category"])
+        exist = container.animal_category_repository.select(
+            session=session,
+            query=query,
+        )
+        if len(exist) > 0:
+            continue
+        record = AnimalCategoryCreate(
+            id=v["category"],
+            name=k,
+        )
+        container.animal_category_repository.insert(
+            session=session,
+            record=record,
+            commit=True,
+        )
+    logger.info("done initialize category")
+
+
+def initialize_subcategory():
+    logger.info(f"initialize subcategory: {Configurations.animal_subcategory_file}")
+    with open(Configurations.animal_subcategory_file, "r") as f:
+        data = json.load(f)
+    session = container.database.get_session().__next__()
+    for k, v in data.items():
+        query = AnimalSubcategoryQuery(id=v["subcategory"])
+        exist = container.animal_subcategory_repository.select(
+            session=session,
+            query=query,
+        )
+        if len(exist) > 0:
+            continue
+        record = AnimalSubcategoryCreate(
+            id=v["subcategory"],
+            animal_category_id=v["category"],
+            name=k,
+        )
+        container.animal_subcategory_repository.insert(
+            session=session,
+            record=record,
+            commit=True,
+        )
+    logger.info("done initialize subcategory")
 
 
 def initialize_user():

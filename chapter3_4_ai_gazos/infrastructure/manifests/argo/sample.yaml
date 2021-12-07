@@ -1,0 +1,84 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: hello-hello-hello-
+spec:
+  entrypoint: hello-hello-hello
+  arguments:
+    parameters:
+      - name: repeat
+        value: "1"
+  templates:
+    - name: hello-hello-hello
+      dag:
+        tasks:
+          - name: hello1
+            template: gen-random-int
+            arguments:
+              parameters:
+                - name: repeat
+                  value: "1"
+          - name: reader1
+            template: read-int
+            dependencies: [hello1]
+            arguments:
+              artifacts:
+                - name: random
+                  from: "{{tasks.hello1.outputs.artifacts.random}}"
+          - name: hello20
+            template: gen-random-int
+            dependencies: [hello1]
+            arguments:
+              parameters:
+                - name: repeat
+                  value: "20"
+          - name: reader20
+            template: read-int
+            dependencies: [hello20]
+            arguments:
+              artifacts:
+                - name: random
+                  from: "{{tasks.hello20.outputs.artifacts.random}}"
+    - name: gen-random-int
+      inputs:
+        parameters:
+          - name: repeat
+      script:
+        image: python:3.9.7-slim
+        command: [python]
+        source: |
+          import random
+          import os
+          import logging
+          import json
+          from time import sleep
+          logger = logging.getLogger("main")
+          logger.setLevel(logging.DEBUG)
+          formatter = logging.Formatter("[%(asctime)s] [%(levelname)s] [%(name)s] [%(filename)s:%(lineno)d] [%(funcName)s] %(message)s")
+          handler = logging.StreamHandler()
+          handler.setLevel(logging.DEBUG)
+          handler.setFormatter(formatter)
+          logger.addHandler(handler)
+          _inputs = int({{inputs.parameters.repeat}})
+          logger.info(f"START: {_inputs}")
+          a={}
+          for i in range(_inputs):
+            r = random.randint(1, 100)
+            logger.info(f"{i}: {r}")
+            a[i] = r
+          with open("/tmp/a.json", "w") as f:
+            json.dump(a, f)
+          print("DONE")
+      outputs:
+        artifacts:
+          - name: random
+            path: /tmp/a.json
+    - name: read-int
+      inputs:
+        artifacts:
+          - name: random
+            path: /tmp/a.json
+      container:
+        image: alpine:latest
+        command: [sh, -c]
+        args: ["cat /tmp/a.json"]

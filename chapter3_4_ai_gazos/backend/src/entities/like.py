@@ -6,7 +6,7 @@ from pydantic import BaseModel, Extra
 
 class LikeQuery(BaseModel):
     id: Optional[str]
-    content_id: Optional[str]
+    animal_id: Optional[str]
     user_id: Optional[str]
 
     class Config:
@@ -15,7 +15,7 @@ class LikeQuery(BaseModel):
 
 class LikeCreate(BaseModel):
     id: str
-    content_id: str
+    animal_id: str
     user_id: str
 
     class Config:
@@ -31,7 +31,7 @@ class LikeDelete(BaseModel):
 
 class LikeModel(BaseModel):
     id: str
-    content_id: str
+    animal_id: str
     user_id: str
     created_at: datetime
     updated_at: datetime
