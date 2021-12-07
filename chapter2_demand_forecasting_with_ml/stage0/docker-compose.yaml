@@ -1,6 +1,24 @@
 version: "3"
 
 services:
+  postgres:
+    image: postgres:13.4
+    container_name: postgres
+    volumes:
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    networks:
+      - default
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=mlflow
+      - POSTGRES_INITDB_ARGS="--encoding=UTF-8"
+    ports:
+      - 5432:5432
+    hostname: postgres
+    restart: always
+    stdin_open: true
+
   mlflow:
     container_name: mlflow
     image: shibui/building-ml-system:beverage_sales_forecasting_mlflow_0.0.0
@@ -10,7 +28,7 @@ services:
       - "mlflow"
       - "server"
       - "--backend-store-uri"
-      - "/opt/outputs/mlruns"
+      - "postgresql+psycopg2://user:password@postgres:5432/mlflow"
       - "--default-artifact-root"
       - "/opt/outputs/mlruns"
       - "--host"
@@ -19,6 +37,8 @@ services:
       - 15000:5000
     restart: always
     hostname: mlflow
+    depends_on:
+      - postgres
 
   ml:
     container_name: ml

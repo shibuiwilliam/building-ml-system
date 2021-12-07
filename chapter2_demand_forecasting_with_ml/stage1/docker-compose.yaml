@@ -73,15 +73,17 @@ services:
       - "mlflow"
       - "server"
       - "--backend-store-uri"
-      - "/opt/outputs/mlruns"
+      - "postgresql+psycopg2://user:password@postgres:5432/mlflow"
       - "--default-artifact-root"
       - "/opt/outputs/mlruns"
       - "--host"
-      - "1.0.0.0"
+      - "0.0.0.0"
     ports:
       - 15000:5000
     restart: always
     hostname: mlflow
+    depends_on:
+      - postgres
 
   ml:
     container_name: ml
