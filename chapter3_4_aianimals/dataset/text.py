@@ -134,7 +134,13 @@ cat_meow = [
     "ミャウミャウ",
     "にーにー",
 ]
-dog_bugh = ["わんわん", "ワンワン", "ばふばふ", "バフバフ", "わうわう", "わん", "ワン"]
+dog_bugh = [
+    "わんわん",
+    "ワンワン",
+    "ばふばふ",
+    "バフバフ",
+    "わうわう",
+]
 mb_prepre = ["いつも", "ときどき", "たまに", "強く", "弱々しく", "優しく", "激しく", "大きく", "小さく"]
 mb_prefix = [
     "大声で",
@@ -160,8 +166,7 @@ mb_prefix = [
     "物静かに",
     "まじめに",
     "凛と",
-    "天がひっくり返ったように",
-    "天地をひっくり返すように",
+    "天地がひっくり返ったように",
     "王様のように",
     "神様のように",
     "晴天のように",
@@ -1051,7 +1056,6 @@ deai_pre = [
     "数年前に",
     "数ヶ月前に",
     "だいぶ昔に",
-    "忘れもしない",
 ]
 deai = [
     "ペットショップで",
@@ -1308,20 +1312,28 @@ for k, v in data.items():
         nmss.extend(gitai)
         nmss.extend(cat_meow if is_cat else dog_bugh)
 
-        nmss_r = random.randint(1, len(nmss))
+        length = 1
+        if random.random() > 0.7:
+            length += 1
+        if random.random() > 0.9:
+            length += 1
+        if random.random() > 0.9:
+            length += 1
+        nmss_r = random.randint(1, length)
         nmss_p = list(permutations(nmss, nmss_r))
 
         nr = random.choice(nmss_p)
-        name = "".join(nr)
+        an = "".join(nr)
         if random.random() > 0.8:
+            an += random.choice(kudoku)
             if random.random() > 0.6:
-                name += nmp
+                an += nmp
             if random.random() > 0.7:
-                name += nmw
+                an += nmw
             if random.random() > 0.6:
-                name += mp
-        dd[k]["name"] = name
-        dd[k]["description"] = s
+                an += mp
+        dd[k]["name"] = an
+        dd[k]["description"] = desc
 
     logger.info(dd[k])
 
