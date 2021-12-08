@@ -15,11 +15,52 @@ handler.setLevel(LOG_LEVEL)
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-kudoku = ["。", "！", "！！", "！？", "(ΦωΦ)", "(^o^)", ":D", "m(_ _)m", "＼(^o^)／", "U^ｪ^U", "☆彡", "☆", "★", "☆ミ"]
+kudoku = [
+    "。",
+    "。",
+    "。",
+    "。",
+    "。",
+    "。",
+    "。",
+    "。",
+    "。",
+    "。",
+    "。",
+    "。",
+    "。",
+    "！",
+    "！",
+    "！",
+    "！",
+    "！",
+    "！",
+    "！",
+    "！",
+    "！！",
+    "！！",
+    "。",
+    "！",
+    "！！",
+    "。",
+    "！",
+    "！！",
+    "！？",
+    "(ΦωΦ)",
+    "(^o^)",
+    ":D",
+    "m(_ _)m",
+    "＼(^o^)／",
+    "U^ｪ^U",
+    "☆彡",
+    "☆",
+    "★",
+    "☆ミ",
+]
 
 
 def do_aisatsu():
-    aisatsu = ["こんにちは", "はじめまして", "はろー", "ハロー", "お疲れさまです"]
+    aisatsu = ["こんにちは", "はじめまして", "はろー", "ハロー", "ぜひ見てください"]
     a = random.choice(aisatsu)
     k = random.choice(kudoku)
     return a + k
@@ -60,6 +101,12 @@ gitai = [
     "ほくほく",
     "もくもく",
     "もきゅもきゅ",
+    "るんるん",
+    "ルンルン気分",
+    "ルンルン",
+    "わくわく",
+    "ランラン",
+    "ドキドキ",
 ]
 
 
@@ -135,6 +182,19 @@ mb_suffix = [
     "となきます",
     "と言ってます",
 ]
+mb_suffix_past = [
+    "鳴いてました",
+    "ないてました",
+    "言ってました",
+    "(ΦωΦ)と鳴いてました",
+    "＼(^o^)／と鳴いてました",
+    "(^o^)と鳴いてました",
+    "(^O^)と鳴いてました",
+    "Uo･ｪ･oUと鳴いてました",
+    "と鳴いてました",
+    "とないてました",
+    "と言ってました",
+]
 
 
 def do_naku(is_cat: bool):
@@ -151,6 +211,30 @@ def do_naku(is_cat: bool):
     mpp = random.choice(mb_prepre)
     mp = random.choice(mb_prefix)
     ms = random.choice(mb_suffix)
+    if random.random() > 0.2:
+        p = ""
+        if random.random() > 0.7:
+            p += mpp
+        p += mp
+        naku = mp + naku
+    k = random.choice(kudoku)
+    return naku + ms + k
+
+
+def do_naita(is_cat: bool):
+    mb = cat_meow if is_cat else dog_bugh
+    naku = random.choice(mb)
+    if random.random() > 0.95:
+        n2 = random.choice(mb)
+        if n2 != naku:
+            naku = f"{naku}とか{n2}"
+    if random.random() > 0.999:
+        n3 = random.choice(mb)
+        if n3 not in naku:
+            naku = f"{naku}とか{n3}"
+    mpp = random.choice(mb_prepre)
+    mp = random.choice(mb_prefix)
+    ms = random.choice(mb_suffix_past)
     if random.random() > 0.2:
         p = ""
         if random.random() > 0.7:
@@ -983,7 +1067,7 @@ deai = [
     "学校で",
     "職場で",
 ]
-deatta = ["拾いました", "もらいました", "引き取りました"]
+deatta = ["拾いました", "もらいました", "引き取りました", "導かれました"]
 deatta_suffix = [
     "一目惚れです",
     "ひとめぼれです",
@@ -1013,6 +1097,118 @@ def do_deai():
     return dp + d + de + k + ds + kk
 
 
+not_mine_place = [
+    "道端で",
+    "学校で",
+    "旅行先で",
+    "旅先で",
+    "近所で",
+    "友人宅で",
+    "職場で",
+    "公園で",
+    "ペットショップで",
+    "河原で",
+    "山で",
+    "家の近くで",
+    "通勤途中で",
+    "通学途中で",
+    "散歩中に",
+    "ドライブ中に",
+]
+
+not_mine_when = [
+    "昨日",
+    "昨夜",
+    "一昨日",
+    "先週",
+    "数日前",
+    "数週間前",
+    "先月",
+    "先々週",
+    "さっき",
+    "ついさっき",
+    "今朝",
+    "今日",
+    "昼前に",
+    "午前に",
+    "午後に",
+]
+
+not_mine_pre = [
+    "偶然",
+    "ばったり",
+    "久しぶりに",
+    "たまたま",
+    "突然",
+    "運命的に",
+    "思いがけず",
+]
+not_mine = [
+    "見つけました",
+    "出会いました",
+    "遭遇しました",
+    "見ました",
+    "であいました",
+    "みかけました",
+    "見かけました",
+    "邂逅しました",
+    "鉢合わせました",
+    "会いました",
+    "出くわしました",
+    "目が合いました",
+    "お目にかかりました",
+    "めぐりあいました",
+]
+not_mine_suf = [
+    "一目惚れでした",
+    "めろめろでした",
+    "運命を感じました",
+    "かわいすぎました",
+    "最高でした",
+    "きゃわわわわでした",
+    "胸キュンでした",
+    "キュンキュンでした",
+    "胸が高鳴りました",
+    "心躍りました",
+    "ズッキューンでした",
+    "ドキっとしました",
+    "心がはずみました",
+    "幸せでした",
+    "心が華やぎました",
+    "ときめきました",
+    "ドッキューンでした",
+    "キュンとしました",
+]
+
+
+def do_not_mine():
+    nmp = random.choice(not_mine_place)
+    nmw = random.choice(not_mine_when)
+    mp = random.choice(not_mine_pre)
+    nm = random.choice(not_mine)
+    nms = random.choice(not_mine_suf)
+
+    s = ""
+
+    nnn = [nmp, nmw, mp]
+    nr = random.randint(1, len(nnn))
+    nperm = list(permutations(nnn, nr))
+    nps = random.choice(nperm)
+    logger.info(nps)
+    for np in nps:
+        logger.info(np)
+        s += np
+    s += nm
+    if random.random() > 0.3:
+        s += random.choice(kudoku)
+    if random.random() > 0.6:
+        s += nms
+        if random.random() > 0.4:
+            s += random.choice(kudoku)
+    logger.info(s)
+    return str(s), nmp, nmw, mp, nm, nms
+
+
 with open("animal.json", "r") as f:
     data = json.load(f)
 
@@ -1021,50 +1217,112 @@ for k, v in data.items():
     dd[k] = v
     is_cat = True if v["category"] == 1 else False
     l = []
-    _n = cat_name if is_cat else dog_name
-    an = random.choice(_n)
 
-    firsts = ["aisatsu", "name"]
-    first_r = random.randint(0, len(firsts))
-    first_perm = list(permutations(firsts, first_r))
+    if random.random() > 0.7:
+        logger.info("yours")
+        _n = cat_name if is_cat else dog_name
+        an = random.choice(_n)
 
-    lasts = ["hyogen", "naku", "suki", "deai"]
-    last_r = random.randint(0, len(lasts))
-    last_perm = list(permutations(lasts, last_r))
+        firsts = ["aisatsu", "name"]
+        first_r = random.randint(0, len(firsts))
+        first_perm = list(permutations(firsts, first_r))
 
-    fps = random.choice(first_perm)
-    lps = random.choice(last_perm)
+        lasts = ["hyogen", "naku", "suki", "deai"]
+        last_r = random.randint(0, len(lasts))
+        last_perm = list(permutations(lasts, last_r))
 
-    for fp in fps:
-        if fp == "aisatsu":
-            _ai = do_aisatsu()
-            l.append(_ai)
-        if fp == "name":
-            _na = do_name(is_cat=is_cat, an=an)
-            l.append(_na)
+        fps = random.choice(first_perm)
+        lps = random.choice(last_perm)
 
-    for lp in lps:
-        if lp == "hyogen":
-            _hy = do_hyogen()
-            l.append(_hy)
-        if lp == "naku":
-            _nk = do_naku(is_cat=is_cat)
-            l.append(_nk)
-        if lp == "suki":
-            _sk = do_suki(is_cat=is_cat)
-            l.append(_sk)
-        if lp == "deai":
-            _de = do_deai()
-            l.append(_de)
+        for fp in fps:
+            if fp == "aisatsu":
+                _ai = do_aisatsu()
+                l.append(_ai)
+            if fp == "name":
+                _na = do_name(is_cat=is_cat, an=an)
+                l.append(_na)
 
-    logger.info(l)
-    desc = ""
-    for ll in l:
-        desc += ll
-        if random.random() > 0.5:
-            desc += "\n"
-    dd[k]["name"] = an
-    dd[k]["description"] = desc
+        for lp in lps:
+            if lp == "hyogen":
+                _hy = do_hyogen()
+                l.append(_hy)
+                if random.random() > 0.9:
+                    an = _hy
+            if lp == "naku":
+                _nk = do_naku(is_cat=is_cat)
+                l.append(_nk)
+                if random.random() > 0.9:
+                    an = _nk
+            if lp == "suki":
+                _sk = do_suki(is_cat=is_cat)
+                l.append(_sk)
+                if random.random() > 0.9:
+                    an = _sk
+            if lp == "deai":
+                _de = do_deai()
+                l.append(_de)
+                if random.random() > 0.9:
+                    an = _de
+
+        logger.info(l)
+        desc = ""
+        for ll in l:
+            desc += ll
+            if random.random() > 0.5:
+                desc += "\n"
+        _k = random.choice(kudoku)
+        if random.random() > 0.7:
+            an += _k
+        dd[k]["name"] = an
+        dd[k]["description"] = desc
+    else:
+        logger.info("not yours")
+        s, nmp, nmw, mp, nm, nms = do_not_mine()
+        logger.info(f"{s}, {nmp}, {nmw}, {mp}, {nm}, {nms}")
+        naita = do_naita(is_cat=is_cat)
+
+        l = []
+        if random.random() > 0.2:
+            if random.random() > 0.4:
+                if random.random() > 0.6:
+                    l.append(s)
+                    l.append(naita)
+                elif random.random() > 0.7:
+                    l.append(naita)
+                    l.append(s)
+            elif random.random() > 0.6:
+                l.append(s)
+            elif random.random() > 0.7:
+                l.append(naita)
+        logger.info(l)
+        desc = ""
+        for ll in l:
+            logger.info(ll)
+            desc += ll
+            logger.info(desc)
+            if random.random() > 0.5:
+                desc += "\n"
+                logger.info(desc)
+
+        nmss = [n for n in hyogen]
+        nmss.extend(gitai)
+        nmss.extend(cat_meow if is_cat else dog_bugh)
+
+        nmss_r = random.randint(1, len(nmss))
+        nmss_p = list(permutations(nmss, nmss_r))
+
+        nr = random.choice(nmss_p)
+        name = "".join(nr)
+        if random.random() > 0.8:
+            if random.random() > 0.6:
+                name += nmp
+            if random.random() > 0.7:
+                name += nmw
+            if random.random() > 0.6:
+                name += mp
+        dd[k]["name"] = name
+        dd[k]["description"] = s
+
     logger.info(dd[k])
 
 with open("animal.json", "w") as f:
