@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: data-registry-
+spec:
+  entrypoint: data-registry
+  arguments:
+    parameters:
+      - name: repeat
+        value: "1"
+  templates:
+    - name: data-registry
+      container:
+        image: shibui/building-ml-system:ai_animals_data_manager_0.0.0
+        command: [python, -m, src.main]
+        env:
+          - name: POSTGRES_SERVER
+            value: postgres.aianimals.svc.cluster.local
+          - name: POSTGRES_PORT
+            value: "5432"
+          - name: POSTGRES_USER
+            value: postgres
+          - name: POSTGRES_PASSWORD
+            value: password
+          - name: POSTGRES_DB
+            value: aianimals
+          - name: RUN_ENVIRONMENT
+            value: cloud
+          - name: LOG_LEVEL
+            value: DEBUG
+          - name: DATA_DIRECTORY
+            value: "/opt/dataset"
+  imagePullSecrets:
+    - name: regcred

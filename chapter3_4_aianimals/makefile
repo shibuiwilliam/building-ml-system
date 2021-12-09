@@ -4,9 +4,11 @@ DOCKER_COMPOSE := docker-compose.yaml
 VERSION := 0.0.0
 
 DOCKER_REPOSITORY := shibui/building-ml-system
+TAG = ai_animals
 
 DIR := $(ABSOLUTE_PATH)
-TAG = ai_animals
+K8S_DIR := $(ABSOLUTE_PATH)/infrastructure
+K8S_SECRET_DIR := $(K8S_DIR)/secrets
 
 
 ############ DATA MANAGER COMMANDS ############
@@ -54,6 +56,7 @@ push_data_manager:
 
 ############ BACKEND COMMANDS ############
 BACKEND_DIR := $(DIR)/backend
+BACKEND_MANIFEST_DIR := $(K8S_DIR)/manifests/backend
 DOCKERFILE_BACKEND = $(BACKEND_DIR)/$(DOCKERFILE)
 DOCKER_BACKEND_TAG = $(TAG)_backend
 DOCKER_BACKEND_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_BACKEND_TAG)_$(VERSION)
@@ -94,41 +97,55 @@ build_backend:
 push_backend: 
 	docker push $(DOCKER_BACKEND_IMAGE_NAME)
 
+.PHONY: deploy_backend_ns
+deploy_backend_ns:
+	kubectl apply -f $(BACKEND_MANIFEST_DIR)/namespace.yaml 
 
-############ KUBERNETES COMMANDS ############
-K8S_DIR := $(ABSOLUTE_PATH)/infrastructure
-K8S_SECRET_DIR := $(K8S_DIR)/secrets
-
-.PHONY: admin_clusterrole
-admin_clusterrole:
+.PHONY: registry_backend
+registry_backend: deploy_backend_ns
 	@cd $(K8S_SECRET_DIR) && \
-		./admin_clusterrole.sh
+		NAMESPACE=aianimals ./private_registry_secret.sh
+
+.PHONY: deploy_backend
+deploy_backend: deploy_backend_ns
+	kubectl apply -f $(BACKEND_MANIFEST_DIR)/postgres.yaml && \
+	kubectl apply -f $(BACKEND_MANIFEST_DIR)/backend.yaml
 
 
 ############ ARGO COMMANDS ############
 ARGO_DIR := $(K8S_DIR)/manifests/argo
 
-.PHONY: argo_registry
-argo_registry:
+.PHONY: deploy_argo_ns
+deploy_argo_ns:
+	kubectl apply -f $(ARGO_DIR)/namespace.yaml
+
+.PHONY: registry_argo
+registry_argo: deploy_argo_ns
 	@cd $(K8S_SECRET_DIR) && \
 		NAMESPACE=argo ./private_registry_secret.sh
 
-.PHONY: argo_deploy
-argo_deploy:
-	kubectl apply -f $(ARGO_DIR)/namespace.yaml && \
+.PHONY: deploy_argo
+deploy_argo: deploy_argo_ns
 	kubectl apply -f $(ARGO_DIR)/quick_argo.yaml
 
+.PHONY: port_forward_argo
+port_forward_argo:
+	kubectl -n argo port-forward service/argo-server 2746:2746 &
 
 ############ ELASTICSEARCH COMMANDS ############
 ES_DIR := $(K8S_DIR)/manifests/elasticsearch
 
-.PHONY: es_registry
-es_registry:
-	@cd $(K8S_SECRET_DIR) && \
-		NAMESPACE=argo ./private_registry_secret.sh
+.PHONY: deploy_es_ns
+deploy_es_ns:
+	kubectl apply -f $(ES_DIR)/namespace.yaml
 
-.PHONY: es_deploy
-es_deploy:
+.PHONY: registry_es
+registry_es: deploy_es_ns
+	@cd $(K8S_SECRET_DIR) && \
+		NAMESPACE=elastic-search ./private_registry_secret.sh
+
+.PHONY: deploy_es
+deploy_es: deploy_es_ns
 	kubectl apply -f $(ES_DIR)/crds.yaml && \
 	kubectl apply -f $(ES_DIR)/operator.yaml && \
 	kubectl apply -f $(ES_DIR)/deployment.yaml
@@ -138,6 +155,14 @@ es_password:
 	kubectl -n elastic-search \
 		get secret elastic-search-es-elastic-user \
 		-o go-template='{{.data.elastic | base64decode}}'
+
+.PHONY: port_forward_es
+port_forward_es:
+	kubectl -n elastic-search port-forward service/elastic-search-es-http 9200:9200 &
+
+.PHONY: port_forward_kibana
+port_forward_kibana:
+	kubectl -n elastic-search port-forward service/kibana-kb-http 5601:5601 &
 
 
 ############ DOCKER COMPOSE COMMANDS ############
@@ -152,6 +177,24 @@ down:
 	docker-compose \
 		-f $(DOCKER_COMPOSE) \
 		down
+
+
+############ DEPLOYMENT COMMANDS ############
+.PHONY: registry_default
+registry_default:
+	@cd $(K8S_SECRET_DIR) && \
+		NAMESPACE=default ./private_registry_secret.sh
+
+.PHONY: admin_clusterrole
+admin_clusterrole:
+	@cd $(K8S_SECRET_DIR) && \
+		./admin_clusterrole.sh
+
+.PHONY: deploy_all
+deploy_all: registry_default admin_clusterrole \
+	registry_backend deploy_backend \
+	registry_argo deploy_argo \
+	registry_es deploy_es
 
 
 ############ ALL COMMANDS ############

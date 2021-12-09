@@ -26,10 +26,10 @@ spec:
           resources:
             limits:
               cpu: 500m
-              memory: "2000Mi"
+              memory: "1000Mi"
             requests:
               cpu: 500m
-              memory: "2000Mi"
+              memory: "1000Mi"
           env:
             - name: POSTGRES_SERVER
               value: postgres.aianimals.svc.cluster.local
@@ -41,14 +41,12 @@ spec:
               value: password
             - name: POSTGRES_DB
               value: aianimals
+            - name: GCS_BUCKET
+              value: aianimals
             - name: RUN_ENVIRONMENT
               value: cloud
             - name: PORT
               value: "8000"
-            - name: INITIALIZE
-              value: "1"
-            - name: DATA_DIRECTORY
-              value: /opt/dataset
             - name: WORKERS
               value: "1"
             - name: TIMEOUT
