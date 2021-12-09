@@ -23,16 +23,6 @@ class AbstractUserRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def select_by_ids(
-        self,
-        session: Session,
-        user_ids: List[str],
-        limit=100,
-        offset=0,
-    ) -> List[UserModel]:
-        raise NotImplementedError
-
-    @abstractmethod
     def insert(
         self,
         session: Session,

@@ -1,5 +1,18 @@
+from src.controller.animal_category_controller import AbstractAnimalCategoryController
+from src.controller.animal_controller import AbstractAnimalController
+from src.controller.animal_subcategory_controller import AbstractAnimalSubcategoryController
+from src.controller.implementation.animal_category_controller import AnimalCategoryController
+from src.controller.implementation.animal_controller import AnimalController
+from src.controller.implementation.animal_subcategory_controller import AnimalSubcategoryController
+from src.controller.implementation.like_controller import LikeController
+from src.controller.implementation.table_controller import TableController
+from src.controller.implementation.user_controller import UserController
+from src.controller.like_controller import AbstractLikeController
+from src.controller.table_controller import AbstractTableController
+from src.controller.user_controller import AbstractUserController
 from src.infrastructure.client.postgresql_database import PostgreSQLDatabase
 from src.infrastructure.database import AbstractDatabase
+from src.middleware.logger import configure_logger
 from src.repository.animal_category_repository import AbstractAnimalCategoryRepository
 from src.repository.animal_repository import AbstractAnimalRepository
 from src.repository.animal_subcategory_repository import AbstractAnimalSubcategoryRepository
@@ -19,15 +32,13 @@ from src.usecase.implementation.animal_category_usecase import AnimalCategoryUse
 from src.usecase.implementation.animal_subcategory_usecase import AnimalSubcategoryUsecase
 from src.usecase.implementation.animal_usecase import AnimalUsecase
 from src.usecase.implementation.like_usecase import LikeUsecase
-from src.usecase.implementation.metadata_usecase import MetadataUsecase
 from src.usecase.implementation.table_usecase import TableUsecase
 from src.usecase.implementation.user_usecase import UserUsecase
 from src.usecase.like_usecase import AbstractLikeUsecase
-from src.usecase.metadata_usecase import AbstractMetadataUsecase
 from src.usecase.table_usecase import AbstractTableUsecase
 from src.usecase.user_usecase import AbstractUserUsecase
 
-logger = getLogger(__name__)
+logger = configure_logger(__name__)
 
 
 class Container(object):
@@ -49,27 +60,26 @@ class Container(object):
             animal_category_repository=self.animal_category_repository,
         )
         self.animal_subcategory_usecase: AbstractAnimalSubcategoryUsecase = AnimalSubcategoryUsecase(
-            animal_category_repository=self.animal_category_repository,
             animal_subcategory_repository=self.animal_subcategory_repository,
         )
         self.user_usecase: AbstractUserUsecase = UserUsecase(
             user_repository=self.user_repository,
         )
-        self.animal_usecase: AbstractAnimalUsecase = AnimalUsecase(
-            like_repository=self.like_repository,
-            user_repository=self.user_repository,
-            animal_category_repository=self.animal_category_repository,
-            animal_subcategory_repository=self.animal_subcategory_repository,
-            animal_repository=self.animal_reposigory,
-            storage_client=self.storage_client,
-        )
+        self.animal_usecase: AbstractAnimalUsecase = AnimalUsecase(animal_repository=self.animal_reposigory)
         self.like_usecase: AbstractLikeUsecase = LikeUsecase(
             like_repository=self.like_repository,
         )
-        self.metadata_usecase: AbstractMetadataUsecase = MetadataUsecase(
-            animal_category_repository=self.animal_category_repository,
-            animal_subcategory_repository=self.animal_subcategory_repository,
+
+        self.table_controller: AbstractTableController = TableController(table_usecase=self.table_usecase)
+        self.animal_category_controller: AbstractAnimalCategoryController = AnimalCategoryController(
+            animal_category_usecase=self.animal_category_usecase
         )
+        self.animal_subcategory_controller: AbstractAnimalSubcategoryController = AnimalSubcategoryController(
+            animal_subcategory_usecase=self.animal_subcategory_usecase
+        )
+        self.user_controller: AbstractUserController = UserController(user_usecase=self.user_usecase)
+        self.animal_controller: AbstractAnimalController = AnimalController(animal_usecase=self.animal_usecase)
+        self.like_controller: AbstractLikeController = LikeController(like_usecase=self.like_usecase)
 
 
 container = Container(

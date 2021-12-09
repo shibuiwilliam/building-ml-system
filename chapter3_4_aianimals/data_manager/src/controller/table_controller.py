@@ -1,32 +1,29 @@
 from abc import ABC, abstractmethod
 
-from sqlalchemy import Column, Index
 from sqlalchemy.engine import Engine
 from src.middleware.logger import configure_logger
-from src.schema.base import Base
+from src.usecase.table_usecase import AbstractTableUsecase
 
 logger = configure_logger(__name__)
 
 
-class AbstractTableRepository(ABC):
-    def __init__(self):
-        pass
+class AbstractTableController(ABC):
+    def __init__(
+        self,
+        table_usecase: AbstractTableUsecase,
+    ):
+        self.table_usecase = table_usecase
 
     @abstractmethod
     def create_table(
         self,
         engine: Engine,
-        table: Base,
-        checkfirst: bool = True,
     ):
         raise NotImplementedError
 
     @abstractmethod
     def create_index(
+        self,
         engine: Engine,
-        table: Base,
-        column: Column,
-        checkfirst: bool = True,
-        unique: bool = False,
-    ) -> Index:
+    ):
         raise NotImplementedError

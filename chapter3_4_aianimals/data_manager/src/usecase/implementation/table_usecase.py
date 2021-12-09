@@ -29,8 +29,8 @@ class TableUsecase(AbstractTableUsecase):
 
     def create_index(
         self,
-        table: Base,
         engine: Engine,
+        table: Base,
         column: Column,
         checkfirst: bool = True,
         unique: bool = False,

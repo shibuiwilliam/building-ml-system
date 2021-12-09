@@ -16,8 +16,6 @@ from src.schema.base import Base
 from src.schema.like import Like
 from src.schema.user import User
 
-logger = getLogger(__name__)
-
 
 def create_tables(checkfirst: bool = True):
     logger.info("create tables")

@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
-from src.entities.like import LikeDelete, LikeModel, LikeQuery
+from src.entities.like import LikeCreate, LikeModel, LikeQuery
 from src.middleware.logger import configure_logger
 
 logger = configure_logger(__name__)
@@ -23,10 +23,10 @@ class AbstractLikeRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def delete(
+    def insert(
         self,
         session: Session,
-        record: LikeDelete,
+        record: LikeCreate,
         commit: bool = True,
-    ):
+    ) -> Optional[LikeModel]:
         raise NotImplementedError

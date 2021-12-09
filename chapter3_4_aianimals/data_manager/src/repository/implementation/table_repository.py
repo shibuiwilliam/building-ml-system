@@ -26,8 +26,8 @@ class TableRepository(AbstractTableRepository):
         logger.info(f"done create table: {table.__table__}")
 
     def create_index(
-        table: Base,
         engine: Engine,
+        table: Base,
         column: Column,
         checkfirst: bool = True,
         unique: bool = False,
