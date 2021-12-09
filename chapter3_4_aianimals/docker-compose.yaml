@@ -40,6 +40,39 @@ services:
       - INITIALIZE=1
       - PORT=8000
     command: ./run.sh
+    hostname: backend
+    depends_on:
+      - postgres
+
+  es:
+    container_name: es
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.0
+    volumes:
+      - ./local_conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    restart: always
+    networks:
+      - default
+    ports:
+      - 127.0.0.1:9200:9200
+      - 127.0.0.1:9201:9201
+      - 127.0.0.1:9300:9300
+    environment:
+      - discovery.type=single-node
+    hostname: es
+    depends_on:
+      - postgres
+
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:7.16.0
+    restart: always
+    networks:
+      - default
+    ports:
+      - 127.0.0.1:5601:5601
+    environment:
+      - ELASTICSEARCH_HOSTS="http://es:9200"
+    hostname: kibana
     depends_on:
       - postgres
 

@@ -66,3 +66,47 @@ down:
 		down
 
 
+
+############ KUBERNETES COMMANDS ############
+K8S_DIR := $(ABSOLUTE_PATH)/infrastructure
+K8S_SECRET_DIR := $(K8S_DIR)/secrets
+
+.PHONY: admin_clusterrole
+admin_clusterrole:
+	@cd $(K8S_SECRET_DIR) && \
+		./admin_clusterrole.sh
+
+
+############ ARGO COMMANDS ############
+ARGO_DIR := $(K8S_DIR)/manifests/argo
+
+.PHONY: argo_registry
+argo_registry:
+	@cd $(K8S_SECRET_DIR) && \
+		NAMESPACE=argo ./private_registry_secret.sh
+
+.PHONY: argo_deploy
+argo_deploy:
+	kubectl apply -f $(ARGO_DIR)/namespace.yaml && \
+	kubectl apply -f $(ARGO_DIR)/quick_argo.yaml
+
+
+############ ELASTICSEARCH COMMANDS ############
+ES_DIR := $(K8S_DIR)/manifests/elasticsearch
+
+.PHONY: es_registry
+es_registry:
+	@cd $(K8S_SECRET_DIR) && \
+		NAMESPACE=argo ./private_registry_secret.sh
+
+.PHONY: es_deploy
+es_deploy:
+	kubectl apply -f $(ES_DIR)/crds.yaml && \
+	kubectl apply -f $(ES_DIR)/operator.yaml && \
+	kubectl apply -f $(ES_DIR)/deployment.yaml
+
+.PHONY: es_password
+es_password:
+	kubectl -n elastic-search \
+		get secret elastic-search-es-elastic-user \
+		-o go-template='{{.data.elastic | base64decode}}'

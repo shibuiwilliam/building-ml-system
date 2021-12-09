@@ -1,7 +1,7 @@
 import json
+import logging
 import os
 import random
-import logging
 from itertools import permutations
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", logging.DEBUG)
@@ -1228,11 +1228,13 @@ for k, v in data.items():
         an = random.choice(_n)
 
         firsts = ["aisatsu", "name"]
-        first_r = random.randint(0, len(firsts))
+        m = 0 if random.random() > 0.9 else 1
+        first_r = random.randint(m, len(firsts))
         first_perm = list(permutations(firsts, first_r))
 
         lasts = ["hyogen", "naku", "suki", "deai"]
-        last_r = random.randint(0, len(lasts))
+        m = 0 if random.random() > 0.9 else 1
+        last_r = random.randint(m, len(lasts))
         last_perm = list(permutations(lasts, last_r))
 
         fps = random.choice(first_perm)
@@ -1286,17 +1288,17 @@ for k, v in data.items():
         naita = do_naita(is_cat=is_cat)
 
         l = []
-        if random.random() > 0.2:
-            if random.random() > 0.4:
-                if random.random() > 0.6:
+        if random.random() > 0.1:
+            if random.random() > 0.3:
+                if random.random() > 0.2:
                     l.append(s)
                     l.append(naita)
-                elif random.random() > 0.7:
+                elif random.random() > 0.1:
                     l.append(naita)
                     l.append(s)
-            elif random.random() > 0.6:
+            elif random.random() > 0.1:
                 l.append(s)
-            elif random.random() > 0.7:
+            elif random.random() > 0.3:
                 l.append(naita)
         logger.info(l)
         desc = ""
