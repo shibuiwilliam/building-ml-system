@@ -40,8 +40,18 @@ class AnimalSubcategoryUsecase(AbstractAnimalSubcategoryUsecase):
         session: Session,
         request: AnimalSubcategoryCreateRequest,
     ) -> Optional[AnimalSubcategoryResponse]:
+        logger.info(f"register: {request}")
+        exists = self.animal_subcategory_repository.select(
+            session=session,
+            query=AnimalSubcategoryQuery(id=request.id),
+        )
+        if len(exists) > 0:
+            response = AnimalSubcategoryResponse(**exists[0].dict())
+            logger.info(f"exists: {response}")
+            return response
+
         record = AnimalSubcategoryCreate(
-            id=get_uuid(),
+            id=request.id,
             animal_category_id=request.animal_category_id,
             name=request.name,
         )
@@ -52,5 +62,6 @@ class AnimalSubcategoryUsecase(AbstractAnimalSubcategoryUsecase):
         )
         if data is not None:
             response = AnimalSubcategoryResponse(**data.dict())
+            logger.info(f"done register: {response}")
             return response
         return None

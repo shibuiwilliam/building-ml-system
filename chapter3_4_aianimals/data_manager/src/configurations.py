@@ -3,7 +3,7 @@ import os
 
 class Configurations:
     run_environment = os.getenv("RUN_ENVIRONMENT", "local")
-    work_directory = os.getenv("WORK_DIRECTORY", "/tmp")
+
     data_directory = os.environ["DATA_DIRECTORY"]
     animal_category_file = os.path.join(data_directory, "animal_category.json")
     animal_subcategory_file = os.path.join(data_directory, "animal_subcategory.json")

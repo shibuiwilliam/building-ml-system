@@ -19,6 +19,26 @@ services:
     hostname: postgres
     stdin_open: true
 
+  data_manager:
+    container_name: data_manager
+    image: shibui/building-ml-system:ai_animals_data_manager_0.0.0
+    restart: "no"
+    networks:
+      - default
+    environment:
+      - POSTGRES_SERVER=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=aianimals
+      - LOG_LEVEL=DEBUG
+      - RUN_ENVIRONMENT=local
+      - DATA_DIRECTORY=/opt/dataset
+    command: >
+      /bin/sh -c "sleep 5s && python -m src.main"
+    depends_on:
+      - postgres
+
   backend:
     container_name: backend
     image: shibui/building-ml-system:ai_animals_backend_0.0.0

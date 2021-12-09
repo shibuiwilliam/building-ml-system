@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel, Extra
@@ -16,10 +17,12 @@ class UserRequest(BaseModel):
 
 
 class UserCreateRequest(BaseModel):
-    handle_name: Optional[str]
-    email_address: Optional[str]
+    id: str
+    handle_name: str
+    email_address: str
     age: Optional[int]
     gender: Optional[int]
+    created_at: datetime
 
     class Config:
         extra = Extra.forbid

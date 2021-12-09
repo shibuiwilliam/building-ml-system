@@ -36,8 +36,8 @@ class TableUsecase(AbstractTableUsecase):
         unique: bool = False,
     ) -> Index:
         return self.table_repository.create_index(
-            table=table,
             engine=engine,
+            table=table,
             column=column,
             checkfirst=checkfirst,
             unique=unique,

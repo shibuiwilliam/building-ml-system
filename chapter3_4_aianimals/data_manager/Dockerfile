@@ -2,7 +2,7 @@ ARG FROM_IMAGE=python:3.9.7-slim
 
 FROM ${FROM_IMAGE}
 
-ARG LOCAL_DIR=backend
+ARG LOCAL_DIR=data_manager
 
 ENV PROJECT_DIR opt
 WORKDIR /${PROJECT_DIR}
@@ -21,6 +21,4 @@ COPY ./dataset/animal_subcategory.json /${PROJECT_DIR}/dataset/animal_subcategor
 COPY ./dataset/animal.json /${PROJECT_DIR}/dataset/animal.json
 COPY ./dataset/user.json /${PROJECT_DIR}/dataset/user.json
 
-COPY ${LOCAL_DIR}/run.sh /${PROJECT_DIR}/run.sh
-RUN chmod +x /${PROJECT_DIR}/run.sh
-CMD [ "./run.sh" ]
+CMD [ "python", "-m", "src.main" ]

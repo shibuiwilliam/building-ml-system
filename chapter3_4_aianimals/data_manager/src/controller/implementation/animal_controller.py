@@ -22,6 +22,7 @@ class AnimalController(AbstractAnimalController):
         session: Session,
         file_path: str,
     ):
+        logger.info(f"register animal: {file_path}")
         with open(file_path, "r") as f:
             data = json.load(f)
         for k, v in data.items():
@@ -30,12 +31,13 @@ class AnimalController(AbstractAnimalController):
                 animal_category_id=v["category"],
                 animal_subcategory_id=v["subcategory"],
                 user_id=v["user_id"],
-                photo_url=v["photo_url"],
                 name=v["filename"],
-                description="",
+                description=v["description"],
+                photo_url=v["photo_url"],
                 created_at=datetime.strptime(v["created_at"], "%Y-%m-%dT%H:%M:%S.%f"),
             )
             self.animal_usecase.register(
                 session=session,
                 request=request,
             )
+        logger.info(f"done register animal: {file_path}")

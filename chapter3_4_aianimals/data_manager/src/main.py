@@ -6,6 +6,7 @@ logger = configure_logger(__name__)
 
 
 def main():
+    logger.info("START...")
     container.table_controller.create_table()
     container.table_controller.create_index()
     container.animal_category_controller.register(
@@ -24,7 +25,9 @@ def main():
         session=container.database.get_session().__next__(),
         file_path=Configurations.animal_file,
     )
+    logger.info("DONE...")
 
 
 if __name__ == "__main__":
+    logger.info("AAAAAAAAAAAAA")
     main()

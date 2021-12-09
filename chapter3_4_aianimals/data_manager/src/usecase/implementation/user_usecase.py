@@ -46,8 +46,18 @@ class UserUsecase(AbstractUserUsecase):
         session: Session,
         request: UserCreateRequest,
     ) -> Optional[UserResponse]:
+        logger.info(f"register: {request}")
+        exists = self.user_repository.select(
+            session=session,
+            query=UserQuery(id=request.id),
+        )
+        if len(exists) > 0:
+            response = UserResponse(**exists[0].dict())
+            logger.info(f"exists: {response}")
+            return response
+
         record = UserCreate(
-            id=get_uuid(),
+            id=request.id,
             handle_name=request.handle_name,
             email_address=request.email_address,
             age=request.age,
@@ -60,5 +70,6 @@ class UserUsecase(AbstractUserUsecase):
         )
         if data is not None:
             response = UserResponse(**data.dict())
+            logger.info(f"done register: {response}")
             return response
         return None

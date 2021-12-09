@@ -21,6 +21,7 @@ class LikeController(AbstractLikeController):
         session: Session,
         file_path: str,
     ):
+        logger.info(f"register like: {file_path}")
         with open(file_path, "r") as f:
             data = json.load(f)
         for _, v in data.items():
@@ -32,3 +33,4 @@ class LikeController(AbstractLikeController):
                 session=session,
                 request=request,
             )
+        logger.info(f"done register like: {file_path}")

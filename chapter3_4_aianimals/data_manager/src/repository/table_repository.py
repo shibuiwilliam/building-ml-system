@@ -23,6 +23,7 @@ class AbstractTableRepository(ABC):
 
     @abstractmethod
     def create_index(
+        self,
         engine: Engine,
         table: Base,
         column: Column,

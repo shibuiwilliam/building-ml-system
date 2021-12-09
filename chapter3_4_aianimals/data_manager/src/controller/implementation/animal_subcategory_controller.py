@@ -21,6 +21,7 @@ class AnimalSubcategoryController(AbstractAnimalSubcategoryController):
         session: Session,
         file_path: str,
     ):
+        logger.info(f"register animal subcategory: {file_path}")
         with open(file_path, "r") as f:
             data = json.load(f)
         for k, v in data.items():
@@ -33,3 +34,4 @@ class AnimalSubcategoryController(AbstractAnimalSubcategoryController):
                 session=session,
                 request=request,
             )
+        logger.info(f"done register animal subcategory: {file_path}")

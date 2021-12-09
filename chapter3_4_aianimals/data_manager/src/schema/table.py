@@ -1,6 +1,10 @@
 from enum import Enum
 from typing import List
 
+from src.middleware.logger import configure_logger
+
+logger = configure_logger(__name__)
+
 
 class TABLES(Enum):
     ANIMAL_CATEGORY = "animal_categories"

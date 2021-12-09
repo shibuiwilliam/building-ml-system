@@ -1,11 +1,11 @@
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
-from src.entities.like import LikeCreate, LikeDelete
+from src.entities.like import LikeCreate, LikeQuery
 from src.middleware.logger import configure_logger
 from src.middleware.strings import get_uuid
 from src.repository.like_repository import AbstractLikeRepository
-from src.request_object.like import LikeCreateRequest, LikeDeleteRequest, LikeRequest
+from src.request_object.like import LikeCreateRequest, LikeRequest
 from src.response_object.like import LikeResponse
 from src.usecase.like_usecase import AbstractLikeUsecase
 
@@ -30,7 +30,7 @@ class LikeUsecase(AbstractLikeUsecase):
             raise ValueError
         query: Optional[LikeRequest] = None
         if request is not None:
-            query = LikeRequest(**request.dict())
+            query = LikeQuery(**request.dict())
         data = self.like_repository.select(
             session=session,
             query=query,
@@ -45,26 +45,24 @@ class LikeUsecase(AbstractLikeUsecase):
         session: Session,
         request: LikeCreateRequest,
     ) -> Optional[LikeResponse]:
-        query = LikeRequest(
-            animal_id=request.animal_id,
-            user_id=request.user_id,
-        )
-        exist = self.like_repository.select(
+        logger.info(f"register: {request}")
+        exists = self.like_repository.select(
             session=session,
-            query=query,
-            limit=1,
-            offset=0,
+            query=LikeQuery(
+                animal_id=request.animal_id,
+                user_id=request.user_id,
+            ),
         )
-        logger.info(f"exist: {exist}")
-        if len(exist) > 0:
-            return None
+        if len(exists) > 0:
+            response = LikeResponse(**exists[0].dict())
+            logger.info(f"exists: {response}")
+            return response
 
         record = LikeCreate(
             id=get_uuid(),
             animal_id=request.animal_id,
             user_id=request.user_id,
         )
-        logger.info(f"record: {record}")
         data = self.like_repository.insert(
             session=session,
             record=record,
@@ -73,17 +71,6 @@ class LikeUsecase(AbstractLikeUsecase):
         logger.info(f"registered: {data}")
         if data is not None:
             response = LikeResponse(**data.dict())
+            logger.info(f"done register: {response}")
             return response
         return None
-
-    def delete(
-        self,
-        session: Session,
-        request: LikeDeleteRequest,
-    ):
-        record = LikeDelete(**request.dict())
-        self.like_repository.delete(
-            session=session,
-            record=record,
-            commit=True,
-        )

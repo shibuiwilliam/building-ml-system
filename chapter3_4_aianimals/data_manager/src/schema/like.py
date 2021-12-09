@@ -1,9 +1,10 @@
 from sqlalchemy import Column, DateTime, ForeignKey, String
 from sqlalchemy.sql.functions import current_timestamp
+from src.middleware.logger import configure_logger
 from src.schema.base import Base
 from src.schema.table import TABLES
 
-logger = getLogger(__name__)
+logger = configure_logger(__name__)
 
 
 class Like(Base):

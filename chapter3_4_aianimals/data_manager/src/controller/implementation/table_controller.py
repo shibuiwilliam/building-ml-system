@@ -63,6 +63,7 @@ class TableController(AbstractTableController):
         ]
 
         for index in animal_category_indices:
+            logger.info(f"create index: {index}")
             self.table_usecase.create_index(
                 engine=self.engine,
                 table=AnimalCategory,
@@ -70,35 +71,44 @@ class TableController(AbstractTableController):
                 checkfirst=True,
                 unique=index["unique"],
             )
+            logger.info(f"done create index: {index}")
         for index in animal_subcategory_indices:
+            logger.info(f"create index: {index}")
             self.table_usecase.create_index(
                 engine=self.engine,
-                table=AnimalCategory,
+                table=AnimalSubcategory,
                 column=index["column"],
                 checkfirst=True,
                 unique=index["unique"],
             )
+            logger.info(f"done create index: {index}")
         for index in user_indices:
+            logger.info(f"create index: {index}")
             self.table_usecase.create_index(
                 engine=self.engine,
-                table=AnimalCategory,
+                table=User,
                 column=index["column"],
                 checkfirst=True,
                 unique=index["unique"],
             )
+            logger.info(f"done create index: {index}")
         for index in animal_indices:
+            logger.info(f"create index: {index}")
             self.table_usecase.create_index(
                 engine=self.engine,
-                table=AnimalCategory,
+                table=Animal,
                 column=index["column"],
                 checkfirst=True,
                 unique=index["unique"],
             )
+            logger.info(f"done create index: {index}")
         for index in like_indices:
+            logger.info(f"create index: {index}")
             self.table_usecase.create_index(
                 engine=self.engine,
-                table=AnimalCategory,
+                table=Like,
                 column=index["column"],
                 checkfirst=True,
                 unique=index["unique"],
             )
+            logger.info(f"done create index: {index}")

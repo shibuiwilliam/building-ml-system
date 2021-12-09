@@ -14,6 +14,7 @@ class AnimalSubcategoryRequest(BaseModel):
 
 
 class AnimalSubcategoryCreateRequest(BaseModel):
+    id: int
     animal_category_id: int
     name: str
 

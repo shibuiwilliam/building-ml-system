@@ -13,6 +13,7 @@ class AnimalCategoryRequest(BaseModel):
 
 
 class AnimalCategoryCreateRequest(BaseModel):
+    id: int
     name: str
 
     class Config:

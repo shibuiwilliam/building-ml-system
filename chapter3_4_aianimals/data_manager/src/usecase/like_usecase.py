@@ -4,7 +4,7 @@ from typing import List, Optional
 from sqlalchemy.orm import Session
 from src.middleware.logger import configure_logger
 from src.repository.like_repository import AbstractLikeRepository
-from src.request_object.like import LikeCreateRequest, LikeDeleteRequest, LikeRequest
+from src.request_object.like import LikeCreateRequest, LikeRequest
 from src.response_object.like import LikeResponse
 
 logger = configure_logger(__name__)
@@ -33,12 +33,4 @@ class AbstractLikeUsecase(ABC):
         session: Session,
         request: LikeCreateRequest,
     ) -> Optional[LikeResponse]:
-        raise NotImplementedError
-
-    @abstractmethod
-    def delete(
-        self,
-        session: Session,
-        request: LikeDeleteRequest,
-    ):
         raise NotImplementedError

@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel, Extra
@@ -17,12 +18,14 @@ class AnimalRequest(BaseModel):
 
 
 class AnimalCreateRequest(BaseModel):
+    id: str
     animal_category_id: int
     animal_subcategory_id: int
     user_id: str
     name: str
     description: str
     photo_url: str
+    created_at: Optional[datetime]
 
     class Config:
         extra = Extra.forbid
