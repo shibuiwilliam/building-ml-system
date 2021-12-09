@@ -18,27 +18,25 @@ class TableController(AbstractTableController):
     def __init__(
         self,
         table_usecase: AbstractTableUsecase,
-    ):
-        super().__init__(table_usecase=table_usecase)
-
-    def create_table(
-        self,
         engine: Engine,
     ):
+        super().__init__(
+            table_usecase=table_usecase,
+            engine=engine,
+        )
+
+    def create_table(self):
         tables: List[Base] = [AnimalCategory, AnimalSubcategory, User, Animal, Like]
         for table in tables:
             logger.info(f"create table: {table.__table__}")
             self.table_usecase.create_table(
-                engine=engine,
+                engine=self.engine,
                 table=table,
                 checkfirst=True,
             )
             logger.info(f"done create table: {table.__table__}")
 
-    def create_index(
-        self,
-        engine: Engine,
-    ):
+    def create_index(self):
         animal_category_indices = [
             {"column": AnimalCategory.name, "unique": True},
             {"column": AnimalCategory.is_deleted, "unique": False},
@@ -66,7 +64,7 @@ class TableController(AbstractTableController):
 
         for index in animal_category_indices:
             self.table_usecase.create_index(
-                engine=engine,
+                engine=self.engine,
                 table=AnimalCategory,
                 column=index["column"],
                 checkfirst=True,
@@ -74,7 +72,7 @@ class TableController(AbstractTableController):
             )
         for index in animal_subcategory_indices:
             self.table_usecase.create_index(
-                engine=engine,
+                engine=self.engine,
                 table=AnimalCategory,
                 column=index["column"],
                 checkfirst=True,
@@ -82,7 +80,7 @@ class TableController(AbstractTableController):
             )
         for index in user_indices:
             self.table_usecase.create_index(
-                engine=engine,
+                engine=self.engine,
                 table=AnimalCategory,
                 column=index["column"],
                 checkfirst=True,
@@ -90,7 +88,7 @@ class TableController(AbstractTableController):
             )
         for index in animal_indices:
             self.table_usecase.create_index(
-                engine=engine,
+                engine=self.engine,
                 table=AnimalCategory,
                 column=index["column"],
                 checkfirst=True,
@@ -98,7 +96,7 @@ class TableController(AbstractTableController):
             )
         for index in like_indices:
             self.table_usecase.create_index(
-                engine=engine,
+                engine=self.engine,
                 table=AnimalCategory,
                 column=index["column"],
                 checkfirst=True,

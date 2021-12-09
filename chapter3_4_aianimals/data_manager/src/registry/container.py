@@ -70,7 +70,10 @@ class Container(object):
             like_repository=self.like_repository,
         )
 
-        self.table_controller: AbstractTableController = TableController(table_usecase=self.table_usecase)
+        self.table_controller: AbstractTableController = TableController(
+            table_usecase=self.table_usecase,
+            engine=self.database.engine,
+        )
         self.animal_category_controller: AbstractAnimalCategoryController = AnimalCategoryController(
             animal_category_usecase=self.animal_category_usecase
         )

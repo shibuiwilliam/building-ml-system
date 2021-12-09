@@ -11,19 +11,15 @@ class AbstractTableController(ABC):
     def __init__(
         self,
         table_usecase: AbstractTableUsecase,
-    ):
-        self.table_usecase = table_usecase
-
-    @abstractmethod
-    def create_table(
-        self,
         engine: Engine,
     ):
+        self.table_usecase = table_usecase
+        self.engine = engine
+
+    @abstractmethod
+    def create_table(self):
         raise NotImplementedError
 
     @abstractmethod
-    def create_index(
-        self,
-        engine: Engine,
-    ):
+    def create_index(self):
         raise NotImplementedError
