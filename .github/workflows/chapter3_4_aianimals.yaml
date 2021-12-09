@@ -24,5 +24,5 @@ jobs:
         env:
           DOCKER_BUILDKIT: 1
         run: |
-          make build_backend
-          make push_backend
+          make build_all
+          make push_all

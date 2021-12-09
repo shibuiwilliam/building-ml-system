@@ -1,14 +1,14 @@
-from logging import getLogger
 from typing import List, Optional
 
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from src.entities.animal_category import AnimalCategoryCreate, AnimalCategoryModel, AnimalCategoryQuery
+from src.middleware.logger import configure_logger
 from src.repository.animal_category_repository import AbstractAnimalCategoryRepository
 from src.schema.animal_category import AnimalCategory
 from src.schema.table import TABLES
 
-logger = getLogger(__name__)
+logger = configure_logger(__name__)
 
 
 class AnimalCategoryRepository(AbstractAnimalCategoryRepository):

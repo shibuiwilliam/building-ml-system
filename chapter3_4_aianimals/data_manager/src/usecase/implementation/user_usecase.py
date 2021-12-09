@@ -1,15 +1,15 @@
-from logging import getLogger
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
 from src.entities.user import UserCreate, UserQuery
+from src.middleware.logger import configure_logger
 from src.middleware.strings import get_uuid
 from src.repository.user_repository import AbstractUserRepository
 from src.request_object.user import UserCreateRequest, UserRequest
 from src.response_object.user import UserResponse
 from src.usecase.user_usecase import AbstractUserUsecase
 
-logger = getLogger(__name__)
+logger = configure_logger(__name__)
 
 
 class UserUsecase(AbstractUserUsecase):

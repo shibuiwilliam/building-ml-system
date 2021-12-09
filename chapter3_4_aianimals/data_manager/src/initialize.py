@@ -1,6 +1,5 @@
 import json
 from datetime import datetime
-from logging import getLogger
 
 from sqlalchemy import Column, Index
 from sqlalchemy.engine import Engine

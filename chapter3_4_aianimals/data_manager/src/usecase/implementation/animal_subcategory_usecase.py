@@ -1,28 +1,23 @@
-from logging import getLogger
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
 from src.entities.animal_subcategory import AnimalSubcategoryCreate, AnimalSubcategoryQuery
+from src.middleware.logger import configure_logger
 from src.middleware.strings import get_uuid
-from src.repository.animal_category_repository import AbstractAnimalCategoryRepository
 from src.repository.animal_subcategory_repository import AbstractAnimalSubcategoryRepository
 from src.request_object.animal_subcategory import AnimalSubcategoryCreateRequest, AnimalSubcategoryRequest
 from src.response_object.animal_subcategory import AnimalSubcategoryResponse
 from src.usecase.animal_subcategory_usecase import AbstractAnimalSubcategoryUsecase
 
-logger = getLogger(__name__)
+logger = configure_logger(__name__)
 
 
 class AnimalSubcategoryUsecase(AbstractAnimalSubcategoryUsecase):
     def __init__(
         self,
-        animal_category_repository: AbstractAnimalCategoryRepository,
         animal_subcategory_repository: AbstractAnimalSubcategoryRepository,
     ):
-        super().__init__(
-            animal_subcategory_repository=animal_subcategory_repository,
-            animal_category_repository=animal_category_repository,
-        )
+        super().__init__(animal_subcategory_repository=animal_subcategory_repository)
 
     def retrieve(
         self,

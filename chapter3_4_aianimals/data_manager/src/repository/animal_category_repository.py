@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
-from logging import getLogger
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
 from src.entities.animal_category import AnimalCategoryCreate, AnimalCategoryModel, AnimalCategoryQuery
+from src.middleware.logger import configure_logger
 
-logger = getLogger(__name__)
+logger = configure_logger(__name__)
 
 
 class AbstractAnimalCategoryRepository(ABC):

@@ -1,15 +1,15 @@
-from logging import getLogger
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
 from src.entities.like import LikeCreate, LikeDelete
+from src.middleware.logger import configure_logger
 from src.middleware.strings import get_uuid
 from src.repository.like_repository import AbstractLikeRepository
 from src.request_object.like import LikeCreateRequest, LikeDeleteRequest, LikeRequest
 from src.response_object.like import LikeResponse
 from src.usecase.like_usecase import AbstractLikeUsecase
 
-logger = getLogger(__name__)
+logger = configure_logger(__name__)
 
 
 class LikeUsecase(AbstractLikeUsecase):

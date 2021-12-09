@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
-from logging import getLogger
 
 from sqlalchemy import Column, Index
 from sqlalchemy.engine import Engine
+from src.middleware.logger import configure_logger
 from src.schema.base import Base
 
-logger = getLogger(__name__)
+logger = configure_logger(__name__)
 
 
 class AbstractTableRepository(ABC):

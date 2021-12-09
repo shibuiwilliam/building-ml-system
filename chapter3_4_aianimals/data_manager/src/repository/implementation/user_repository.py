@@ -1,14 +1,14 @@
-from logging import getLogger
 from typing import List, Optional
 
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from src.entities.user import UserCreate, UserModel, UserQuery
+from src.middleware.logger import configure_logger
 from src.repository.user_repository import AbstractUserRepository
 from src.schema.table import TABLES
 from src.schema.user import User
 
-logger = getLogger(__name__)
+logger = configure_logger(__name__)
 
 
 class UserRepository(AbstractUserRepository):

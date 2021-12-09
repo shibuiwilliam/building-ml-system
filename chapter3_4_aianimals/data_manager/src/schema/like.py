@@ -1,5 +1,3 @@
-from logging import getLogger
-
 from sqlalchemy import Column, DateTime, ForeignKey, String
 from sqlalchemy.sql.functions import current_timestamp
 from src.schema.base import Base

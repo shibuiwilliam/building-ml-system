@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
-from logging import getLogger
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
+from src.middleware.logger import configure_logger
 from src.repository.user_repository import AbstractUserRepository
 from src.request_object.user import UserCreateRequest, UserRequest
 from src.response_object.user import UserResponse
 
-logger = getLogger(__name__)
+logger = configure_logger(__name__)
 
 
 class AbstractUserUsecase(ABC):

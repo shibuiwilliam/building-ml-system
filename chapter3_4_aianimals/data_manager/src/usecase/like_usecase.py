@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
-from logging import getLogger
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
+from src.middleware.logger import configure_logger
 from src.repository.like_repository import AbstractLikeRepository
 from src.request_object.like import LikeCreateRequest, LikeDeleteRequest, LikeRequest
 from src.response_object.like import LikeResponse
 
-logger = getLogger(__name__)
+logger = configure_logger(__name__)
 
 
 class AbstractLikeUsecase(ABC):

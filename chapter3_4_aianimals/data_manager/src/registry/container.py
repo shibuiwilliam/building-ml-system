@@ -1,5 +1,3 @@
-from logging import getLogger
-
 from src.infrastructure.client.postgresql_database import PostgreSQLDatabase
 from src.infrastructure.database import AbstractDatabase
 from src.repository.animal_category_repository import AbstractAnimalCategoryRepository

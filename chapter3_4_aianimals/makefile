@@ -9,6 +9,49 @@ DIR := $(ABSOLUTE_PATH)
 TAG = ai_animals
 
 
+############ DATA MANAGER COMMANDS ############
+DATA_MANAGER_DIR := $(DIR)/data_manager
+DOCKERFILE_DATA_MANAGER = $(DATA_MANAGER_DIR)/$(DOCKERFILE)
+DOCKER_DATA_MANAGER_TAG = $(TAG)_data_manager
+DOCKER_DATA_MANAGER_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_DATA_MANAGER_TAG)_$(VERSION)
+DOCKER_DATA_MANAGER_IMAGE_NAME_TEST = $(DOCKER_REPOSITORY):$(DOCKER_DATA_MANAGER_TAG)_$(VERSION)_$(DOCKER_TEST_TAG)
+
+.PHONY: patch_data_manager
+patch_data_manager:
+	cd $(DATA_MANAGER_DIR) && \
+	poetry version patch
+
+.PHONY: minor_upgrade_data_manager
+minor_upgrade_data_manager:
+	cd $(DATA_MANAGER_DIR) && \
+	poetry version minor
+
+.PHONY: major_upgrade_data_manager
+major_upgrade_data_manager:
+	cd $(DATA_MANAGER_DIR) && \
+	poetry version major
+
+.PHONY: req_data_manager
+req_data_manager:
+	cd $(DATA_MANAGER_DIR) && \
+	poetry export \
+		--without-hashes \
+		-f requirements.txt \
+		--output requirements.txt
+
+.PHONY: build_data_manager
+build_data_manager: 
+	docker build \
+		--platform linux/amd64 \
+		-t $(DOCKER_DATA_MANAGER_IMAGE_NAME) \
+		-f $(DOCKERFILE_DATA_MANAGER) \
+		.
+	 
+.PHONY: push_data_manager
+push_data_manager: 
+	docker push $(DOCKER_DATA_MANAGER_IMAGE_NAME)
+
+
 ############ BACKEND COMMANDS ############
 BACKEND_DIR := $(DIR)/backend
 DOCKERFILE_BACKEND = $(BACKEND_DIR)/$(DOCKERFILE)
@@ -50,21 +93,6 @@ build_backend:
 .PHONY: push_backend
 push_backend: 
 	docker push $(DOCKER_BACKEND_IMAGE_NAME)
-
-
-############ DOCKER COMPOSE COMMANDS ############
-.PHONY: up
-up:
-	docker-compose \
-		-f $(DOCKER_COMPOSE) \
-		up -d
-
-.PHONY: down
-down:
-	docker-compose \
-		-f $(DOCKER_COMPOSE) \
-		down
-
 
 
 ############ KUBERNETES COMMANDS ############
@@ -110,3 +138,24 @@ es_password:
 	kubectl -n elastic-search \
 		get secret elastic-search-es-elastic-user \
 		-o go-template='{{.data.elastic | base64decode}}'
+
+
+############ DOCKER COMPOSE COMMANDS ############
+.PHONY: up
+up:
+	docker-compose \
+		-f $(DOCKER_COMPOSE) \
+		up -d
+
+.PHONY: down
+down:
+	docker-compose \
+		-f $(DOCKER_COMPOSE) \
+		down
+
+
+############ ALL COMMANDS ############
+.PHONY: req_all
+req_all: req_data_manager req_backend
+build_all: build_data_manager build_backend
+push_all: push_backend push_data_manager

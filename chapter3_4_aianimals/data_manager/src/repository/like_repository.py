@@ -1,12 +1,11 @@
 from abc import ABC, abstractmethod
-from logging import getLogger
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 from sqlalchemy.orm import Session
-from src.entities.common import Count
-from src.entities.like import LikeCreate, LikeDelete, LikeModel, LikeQuery
+from src.entities.like import LikeDelete, LikeModel, LikeQuery
+from src.middleware.logger import configure_logger
 
-logger = getLogger(__name__)
+logger = configure_logger(__name__)
 
 
 class AbstractLikeRepository(ABC):

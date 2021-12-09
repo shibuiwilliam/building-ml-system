@@ -1,23 +1,20 @@
 from abc import ABC, abstractmethod
-from logging import getLogger
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
-from src.repository.animal_category_repository import AbstractAnimalCategoryRepository
+from src.middleware.logger import configure_logger
 from src.repository.animal_subcategory_repository import AbstractAnimalSubcategoryRepository
 from src.request_object.animal_subcategory import AnimalSubcategoryCreateRequest, AnimalSubcategoryRequest
 from src.response_object.animal_subcategory import AnimalSubcategoryResponse
 
-logger = getLogger(__name__)
+logger = configure_logger(__name__)
 
 
 class AbstractAnimalSubcategoryUsecase(ABC):
     def __init__(
         self,
-        animal_category_repository: AbstractAnimalCategoryRepository,
         animal_subcategory_repository: AbstractAnimalSubcategoryRepository,
     ):
-        self.animal_category_repository = animal_category_repository
         self.animal_subcategory_repository = animal_subcategory_repository
 
     @abstractmethod

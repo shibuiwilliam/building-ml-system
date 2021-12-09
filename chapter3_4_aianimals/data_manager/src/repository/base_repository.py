@@ -1,9 +1,9 @@
-from logging import getLogger
 from typing import Dict
 
+from src.middleware.logger import configure_logger
 from src.schema.base import Base
 
-logger = getLogger(__name__)
+logger = configure_logger(__name__)
 
 
 def model_to_dict(row: Base) -> Dict:

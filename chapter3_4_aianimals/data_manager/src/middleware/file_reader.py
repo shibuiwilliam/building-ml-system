@@ -1,8 +1,9 @@
 import csv
-from logging import getLogger
 from typing import Dict, List, Optional
 
-logger = getLogger(name=__name__)
+from src.middleware.logger import configure_logger
+
+logger = configure_logger(__name__)
 
 
 def read_text_file(file_path: str) -> str:

@@ -4,6 +4,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker
 from src.infrastructure.database import AbstractDatabase
+from src.middleware.logger import configure_logger
+
+logger = configure_logger(__name__)
 
 
 class PostgreSQLDatabase(AbstractDatabase):

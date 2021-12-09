@@ -1,15 +1,15 @@
-from logging import getLogger
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
 from src.entities.animal_category import AnimalCategoryCreate, AnimalCategoryQuery
+from src.middleware.logger import configure_logger
 from src.middleware.strings import get_uuid
 from src.repository.animal_category_repository import AbstractAnimalCategoryRepository
 from src.request_object.animal_category import AnimalCategoryCreateRequest, AnimalCategoryRequest
 from src.response_object.animal_category import AnimalCategoryResponse
 from src.usecase.animal_category_usecase import AbstractAnimalCategoryUsecase
 
-logger = getLogger(__name__)
+logger = configure_logger(__name__)
 
 
 class AnimalCategoryUsecase(AbstractAnimalCategoryUsecase):
