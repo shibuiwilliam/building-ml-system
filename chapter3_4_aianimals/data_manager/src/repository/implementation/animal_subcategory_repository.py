@@ -5,7 +5,6 @@ from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from src.entities.animal_subcategory import AnimalSubcategoryCreate, AnimalSubcategoryModel, AnimalSubcategoryQuery
 from src.repository.animal_subcategory_repository import AbstractAnimalSubcategoryRepository
-from src.schema.animal_category import AnimalCategory
 from src.schema.animal_subcategory import AnimalSubcategory
 from src.schema.table import TABLES
 
@@ -27,39 +26,20 @@ class AnimalSubcategoryRepository(AbstractAnimalSubcategoryRepository):
             if query.id is not None:
                 filters.append(AnimalSubcategory.id == query.id)
             if query.animal_category_id is not None:
-                filters.append(AnimalCategory.id == query.animal_category_id)
+                filters.append(AnimalSubcategory.id == query.animal_category_id)
             if query.name is not None:
                 filters.append(AnimalSubcategory.name == query.name)
             if query.is_deleted is not None:
                 filters.append(AnimalSubcategory.is_deleted == query.is_deleted)
-        results = (
-            session.query(
-                AnimalSubcategory.id.label("id"),
-                AnimalSubcategory.name.label("name"),
-                AnimalCategory.id.label("animal_category_id"),
-                AnimalCategory.name.label("animal_category_name"),
-                AnimalSubcategory.is_deleted.label("is_deleted"),
-                AnimalSubcategory.created_at.label("created_at"),
-                AnimalSubcategory.updated_at.label("updated_at"),
-            )
-            .join(
-                AnimalCategory,
-                AnimalCategory.id == AnimalSubcategory.animal_category_id,
-                isouter=True,
-            )
-            .filter(and_(*filters))
-            .order_by(AnimalSubcategory.id)
-            .all()
-        )
+        results = session.query(AnimalSubcategory).filter(and_(*filters)).order_by(AnimalSubcategory.id).all()
         data = [
             AnimalSubcategoryModel(
-                id=d[0],
-                name=d[1],
-                animal_category_id=d[2],
-                animal_category_name=d[3],
-                is_deleted=d[4],
-                created_at=d[5],
-                updated_at=d[6],
+                id=d.id,
+                name=d.name,
+                animal_category_id=d.animal_category_id,
+                is_deleted=d.is_deleted,
+                created_at=d.created_at,
+                updated_at=d.updated_at,
             )
             for d in results
         ]

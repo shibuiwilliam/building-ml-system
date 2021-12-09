@@ -53,29 +53,6 @@ class UserRepository(AbstractUserRepository):
         ]
         return data
 
-    def select_by_ids(
-        self,
-        session: Session,
-        user_ids: List[str],
-        limit=100,
-        offset=0,
-    ) -> List[UserModel]:
-        results = session.query(User).filter(User.id.in_(user_ids)).order_by(User.id).limit(limit).offset(offset)
-        data = [
-            UserModel(
-                id=d.id,
-                handle_name=d.handle_name,
-                email_address=d.email_address,
-                age=d.age,
-                gender=d.gender,
-                deactivated=d.deactivated,
-                created_at=d.created_at,
-                updated_at=d.updated_at,
-            )
-            for d in results
-        ]
-        return data
-
     def insert(
         self,
         session: Session,

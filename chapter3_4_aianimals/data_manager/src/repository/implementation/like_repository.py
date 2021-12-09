@@ -45,24 +45,6 @@ class LikeRepository(AbstractLikeRepository):
         ]
         return data
 
-    def count(
-        self,
-        session: Session,
-        animal_ids: List[str],
-    ) -> Dict[str, Count]:
-        results = (
-            session.query(
-                func.count(Like.id).label("count"),
-                Like.animal_id.label("animal_id"),
-            )
-            .filter(Like.animal_id.in_(animal_ids))
-            .group_by(Like.animal_id)
-            .order_by(Like.animal_id)
-            .all()
-        )
-        data = {r["animal_id"]: Count(count=r["count"]) for r in results}
-        return data
-
     def insert(
         self,
         session: Session,
@@ -82,15 +64,3 @@ class LikeRepository(AbstractLikeRepository):
             )
             return result[0]
         return None
-
-    def delete(
-        self,
-        session: Session,
-        record: LikeDelete,
-        commit: bool = True,
-    ):
-        results = session.query(Like).filter(Like.id == record.id).all()
-        for r in results:
-            session.delete(r)
-            if commit:
-                session.commit()

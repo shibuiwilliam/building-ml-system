@@ -24,23 +24,6 @@ class AbstractLikeRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def count(
-        self,
-        session: Session,
-        animal_ids: List[str],
-    ) -> Dict[str, Count]:
-        raise NotImplementedError
-
-    @abstractmethod
-    def insert(
-        self,
-        session: Session,
-        record: LikeCreate,
-        commit: bool = True,
-    ) -> Optional[LikeModel]:
-        raise NotImplementedError
-
-    @abstractmethod
     def delete(
         self,
         session: Session,

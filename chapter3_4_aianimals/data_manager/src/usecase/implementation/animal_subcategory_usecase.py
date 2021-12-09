@@ -2,7 +2,6 @@ from logging import getLogger
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
-from src.entities.animal_category import AnimalCategoryQuery
 from src.entities.animal_subcategory import AnimalSubcategoryCreate, AnimalSubcategoryQuery
 from src.middleware.strings import get_uuid
 from src.repository.animal_category_repository import AbstractAnimalCategoryRepository
@@ -30,22 +29,9 @@ class AnimalSubcategoryUsecase(AbstractAnimalSubcategoryUsecase):
         session: Session,
         request: Optional[AnimalSubcategoryRequest] = None,
     ) -> List[AnimalSubcategoryResponse]:
-        animal_category_id: Optional[str] = None
-        if request is not None and request.animal_category_name is not None:
-            animal_category = self.animal_category_repository.select(
-                session=session,
-                query=AnimalCategoryQuery(name=request.animal_category_name),
-            )
-            animal_category_id = animal_category[0].id
-
         query: Optional[AnimalSubcategoryQuery] = None
         if request is not None:
-            query = AnimalSubcategoryQuery(
-                id=request.id,
-                animal_category_id=animal_category_id,
-                name=request.name,
-                is_deleted=request.is_deleted,
-            )
+            query = AnimalSubcategoryQuery(**request.dict())
 
         data = self.animal_subcategory_repository.select(
             session=session,

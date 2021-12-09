@@ -26,7 +26,6 @@ class AnimalSubcategoryCreate(BaseModel):
 class AnimalSubcategoryModel(BaseModel):
     id: int
     animal_category_id: int
-    animal_category_name: str
     name: str
     is_deleted: bool
     created_at: datetime
