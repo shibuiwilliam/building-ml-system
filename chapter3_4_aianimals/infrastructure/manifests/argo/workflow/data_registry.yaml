@@ -11,7 +11,7 @@ spec:
   templates:
     - name: data-registry
       container:
-        image: shibui/building-ml-system:ai_animals_data_manager_0.0.0
+        image: shibui/building-ml-system:ai_animals_data_registry_0.0.0
         command: [python, -m, src.main]
         env:
           - name: POSTGRES_SERVER

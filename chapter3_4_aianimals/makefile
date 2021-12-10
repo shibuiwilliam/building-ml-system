@@ -11,46 +11,46 @@ K8S_DIR := $(ABSOLUTE_PATH)/infrastructure
 K8S_SECRET_DIR := $(K8S_DIR)/secrets
 
 
-############ DATA MANAGER COMMANDS ############
-DATA_MANAGER_DIR := $(DIR)/data_manager
-DOCKERFILE_DATA_MANAGER = $(DATA_MANAGER_DIR)/$(DOCKERFILE)
-DOCKER_DATA_MANAGER_TAG = $(TAG)_data_manager
-DOCKER_DATA_MANAGER_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_DATA_MANAGER_TAG)_$(VERSION)
-DOCKER_DATA_MANAGER_IMAGE_NAME_TEST = $(DOCKER_REPOSITORY):$(DOCKER_DATA_MANAGER_TAG)_$(VERSION)_$(DOCKER_TEST_TAG)
+############ DATA REGISTRY COMMANDS ############
+DATA_REGISTRY_DIR := $(DIR)/data_registry
+DOCKERFILE_DATA_REGISTRY = $(DATA_REGISTRY_DIR)/$(DOCKERFILE)
+DOCKER_DATA_REGISTRY_TAG = $(TAG)_data_registry
+DOCKER_DATA_REGISTRY_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_DATA_REGISTRY_TAG)_$(VERSION)
+DOCKER_DATA_REGISTRY_IMAGE_NAME_TEST = $(DOCKER_REPOSITORY):$(DOCKER_DATA_REGISTRY_TAG)_$(VERSION)_$(DOCKER_TEST_TAG)
 
-.PHONY: patch_data_manager
-patch_data_manager:
-	cd $(DATA_MANAGER_DIR) && \
+.PHONY: patch_data_registry
+patch_data_registry:
+	cd $(DATA_REGISTRY_DIR) && \
 	poetry version patch
 
-.PHONY: minor_upgrade_data_manager
-minor_upgrade_data_manager:
-	cd $(DATA_MANAGER_DIR) && \
+.PHONY: minor_upgrade_data_registry
+minor_upgrade_data_registry:
+	cd $(DATA_REGISTRY_DIR) && \
 	poetry version minor
 
-.PHONY: major_upgrade_data_manager
-major_upgrade_data_manager:
-	cd $(DATA_MANAGER_DIR) && \
+.PHONY: major_upgrade_data_registry
+major_upgrade_data_registry:
+	cd $(DATA_REGISTRY_DIR) && \
 	poetry version major
 
-.PHONY: req_data_manager
-req_data_manager:
-	cd $(DATA_MANAGER_DIR) && \
+.PHONY: req_data_registry
+req_data_registry:
+	cd $(DATA_REGISTRY_DIR) && \
 	poetry export \
 		--without-hashes \
 		-f requirements.txt \
 		--output requirements.txt
 
-.PHONY: build_data_manager
-build_data_manager: 
+.PHONY: build_data_registry
+build_data_registry: 
 	docker build \
-		-t $(DOCKER_DATA_MANAGER_IMAGE_NAME) \
-		-f $(DOCKERFILE_DATA_MANAGER) \
+		-t $(DOCKER_DATA_REGISTRY_IMAGE_NAME) \
+		-f $(DOCKERFILE_DATA_REGISTRY) \
 		.
 	 
-.PHONY: push_data_manager
-push_data_manager: 
-	docker push $(DOCKER_DATA_MANAGER_IMAGE_NAME)
+.PHONY: push_data_registry
+push_data_registry: 
+	docker push $(DOCKER_DATA_REGISTRY_IMAGE_NAME)
 
 
 ############ BACKEND COMMANDS ############
@@ -212,6 +212,6 @@ deploy_all: registry_default admin_clusterrole \
 
 ############ ALL COMMANDS ############
 .PHONY: req_all
-req_all: req_data_manager req_backend
-build_all: build_data_manager build_backend build_es
-push_all: push_backend push_data_manager push_es
+req_all: req_data_registry req_backend
+build_all: build_data_registry build_backend build_es
+push_all: push_backend push_data_registry push_es
