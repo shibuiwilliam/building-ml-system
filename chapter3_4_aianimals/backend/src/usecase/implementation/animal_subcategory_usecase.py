@@ -30,7 +30,7 @@ class AnimalSubcategoryUsecase(AbstractAnimalSubcategoryUsecase):
         session: Session,
         request: Optional[AnimalSubcategoryRequest] = None,
     ) -> List[AnimalSubcategoryResponse]:
-        animal_category_id: Optional[str] = None
+        animal_category_id: Optional[int] = None
         if request is not None and request.animal_category_name is not None:
             animal_category = self.animal_category_repository.select(
                 session=session,

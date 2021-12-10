@@ -1,7 +1,10 @@
 import os
+from logging import getLogger
 
 from src.configurations import Configurations
 from src.infrastructure.storage import AbstractStorage
+
+logger = getLogger(__name__)
 
 
 class LocalStorage(AbstractStorage):

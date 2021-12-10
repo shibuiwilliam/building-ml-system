@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
+from src.infrastructure.queue import AbstractQueue
 from src.middleware.logger import configure_logger
 from src.repository.animal_repository import AbstractAnimalRepository
 from src.request_object.animal import AnimalCreateRequest, AnimalRequest
@@ -14,8 +15,10 @@ class AbstractAnimalUsecase(ABC):
     def __init__(
         self,
         animal_repository: AbstractAnimalRepository,
+        queue: AbstractQueue,
     ):
         self.animal_repository = animal_repository
+        self.queue = queue
 
     @abstractmethod
     def retrieve(

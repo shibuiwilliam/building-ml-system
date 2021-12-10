@@ -16,6 +16,7 @@ python-multipart = "^0.0.5"
 aiofiles = "^0.8.0"
 psycopg2-binary = "^2.9.2"
 google-cloud-storage = "^1.43.0"
+redis = "^4.0.2"
 
 [tool.poetry.dev-dependencies]
 

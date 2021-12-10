@@ -11,7 +11,9 @@ from src.controller.like_controller import AbstractLikeController
 from src.controller.table_controller import AbstractTableController
 from src.controller.user_controller import AbstractUserController
 from src.infrastructure.client.postgresql_database import PostgreSQLDatabase
+from src.infrastructure.client.redis_queue import RedisQueue
 from src.infrastructure.database import AbstractDatabase
+from src.infrastructure.queue import AbstractQueue
 from src.middleware.logger import configure_logger
 from src.repository.animal_category_repository import AbstractAnimalCategoryRepository
 from src.repository.animal_repository import AbstractAnimalRepository
@@ -45,8 +47,10 @@ class Container(object):
     def __init__(
         self,
         database: AbstractDatabase,
+        queue: AbstractQueue,
     ):
         self.database = database
+        self.queue = queue
 
         self.table_repository: AbstractTableRepository = TableRepository()
         self.animal_category_repository: AbstractAnimalCategoryRepository = AnimalCategoryRepository()
@@ -65,7 +69,10 @@ class Container(object):
         self.user_usecase: AbstractUserUsecase = UserUsecase(
             user_repository=self.user_repository,
         )
-        self.animal_usecase: AbstractAnimalUsecase = AnimalUsecase(animal_repository=self.animal_reposigory)
+        self.animal_usecase: AbstractAnimalUsecase = AnimalUsecase(
+            animal_repository=self.animal_reposigory,
+            queue=self.queue,
+        )
         self.like_usecase: AbstractLikeUsecase = LikeUsecase(
             like_repository=self.like_repository,
         )
@@ -87,4 +94,5 @@ class Container(object):
 
 container = Container(
     database=PostgreSQLDatabase(),
+    queue=RedisQueue(),
 )

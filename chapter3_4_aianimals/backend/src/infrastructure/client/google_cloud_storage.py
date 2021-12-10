@@ -1,8 +1,11 @@
 import os
+from logging import getLogger
 
 from google.cloud import storage
 from src.configurations import Configurations
 from src.infrastructure.storage import AbstractStorage
+
+logger = getLogger(__name__)
 
 
 class GoogleCloudStorage(AbstractStorage):

@@ -19,6 +19,12 @@ services:
     hostname: postgres
     stdin_open: true
 
+  redis:
+    container_name: redis
+    image: redis:latest
+    ports:
+      - 6379:6379
+
   data_registry:
     container_name: data_registry
     image: shibui/building-ml-system:ai_animals_data_registry_0.0.0
@@ -31,13 +37,17 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=aianimals
-      - LOG_LEVEL=DEBUG
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - LOG_LEVEL=INFO
       - RUN_ENVIRONMENT=local
       - DATA_DIRECTORY=/opt/dataset
     command: >
       /bin/sh -c "sleep 5s && python -m src.main"
     depends_on:
       - postgres
+      - redis
 
   backend:
     container_name: backend
@@ -53,6 +63,9 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=aianimals
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
       - LOG_LEVEL=INFO
       - RUN_ENVIRONMENT=local
       - DATA_DIRECTORY=/opt/dataset
@@ -63,6 +76,7 @@ services:
     hostname: backend
     depends_on:
       - postgres
+      - redis
 
   es:
     container_name: es

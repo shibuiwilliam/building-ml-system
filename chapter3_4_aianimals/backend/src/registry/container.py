@@ -5,7 +5,9 @@ from src.constants import RUN_ENVIRONMENT
 from src.infrastructure.client.google_cloud_storage import GoogleCloudStorage
 from src.infrastructure.client.local_storage import LocalStorage
 from src.infrastructure.client.postgresql_database import PostgreSQLDatabase
+from src.infrastructure.client.redis_queue import RedisQueue
 from src.infrastructure.database import AbstractDatabase
+from src.infrastructure.queue import AbstractQueue
 from src.infrastructure.storage import AbstractStorage
 from src.repository.animal_category_repository import AbstractAnimalCategoryRepository
 from src.repository.animal_repository import AbstractAnimalRepository
@@ -38,9 +40,11 @@ class Container(object):
         self,
         storage_client: AbstractStorage,
         database: AbstractDatabase,
+        queue: AbstractQueue,
     ):
         self.database = database
         self.storage_client = storage_client
+        self.queue = queue
 
         self.animal_category_repository: AbstractAnimalCategoryRepository = AnimalCategoryRepository()
         self.animal_subcategory_repository: AbstractAnimalSubcategoryRepository = AnimalSubcategoryRepository()
@@ -59,12 +63,9 @@ class Container(object):
             user_repository=self.user_repository,
         )
         self.animal_usecase: AbstractAnimalUsecase = AnimalUsecase(
-            like_repository=self.like_repository,
-            user_repository=self.user_repository,
-            animal_category_repository=self.animal_category_repository,
-            animal_subcategory_repository=self.animal_subcategory_repository,
             animal_repository=self.animal_reposigory,
             storage_client=self.storage_client,
+            queue=self.queue,
         )
         self.like_usecase: AbstractLikeUsecase = LikeUsecase(
             like_repository=self.like_repository,
@@ -83,4 +84,5 @@ elif Configurations.run_environment == RUN_ENVIRONMENT.CLOUD.value:
 container = Container(
     storage_client=storage_client,
     database=PostgreSQLDatabase(),
+    queue=RedisQueue(),
 )

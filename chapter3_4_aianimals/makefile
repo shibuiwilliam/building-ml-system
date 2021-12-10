@@ -110,6 +110,48 @@ deploy_backend: deploy_backend_ns
 	kubectl apply -f $(BACKEND_MANIFEST_DIR)/backend.yaml
 
 
+############ GATE KEEPER COMMANDS ############
+GATE_KEEPER_DIR := $(DIR)/gate_keeper
+DOCKERFILE_GATE_KEEPER = $(GATE_KEEPER_DIR)/$(DOCKERFILE)
+DOCKER_GATE_KEEPER_TAG = $(TAG)_gate_keeper
+DOCKER_GATE_KEEPER_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_GATE_KEEPER_TAG)_$(VERSION)
+DOCKER_GATE_KEEPER_IMAGE_NAME_TEST = $(DOCKER_REPOSITORY):$(DOCKER_GATE_KEEPER_TAG)_$(VERSION)_$(DOCKER_TEST_TAG)
+
+.PHONY: patch_gate_keeper
+patch_gate_keeper:
+	cd $(GATE_KEEPER_DIR) && \
+	poetry version patch
+
+.PHONY: minor_upgrade_gate_keeper
+minor_upgrade_gate_keeper:
+	cd $(GATE_KEEPER_DIR) && \
+	poetry version minor
+
+.PHONY: major_upgrade_gate_keeper
+major_upgrade_gate_keeper:
+	cd $(GATE_KEEPER_DIR) && \
+	poetry version major
+
+.PHONY: req_gate_keeper
+req_gate_keeper:
+	cd $(GATE_KEEPER_DIR) && \
+	poetry export \
+		--without-hashes \
+		-f requirements.txt \
+		--output requirements.txt
+
+.PHONY: build_gate_keeper
+build_gate_keeper: 
+	docker build \
+		-t $(DOCKER_GATE_KEEPER_IMAGE_NAME) \
+		-f $(DOCKERFILE_GATE_KEEPER) \
+		.
+	 
+.PHONY: push_gate_keeper
+push_gate_keeper: 
+	docker push $(DOCKER_GATE_KEEPER_IMAGE_NAME)
+
+
 ############ ARGO COMMANDS ############
 ARGO_MANIFEST_DIR := $(K8S_DIR)/manifests/argo
 
@@ -212,6 +254,21 @@ deploy_all: registry_default admin_clusterrole \
 
 ############ ALL COMMANDS ############
 .PHONY: req_all
-req_all: req_data_registry req_backend
-build_all: build_data_registry build_backend build_es
-push_all: push_backend push_data_registry push_es
+req_all: \
+	req_data_registry \
+	req_backend \
+	req_gate_keeper
+
+.PHONY: build_all
+build_all: \
+	build_data_registry \
+	build_backend \
+	build_gate_keeper \
+	build_es
+
+.PHONY: push_all
+push_all: \
+	push_backend \
+	push_data_registry \
+	push_gate_keeper \
+	push_es

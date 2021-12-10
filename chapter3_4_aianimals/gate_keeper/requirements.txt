@@ -1,0 +1,23 @@
+aiohttp==3.8.1; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version < "4" and python_version >= "3.6"
+aiosignal==1.2.0; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version < "4" and python_version >= "3.6"
+anyio==3.4.0; python_full_version >= "3.6.2" and python_version >= "3.6"
+async-timeout==4.0.1; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version < "4" and python_version >= "3.6"
+attrs==21.2.0; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version < "4" and python_version >= "3.6"
+certifi==2021.10.8; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version < "4" and python_version >= "3.6"
+charset-normalizer==2.0.9; python_full_version >= "3.5.0" and python_version >= "3.6" and python_version < "4"
+deprecated==1.2.13; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version >= "3.6"
+elasticsearch==7.16.0; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.4.0" and python_version < "4")
+frozenlist==1.2.0; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version < "4" and python_version >= "3.6"
+h11==0.12.0; python_version >= "3.6"
+httpcore==0.14.3; python_version >= "3.6"
+httpx==0.21.1; python_version >= "3.6"
+idna==3.3; python_version >= "3.6" and python_full_version >= "3.6.2" and (python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version < "4" and python_version >= "3.6")
+multidict==5.2.0; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version < "4" and python_version >= "3.6"
+pydantic==1.8.2; python_full_version >= "3.6.1"
+redis==4.0.2; python_version >= "3.6"
+rfc3986==1.5.0; python_version >= "3.6"
+sniffio==1.2.0; python_full_version >= "3.6.2" and python_version >= "3.6"
+typing-extensions==4.0.1; python_version >= "3.6" and python_full_version >= "3.6.1" and (python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version < "4" and python_version >= "3.6")
+urllib3==1.26.7; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version < "4"
+wrapt==1.13.3; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.6"
+yarl==1.7.2; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version < "4" and python_version >= "3.6"

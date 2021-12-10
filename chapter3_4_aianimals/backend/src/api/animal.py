@@ -2,7 +2,7 @@ import os
 from logging import getLogger
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, File, Form, UploadFile
+from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, UploadFile
 from sqlalchemy.orm import Session
 from src.configurations import Configurations
 from src.middleware.strings import random_str
@@ -62,6 +62,7 @@ async def liked_by(
 
 @router.post("", response_model=Optional[AnimalResponse])
 async def post_animal(
+    background_tasks: BackgroundTasks,
     request: AnimalCreateRequest = Form(...),
     file: UploadFile = File(...),
     session: Session = Depends(container.database.get_session),
@@ -76,5 +77,6 @@ async def post_animal(
         session=session,
         request=request,
         local_file_path=local_file_path,
+        background_tasks=background_tasks,
     )
     return data

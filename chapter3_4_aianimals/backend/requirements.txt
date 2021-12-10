@@ -6,6 +6,7 @@ certifi==2021.10.8; python_version >= "2.7" and python_full_version < "3.0.0" or
 charset-normalizer==2.0.8; python_full_version >= "3.6.0" and python_version >= "3"
 click==8.0.3; python_version >= "3.6"
 colorama==0.4.4; python_version >= "3.6" and python_full_version < "3.0.0" and platform_system == "Windows" or platform_system == "Windows" and python_version >= "3.6" and python_full_version >= "3.5.0"
+deprecated==1.2.13; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version >= "3.6"
 fastapi==0.70.0; python_full_version >= "3.6.1"
 google-api-core==2.2.2; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.6"
 google-auth==2.3.3; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.6"
@@ -24,6 +25,7 @@ pyasn1-modules==0.2.8; python_version >= "3.6" and python_full_version < "3.0.0"
 pyasn1==0.4.8; python_version >= "3.6" and python_full_version < "3.0.0" and python_version < "4" and (python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.6") or python_full_version >= "3.6.0" and python_version >= "3.6" and python_version < "4" and (python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.6")
 pydantic==1.8.2; python_full_version >= "3.6.1"
 python-multipart==0.0.5
+redis==4.0.2; python_version >= "3.6"
 requests==2.26.0; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.6"
 rsa==4.8; python_version >= "3.6" and python_version < "4" and (python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.6")
 six==1.16.0; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.6"
@@ -33,3 +35,4 @@ starlette==0.16.0; python_version >= "3.6" and python_full_version >= "3.6.1"
 typing-extensions==4.0.1; python_version >= "3.6" and python_full_version >= "3.6.1"
 urllib3==1.26.7; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version < "4"
 uvicorn==0.15.0
+wrapt==1.13.3; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.6"

@@ -1,9 +1,12 @@
 import os
+from logging import getLogger
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker
 from src.infrastructure.database import AbstractDatabase
+
+logger = getLogger(__name__)
 
 
 class PostgreSQLDatabase(AbstractDatabase):

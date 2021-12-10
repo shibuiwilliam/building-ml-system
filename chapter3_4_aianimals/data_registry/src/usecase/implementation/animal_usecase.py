@@ -2,8 +2,8 @@ from typing import List, Optional
 
 from sqlalchemy.orm import Session
 from src.entities.animal import AnimalCreate, AnimalQuery
+from src.infrastructure.queue import AbstractQueue
 from src.middleware.logger import configure_logger
-from src.middleware.strings import get_uuid
 from src.repository.animal_repository import AbstractAnimalRepository
 from src.request_object.animal import AnimalCreateRequest, AnimalRequest
 from src.response_object.animal import AnimalResponse, AnimalResponseWithLike
@@ -16,8 +16,12 @@ class AnimalUsecase(AbstractAnimalUsecase):
     def __init__(
         self,
         animal_repository: AbstractAnimalRepository,
+        queue: AbstractQueue,
     ):
-        super().__init__(animal_repository=animal_repository)
+        super().__init__(
+            animal_repository=animal_repository,
+            queue=queue,
+        )
 
     def retrieve(
         self,
@@ -71,6 +75,10 @@ class AnimalUsecase(AbstractAnimalUsecase):
         )
         if data is not None:
             response = AnimalResponse(**data.dict())
+            self.queue.enqueue(
+                queue_name="animal",
+                key=data.id,
+            )
             logger.info(f"done register: {response}")
             return response
         return None
