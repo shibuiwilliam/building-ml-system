@@ -68,7 +68,7 @@ services:
     container_name: es
     image: docker.elastic.co/elasticsearch/elasticsearch:7.16.0
     volumes:
-      - ./local_conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./infrastructure/local_conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
     restart: always
     networks:
       - default
@@ -78,6 +78,9 @@ services:
       - 127.0.0.1:9300:9300
     environment:
       - discovery.type=single-node
+    command: >
+      /bin/sh -c "./bin/elasticsearch-plugin install analysis-kuromoji &&
+      ./bin/elasticsearch-plugin install analysis-icu && ./bin/elasticsearch"
     hostname: es
     depends_on:
       - postgres

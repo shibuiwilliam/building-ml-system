@@ -92,7 +92,7 @@ build_backend:
 		-t $(DOCKER_BACKEND_IMAGE_NAME) \
 		-f $(DOCKERFILE_BACKEND) \
 		.
-	 
+
 .PHONY: push_backend
 push_backend: 
 	docker push $(DOCKER_BACKEND_IMAGE_NAME)
@@ -113,11 +113,11 @@ deploy_backend: deploy_backend_ns
 
 
 ############ ARGO COMMANDS ############
-ARGO_DIR := $(K8S_DIR)/manifests/argo
+ARGO_MANIFEST_DIR := $(K8S_DIR)/manifests/argo
 
 .PHONY: deploy_argo_ns
 deploy_argo_ns:
-	kubectl apply -f $(ARGO_DIR)/namespace.yaml
+	kubectl apply -f $(ARGO_MANIFEST_DIR)/namespace.yaml
 
 .PHONY: registry_argo
 registry_argo: deploy_argo_ns
@@ -126,18 +126,34 @@ registry_argo: deploy_argo_ns
 
 .PHONY: deploy_argo
 deploy_argo: deploy_argo_ns
-	kubectl apply -f $(ARGO_DIR)/quick_argo.yaml
+	kubectl apply -f $(ARGO_MANIFEST_DIR)/quick_argo.yaml
 
 .PHONY: port_forward_argo
 port_forward_argo:
 	kubectl -n argo port-forward service/argo-server 2746:2746 &
 
 ############ ELASTICSEARCH COMMANDS ############
-ES_DIR := $(K8S_DIR)/manifests/elasticsearch
+ES_DIR := $(DIR)/elasticsearch
+ES_MANIFEST_DIR := $(K8S_DIR)/manifests/elasticsearch
+DOCKERFILE_ES = $(ES_DIR)/$(DOCKERFILE)
+DOCKER_ES_TAG = $(TAG)_elasticsearch
+DOCKER_ES_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_ES_TAG)_$(VERSION)
+
+.PHONY: build_es
+build_es: 
+	docker build \
+		--platform linux/amd64 \
+		-t $(DOCKER_ES_IMAGE_NAME) \
+		-f $(DOCKERFILE_ES) \
+		.
+
+.PHONY: push_es
+push_es:
+	docker push $(DOCKER_ES_IMAGE_NAME)
 
 .PHONY: deploy_es_ns
 deploy_es_ns:
-	kubectl apply -f $(ES_DIR)/namespace.yaml
+	kubectl apply -f $(ES_MANIFEST_DIR)/namespace.yaml
 
 .PHONY: registry_es
 registry_es: deploy_es_ns
@@ -146,9 +162,9 @@ registry_es: deploy_es_ns
 
 .PHONY: deploy_es
 deploy_es: deploy_es_ns
-	kubectl apply -f $(ES_DIR)/crds.yaml && \
-	kubectl apply -f $(ES_DIR)/operator.yaml && \
-	kubectl apply -f $(ES_DIR)/deployment.yaml
+	kubectl apply -f $(ES_MANIFEST_DIR)/crds.yaml && \
+	kubectl apply -f $(ES_MANIFEST_DIR)/operator.yaml && \
+	kubectl apply -f $(ES_MANIFEST_DIR)/deployment.yaml
 
 .PHONY: es_password
 es_password:
@@ -200,5 +216,5 @@ deploy_all: registry_default admin_clusterrole \
 ############ ALL COMMANDS ############
 .PHONY: req_all
 req_all: req_data_manager req_backend
-build_all: build_data_manager build_backend
-push_all: push_backend push_data_manager
+build_all: build_data_manager build_backend build_es
+push_all: push_backend push_data_manager push_es
