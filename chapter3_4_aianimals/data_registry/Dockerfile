@@ -2,7 +2,7 @@ ARG FROM_IMAGE=python:3.9.7-slim
 
 FROM ${FROM_IMAGE}
 
-ARG LOCAL_DIR=data_manager
+ARG LOCAL_DIR=data_registry
 
 ENV PROJECT_DIR opt
 WORKDIR /${PROJECT_DIR}
