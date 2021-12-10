@@ -44,7 +44,6 @@ req_data_manager:
 .PHONY: build_data_manager
 build_data_manager: 
 	docker build \
-		--platform linux/amd64 \
 		-t $(DOCKER_DATA_MANAGER_IMAGE_NAME) \
 		-f $(DOCKERFILE_DATA_MANAGER) \
 		.
@@ -88,7 +87,6 @@ req_backend:
 .PHONY: build_backend
 build_backend: 
 	docker build \
-		--platform linux/amd64 \
 		-t $(DOCKER_BACKEND_IMAGE_NAME) \
 		-f $(DOCKERFILE_BACKEND) \
 		.
@@ -142,7 +140,6 @@ DOCKER_ES_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_ES_TAG)_$(VERSION)
 .PHONY: build_es
 build_es: 
 	docker build \
-		--platform linux/amd64 \
 		-t $(DOCKER_ES_IMAGE_NAME) \
 		-f $(DOCKERFILE_ES) \
 		.
