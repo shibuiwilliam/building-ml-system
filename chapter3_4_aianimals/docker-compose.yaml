@@ -110,6 +110,35 @@ services:
     depends_on:
       - postgres
 
+  gate_keeper_animal_to_search:
+    container_name: gate_keeper_animal_to_search
+    image: shibui/building-ml-system:ai_animals_gate_keeper_0.0.0
+    restart: always
+    networks:
+      - default
+    environment:
+      - POSTGRES_SERVER=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=aianimals
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - ES_HOST=es
+      - ES_SCHEMA=http
+      - ES_PORT=9200
+      - LOG_LEVEL=INFO
+      - RUN_ENVIRONMENT=local
+      - DATA_DIRECTORY=/opt/dataset
+    command: >
+      /bin/sh -c "sleep 20s && python -m src.main --job animal_to_search_job"
+    depends_on:
+      - postgres
+      - redis
+      - backend
+      - es
+
 networks:
   default:
     name: aianimals

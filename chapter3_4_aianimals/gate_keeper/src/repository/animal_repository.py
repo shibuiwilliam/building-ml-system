@@ -47,6 +47,10 @@ class AbstractAnimalRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    def index_exists(self) -> bool:
+        raise NotImplementedError
+
+    @abstractmethod
     def create_document(
         self,
         id: str,

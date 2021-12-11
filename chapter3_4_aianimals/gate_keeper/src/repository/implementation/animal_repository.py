@@ -112,6 +112,9 @@ class AnimalRepository(AbstractAnimalRepository):
     def get_index(self) -> Dict:
         return self.search.get_index(index=ANIMAL_MAPPING_NAME)
 
+    def index_exists(self) -> bool:
+        return self.search.index_exists(index=ANIMAL_MAPPING_NAME)
+
     def create_document(
         self,
         id: str,

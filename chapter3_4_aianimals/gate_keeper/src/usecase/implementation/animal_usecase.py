@@ -24,6 +24,9 @@ class AnimalUsecase(AbstractAnimalUsecase):
     def get_index(self) -> Dict:
         return self.animal_repository.get_index()
 
+    def index_exists(self) -> bool:
+        return self.animal_repository.index_exists()
+
     def register_index(self):
         animal_id = self.animal_repository.dequeue()
         if animal_id is None:

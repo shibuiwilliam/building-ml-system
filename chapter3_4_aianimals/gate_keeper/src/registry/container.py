@@ -1,11 +1,10 @@
-from src.controller.animal_controller import AbstractAnimalController
-from src.controller.implementation.animal_controller import AnimalController
 from src.infrastructure.client.elastic_search import Elasticsearch
 from src.infrastructure.client.postgresql_database import PostgreSQLDatabase
 from src.infrastructure.client.redis_queue import RedisQueue
 from src.infrastructure.database import AbstractDatabase
 from src.infrastructure.queue import AbstractQueue
 from src.infrastructure.search import AbstractSearch
+from src.job.animal_to_search_job import AnimalToSearchJob
 from src.middleware.logger import configure_logger
 from src.repository.animal_repository import AbstractAnimalRepository
 from src.repository.implementation.animal_repository import AnimalRepository
@@ -33,7 +32,7 @@ class Container(object):
         )
         self.animal_usecase: AbstractAnimalUsecase = AnimalUsecase(animal_repository=self.animal_reposigory)
 
-        self.animal_controller: AbstractAnimalController = AnimalController(animal_usecase=self.animal_usecase)
+        self.animal_search_job: AnimalToSearchJob = AnimalToSearchJob(animal_usecase=self.animal_usecase)
 
 
 container = Container(

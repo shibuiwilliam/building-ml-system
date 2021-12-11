@@ -23,5 +23,9 @@ class AbstractAnimalUsecase(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    def index_exists(self) -> bool:
+        raise NotImplementedError
+
+    @abstractmethod
     def register_index(self):
         raise NotImplementedError

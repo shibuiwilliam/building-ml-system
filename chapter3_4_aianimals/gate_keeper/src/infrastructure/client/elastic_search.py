@@ -3,6 +3,9 @@ from typing import Dict, Tuple
 
 from elasticsearch import Elasticsearch as ES
 from src.infrastructure.search import AbstractSearch
+from src.middleware.logger import configure_logger
+
+logger = configure_logger(__name__)
 
 
 class Elasticsearch(AbstractSearch):
@@ -22,7 +25,7 @@ class Elasticsearch(AbstractSearch):
         index: str,
         body: Dict,
     ):
-        self.es_client.create(
+        self.es_client.indices.create(
             index=index,
             body=body,
         )
@@ -32,6 +35,14 @@ class Elasticsearch(AbstractSearch):
         index: str,
     ) -> Dict:
         return self.es_client.indices.get_mapping(index=index)
+
+    def index_exists(
+        self,
+        index: str,
+    ) -> bool:
+        indices = self.es_client.cat.indices(index="*", h="index").splitlines()
+        logger.info(f"indices: {indices}")
+        return index in indices
 
     def create_document(
         self,

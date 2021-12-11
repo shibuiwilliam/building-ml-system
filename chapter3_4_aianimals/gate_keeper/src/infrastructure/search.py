@@ -22,6 +22,13 @@ class AbstractSearch(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    def index_exists(
+        self,
+        index: str,
+    ) -> bool:
+        raise NotImplementedError
+
+    @abstractmethod
     def create_document(
         self,
         index: str,
