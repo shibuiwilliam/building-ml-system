@@ -75,7 +75,6 @@ class AnimalModel(BaseModel):
     animal_category_name: str
     animal_subcategory_id: int
     animal_subcategory_name: str
-    user_id: str
     name: str
     description: str
     photo_url: str

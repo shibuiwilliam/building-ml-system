@@ -1,5 +1,3 @@
-from concurrent.futures import ThreadPoolExecutor
-
 from src.job.abstract_job import AbstractJob
 from src.middleware.logger import configure_logger
 from src.usecase.animal_usecase import AbstractAnimalUsecase
@@ -27,5 +25,4 @@ class AnimalToSearchJob(AbstractJob):
             logger.info("register index")
             self.animal_usecase.create_index()
 
-        with ThreadPoolExecutor(4) as executor:
-            executor.map(self._run)
+        self._run()

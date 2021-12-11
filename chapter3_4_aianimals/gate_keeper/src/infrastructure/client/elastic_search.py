@@ -25,10 +25,12 @@ class Elasticsearch(AbstractSearch):
         index: str,
         body: Dict,
     ):
+        logger.info(f"register index {index} with body {body}")
         self.es_client.indices.create(
             index=index,
             body=body,
         )
+        logger.info(f"done register index {index} with body {body}")
 
     def get_index(
         self,
@@ -50,6 +52,7 @@ class Elasticsearch(AbstractSearch):
         id: Tuple[str, int],
         body: Dict,
     ):
+        logger.info(f"register document in index {index} with id {id} and body {body}")
         self.es_client.create(
             index=index,
             id=id,
