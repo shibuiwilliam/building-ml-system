@@ -7,7 +7,8 @@ from pydantic import BaseModel, Extra
 class AnimalSubcategoryQuery(BaseModel):
     id: Optional[int]
     animal_category_id: Optional[int]
-    name: Optional[str]
+    name_en: Optional[str]
+    name_ja: Optional[str]
     is_deleted: Optional[bool] = False
 
     class Config:
@@ -17,7 +18,8 @@ class AnimalSubcategoryQuery(BaseModel):
 class AnimalSubcategoryCreate(BaseModel):
     id: int
     animal_category_id: int
-    name: str
+    name_en: str
+    name_ja: str
 
     class Config:
         extra = Extra.forbid
@@ -26,7 +28,8 @@ class AnimalSubcategoryCreate(BaseModel):
 class AnimalSubcategoryModel(BaseModel):
     id: int
     animal_category_id: int
-    name: str
+    name_en: str
+    name_ja: str
     is_deleted: bool
     created_at: datetime
     updated_at: datetime

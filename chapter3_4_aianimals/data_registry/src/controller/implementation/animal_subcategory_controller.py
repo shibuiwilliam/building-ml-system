@@ -25,10 +25,12 @@ class AnimalSubcategoryController(AbstractAnimalSubcategoryController):
         with open(file_path, "r") as f:
             data = json.load(f)
         for k, v in data.items():
+            logger.info(f"animal subcategory {k} {v}")
             request = AnimalSubcategoryCreateRequest(
                 id=v["subcategory"],
                 animal_category_id=v["category"],
-                name=k,
+                name_en=v["name_en"],
+                name_ja=v["name_ja"],
             )
             self.animal_subcategory_usecase.register(
                 session=session,

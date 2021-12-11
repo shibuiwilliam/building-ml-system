@@ -33,9 +33,11 @@ class AnimalCreate(BaseModel):
 class AnimalModelBase(BaseModel):
     id: str
     animal_category_id: int
-    animal_category_name: str
+    animal_category_name_en: str
+    animal_category_name_ja: str
     animal_subcategory_id: int
-    animal_subcategory_name: str
+    animal_subcategory_name_en: str
+    animal_subcategory_name_ja: str
     user_id: str
     user_handle_name: str
     name: str

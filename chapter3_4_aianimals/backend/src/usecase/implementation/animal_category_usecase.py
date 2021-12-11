@@ -42,7 +42,8 @@ class AnimalCategoryUsecase(AbstractAnimalCategoryUsecase):
     ) -> Optional[AnimalCategoryResponse]:
         record = AnimalCategoryCreate(
             id=get_uuid(),
-            name=request.name,
+            name_en=request.name_en,
+            name_ja=request.name_ja,
         )
         data = self.animal_category_repository.insert(
             session=session,

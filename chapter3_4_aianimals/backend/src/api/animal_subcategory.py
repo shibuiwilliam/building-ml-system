@@ -15,8 +15,10 @@ router = APIRouter()
 @router.get("", response_model=List[AnimalSubcategoryResponse])
 async def get_animal_subcategory(
     id: Optional[int] = None,
-    name: Optional[str] = None,
-    animal_category_name: Optional[str] = None,
+    name_en: Optional[str] = None,
+    name_ja: Optional[str] = None,
+    animal_category_name_en: Optional[str] = None,
+    animal_category_name_ja: Optional[str] = None,
     is_deleted: Optional[bool] = False,
     session: Session = Depends(container.database.get_session),
 ):
@@ -24,8 +26,10 @@ async def get_animal_subcategory(
         session=session,
         request=AnimalSubcategoryRequest(
             id=id,
-            name=name,
-            animal_category_name=animal_category_name,
+            name_en=name_en,
+            name_ja=name_ja,
+            animal_category_name_en=animal_category_name_en,
+            animal_category_name_ja=animal_category_name_ja,
             is_deleted=is_deleted,
         ),
     )

@@ -47,8 +47,10 @@ class AnimalUsecase(AbstractAnimalUsecase):
         document = AnimalDocument(
             name=animal.name,
             description=animal.description,
-            animal_category=animal.animal_category_name,
-            animal_subcategory=animal.animal_subcategory_name,
+            animal_category_en=animal.animal_category_name_en,
+            animal_category_ja=animal.animal_category_name_ja,
+            animal_subcategory_en=animal.animal_subcategory_name_en,
+            animal_subcategory_ja=animal.animal_subcategory_name_ja,
         )
         self.animal_repository.create_document(
             id=animal.id,

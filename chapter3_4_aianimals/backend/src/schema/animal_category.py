@@ -15,7 +15,12 @@ class AnimalCategory(Base):
         INT,
         primary_key=True,
     )
-    name = Column(
+    name_en = Column(
+        String(128),
+        nullable=False,
+        unique=False,
+    )
+    name_ja = Column(
         String(128),
         nullable=False,
         unique=False,

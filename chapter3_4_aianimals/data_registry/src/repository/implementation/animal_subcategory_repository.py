@@ -27,15 +27,18 @@ class AnimalSubcategoryRepository(AbstractAnimalSubcategoryRepository):
                 filters.append(AnimalSubcategory.id == query.id)
             if query.animal_category_id is not None:
                 filters.append(AnimalSubcategory.id == query.animal_category_id)
-            if query.name is not None:
-                filters.append(AnimalSubcategory.name == query.name)
+            if query.name_en is not None:
+                filters.append(AnimalSubcategory.name_en == query.name_en)
+            if query.name_ja is not None:
+                filters.append(AnimalSubcategory.name_ja == query.name_ja)
             if query.is_deleted is not None:
                 filters.append(AnimalSubcategory.is_deleted == query.is_deleted)
         results = session.query(AnimalSubcategory).filter(and_(*filters)).order_by(AnimalSubcategory.id).all()
         data = [
             AnimalSubcategoryModel(
                 id=d.id,
-                name=d.name,
+                name_en=d.name_en,
+                name_ja=d.name_ja,
                 animal_category_id=d.animal_category_id,
                 is_deleted=d.is_deleted,
                 created_at=d.created_at,

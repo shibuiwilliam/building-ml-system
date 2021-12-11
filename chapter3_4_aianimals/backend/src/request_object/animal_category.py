@@ -5,7 +5,8 @@ from pydantic import BaseModel, Extra
 
 class AnimalCategoryRequest(BaseModel):
     id: Optional[int]
-    name: Optional[str]
+    name_en: Optional[str]
+    name_ja: Optional[str]
     is_deleted: Optional[bool] = False
 
     class Config:
@@ -13,7 +14,8 @@ class AnimalCategoryRequest(BaseModel):
 
 
 class AnimalCategoryCreateRequest(BaseModel):
-    name: str
+    name_en: str
+    name_ja: str
 
     class Config:
         extra = Extra.forbid

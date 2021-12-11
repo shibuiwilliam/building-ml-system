@@ -36,11 +36,19 @@ ANIMAL_MAPPING = {
                 "type": "text",
                 "analyzer": "kuromoji_analyzer",
             },
-            "animal_category": {
+            "animal_category_en": {
                 "type": "text",
             },
-            "animal_subcategory": {
+            "animal_category_ja": {
                 "type": "text",
+                "analyzer": "kuromoji_analyzer",
+            },
+            "animal_subcategory_en": {
+                "type": "text",
+            },
+            "animal_subcategory_ja": {
+                "type": "text",
+                "analyzer": "kuromoji_analyzer",
             },
         }
     },
@@ -50,8 +58,10 @@ ANIMAL_MAPPING = {
 class AnimalDocument(BaseModel):
     name: str
     description: str
-    animal_category: str
-    animal_subcategory: str
+    animal_category_en: str
+    animal_category_ja: str
+    animal_subcategory_en: str
+    animal_subcategory_ja: str
 
     class Config:
         extra = Extra.forbid
@@ -72,9 +82,11 @@ class AnimalQuery(BaseModel):
 class AnimalModel(BaseModel):
     id: str
     animal_category_id: int
-    animal_category_name: str
+    animal_category_name_en: str
+    animal_category_name_ja: str
     animal_subcategory_id: int
-    animal_subcategory_name: str
+    animal_subcategory_name_en: str
+    animal_subcategory_name_ja: str
     name: str
     description: str
     photo_url: str

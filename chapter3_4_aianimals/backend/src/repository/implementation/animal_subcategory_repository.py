@@ -28,16 +28,20 @@ class AnimalSubcategoryRepository(AbstractAnimalSubcategoryRepository):
                 filters.append(AnimalSubcategory.id == query.id)
             if query.animal_category_id is not None:
                 filters.append(AnimalCategory.id == query.animal_category_id)
-            if query.name is not None:
-                filters.append(AnimalSubcategory.name == query.name)
+            if query.name_en is not None:
+                filters.append(AnimalSubcategory.name_en == query.name_en)
+            if query.name_ja is not None:
+                filters.append(AnimalSubcategory.name_ja == query.name_ja)
             if query.is_deleted is not None:
                 filters.append(AnimalSubcategory.is_deleted == query.is_deleted)
         results = (
             session.query(
                 AnimalSubcategory.id.label("id"),
-                AnimalSubcategory.name.label("name"),
+                AnimalSubcategory.name_en.label("name_en"),
+                AnimalSubcategory.name_ja.label("name_ja"),
                 AnimalCategory.id.label("animal_category_id"),
-                AnimalCategory.name.label("animal_category_name"),
+                AnimalCategory.name_en.label("animal_category_name_en"),
+                AnimalCategory.name_ja.label("animal_category_name_ja"),
                 AnimalSubcategory.is_deleted.label("is_deleted"),
                 AnimalSubcategory.created_at.label("created_at"),
                 AnimalSubcategory.updated_at.label("updated_at"),
@@ -54,12 +58,14 @@ class AnimalSubcategoryRepository(AbstractAnimalSubcategoryRepository):
         data = [
             AnimalSubcategoryModel(
                 id=d[0],
-                name=d[1],
-                animal_category_id=d[2],
-                animal_category_name=d[3],
-                is_deleted=d[4],
-                created_at=d[5],
-                updated_at=d[6],
+                name_en=d[1],
+                name_ja=d[2],
+                animal_category_id=d[3],
+                animal_category_name_en=d[4],
+                animal_category_name_ja=d[5],
+                is_deleted=d[6],
+                created_at=d[7],
+                updated_at=d[8],
             )
             for d in results
         ]

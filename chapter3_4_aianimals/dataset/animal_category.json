@@ -1,11 +1,17 @@
 {
     "other": {
-        "category": 0
+        "category": 0,
+        "name_en": "other",
+        "name_ja": "その他"
     },
     "cat": {
-        "category": 1
+        "category": 1,
+        "name_en": "cat",
+        "name_ja": "ネコ"
     },
     "dog": {
-        "category": 2
+        "category": 2,
+        "name_en": "dog",
+        "name_ja": "イヌ"
     }
 }

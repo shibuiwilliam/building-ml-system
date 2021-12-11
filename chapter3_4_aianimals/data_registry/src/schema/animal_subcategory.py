@@ -20,7 +20,12 @@ class AnimalSubcategory(Base):
         nullable=False,
         unique=False,
     )
-    name = Column(
+    name_en = Column(
+        String(128),
+        nullable=False,
+        unique=False,
+    )
+    name_ja = Column(
         String(128),
         nullable=False,
         unique=False,

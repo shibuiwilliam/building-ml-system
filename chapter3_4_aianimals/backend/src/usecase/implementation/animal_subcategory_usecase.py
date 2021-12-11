@@ -31,19 +31,26 @@ class AnimalSubcategoryUsecase(AbstractAnimalSubcategoryUsecase):
         request: Optional[AnimalSubcategoryRequest] = None,
     ) -> List[AnimalSubcategoryResponse]:
         animal_category_id: Optional[int] = None
-        if request is not None and request.animal_category_name is not None:
-            animal_category = self.animal_category_repository.select(
-                session=session,
-                query=AnimalCategoryQuery(name=request.animal_category_name),
-            )
-            animal_category_id = animal_category[0].id
+        if request is not None:
+            _query = AnimalCategoryQuery()
+            if request.animal_category_name_en is not None:
+                _query.name_en = request.animal_category_name_en
+            if request.animal_category_name_ja is not None:
+                _query.name_ja = request.animal_category_name_ja
+            if _query.name_en is not None or _query.name_ja is not None:
+                animal_category = self.animal_category_repository.select(
+                    session=session,
+                    query=_query,
+                )
+                animal_category_id = animal_category[0].id
 
         query: Optional[AnimalSubcategoryQuery] = None
         if request is not None:
             query = AnimalSubcategoryQuery(
                 id=request.id,
                 animal_category_id=animal_category_id,
-                name=request.name,
+                name_en=request.name_en,
+                name_ja=request.name_ja,
                 is_deleted=request.is_deleted,
             )
 
@@ -62,7 +69,8 @@ class AnimalSubcategoryUsecase(AbstractAnimalSubcategoryUsecase):
         record = AnimalSubcategoryCreate(
             id=get_uuid(),
             animal_category_id=request.animal_category_id,
-            name=request.name,
+            name_en=request.name_en,
+            name_ja=request.name_ja,
         )
         data = self.animal_subcategory_repository.insert(
             session=session,

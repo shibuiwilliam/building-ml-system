@@ -3,7 +3,6 @@ from typing import List, Optional
 from sqlalchemy.orm import Session
 from src.entities.animal_category import AnimalCategoryCreate, AnimalCategoryQuery
 from src.middleware.logger import configure_logger
-from src.middleware.strings import get_uuid
 from src.repository.animal_category_repository import AbstractAnimalCategoryRepository
 from src.request_object.animal_category import AnimalCategoryCreateRequest, AnimalCategoryRequest
 from src.response_object.animal_category import AnimalCategoryResponse
@@ -52,7 +51,8 @@ class AnimalCategoryUsecase(AbstractAnimalCategoryUsecase):
 
         record = AnimalCategoryCreate(
             id=request.id,
-            name=request.name,
+            name_en=request.name_en,
+            name_ja=request.name_ja,
         )
         data = self.animal_category_repository.insert(
             session=session,
