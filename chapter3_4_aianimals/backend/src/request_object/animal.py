@@ -1,5 +1,5 @@
 import json
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, Extra
 
@@ -35,3 +35,14 @@ class AnimalCreateRequest(BaseModel):
         if isinstance(value, str):
             return cls(**json.loads(value))
         return value
+
+
+class AnimalSearchRequest(BaseModel):
+    animal_category_name_en: Optional[str]
+    animal_category_name_ja: Optional[str]
+    animal_subcategory_name_en: Optional[str]
+    animal_subcategory_name_ja: Optional[str]
+    phrases: List[str]
+
+    class Config:
+        extra = Extra.forbid

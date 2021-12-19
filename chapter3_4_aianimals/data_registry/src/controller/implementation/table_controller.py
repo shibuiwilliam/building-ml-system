@@ -38,11 +38,13 @@ class TableController(AbstractTableController):
 
     def create_index(self):
         animal_category_indices = [
-            {"column": AnimalCategory.name, "unique": True},
+            {"column": AnimalCategory.name_en, "unique": True},
+            {"column": AnimalCategory.name_ja, "unique": True},
             {"column": AnimalCategory.is_deleted, "unique": False},
         ]
         animal_subcategory_indices = [
-            {"column": AnimalSubcategory.name, "unique": True},
+            {"column": AnimalSubcategory.name_en, "unique": True},
+            {"column": AnimalSubcategory.name_ja, "unique": True},
             {"column": AnimalSubcategory.animal_category_id, "unique": False},
             {"column": AnimalSubcategory.is_deleted, "unique": False},
         ]

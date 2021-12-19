@@ -2,18 +2,22 @@ from logging import getLogger
 
 from src.configurations import Configurations
 from src.constants import RUN_ENVIRONMENT
+from src.infrastructure.client.elastic_search import Elasticsearch
 from src.infrastructure.client.google_cloud_storage import GoogleCloudStorage
 from src.infrastructure.client.local_storage import LocalStorage
 from src.infrastructure.client.postgresql_database import PostgreSQLDatabase
 from src.infrastructure.client.redis_queue import RedisQueue
 from src.infrastructure.database import AbstractDatabase
 from src.infrastructure.queue import AbstractQueue
+from src.infrastructure.search import AbstractSearch
 from src.infrastructure.storage import AbstractStorage
 from src.repository.animal_category_repository import AbstractAnimalCategoryRepository
 from src.repository.animal_repository import AbstractAnimalRepository
+from src.repository.animal_search_repository import AbstractAnimalSearchRepository
 from src.repository.animal_subcategory_repository import AbstractAnimalSubcategoryRepository
 from src.repository.implementation.animal_category_repository import AnimalCategoryRepository
 from src.repository.implementation.animal_repository import AnimalRepository
+from src.repository.implementation.animal_search_repository import AnimalSearchRepository
 from src.repository.implementation.animal_subcategory_repository import AnimalSubcategoryRepository
 from src.repository.implementation.like_repository import LikeRepository
 from src.repository.implementation.user_repository import UserRepository
@@ -41,16 +45,21 @@ class Container(object):
         storage_client: AbstractStorage,
         database: AbstractDatabase,
         queue: AbstractQueue,
+        search_client: AbstractSearch,
     ):
         self.database = database
         self.storage_client = storage_client
         self.queue = queue
+        self.search_client = search_client
 
         self.animal_category_repository: AbstractAnimalCategoryRepository = AnimalCategoryRepository()
         self.animal_subcategory_repository: AbstractAnimalSubcategoryRepository = AnimalSubcategoryRepository()
         self.animal_reposigory: AbstractAnimalRepository = AnimalRepository()
         self.user_repository: AbstractUserRepository = UserRepository()
         self.like_repository: AbstractLikeRepository = LikeRepository()
+        self.animal_search_repository: AbstractAnimalSearchRepository = AnimalSearchRepository(
+            search_client=self.search_client
+        )
 
         self.animal_category_usecase: AbstractAnimalCategoryUsecase = AnimalCategoryUsecase(
             animal_category_repository=self.animal_category_repository,
@@ -64,6 +73,7 @@ class Container(object):
         )
         self.animal_usecase: AbstractAnimalUsecase = AnimalUsecase(
             animal_repository=self.animal_reposigory,
+            animal_search_repository=self.animal_search_repository,
             storage_client=self.storage_client,
             queue=self.queue,
         )
@@ -85,4 +95,5 @@ container = Container(
     storage_client=storage_client,
     database=PostgreSQLDatabase(),
     queue=RedisQueue(),
+    search_client=Elasticsearch(),
 )

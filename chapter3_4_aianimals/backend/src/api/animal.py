@@ -7,8 +7,8 @@ from sqlalchemy.orm import Session
 from src.configurations import Configurations
 from src.middleware.strings import random_str
 from src.registry.container import container
-from src.request_object.animal import AnimalCreateRequest, AnimalRequest
-from src.response_object.animal import AnimalResponse, AnimalResponseWithLike
+from src.request_object.animal import AnimalCreateRequest, AnimalRequest, AnimalSearchRequest
+from src.response_object.animal import AnimalResponse, AnimalResponseWithLike, AnimalSearchResponses
 from src.response_object.user import UserResponse
 
 logger = getLogger(__name__)
@@ -78,5 +78,20 @@ async def post_animal(
         request=request,
         local_file_path=local_file_path,
         background_tasks=background_tasks,
+    )
+    return data
+
+
+@router.post("/search", response_model=Optional[AnimalSearchResponses])
+async def search_animal(
+    request: Optional[AnimalSearchRequest] = None,
+    limit: int = 100,
+    offset: int = 0,
+):
+    logger.info(f"search animal: {request}")
+    data = container.animal_usecase.search(
+        request=request,
+        limit=limit,
+        offset=offset,
     )
     return data

@@ -3,13 +3,19 @@ from typing import List, Optional
 
 from fastapi import BackgroundTasks
 from sqlalchemy.orm import Session
-from src.entities.animal import AnimalCreate, AnimalQuery
+from src.entities.animal import AnimalCreate, AnimalQuery, AnimalSearchQuery
 from src.infrastructure.queue import AbstractQueue
 from src.infrastructure.storage import AbstractStorage
 from src.middleware.strings import get_uuid
 from src.repository.animal_repository import AbstractAnimalRepository
-from src.request_object.animal import AnimalCreateRequest, AnimalRequest
-from src.response_object.animal import AnimalResponse, AnimalResponseWithLike
+from src.repository.animal_search_repository import AbstractAnimalSearchRepository
+from src.request_object.animal import AnimalCreateRequest, AnimalRequest, AnimalSearchRequest
+from src.response_object.animal import (
+    AnimalResponse,
+    AnimalResponseWithLike,
+    AnimalSearchResponse,
+    AnimalSearchResponses,
+)
 from src.response_object.user import UserResponse
 from src.usecase.animal_usecase import AbstractAnimalUsecase
 
@@ -20,11 +26,13 @@ class AnimalUsecase(AbstractAnimalUsecase):
     def __init__(
         self,
         animal_repository: AbstractAnimalRepository,
+        animal_search_repository: AbstractAnimalSearchRepository,
         storage_client: AbstractStorage,
         queue: AbstractQueue,
     ):
         super().__init__(
             animal_repository=animal_repository,
+            animal_search_repository=animal_search_repository,
             storage_client=storage_client,
             queue=queue,
         )
@@ -106,3 +114,30 @@ class AnimalUsecase(AbstractAnimalUsecase):
             )
             return response
         return None
+
+    def search(
+        self,
+        request: Optional[AnimalSearchRequest] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> AnimalSearchResponses:
+        query: Optional[AnimalSearchQuery] = None
+        if request is not None:
+            query = AnimalSearchQuery(
+                animal_category_name_en=request.animal_category_name_en,
+                animal_category_name_ja=request.animal_category_name_ja,
+                animal_subcategory_name_en=request.animal_subcategory_name_en,
+                animal_subcategory_name_ja=request.animal_subcategory_name_ja,
+                phrases=request.phrases,
+            )
+        results = self.animal_search_repository.search(
+            query=query,
+            from_=offset,
+            size=limit,
+        )
+        searched = AnimalSearchResponses(
+            hits=results.hits,
+            max_score=results.max_score,
+            results=[AnimalSearchResponse(**r.dict()) for r in results.results],
+        )
+        return searched

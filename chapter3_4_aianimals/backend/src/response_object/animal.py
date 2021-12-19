@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List
 
 from pydantic import BaseModel, Extra
 
@@ -28,6 +29,31 @@ class AnimalResponse(AnimalResponseBase):
 
 class AnimalResponseWithLike(AnimalResponseBase):
     like: int
+
+    class Config:
+        extra = Extra.forbid
+
+
+class AnimalSearchResponse(BaseModel):
+    score: float
+    id: str
+    name: str
+    description: str
+    photo_url: str
+    animal_category_name_en: str
+    animal_category_name_ja: str
+    animal_subcategory_name_en: str
+    animal_subcategory_name_ja: str
+    user_handle_name: str
+
+    class Config:
+        extra = Extra.forbid
+
+
+class AnimalSearchResponses(BaseModel):
+    hits: int
+    max_score: float
+    results: List[AnimalSearchResponse]
 
     class Config:
         extra = Extra.forbid

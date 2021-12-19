@@ -36,19 +36,22 @@ ANIMAL_MAPPING = {
                 "type": "text",
                 "analyzer": "kuromoji_analyzer",
             },
-            "animal_category_en": {
+            "animal_category_name_en": {
                 "type": "text",
             },
-            "animal_category_ja": {
+            "animal_category_name_ja": {
                 "type": "text",
                 "analyzer": "kuromoji_analyzer",
             },
-            "animal_subcategory_en": {
+            "animal_subcategory_name_en": {
                 "type": "text",
             },
-            "animal_subcategory_ja": {
+            "animal_subcategory_name_ja": {
                 "type": "text",
                 "analyzer": "kuromoji_analyzer",
+            },
+            "user_handle_name": {
+                "type": "text",
             },
         }
     },
@@ -58,10 +61,12 @@ ANIMAL_MAPPING = {
 class AnimalDocument(BaseModel):
     name: str
     description: str
-    animal_category_en: str
-    animal_category_ja: str
-    animal_subcategory_en: str
-    animal_subcategory_ja: str
+    photo_url: str
+    animal_category_name_en: str
+    animal_category_name_ja: str
+    animal_subcategory_name_en: str
+    animal_subcategory_name_ja: str
+    user_handle_name: str
 
     class Config:
         extra = Extra.forbid
@@ -91,5 +96,7 @@ class AnimalModel(BaseModel):
     description: str
     photo_url: str
     deactivated: bool = False
+    user_id: str
+    user_handle_name: str
     created_at: datetime
     updated_at: datetime

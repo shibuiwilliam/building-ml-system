@@ -7,8 +7,9 @@ from sqlalchemy.orm import Session
 from src.infrastructure.queue import AbstractQueue
 from src.infrastructure.storage import AbstractStorage
 from src.repository.animal_repository import AbstractAnimalRepository
-from src.request_object.animal import AnimalCreateRequest, AnimalRequest
-from src.response_object.animal import AnimalResponse, AnimalResponseWithLike
+from src.repository.animal_search_repository import AbstractAnimalSearchRepository
+from src.request_object.animal import AnimalCreateRequest, AnimalRequest, AnimalSearchRequest
+from src.response_object.animal import AnimalResponse, AnimalResponseWithLike, AnimalSearchResponses
 from src.response_object.user import UserResponse
 
 logger = getLogger(__name__)
@@ -18,10 +19,12 @@ class AbstractAnimalUsecase(ABC):
     def __init__(
         self,
         animal_repository: AbstractAnimalRepository,
+        animal_search_repository: AbstractAnimalSearchRepository,
         storage_client: AbstractStorage,
         queue: AbstractQueue,
     ):
         self.animal_repository = animal_repository
+        self.animal_search_repository = animal_search_repository
         self.storage_client = storage_client
         self.queue = queue
 
@@ -53,4 +56,13 @@ class AbstractAnimalUsecase(ABC):
         local_file_path: str,
         background_tasks: BackgroundTasks,
     ) -> Optional[AnimalResponse]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def search(
+        self,
+        request: Optional[AnimalSearchRequest] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> AnimalSearchResponses:
         raise NotImplementedError

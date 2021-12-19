@@ -10,6 +10,7 @@ from src.repository.animal_repository import AbstractAnimalRepository
 from src.schema.animal import Animal
 from src.schema.animal_category import AnimalCategory
 from src.schema.animal_subcategory import AnimalSubcategory
+from src.schema.user import User
 
 logger = configure_logger(__name__)
 
@@ -62,6 +63,8 @@ class AnimalRepository(AbstractAnimalRepository):
                 Animal.description.label("description"),
                 Animal.photo_url.label("photo_url"),
                 Animal.deactivated.label("deactivated"),
+                User.id.label("user_id"),
+                User.handle_name.label("user_handle_name"),
                 Animal.created_at.label("created_at"),
                 Animal.updated_at.label("updated_at"),
             )
@@ -73,6 +76,11 @@ class AnimalRepository(AbstractAnimalRepository):
             .join(
                 AnimalSubcategory,
                 AnimalSubcategory.id == Animal.animal_subcategory_id,
+                isouter=True,
+            )
+            .join(
+                User,
+                User.id == Animal.user_id,
                 isouter=True,
             )
             .filter(and_(*filters))
@@ -93,8 +101,10 @@ class AnimalRepository(AbstractAnimalRepository):
                 description=d[8],
                 photo_url=d[9],
                 deactivated=d[10],
-                created_at=d[11],
-                updated_at=d[12],
+                user_id=d[11],
+                user_handle_name=d[12],
+                created_at=d[13],
+                updated_at=d[14],
             )
             for d in results
         ]

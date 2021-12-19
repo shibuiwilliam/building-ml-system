@@ -2,11 +2,12 @@ aiofiles==0.8.0; python_version >= "3.6" and python_version < "4.0"
 anyio==3.4.0; python_version >= "3.6" and python_full_version >= "3.6.2"
 asgiref==3.4.1; python_version >= "3.6"
 cachetools==4.2.4; python_version >= "3.5" and python_version < "4.0" and (python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.6")
-certifi==2021.10.8; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0"
+certifi==2021.10.8; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version < "4"
 charset-normalizer==2.0.8; python_full_version >= "3.6.0" and python_version >= "3"
 click==8.0.3; python_version >= "3.6"
 colorama==0.4.4; python_version >= "3.6" and python_full_version < "3.0.0" and platform_system == "Windows" or platform_system == "Windows" and python_version >= "3.6" and python_full_version >= "3.5.0"
 deprecated==1.2.13; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version >= "3.6"
+elasticsearch==7.16.1; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.4.0" and python_version < "4")
 fastapi==0.70.0; python_full_version >= "3.6.1"
 google-api-core==2.2.2; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.6"
 google-auth==2.3.3; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.6"

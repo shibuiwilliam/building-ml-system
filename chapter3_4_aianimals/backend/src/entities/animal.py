@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, Extra
 
@@ -57,6 +57,42 @@ class AnimalModel(AnimalModelBase):
 
 class AnimalModelWithLike(AnimalModelBase):
     like: int
+
+    class Config:
+        extra = Extra.forbid
+
+
+class AnimalSearchQuery(BaseModel):
+    animal_category_name_en: Optional[str]
+    animal_category_name_ja: Optional[str]
+    animal_subcategory_name_en: Optional[str]
+    animal_subcategory_name_ja: Optional[str]
+    phrases: List[str]
+
+    class Config:
+        extra = Extra.forbid
+
+
+class AnimalSearchResult(BaseModel):
+    score: float
+    id: str
+    name: str
+    description: str
+    photo_url: str
+    animal_category_name_en: str
+    animal_category_name_ja: str
+    animal_subcategory_name_en: str
+    animal_subcategory_name_ja: str
+    user_handle_name: str
+
+    class Config:
+        extra = Extra.forbid
+
+
+class AnimalSearchResults(BaseModel):
+    hits: int
+    max_score: float
+    results: List[AnimalSearchResult]
 
     class Config:
         extra = Extra.forbid
