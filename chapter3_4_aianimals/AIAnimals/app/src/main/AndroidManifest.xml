@@ -1,50 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.aianimals">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-        android:allowBackup="true"
-        android:name=".App"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme" >
-
+        android:theme="@style/Theme.AIAnimals">
         <activity
-            android:name="com.example.aianimals.core.navigation.RouteActivity"
-            android:exported="true"
-            android:noHistory="true"
-            android:theme="@style/AppTheme.Translucent">
+            android:name="com.example.aianimals.listing.AnimalListActivity"
+            android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name=".services.login.LoginActivity"
-            android:exported="false"
-            android:label="@string/login_screen_title">
-        </activity>
-
-        <activity
-            android:name=".services.animal.listing.AnimalsActivity"
-            android:exported="false"
-            android:label="@string/animals_screen_title">
-        </activity>
-
-        <activity
-            android:name=".services.animal.listing.AnimalDetailsActivity"
-            android:exported="false"
-            android:label="@string/animal_details_screen_title"
-            android:theme="@style/AppTheme.Translucent">
-        </activity>
-
-
     </application>
 
 </manifest>
