@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="@id/tv_animal_price"
         app:layout_constraintStart_toEndOf="@id/tv_animal_price"
-        android:text="円"/>
+        android:text="@string/jpy"/>
 
     <TextView
         android:id="@+id/tv_animal_purchase_date"

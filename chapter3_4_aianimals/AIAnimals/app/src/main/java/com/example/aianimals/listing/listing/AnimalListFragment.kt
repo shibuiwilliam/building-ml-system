@@ -1,7 +1,7 @@
-package com.example.aianimals.listing
+package com.example.aianimals.listing.listing
 
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.aianimals.R
+import com.example.aianimals.listing.detail.AnimalDetailActivity
+import com.example.aianimals.listing.detail.AnimalDetailFragment
 import com.example.aianimals.repository.Animal
 
 class AnimalListFragment : Fragment(), AnimalListContract.View {
@@ -19,7 +21,7 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
     private val animalListRecyclerViewAdapter = AnimalListRecyclerViewAdapter(mutableMapOf<Int, Animal>())
     private lateinit var animalListView: RecyclerView
 
-    override fun showAddresses(animals: Map<Int, Animal>) {
+    override fun showAnimals(animals: Map<Int, Animal>) {
         animalListRecyclerViewAdapter.animals = animals
         animalListView.visibility = View.VISIBLE
     }
@@ -34,7 +36,7 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.fragment_animal_list, container, false)
+        val root = inflater.inflate(R.layout.animal_list_fragment, container, false)
 
         with (root) {
             activity?.title = getString(R.string.item_list)
@@ -50,19 +52,23 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
             animalListRecyclerViewAdapter.setOnAnimalCellClickListener(
                 object : AnimalListRecyclerViewAdapter.OnAnimalCellClickListener {
                     override fun onItemClick(animal: Animal) {
-                        setFragmentResult(
-                            "animalData",
-                            bundleOf(
-                                "animalName" to animal.name,
-                                "animalPrice" to animal.price,
-                                "animalPurchaseDate" to animal.date
-                            )
-                        )
-                        parentFragmentManager
-                            .beginTransaction()
-                            .replace(R.id.flagment_activity_main, AnimalFragment())
-                            .addToBackStack(null)
-                            .commit()
+                        val intent = Intent(context, AnimalDetailActivity::class.java).apply {
+                            putExtra(AnimalDetailActivity.EXTRA_ANIMAL_ID, animal.id)
+                        }
+                        startActivity(intent)
+//                        setFragmentResult(
+//                            "animalData",
+//                            bundleOf(
+//                                "animalName" to animal.name,
+//                                "animalPrice" to animal.price,
+//                                "animalPurchaseDate" to animal.date
+//                            )
+//                        )
+//                        parentFragmentManager
+//                            .beginTransaction()
+//                            .replace(R.id.animal_list_activity_frame, AnimalDetailFragment())
+//                            .addToBackStack(null)
+//                            .commit()
                     }
                 }
             )
@@ -71,7 +77,7 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
     }
 
     companion object {
-        fun newInstance(): AnimalListFragment{
+        fun newInstance(): AnimalListFragment {
             return AnimalListFragment()
         }
     }

@@ -1,15 +1,15 @@
-package com.example.aianimals.listing
+package com.example.aianimals.listing.detail
 
 import com.example.aianimals.BasePresenter
 import com.example.aianimals.BaseView
 import com.example.aianimals.repository.Animal
 
-interface AnimalListContract {
+class AnimalDetailContract {
     interface Presenter : BasePresenter {
-        fun listAnimals()
+        fun getAnimal(animalID: Int)
     }
 
     interface View: BaseView<Presenter> {
-        fun showAddresses(animals: Map<Int, Animal>)
+        fun showAnimal(animal: Animal)
     }
 }

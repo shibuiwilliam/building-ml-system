@@ -1,4 +1,4 @@
-package com.example.aianimals.listing
+package com.example.aianimals.listing.listing
 
 import android.view.LayoutInflater
 import android.view.View
@@ -30,7 +30,7 @@ class AnimalListRecyclerViewAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AnimalListRecyclerViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val view = inflater.inflate(R.layout.cell_animal_list, parent, false)
+        val view = inflater.inflate(R.layout.animal_list_fragment_cell, parent, false)
         return AnimalListRecyclerViewHolder(view)
     }
 
@@ -57,12 +57,6 @@ class AnimalListRecyclerViewAdapter(
             animalName = itemView.findViewById(R.id.tv_animal_name)
             animalPrice = itemView.findViewById(R.id.tv_animal_price)
             animalPurchaseDate = itemView.findViewById(R.id.tv_animal_purchase_date)
-        }
-    }
-
-    private inner class AnimalClickListener : View.OnClickListener {
-        override fun onClick(view: View) {
-            Toast.makeText(view.context, "aaaa", Toast.LENGTH_SHORT).show()
         }
     }
 }

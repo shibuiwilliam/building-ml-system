@@ -13,7 +13,7 @@ class AnimalRepository(): AnimalDataSource{
         val animals: MutableMap<Int, Animal> = mutableMapOf<Int, Animal>()
         val range = (10..50)
         for (i in 0..20) {
-            val animal = Animal("Kotlinスタートブック", range.random()*100, "2020/11/24")
+            val animal = Animal(i,"Kotlinスタートブック", range.random()*100, "2020/11/24")
             animals[i] = animal
             Log.i("AnimalRepository", "animal: ${animal}")
         }
