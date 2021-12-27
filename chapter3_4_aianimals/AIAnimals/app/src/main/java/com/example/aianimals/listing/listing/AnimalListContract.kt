@@ -9,7 +9,7 @@ interface AnimalListContract {
         fun listAnimals()
     }
 
-    interface View: BaseView<Presenter> {
+    interface View : BaseView<Presenter> {
         fun showAnimals(animals: Map<Int, Animal>)
     }
 }

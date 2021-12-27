@@ -2,23 +2,12 @@ package com.example.aianimals.repository.source
 
 import android.util.Log
 import com.example.aianimals.repository.Animal
+import com.example.aianimals.repository.source.local.AnimalLocalDataSource
 
-class AnimalRepository(): AnimalDataSource{
-    var animals: MutableMap<Int, Animal> = mutableMapOf<Int, Animal>()
-    init {
-        this.animals = this.createDummyAnimalList()
-    }
-
-    private fun createDummyAnimalList(): MutableMap<Int, Animal> {
-        val animals: MutableMap<Int, Animal> = mutableMapOf<Int, Animal>()
-        val range = (10..50)
-        for (i in 0..20) {
-            val animal = Animal(i,"Kotlinスタートブック", range.random()*100, "2020/11/24")
-            animals[i] = animal
-            Log.i("AnimalRepository", "animal: ${animal}")
-        }
-        return animals
-    }
+class AnimalRepository(
+    val animalLocalDataSource: AnimalLocalDataSource
+) : AnimalDataSource {
+    var animals: MutableMap<Int, Animal> = mutableMapOf()
 
     override fun listAnimals(callback: AnimalDataSource.ListAnimalsCallback) {
         callback.onListAnimal(this.animals)
@@ -31,11 +20,17 @@ class AnimalRepository(): AnimalDataSource{
 
     companion object {
         private var INSTANCE: AnimalRepository? = null
-        @JvmStatic fun getInstance(): AnimalRepository {
-            return INSTANCE ?: AnimalRepository()
+
+        @JvmStatic
+        fun getInstance(
+            animalLocalDataSource : AnimalLocalDataSource
+        ): AnimalRepository {
+            return INSTANCE ?: AnimalRepository(animalLocalDataSource)
                 .apply { INSTANCE = this }
         }
-        @JvmStatic fun destroyInstance() {
+
+        @JvmStatic
+        fun destroyInstance() {
             INSTANCE = null
         }
     }

@@ -1,7 +1,8 @@
 package com.example.aianimals.listing.detail
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import com.example.aianimals.Injection
 import com.example.aianimals.R
 import com.example.aianimals.repository.source.AnimalRepository
 
@@ -15,18 +16,19 @@ class AnimalDetailActivity : AppCompatActivity() {
         val animalID: Int = intent.getIntExtra(EXTRA_ANIMAL_ID, -1)
 
         val animalDetailFragment = supportFragmentManager
-            .findFragmentById(R.id.animal_detail_activity_frame) as AnimalDetailFragment? ?:
-            AnimalDetailFragment.newInstance(animalID).also {
+            .findFragmentById(R.id.animal_detail_activity_frame) as AnimalDetailFragment?
+            ?: AnimalDetailFragment.newInstance(animalID).also {
                 supportFragmentManager
                     .beginTransaction()
                     .replace(R.id.animal_detail_activity_frame, it)
                     .commit()
-        }
+            }
 
         animalDetailPresenter = AnimalDetailPresenter(
             animalID,
-            AnimalRepository(),
-            animalDetailFragment)
+            Injection.provideAnimalRepository(applicationContext),
+            animalDetailFragment
+        )
     }
 
     companion object {

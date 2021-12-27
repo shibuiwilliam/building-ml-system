@@ -17,9 +17,12 @@ class AnimalListPresenter(
     }
 
     override fun listAnimals() {
-        this.animalRepository.listAnimals(object : AnimalDataSource.ListAnimalsCallback{
+        this.animalRepository.listAnimals(object : AnimalDataSource.ListAnimalsCallback {
             override fun onListAnimal(animals: Map<Int, Animal>) {
                 animalListView.showAnimals(animals)
+            }
+
+            override fun onDataNotAvailable() {
             }
         })
     }

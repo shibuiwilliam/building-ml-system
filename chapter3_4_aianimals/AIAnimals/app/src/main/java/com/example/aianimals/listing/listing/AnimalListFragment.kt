@@ -5,20 +5,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.setFragmentResult
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.aianimals.R
 import com.example.aianimals.listing.detail.AnimalDetailActivity
-import com.example.aianimals.listing.detail.AnimalDetailFragment
 import com.example.aianimals.repository.Animal
 
 class AnimalListFragment : Fragment(), AnimalListContract.View {
     override lateinit var presenter: AnimalListContract.Presenter
-    private val animalListRecyclerViewAdapter = AnimalListRecyclerViewAdapter(mutableMapOf<Int, Animal>())
+    private val animalListRecyclerViewAdapter =
+        AnimalListRecyclerViewAdapter(mutableMapOf<Int, Animal>())
     private lateinit var animalListView: RecyclerView
 
     override fun showAnimals(animals: Map<Int, Animal>) {
@@ -38,9 +36,11 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
     ): View? {
         val root = inflater.inflate(R.layout.animal_list_fragment, container, false)
 
-        with (root) {
+        with(root) {
             activity?.title = getString(R.string.item_list)
-            animalListView = findViewById<RecyclerView>(R.id.recycler_view).apply { adapter=animalListRecyclerViewAdapter }
+            animalListView = findViewById<RecyclerView>(R.id.recycler_view).apply {
+                adapter = animalListRecyclerViewAdapter
+            }
             val linearLayoutManager = LinearLayoutManager(context)
             animalListView.layoutManager = linearLayoutManager
             animalListView.addItemDecoration(
@@ -56,19 +56,6 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
                             putExtra(AnimalDetailActivity.EXTRA_ANIMAL_ID, animal.id)
                         }
                         startActivity(intent)
-//                        setFragmentResult(
-//                            "animalData",
-//                            bundleOf(
-//                                "animalName" to animal.name,
-//                                "animalPrice" to animal.price,
-//                                "animalPurchaseDate" to animal.date
-//                            )
-//                        )
-//                        parentFragmentManager
-//                            .beginTransaction()
-//                            .replace(R.id.animal_list_activity_frame, AnimalDetailFragment())
-//                            .addToBackStack(null)
-//                            .commit()
                     }
                 }
             )

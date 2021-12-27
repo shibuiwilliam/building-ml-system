@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.aianimals.R
 import com.example.aianimals.repository.Animal
@@ -28,7 +27,10 @@ class AnimalListRecyclerViewAdapter(
         this.onAnimalCellClickListener = onAnimalCellClickListener
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AnimalListRecyclerViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): AnimalListRecyclerViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.animal_list_fragment_cell, parent, false)
         return AnimalListRecyclerViewHolder(view)
@@ -39,7 +41,7 @@ class AnimalListRecyclerViewAdapter(
         holder.animalName.text = animal.name
         holder.animalPrice.text = animal.price.toString()
         holder.animalPurchaseDate.text = animal.date
-        holder.itemView.setOnClickListener{
+        holder.itemView.setOnClickListener {
             onAnimalCellClickListener.onItemClick(animal)
         }
     }

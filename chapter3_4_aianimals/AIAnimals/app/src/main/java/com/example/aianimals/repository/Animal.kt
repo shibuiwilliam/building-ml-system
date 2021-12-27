@@ -1,8 +1,15 @@
 package com.example.aianimals.repository
 
-data class Animal(
-    var id: Int,
-    var name: String,
-    var price: Int,
-    var date: String
-)
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+
+@Entity(tableName = "animals")
+data class Animal @JvmOverloads constructor(
+    @PrimaryKey @ColumnInfo(name = "id") var id: Int = -1,
+    @ColumnInfo var name: String = "",
+    @ColumnInfo var price: Int = -1,
+    @ColumnInfo var date: String = ""
+) {
+}

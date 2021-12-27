@@ -9,7 +9,7 @@ class AnimalDetailContract {
         fun getAnimal(animalID: Int)
     }
 
-    interface View: BaseView<Presenter> {
+    interface View : BaseView<Presenter> {
         fun showAnimal(animal: Animal)
     }
 }

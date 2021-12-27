@@ -1,11 +1,11 @@
 package com.example.aianimals.listing.detail
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.fragment.app.Fragment
 import com.example.aianimals.R
 import com.example.aianimals.repository.Animal
 
@@ -36,7 +36,7 @@ class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
     ): View? {
         val root = inflater.inflate(R.layout.animal_detail_fragment, container, false)
 
-        with (root)
+        with(root)
         {
             activity?.title = getString(R.string.item_detail)
             tv_animal_name = findViewById(R.id.tv_animal_name)

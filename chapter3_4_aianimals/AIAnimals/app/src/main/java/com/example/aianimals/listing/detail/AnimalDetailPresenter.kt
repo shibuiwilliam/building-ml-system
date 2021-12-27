@@ -8,7 +8,7 @@ class AnimalDetailPresenter(
     private val animalID: Int,
     val animalRepository: AnimalRepository,
     val animalDetailView: AnimalDetailContract.View
-) : AnimalDetailContract.Presenter{
+) : AnimalDetailContract.Presenter {
     init {
         this.animalDetailView.presenter = this
     }
@@ -18,9 +18,12 @@ class AnimalDetailPresenter(
     }
 
     override fun getAnimal(animalID: Int) {
-        this.animalRepository.getAnimal(animalID, object : AnimalDataSource.GetAnimalCallback{
+        this.animalRepository.getAnimal(animalID, object : AnimalDataSource.GetAnimalCallback {
             override fun onGetAnimal(animal: Animal) {
                 animalDetailView.showAnimal(animal)
+            }
+
+            override fun onDataNotAvailable() {
             }
         })
     }
