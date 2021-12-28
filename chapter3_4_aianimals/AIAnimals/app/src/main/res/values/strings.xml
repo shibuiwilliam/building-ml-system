@@ -2,7 +2,10 @@
     <string name="app_name">AIAnimals</string>
     <string name="toolbar_title">AIAnimals</string>
     <string name="tv_menu_unit">JPY</string>
-    <string name="item_list">item list</string>
-    <string name="item_detail">item detail</string>
+    <string name="animal_list">animal list</string>
+    <string name="animal_detail">animal detail</string>
     <string name="jpy">JPY</string>
+    <string name="animal_registration">Add animal</string>
+    <string name="animal_name">animal name</string>
+    <string name="animal_description">animal description</string>
 </resources>

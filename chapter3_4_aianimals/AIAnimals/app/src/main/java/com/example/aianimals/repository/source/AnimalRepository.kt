@@ -1,6 +1,7 @@
 package com.example.aianimals.repository.source
 
 
+import android.util.Log
 import com.example.aianimals.repository.Animal
 import com.example.aianimals.repository.source.local.AnimalLocalDataSource
 
@@ -15,7 +16,7 @@ class AnimalRepository(
             return
         }
 
-        animalLocalDataSource.listAnimals(object : AnimalDataSource.ListAnimalsCallback{
+        animalLocalDataSource.listAnimals(object : AnimalDataSource.ListAnimalsCallback {
             override fun onListAnimal(animals: Map<String, Animal>) {
                 cacheAnimals(animals)
                 callback.onListAnimal(cachedAnimals)
@@ -28,14 +29,15 @@ class AnimalRepository(
 
     override fun getAnimal(
         animalID: String,
-        callback: AnimalDataSource.GetAnimalCallback) {
+        callback: AnimalDataSource.GetAnimalCallback
+    ) {
         val animal = getAnimalFromCache(animalID)
         if (animal != null) {
             callback.onGetAnimal(animal)
             return
         }
 
-        animalLocalDataSource.getAnimal(animalID, object : AnimalDataSource.GetAnimalCallback{
+        animalLocalDataSource.getAnimal(animalID, object : AnimalDataSource.GetAnimalCallback {
             override fun onGetAnimal(animal: Animal) {
                 cacheAnimal(animal)
                 callback.onGetAnimal(animal)
@@ -47,6 +49,7 @@ class AnimalRepository(
     }
 
     override fun saveAnimal(animal: Animal) {
+        Log.i("AnimalRepository", "register ${animal}")
         animalLocalDataSource.saveAnimal(animal)
     }
 
@@ -54,13 +57,13 @@ class AnimalRepository(
         this.cachedAnimals[animal.id] = animal
     }
 
-    private fun cacheAnimals(animals: Map<String, Animal>){
-        animals.forEach{
+    private fun cacheAnimals(animals: Map<String, Animal>) {
+        animals.forEach {
             cacheAnimal(it.value)
         }
     }
 
-    private fun getAnimalFromCache(animalID: String) : Animal? {
+    private fun getAnimalFromCache(animalID: String): Animal? {
         return this.cachedAnimals[animalID]
     }
 
@@ -69,7 +72,7 @@ class AnimalRepository(
 
         @JvmStatic
         fun getInstance(
-            animalLocalDataSource : AnimalLocalDataSource
+            animalLocalDataSource: AnimalLocalDataSource
         ): AnimalRepository {
             return INSTANCE ?: AnimalRepository(animalLocalDataSource)
                 .apply { INSTANCE = this }

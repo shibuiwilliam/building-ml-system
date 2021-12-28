@@ -15,11 +15,11 @@ class AnimalDetailActivity : AppCompatActivity() {
         val animalID = intent.getStringExtra(EXTRA_ANIMAL_ID)!!
 
         val animalDetailFragment = supportFragmentManager
-            .findFragmentById(R.id.animal_detail_activity_frame) as AnimalDetailFragment?
+            .findFragmentById(R.id.animal_detail_activity) as AnimalDetailFragment?
             ?: AnimalDetailFragment.newInstance(animalID).also {
                 supportFragmentManager
                     .beginTransaction()
-                    .replace(R.id.animal_detail_activity_frame, it)
+                    .replace(R.id.animal_detail_activity, it)
                     .commit()
             }
 

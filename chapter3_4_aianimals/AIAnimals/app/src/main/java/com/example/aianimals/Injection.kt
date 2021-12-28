@@ -12,7 +12,8 @@ object Injection {
         return AnimalRepository.getInstance(
             AnimalLocalDataSource.getInstance(
                 AppExecutors(),
-                database.animalDao())
+                database.animalDao()
+            )
         )
     }
 }

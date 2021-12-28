@@ -9,15 +9,16 @@ import com.example.aianimals.repository.Animal
 @Database(
     entities = [Animal::class],
     version = 3,
-    exportSchema = false)
-abstract class AnimalDatabase: RoomDatabase() {
+    exportSchema = false
+)
+abstract class AnimalDatabase : RoomDatabase() {
     abstract fun animalDao(): AnimalDao
 
-    companion object{
+    companion object {
         private var INSTANCE: AnimalDatabase? = null
         private val lock = Any()
 
-        fun getInstance(context: Context): AnimalDatabase{
+        fun getInstance(context: Context): AnimalDatabase {
             synchronized(lock) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(

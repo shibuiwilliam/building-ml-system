@@ -10,7 +10,7 @@ import com.example.aianimals.repository.source.AnimalDataSource
 class AnimalLocalDataSource private constructor(
     val appExecutors: AppExecutors,
     val animalDao: AnimalDao
-): AnimalDataSource{
+) : AnimalDataSource {
     var animals: MutableMap<String, Animal> = mutableMapOf()
 
     init {
@@ -28,7 +28,8 @@ class AnimalLocalDataSource private constructor(
                 "かわいい",
                 "2020/11/24",
                 0,
-            "https://www.anicom-sompo.co.jp/nekonoshiori/wp-content/uploads/2018/12/724-2.jpg")
+                "https://www.anicom-sompo.co.jp/nekonoshiori/wp-content/uploads/2018/12/724-2.jpg"
+            )
             animals[id] = animal
             saveAnimal(animal)
             Log.i("AnimalRepository", "animal: ${animal}")
@@ -37,10 +38,10 @@ class AnimalLocalDataSource private constructor(
     }
 
     override fun listAnimals(callback: AnimalDataSource.ListAnimalsCallback) {
-        appExecutors.diskIO.execute{
+        appExecutors.diskIO.execute {
             val animals = this.animalDao.listAnimals()
-            appExecutors.mainThread.execute{
-                if (animals.isEmpty()){
+            appExecutors.mainThread.execute {
+                if (animals.isEmpty()) {
                     callback.onDataNotAvailable()
                 } else {
                     callback.onListAnimal(this.animals)
@@ -50,9 +51,9 @@ class AnimalLocalDataSource private constructor(
     }
 
     override fun getAnimal(animalID: String, callback: AnimalDataSource.GetAnimalCallback) {
-        appExecutors.diskIO.execute{
+        appExecutors.diskIO.execute {
             val animal = this.animalDao.getAnimal(animalID)
-            appExecutors.mainThread.execute{
+            appExecutors.mainThread.execute {
                 if (animal != null) {
                     callback.onGetAnimal(animal)
                 } else {
@@ -63,7 +64,9 @@ class AnimalLocalDataSource private constructor(
     }
 
     override fun saveAnimal(animal: Animal) {
-        appExecutors.diskIO.execute{this.animalDao.insertAnimal(animal)}
+        appExecutors.diskIO.execute {
+            this.animalDao.insertAnimal(animal)
+        }
     }
 
     companion object {
@@ -76,7 +79,7 @@ class AnimalLocalDataSource private constructor(
         ): AnimalLocalDataSource {
             if (INSTANCE == null) {
                 synchronized(AnimalLocalDataSource::javaClass) {
-                    INSTANCE= AnimalLocalDataSource(appExecutors, animalDao)
+                    INSTANCE = AnimalLocalDataSource(appExecutors, animalDao)
                 }
             }
             return INSTANCE!!

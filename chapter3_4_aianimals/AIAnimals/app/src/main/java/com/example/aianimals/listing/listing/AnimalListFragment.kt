@@ -11,7 +11,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.aianimals.R
 import com.example.aianimals.listing.detail.AnimalDetailActivity
+import com.example.aianimals.posting.AnimalRegistrationActivity
 import com.example.aianimals.repository.Animal
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class AnimalListFragment : Fragment(), AnimalListContract.View {
     override lateinit var presenter: AnimalListContract.Presenter
@@ -37,10 +39,11 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
         val root = inflater.inflate(
             R.layout.animal_list_fragment,
             container,
-            false)
+            false
+        )
 
         with(root) {
-            activity?.title = getString(R.string.item_list)
+            activity?.title = getString(R.string.animal_list)
             animalListView = findViewById<RecyclerView>(R.id.recycler_view).apply {
                 adapter = animalListRecyclerViewAdapter
             }
@@ -62,6 +65,13 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
                     }
                 }
             )
+        }
+
+        requireActivity().findViewById<FloatingActionButton>(R.id.add_animal_button).apply {
+            setOnClickListener {
+                val intent = Intent(context, AnimalRegistrationActivity::class.java)
+                startActivity(intent)
+            }
         }
         return root
     }

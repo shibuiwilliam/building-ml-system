@@ -3,16 +3,21 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/ic_add.xml" value="0.1361111111111111" />
+        <entry key="app/src/main/res/layout/activity_animal_registration.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/animal_detail_activity.xml" value="0.15092592592592594" />
         <entry key="app/src/main/res/layout/animal_detail_fragment.xml" value="0.1" />
         <entry key="app/src/main/res/layout/animal_list_activity.xml" value="0.16767983789260385" />
         <entry key="app/src/main/res/layout/animal_list_fragment.xml" value="0.1" />
         <entry key="app/src/main/res/layout/animal_list_fragment_cell.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/animal_registration_activity.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/animal_registration_fragment.xml" value="0.1" />
         <entry key="app/src/main/res/layout/cell_animal_list.xml" value="0.1" />
         <entry key="app/src/main/res/layout/cell_book_list.xml" value="0.11944444444444445" />
         <entry key="app/src/main/res/layout/fragment_animal.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_animal_list.xml" value="0.16767983789260385" />
+        <entry key="app/src/main/res/layout/fragment_animal_registration.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_book.xml" value="0.11944444444444445" />
         <entry key="app/src/main/res/layout/fragment_book_list.xml" value="0.19202898550724637" />
         <entry key="app/src/main/res/layout/row.xml" value="0.20878623188405798" />

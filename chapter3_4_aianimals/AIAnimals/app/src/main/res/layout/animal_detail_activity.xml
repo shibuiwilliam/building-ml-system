@@ -8,7 +8,7 @@
     tools:context=".listing.detail.AnimalDetailActivity">
 
     <FrameLayout
-        android:id="@+id/animal_detail_activity_frame"
+        android:id="@+id/animal_detail_activity"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="parent"

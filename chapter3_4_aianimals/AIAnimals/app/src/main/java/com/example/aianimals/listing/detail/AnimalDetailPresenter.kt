@@ -21,12 +21,12 @@ class AnimalDetailPresenter(
         this.animalRepository.getAnimal(
             animalID,
             object : AnimalDataSource.GetAnimalCallback {
-            override fun onGetAnimal(animal: Animal) {
-                animalDetailView.showAnimal(animal)
-            }
+                override fun onGetAnimal(animal: Animal) {
+                    animalDetailView.showAnimal(animal)
+                }
 
-            override fun onDataNotAvailable() {
-            }
-        })
+                override fun onDataNotAvailable() {
+                }
+            })
     }
 }

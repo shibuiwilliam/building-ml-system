@@ -4,6 +4,11 @@
     package="com.example.aianimals">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature android:name="android.hardware.camera" />
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="false"
@@ -23,6 +28,9 @@
         </activity>
         <activity
             android:name=".listing.detail.AnimalDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".posting.AnimalRegistrationActivity"
             android:exported="false" />
     </application>
 

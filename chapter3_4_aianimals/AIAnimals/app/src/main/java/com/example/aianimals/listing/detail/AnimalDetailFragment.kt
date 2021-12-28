@@ -16,7 +16,7 @@ class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
 
     private lateinit var animalImageView: ImageView
     private lateinit var animalNameView: TextView
-    private lateinit var animalLikesView : TextView
+    private lateinit var animalLikesView: TextView
     private lateinit var animalSubmitDateView: TextView
     private lateinit var animalDescriptionView: TextView
 
@@ -32,7 +32,7 @@ class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
         animalDescriptionView.visibility = View.VISIBLE
 
         Glide.with(this).load(animal.imageUrl).into(animalImageView)
-        animalImageView.visibility=View.VISIBLE
+        animalImageView.visibility = View.VISIBLE
     }
 
     override fun onResume() {
@@ -48,11 +48,12 @@ class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
         val root = inflater.inflate(
             R.layout.animal_detail_fragment,
             container,
-            false)
+            false
+        )
 
         with(root)
         {
-            activity?.title = getString(R.string.item_detail)
+            activity?.title = getString(R.string.animal_detail)
 
             animalImageView = findViewById(R.id.animal_image)
             animalNameView = findViewById(R.id.animal_name)
