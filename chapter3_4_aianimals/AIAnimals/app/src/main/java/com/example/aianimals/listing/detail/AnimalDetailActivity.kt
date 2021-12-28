@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.aianimals.Injection
 import com.example.aianimals.R
-import com.example.aianimals.repository.source.AnimalRepository
 
 class AnimalDetailActivity : AppCompatActivity() {
     private lateinit var animalDetailPresenter: AnimalDetailPresenter
@@ -13,7 +12,7 @@ class AnimalDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.animal_detail_activity)
 
-        val animalID: Int = intent.getIntExtra(EXTRA_ANIMAL_ID, -1)
+        val animalID = intent.getStringExtra(EXTRA_ANIMAL_ID)!!
 
         val animalDetailFragment = supportFragmentManager
             .findFragmentById(R.id.animal_detail_activity_frame) as AnimalDetailFragment?
@@ -32,6 +31,6 @@ class AnimalDetailActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val EXTRA_ANIMAL_ID: String = "ANIMAL_ID"
+        const val EXTRA_ANIMAL_ID = "ANIMAL_ID"
     }
 }

@@ -4,7 +4,7 @@ import com.example.aianimals.repository.Animal
 
 interface AnimalDataSource {
     interface ListAnimalsCallback {
-        fun onListAnimal(animals: Map<Int, Animal>)
+        fun onListAnimal(animals: Map<String, Animal>)
         fun onDataNotAvailable()
     }
 
@@ -14,5 +14,6 @@ interface AnimalDataSource {
     }
 
     fun listAnimals(callback: ListAnimalsCallback)
-    fun getAnimal(animalID: Int, callback: GetAnimalCallback)
+    fun getAnimal(animalID: String, callback: GetAnimalCallback)
+    fun saveAnimal(animal: Animal)
 }

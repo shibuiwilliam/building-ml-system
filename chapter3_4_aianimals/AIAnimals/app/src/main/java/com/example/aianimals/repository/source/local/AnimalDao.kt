@@ -9,6 +9,6 @@ import com.example.aianimals.repository.Animal
 @Dao
 interface AnimalDao {
     @Query("SELECT * FROM animals") fun listAnimals(): List<Animal>
-    @Query("SELECT * FROM animals WHERE id = :animalID") fun getAnimal(animalID: Int): Animal?
-    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insertTask(animal: Animal)
+    @Query("SELECT * FROM animals WHERE id = :animalID") fun getAnimal(animalID: String): Animal?
+    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insertAnimal(animal: Animal)
 }

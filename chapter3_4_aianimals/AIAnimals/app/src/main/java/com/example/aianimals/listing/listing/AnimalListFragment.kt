@@ -16,11 +16,11 @@ import com.example.aianimals.repository.Animal
 class AnimalListFragment : Fragment(), AnimalListContract.View {
     override lateinit var presenter: AnimalListContract.Presenter
     private val animalListRecyclerViewAdapter =
-        AnimalListRecyclerViewAdapter(mutableMapOf<Int, Animal>())
+        AnimalListRecyclerViewAdapter(mutableMapOf())
     private lateinit var animalListView: RecyclerView
 
-    override fun showAnimals(animals: Map<Int, Animal>) {
-        animalListRecyclerViewAdapter.animals = animals
+    override fun showAnimals(animals: Map<String, Animal>) {
+        animalListRecyclerViewAdapter.animals = animals.values.toList()
         animalListView.visibility = View.VISIBLE
     }
 
@@ -34,7 +34,10 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.animal_list_fragment, container, false)
+        val root = inflater.inflate(
+            R.layout.animal_list_fragment,
+            container,
+            false)
 
         with(root) {
             activity?.title = getString(R.string.item_list)

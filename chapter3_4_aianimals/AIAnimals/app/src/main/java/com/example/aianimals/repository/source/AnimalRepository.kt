@@ -1,21 +1,67 @@
 package com.example.aianimals.repository.source
 
-import android.util.Log
+
 import com.example.aianimals.repository.Animal
 import com.example.aianimals.repository.source.local.AnimalLocalDataSource
 
 class AnimalRepository(
-    val animalLocalDataSource: AnimalLocalDataSource
+    val animalLocalDataSource: AnimalDataSource
 ) : AnimalDataSource {
-    var animals: MutableMap<Int, Animal> = mutableMapOf()
+    var cachedAnimals: MutableMap<String, Animal> = mutableMapOf()
 
     override fun listAnimals(callback: AnimalDataSource.ListAnimalsCallback) {
-        callback.onListAnimal(this.animals)
+        if (this.cachedAnimals.isNotEmpty()) {
+            callback.onListAnimal(this.cachedAnimals)
+            return
+        }
+
+        animalLocalDataSource.listAnimals(object : AnimalDataSource.ListAnimalsCallback{
+            override fun onListAnimal(animals: Map<String, Animal>) {
+                cacheAnimals(animals)
+                callback.onListAnimal(cachedAnimals)
+            }
+
+            override fun onDataNotAvailable() {
+            }
+        })
     }
 
-    override fun getAnimal(animalID: Int, callback: AnimalDataSource.GetAnimalCallback) {
-        val animal = this.animals[animalID]!!
-        callback.onGetAnimal(animal)
+    override fun getAnimal(
+        animalID: String,
+        callback: AnimalDataSource.GetAnimalCallback) {
+        val animal = getAnimalFromCache(animalID)
+        if (animal != null) {
+            callback.onGetAnimal(animal)
+            return
+        }
+
+        animalLocalDataSource.getAnimal(animalID, object : AnimalDataSource.GetAnimalCallback{
+            override fun onGetAnimal(animal: Animal) {
+                cacheAnimal(animal)
+                callback.onGetAnimal(animal)
+            }
+
+            override fun onDataNotAvailable() {
+            }
+        })
+    }
+
+    override fun saveAnimal(animal: Animal) {
+        animalLocalDataSource.saveAnimal(animal)
+    }
+
+    private fun cacheAnimal(animal: Animal) {
+        this.cachedAnimals[animal.id] = animal
+    }
+
+    private fun cacheAnimals(animals: Map<String, Animal>){
+        animals.forEach{
+            cacheAnimal(it.value)
+        }
+    }
+
+    private fun getAnimalFromCache(animalID: String) : Animal? {
+        return this.cachedAnimals[animalID]
     }
 
     companion object {

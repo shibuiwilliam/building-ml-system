@@ -19,6 +19,7 @@ class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
         tv_animal_name.text = animal.name
         tv_animal_price.text = animal.price.toString()
         tv_animal_purchase_date.text = animal.date
+
         tv_animal_name.visibility = View.VISIBLE
         tv_animal_price.visibility = View.VISIBLE
         tv_animal_purchase_date.visibility = View.VISIBLE
@@ -34,7 +35,10 @@ class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.animal_detail_fragment, container, false)
+        val root = inflater.inflate(
+            R.layout.animal_detail_fragment,
+            container,
+            false)
 
         with(root)
         {
@@ -42,11 +46,6 @@ class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
             tv_animal_name = findViewById(R.id.tv_animal_name)
             tv_animal_price = findViewById(R.id.tv_animal_price)
             tv_animal_purchase_date = findViewById(R.id.tv_animal_purchase_date)
-//            setFragmentResultListener("animalData") {_, bundle ->
-//                tv_animal_name.text = bundle.getString("animalName")
-//                tv_animal_price.text = bundle.getInt("animalPrice").toString()
-//                tv_animal_purchase_date.text = bundle.getString("animalPurchaseDate")
-//            }
         }
         return root
     }
@@ -55,9 +54,11 @@ class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
 
         private val ARGUMENT_ANIMAL_ID = "ANIMAL_ID"
 
-        fun newInstance(animalID: Int) =
+        fun newInstance(animalID: String?) =
             AnimalDetailFragment().apply {
-                arguments = Bundle().apply { putInt(ARGUMENT_ANIMAL_ID, animalID) }
+                arguments = Bundle().apply {
+                    putString(ARGUMENT_ANIMAL_ID, animalID)
+                }
             }
     }
 }

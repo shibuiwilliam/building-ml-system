@@ -10,6 +10,6 @@ interface AnimalListContract {
     }
 
     interface View : BaseView<Presenter> {
-        fun showAnimals(animals: Map<Int, Animal>)
+        fun showAnimals(animals: Map<String, Animal>)
     }
 }

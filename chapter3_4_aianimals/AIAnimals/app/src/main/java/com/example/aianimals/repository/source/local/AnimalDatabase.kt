@@ -6,7 +6,10 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.aianimals.repository.Animal
 
-@Database(entities = [Animal::class], version = 1)
+@Database(
+    entities = [Animal::class],
+    version = 1,
+    exportSchema = false)
 abstract class AnimalDatabase: RoomDatabase() {
     abstract fun animalDao(): AnimalDao
 
@@ -21,7 +24,8 @@ abstract class AnimalDatabase: RoomDatabase() {
                         context.applicationContext,
                         AnimalDatabase::class.java,
                         "Animals.db"
-                    ).build()
+                    )
+                        .build()
                 }
                 return INSTANCE!!
             }

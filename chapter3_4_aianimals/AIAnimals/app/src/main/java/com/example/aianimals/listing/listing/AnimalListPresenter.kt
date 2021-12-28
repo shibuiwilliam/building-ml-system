@@ -5,8 +5,8 @@ import com.example.aianimals.repository.source.AnimalDataSource
 import com.example.aianimals.repository.source.AnimalRepository
 
 class AnimalListPresenter(
-    val animalRepository: AnimalRepository,
-    val animalListView: AnimalListContract.View
+    private val animalRepository: AnimalRepository,
+    private val animalListView: AnimalListContract.View
 ) : AnimalListContract.Presenter {
     init {
         this.animalListView.presenter = this
@@ -18,7 +18,7 @@ class AnimalListPresenter(
 
     override fun listAnimals() {
         this.animalRepository.listAnimals(object : AnimalDataSource.ListAnimalsCallback {
-            override fun onListAnimal(animals: Map<Int, Animal>) {
+            override fun onListAnimal(animals: Map<String, Animal>) {
                 animalListView.showAnimals(animals)
             }
 

@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.aianimals.Injection
 import com.example.aianimals.R
-import com.example.aianimals.repository.source.AnimalRepository
 
 class AnimalListActivity : AppCompatActivity() {
     private val CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY"

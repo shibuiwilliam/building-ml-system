@@ -9,9 +9,9 @@ import com.example.aianimals.R
 import com.example.aianimals.repository.Animal
 
 class AnimalListRecyclerViewAdapter(
-    animals: Map<Int, Animal>
+    animals: Map<String, Animal>
 ) : RecyclerView.Adapter<AnimalListRecyclerViewAdapter.AnimalListRecyclerViewHolder>() {
-    var animals: Map<Int, Animal> = animals
+    var animals: List<Animal> = animals.values.toList()
         set(animals) {
             field = animals
             notifyDataSetChanged()
