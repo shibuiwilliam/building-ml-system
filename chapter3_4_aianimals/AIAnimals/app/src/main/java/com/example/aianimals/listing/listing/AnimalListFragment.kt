@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.aianimals.R
 import com.example.aianimals.listing.detail.AnimalDetailActivity
-import com.example.aianimals.posting.AnimalRegistrationActivity
+import com.example.aianimals.posting.registration.AnimalRegistrationActivity
 import com.example.aianimals.repository.Animal
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 

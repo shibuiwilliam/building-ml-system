@@ -8,4 +8,7 @@
     <string name="animal_registration">Add animal</string>
     <string name="animal_name">animal name</string>
     <string name="animal_description">animal description</string>
+    <string name="take_photo">Take Photo</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

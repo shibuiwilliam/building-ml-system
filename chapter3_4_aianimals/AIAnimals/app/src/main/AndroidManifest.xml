@@ -17,6 +17,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AIAnimals">
+
         <activity
             android:name=".listing.listing.AnimalListActivity"
             android:exported="true">
@@ -26,11 +27,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".listing.detail.AnimalDetailActivity"
             android:exported="false" />
+
         <activity
-            android:name=".posting.AnimalRegistrationActivity"
+            android:name=".posting.registration.AnimalRegistrationActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".posting.camera.CameraActivity"
             android:exported="false" />
     </application>
 

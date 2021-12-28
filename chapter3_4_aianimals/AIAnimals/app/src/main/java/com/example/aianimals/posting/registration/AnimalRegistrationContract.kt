@@ -1,4 +1,4 @@
-package com.example.aianimals.posting
+package com.example.aianimals.posting.registration
 
 import com.example.aianimals.BasePresenter
 import com.example.aianimals.BaseView

@@ -1,4 +1,4 @@
-package com.example.aianimals.posting
+package com.example.aianimals.posting.registration
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
