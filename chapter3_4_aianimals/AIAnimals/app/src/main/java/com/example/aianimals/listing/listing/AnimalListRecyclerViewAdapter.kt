@@ -37,7 +37,7 @@ class AnimalListRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: AnimalListRecyclerViewHolder, position: Int) {
-        val animal = animals[position]!!
+        val animal = animals[position]
         holder.animalNameView.text = animal.name
         holder.animalLikesView.text = animal.likes.toString()
         holder.animalSubmitDateView.text = animal.date

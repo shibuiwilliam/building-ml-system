@@ -5,16 +5,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.aianimals.R
 import com.example.aianimals.listing.detail.AnimalDetailActivity
+import com.example.aianimals.posting.camera.CameraActivity
 import com.example.aianimals.repository.Animal
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
     override lateinit var presenter: AnimalRegistrationContract.Presenter
 
+    private lateinit var takePhotoButton: Button
     private lateinit var animalNameEdit: TextView
     private lateinit var animalDescriptionEdit: TextView
 
@@ -40,8 +43,16 @@ class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
         with(root) {
             activity?.title = getString(R.string.animal_registration)
 
+            takePhotoButton = findViewById(R.id.take_photo_button)
             animalNameEdit = findViewById(R.id.animal_name_edit)
             animalDescriptionEdit = findViewById(R.id.animal_description_edit)
+
+            takePhotoButton.apply{
+                setOnClickListener {
+                    val intent = Intent(context, CameraActivity::class.java)
+                    startActivity(intent)
+                }
+            }
 
             activity?.findViewById<FloatingActionButton>(R.id.add_animal_button)?.apply {
                 setOnClickListener {
