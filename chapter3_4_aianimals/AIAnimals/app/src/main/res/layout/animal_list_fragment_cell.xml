@@ -6,8 +6,8 @@
     android:layout_height="96dp">
 
     <TextView
-        android:id="@+id/tv_animal_name"
-        android:textSize="22dp"
+        android:id="@+id/animal_name"
+        android:textSize="16dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -17,35 +17,25 @@
         app:layout_constraintVertical_bias="0.1"/>
 
     <TextView
-        android:id="@+id/tv_animal_price"
-        android:textSize="20dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.2"
-        app:layout_constraintVertical_bias="0.9"/>
-
-    <TextView
-        android:textSize="20dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@id/tv_animal_price"
-        app:layout_constraintStart_toEndOf="@id/tv_animal_price"
-        android:text="@string/tv_menu_unit"/>
-
-    <TextView
-        android:id="@+id/tv_animal_purchase_date"
-        android:textSize="20dp"
+        android:id="@+id/animal_likes"
+        android:textSize="16dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.8"
+        app:layout_constraintVertical_bias="0.5"/>
+
+    <TextView
+        android:id="@+id/animal_submit_date"
+        android:textSize="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintVertical_bias="0.9"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

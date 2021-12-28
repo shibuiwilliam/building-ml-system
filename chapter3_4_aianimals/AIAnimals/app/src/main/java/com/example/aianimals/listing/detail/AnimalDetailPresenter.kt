@@ -18,7 +18,9 @@ class AnimalDetailPresenter(
     }
 
     override fun getAnimal(animalID: String) {
-        this.animalRepository.getAnimal(animalID, object : AnimalDataSource.GetAnimalCallback {
+        this.animalRepository.getAnimal(
+            animalID,
+            object : AnimalDataSource.GetAnimalCallback {
             override fun onGetAnimal(animal: Animal) {
                 animalDetailView.showAnimal(animal)
             }

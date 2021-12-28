@@ -8,7 +8,7 @@ import com.example.aianimals.repository.Animal
 
 @Database(
     entities = [Animal::class],
-    version = 1,
+    version = 3,
     exportSchema = false)
 abstract class AnimalDatabase: RoomDatabase() {
     abstract fun animalDao(): AnimalDao
@@ -25,6 +25,7 @@ abstract class AnimalDatabase: RoomDatabase() {
                         AnimalDatabase::class.java,
                         "Animals.db"
                     )
+                        .fallbackToDestructiveMigration()
                         .build()
                 }
                 return INSTANCE!!

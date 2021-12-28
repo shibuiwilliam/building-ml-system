@@ -4,25 +4,35 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.example.aianimals.R
 import com.example.aianimals.repository.Animal
 
 class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
     override lateinit var presenter: AnimalDetailContract.Presenter
-    private lateinit var tv_animal_name: TextView
-    private lateinit var tv_animal_price: TextView
-    private lateinit var tv_animal_purchase_date: TextView
+
+    private lateinit var animalImageView: ImageView
+    private lateinit var animalNameView: TextView
+    private lateinit var animalLikesView : TextView
+    private lateinit var animalSubmitDateView: TextView
+    private lateinit var animalDescriptionView: TextView
 
     override fun showAnimal(animal: Animal) {
-        tv_animal_name.text = animal.name
-        tv_animal_price.text = animal.price.toString()
-        tv_animal_purchase_date.text = animal.date
+        animalNameView.text = animal.name
+        animalLikesView.text = animal.likes.toString()
+        animalSubmitDateView.text = animal.date
+        animalDescriptionView.text = animal.description
 
-        tv_animal_name.visibility = View.VISIBLE
-        tv_animal_price.visibility = View.VISIBLE
-        tv_animal_purchase_date.visibility = View.VISIBLE
+        animalNameView.visibility = View.VISIBLE
+        animalLikesView.visibility = View.VISIBLE
+        animalSubmitDateView.visibility = View.VISIBLE
+        animalDescriptionView.visibility = View.VISIBLE
+
+        Glide.with(this).load(animal.imageUrl).into(animalImageView)
+        animalImageView.visibility=View.VISIBLE
     }
 
     override fun onResume() {
@@ -43,9 +53,12 @@ class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
         with(root)
         {
             activity?.title = getString(R.string.item_detail)
-            tv_animal_name = findViewById(R.id.tv_animal_name)
-            tv_animal_price = findViewById(R.id.tv_animal_price)
-            tv_animal_purchase_date = findViewById(R.id.tv_animal_purchase_date)
+
+            animalImageView = findViewById(R.id.animal_image)
+            animalNameView = findViewById(R.id.animal_name)
+            animalLikesView = findViewById(R.id.animal_likes)
+            animalSubmitDateView = findViewById(R.id.animal_submit_date)
+            animalDescriptionView = findViewById(R.id.animal_description)
         }
         return root
     }

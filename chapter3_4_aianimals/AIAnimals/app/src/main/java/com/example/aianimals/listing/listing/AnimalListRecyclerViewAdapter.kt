@@ -38,9 +38,9 @@ class AnimalListRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: AnimalListRecyclerViewHolder, position: Int) {
         val animal = animals[position]!!
-        holder.animalName.text = animal.name
-        holder.animalPrice.text = animal.price.toString()
-        holder.animalPurchaseDate.text = animal.date
+        holder.animalNameView.text = animal.name
+        holder.animalLikesView.text = animal.likes.toString()
+        holder.animalSubmitDateView.text = animal.date
         holder.itemView.setOnClickListener {
             onAnimalCellClickListener.onItemClick(animal)
         }
@@ -51,14 +51,14 @@ class AnimalListRecyclerViewAdapter(
     }
 
     inner class AnimalListRecyclerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var animalName: TextView
-        var animalPrice: TextView
-        var animalPurchaseDate: TextView
+        var animalNameView: TextView
+        var animalLikesView: TextView
+        var animalSubmitDateView: TextView
 
         init {
-            animalName = itemView.findViewById(R.id.tv_animal_name)
-            animalPrice = itemView.findViewById(R.id.tv_animal_price)
-            animalPurchaseDate = itemView.findViewById(R.id.tv_animal_purchase_date)
+            animalNameView = itemView.findViewById(R.id.animal_name)
+            animalLikesView = itemView.findViewById(R.id.animal_likes)
+            animalSubmitDateView = itemView.findViewById(R.id.animal_submit_date)
         }
     }
 }

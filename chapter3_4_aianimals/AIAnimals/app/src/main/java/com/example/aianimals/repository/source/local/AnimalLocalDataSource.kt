@@ -24,9 +24,11 @@ class AnimalLocalDataSource private constructor(
             val id = Utils.generateUUID()
             val animal = Animal(
                 id,
-                "Kotlinスタートブック",
-                range.random() * 100,
-                "2020/11/24")
+                "ネコ",
+                "かわいい",
+                "2020/11/24",
+                0,
+            "https://www.anicom-sompo.co.jp/nekonoshiori/wp-content/uploads/2018/12/724-2.jpg")
             animals[id] = animal
             saveAnimal(animal)
             Log.i("AnimalRepository", "animal: ${animal}")
