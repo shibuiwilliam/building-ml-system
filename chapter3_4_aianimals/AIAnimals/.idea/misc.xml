@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/drawable/ic_add.xml" value="0.1361111111111111" />
+        <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.14722222222222223" />
         <entry key="app/src/main/res/layout/activity_animal_registration.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/animal_detail_activity.xml" value="0.15092592592592594" />

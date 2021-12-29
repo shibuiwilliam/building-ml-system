@@ -1,5 +1,6 @@
 package com.example.aianimals.posting.camera
 
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -19,10 +20,13 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.aianimals.R
 import com.example.aianimals.middleware.Permission
+import com.example.aianimals.posting.registration.AnimalRegistrationActivity
 import java.io.File
 import java.text.SimpleDateFormat
 
 class CameraFragment : Fragment(), CameraContract.View {
+    private val TAG = CameraFragment::class.java.simpleName
+
     override lateinit var presenter: CameraContract.Presenter
 
     private lateinit var previewFinder: PreviewView
@@ -53,7 +57,8 @@ class CameraFragment : Fragment(), CameraContract.View {
                     it.setSurfaceProvider(previewFinder.surfaceProvider)
                 }
 
-            imageCapture = ImageCapture.Builder()
+            this.imageCapture = ImageCapture
+                .Builder()
                 .build()
 
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
@@ -64,43 +69,46 @@ class CameraFragment : Fragment(), CameraContract.View {
                     this,
                     cameraSelector,
                     preview,
-                    imageCapture)
+                    this.imageCapture)
 
             } catch(e: Exception) {
-                Log.e("CameraFragment", "Use case binding failed", e)
+                Log.e(TAG, "Use case binding failed", e)
             }
 
         }, ContextCompat.getMainExecutor(requireContext()))
     }
 
     override fun takePhoto(outputDirectory: File) {
-        val imageCapture = imageCapture ?: return
+        val imageCapture = this.imageCapture ?: return
 
         val photoFile = File(
             outputDirectory,
             SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS")
                 .format(System.currentTimeMillis()) + ".jpg")
 
-        Log.i("CameraFragment", "taking photo ${photoFile}")
+        Log.i(TAG, "taking photo ${photoFile}")
         val outputOptions = ImageCapture
             .OutputFileOptions
             .Builder(photoFile)
             .build()
-        Log.i("CameraFragment", "taking photo option ${outputOptions}")
+        Log.i(TAG, "taking photo option ${outputOptions}")
 
         imageCapture.takePicture(
             outputOptions,
             ContextCompat.getMainExecutor(requireContext()),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exc: ImageCaptureException) {
-                    Log.e("CameraFragment", "Photo capture failed: ${exc.message}", exc)
+                    Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     val savedUri = Uri.fromFile(photoFile)
-                    val msg = "Photo capture succeeded: $savedUri"
+                    val msg = "Photo capture succeeded: ${savedUri}"
                     Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-                    Log.d("CameraFragment",  msg)
+                    Log.i(TAG,  msg)
+
+                    val intent = Intent(context, AnimalRegistrationActivity::class.java)
+                    startActivity(intent)
                 }
             })
     }

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.aianimals.R
@@ -17,9 +18,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
     override lateinit var presenter: AnimalRegistrationContract.Presenter
 
+    private lateinit var registrationImageView: ImageView
     private lateinit var takePhotoButton: Button
     private lateinit var animalNameEdit: TextView
     private lateinit var animalDescriptionEdit: TextView
+
+    private var imageUri: String? = null
 
     override fun registerAnimal(animal: Animal) {
         presenter.addAnimal(animal)
@@ -43,9 +47,14 @@ class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
         with(root) {
             activity?.title = getString(R.string.animal_registration)
 
+            registrationImageView = findViewById(R.id.registration_image)
             takePhotoButton = findViewById(R.id.take_photo_button)
             animalNameEdit = findViewById(R.id.animal_name_edit)
             animalDescriptionEdit = findViewById(R.id.animal_description_edit)
+
+            if (imageUri == null) {
+                registrationImageView.setImageResource(R.mipmap.ic_launcher)
+            }
 
             takePhotoButton.apply{
                 setOnClickListener {
