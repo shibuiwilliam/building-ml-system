@@ -2,13 +2,16 @@ package com.example.aianimals.posting.registration
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.example.aianimals.R
 import com.example.aianimals.listing.detail.AnimalDetailActivity
 import com.example.aianimals.posting.camera.CameraActivity
@@ -16,6 +19,8 @@ import com.example.aianimals.repository.Animal
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
+    private val TAG = AnimalRegistrationFragment::class.java.simpleName
+
     override lateinit var presenter: AnimalRegistrationContract.Presenter
 
     private lateinit var registrationImageView: ImageView
@@ -23,7 +28,15 @@ class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
     private lateinit var animalNameEdit: TextView
     private lateinit var animalDescriptionEdit: TextView
 
-    private var imageUri: String? = null
+    override fun showImage(imageUri: String?) {
+        if (imageUri == null) {
+            registrationImageView.setImageResource(R.mipmap.ic_launcher)
+        } else {
+            Glide.with(this).load(imageUri).into(registrationImageView)
+        }
+
+        registrationImageView.visibility = View.VISIBLE
+    }
 
     override fun registerAnimal(animal: Animal) {
         presenter.addAnimal(animal)
@@ -52,11 +65,7 @@ class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
             animalNameEdit = findViewById(R.id.animal_name_edit)
             animalDescriptionEdit = findViewById(R.id.animal_description_edit)
 
-            if (imageUri == null) {
-                registrationImageView.setImageResource(R.mipmap.ic_launcher)
-            }
-
-            takePhotoButton.apply{
+            takePhotoButton.apply {
                 setOnClickListener {
                     val intent = Intent(context, CameraActivity::class.java)
                     startActivity(intent)
@@ -65,10 +74,15 @@ class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
 
             activity?.findViewById<FloatingActionButton>(R.id.add_animal_button)?.apply {
                 setOnClickListener {
+                    val imageUri = presenter.getImageUri()
+                    if (imageUri == null) {
+                        Toast.makeText(requireContext(), "you must register photo", Toast.LENGTH_SHORT).show()
+                        Log.e(TAG, "you must register photo")
+                    }
                     val animal = presenter.makeAnimal(
                         animalNameEdit.text.toString(),
                         animalDescriptionEdit.text.toString(),
-                        "https://www.anicom-sompo.co.jp/nekonoshiori/wp-content/uploads/2018/12/724-2.jpg"
+                        imageUri!!
                     )
                     registerAnimal(animal)
 
@@ -92,6 +106,12 @@ class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
     }
 
     companion object {
-        fun newInstance() = AnimalRegistrationFragment()
+        private val ARGUMENT_IMAGE_URI: String? = null
+
+        fun newInstance(imageUri: String?) = AnimalRegistrationFragment().apply {
+            arguments = Bundle().apply {
+                putString(ARGUMENT_IMAGE_URI, imageUri)
+            }
+        }
     }
 }

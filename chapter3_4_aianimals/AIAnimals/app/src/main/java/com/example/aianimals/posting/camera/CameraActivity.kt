@@ -40,10 +40,10 @@ class CameraActivity : AppCompatActivity() {
     private fun getOutputDirectory(): File {
         val mediaDir = externalMediaDirs
             .firstOrNull()?.let {
-            File(it, resources.getString(R.string.app_name))
-                .apply {
-                    mkdirs()
-                }
+                File(it, resources.getString(R.string.app_name))
+                    .apply {
+                        mkdirs()
+                    }
             }
         return if (mediaDir != null && mediaDir.exists())
             mediaDir else filesDir

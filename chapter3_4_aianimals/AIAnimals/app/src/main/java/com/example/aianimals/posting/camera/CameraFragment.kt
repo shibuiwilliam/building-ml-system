@@ -39,7 +39,8 @@ class CameraFragment : Fragment(), CameraContract.View {
         } else {
             requestPermissions(
                 Permission.REQUIRED_PERMISSIONS,
-                Permission.REQUEST_CODE_PERMISSIONS)
+                Permission.REQUEST_CODE_PERMISSIONS
+            )
         }
     }
 
@@ -69,13 +70,15 @@ class CameraFragment : Fragment(), CameraContract.View {
                     this,
                     cameraSelector,
                     preview,
-                    this.imageCapture)
+                    this.imageCapture
+                )
 
-            } catch(e: Exception) {
+            } catch (e: Exception) {
                 Log.e(TAG, "Use case binding failed", e)
             }
 
-        }, ContextCompat.getMainExecutor(requireContext()))
+        }, ContextCompat.getMainExecutor(requireContext())
+        )
     }
 
     override fun takePhoto(outputDirectory: File) {
@@ -84,7 +87,8 @@ class CameraFragment : Fragment(), CameraContract.View {
         val photoFile = File(
             outputDirectory,
             SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS")
-                .format(System.currentTimeMillis()) + ".jpg")
+                .format(System.currentTimeMillis()) + ".jpg"
+        )
 
         Log.i(TAG, "taking photo ${photoFile}")
         val outputOptions = ImageCapture
@@ -105,9 +109,11 @@ class CameraFragment : Fragment(), CameraContract.View {
                     val savedUri = Uri.fromFile(photoFile)
                     val msg = "Photo capture succeeded: ${savedUri}"
                     Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-                    Log.i(TAG,  msg)
+                    Log.i(TAG, msg)
 
-                    val intent = Intent(context, AnimalRegistrationActivity::class.java)
+                    val intent = Intent(context, AnimalRegistrationActivity::class.java).apply {
+                        putExtra(AnimalRegistrationActivity.IMAGE_URI, savedUri.toString())
+                    }
                     startActivity(intent)
                 }
             })
@@ -134,7 +140,7 @@ class CameraFragment : Fragment(), CameraContract.View {
             previewFinder = findViewById(R.id.preview_finder)
             camera_capture_button = findViewById(R.id.camera_capture_button)
 
-            camera_capture_button.apply{
+            camera_capture_button.apply {
                 setOnClickListener {
                     presenter.takePhoto()
                 }
@@ -146,7 +152,8 @@ class CameraFragment : Fragment(), CameraContract.View {
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
-        grantResults: IntArray) {
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == Permission.REQUEST_CODE_PERMISSIONS) {
             if (PackageManager.PERMISSION_GRANTED == grantResults.firstOrNull()) {

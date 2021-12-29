@@ -65,14 +65,12 @@ class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
     }
 
     companion object {
-
         private val ARGUMENT_ANIMAL_ID = "ANIMAL_ID"
 
-        fun newInstance(animalID: String?) =
-            AnimalDetailFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARGUMENT_ANIMAL_ID, animalID)
-                }
+        fun newInstance(animalID: String?) = AnimalDetailFragment().apply {
+            arguments = Bundle().apply {
+                putString(ARGUMENT_ANIMAL_ID, animalID)
             }
+        }
     }
 }
