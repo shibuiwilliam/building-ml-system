@@ -33,9 +33,25 @@ class AnimalRegistrationActivity : AppCompatActivity() {
             Injection.provideAnimalRepository(applicationContext),
             animalRegistrationFragment
         )
+        if (ANIMAL_NAME != null) {
+            animalRegistrationPresenter.setAnimalName(ANIMAL_NAME)
+        }
+        if (ANIMAL_DESCRIPTION != null) {
+            animalRegistrationPresenter.setAnimalDescription(ANIMAL_DESCRIPTION)
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState.apply {
+            putString(ANIMAL_NAME, animalRegistrationPresenter.getAnimalName())
+            putString(ANIMAL_DESCRIPTION, animalRegistrationPresenter.getAnimalDescription())
+        })
     }
 
     companion object {
         val IMAGE_URI: String? = null
+
+        private val ANIMAL_NAME: String? = null
+        private val ANIMAL_DESCRIPTION: String? = null
     }
 }

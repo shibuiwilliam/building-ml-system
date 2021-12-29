@@ -6,6 +6,7 @@ import com.example.aianimals.Injection
 import com.example.aianimals.R
 import java.io.File
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class CameraActivity : AppCompatActivity() {
     private lateinit var cameraPresenter: CameraPresenter
@@ -15,6 +16,8 @@ class CameraActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.camera_activity)
+
+        cameraExecutor = Executors.newSingleThreadExecutor()
 
         val cameraFragment = supportFragmentManager
             .findFragmentById(R.id.camera_activity_frame)
