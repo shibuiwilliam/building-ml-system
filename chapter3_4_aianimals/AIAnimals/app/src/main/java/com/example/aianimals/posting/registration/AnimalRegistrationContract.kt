@@ -2,7 +2,7 @@ package com.example.aianimals.posting.registration
 
 import com.example.aianimals.BasePresenter
 import com.example.aianimals.BaseView
-import com.example.aianimals.repository.Animal
+import com.example.aianimals.repository.animal.Animal
 
 interface AnimalRegistrationContract {
     interface Presenter : BasePresenter {

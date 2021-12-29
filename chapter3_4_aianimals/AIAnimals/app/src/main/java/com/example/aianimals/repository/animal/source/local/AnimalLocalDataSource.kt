@@ -1,11 +1,11 @@
-package com.example.aianimals.repository.source.local
+package com.example.aianimals.repository.animal.source.local
 
 import android.util.Log
 import androidx.annotation.VisibleForTesting
 import com.example.aianimals.middleware.AppExecutors
 import com.example.aianimals.middleware.Utils
-import com.example.aianimals.repository.Animal
-import com.example.aianimals.repository.source.AnimalDataSource
+import com.example.aianimals.repository.animal.Animal
+import com.example.aianimals.repository.animal.source.AnimalDataSource
 
 class AnimalLocalDataSource private constructor(
     val appExecutors: AppExecutors,

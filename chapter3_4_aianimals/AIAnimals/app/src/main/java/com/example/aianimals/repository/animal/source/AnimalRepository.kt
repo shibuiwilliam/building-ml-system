@@ -1,9 +1,9 @@
-package com.example.aianimals.repository.source
+package com.example.aianimals.repository.animal.source
 
 
 import android.util.Log
-import com.example.aianimals.repository.Animal
-import com.example.aianimals.repository.source.local.AnimalLocalDataSource
+import com.example.aianimals.repository.animal.Animal
+import com.example.aianimals.repository.animal.source.local.AnimalLocalDataSource
 
 class AnimalRepository(
     val animalLocalDataSource: AnimalDataSource

@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.aianimals.R
-import com.example.aianimals.repository.Animal
+import com.example.aianimals.repository.animal.Animal
 
 class AnimalListRecyclerViewAdapter(
     animals: Map<String, Animal>

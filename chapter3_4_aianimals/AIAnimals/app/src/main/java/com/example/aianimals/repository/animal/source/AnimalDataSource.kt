@@ -1,6 +1,6 @@
-package com.example.aianimals.repository.source
+package com.example.aianimals.repository.animal.source
 
-import com.example.aianimals.repository.Animal
+import com.example.aianimals.repository.animal.Animal
 
 interface AnimalDataSource {
     interface ListAnimalsCallback {

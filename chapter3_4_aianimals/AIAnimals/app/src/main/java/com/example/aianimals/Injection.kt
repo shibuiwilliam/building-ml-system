@@ -2,9 +2,11 @@ package com.example.aianimals
 
 import android.content.Context
 import com.example.aianimals.middleware.AppExecutors
-import com.example.aianimals.repository.source.AnimalRepository
-import com.example.aianimals.repository.source.local.AnimalDatabase
-import com.example.aianimals.repository.source.local.AnimalLocalDataSource
+import com.example.aianimals.repository.animal.source.AnimalRepository
+import com.example.aianimals.repository.animal.source.local.AnimalDatabase
+import com.example.aianimals.repository.animal.source.local.AnimalLocalDataSource
+import com.example.aianimals.repository.login.source.LoginRepository
+import com.example.aianimals.repository.login.source.local.LoginLocalDataSource
 
 object Injection {
     fun provideAnimalRepository(context: Context): AnimalRepository {
@@ -14,6 +16,12 @@ object Injection {
                 AppExecutors(),
                 database.animalDao()
             )
+        )
+    }
+
+    fun provideLoginRepository(context: Context): LoginRepository {
+        return LoginRepository.getInstance(
+            LoginLocalDataSource.getInstance()
         )
     }
 }

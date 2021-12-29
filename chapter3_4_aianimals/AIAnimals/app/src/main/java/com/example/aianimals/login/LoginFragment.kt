@@ -3,7 +3,6 @@ package com.example.aianimals.login
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +10,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.example.aianimals.R
 import com.example.aianimals.listing.listing.AnimalListActivity
@@ -26,7 +26,7 @@ class LoginFragment : Fragment(), LoginContract.View {
     private lateinit var passwordEdit: EditText
     private lateinit var loginButton: Button
 
-    override fun show(){
+    override fun show() {
         loginText.visibility = View.VISIBLE
         idEdit.visibility = View.VISIBLE
         passwordEdit.visibility = View.VISIBLE
@@ -48,18 +48,18 @@ class LoginFragment : Fragment(), LoginContract.View {
     ): View? {
         val root = inflater.inflate(R.layout.login_fragment, container, false)
 
-        with(root){
+        with(root) {
             activity?.title = getString(R.string.login)
 
-            loginText=findViewById(R.id.login_text)
-            idEdit=findViewById(R.id.id_edit)
-            passwordEdit=findViewById(R.id.password_edit)
-            loginButton=findViewById(R.id.login_button)
+            loginText = findViewById(R.id.login_text)
+            idEdit = findViewById(R.id.id_edit)
+            passwordEdit = findViewById(R.id.password_edit)
+            loginButton = findViewById(R.id.login_button)
 
             presenter.loginResult.observe(this@LoginFragment, Observer {
                 val loginResult = it ?: return@Observer
 
-                if(loginResult.error != null) {
+                if (loginResult.error != null) {
                     Toast.makeText(requireContext(), "login failed", Toast.LENGTH_SHORT).show()
                 }
                 if (loginResult.success != null) {

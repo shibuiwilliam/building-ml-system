@@ -1,10 +1,10 @@
-package com.example.aianimals.repository.source.local
+package com.example.aianimals.repository.animal.source.local
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.aianimals.repository.Animal
+import com.example.aianimals.repository.animal.Animal
 
 @Database(
     entities = [Animal::class],

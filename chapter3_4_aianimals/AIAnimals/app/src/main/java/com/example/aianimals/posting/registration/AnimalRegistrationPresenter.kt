@@ -2,8 +2,8 @@ package com.example.aianimals.posting.registration
 
 import android.util.Log
 import com.example.aianimals.middleware.Utils
-import com.example.aianimals.repository.Animal
-import com.example.aianimals.repository.source.AnimalRepository
+import com.example.aianimals.repository.animal.Animal
+import com.example.aianimals.repository.animal.source.AnimalRepository
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -78,6 +78,6 @@ class AnimalRegistrationPresenter(
 
     override fun clearCurrentValues() {
         animalName = null
-        animalDescription=null
+        animalDescription = null
     }
 }

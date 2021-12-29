@@ -1,8 +1,8 @@
 package com.example.aianimals.listing.detail
 
-import com.example.aianimals.repository.Animal
-import com.example.aianimals.repository.source.AnimalDataSource
-import com.example.aianimals.repository.source.AnimalRepository
+import com.example.aianimals.repository.animal.Animal
+import com.example.aianimals.repository.animal.source.AnimalDataSource
+import com.example.aianimals.repository.animal.source.AnimalRepository
 
 class AnimalDetailPresenter(
     private val animalID: String,

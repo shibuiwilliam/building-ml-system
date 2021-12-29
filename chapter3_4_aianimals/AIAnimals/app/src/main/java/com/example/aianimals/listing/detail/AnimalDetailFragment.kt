@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.aianimals.R
 import com.example.aianimals.listing.listing.AnimalListActivity
-import com.example.aianimals.repository.Animal
+import com.example.aianimals.repository.animal.Animal
 
 class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
     override lateinit var presenter: AnimalDetailContract.Presenter

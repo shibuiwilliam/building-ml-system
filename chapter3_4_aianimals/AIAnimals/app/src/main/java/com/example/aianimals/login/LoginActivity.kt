@@ -1,7 +1,8 @@
 package com.example.aianimals.login
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import com.example.aianimals.Injection
 import com.example.aianimals.R
 
 class LoginActivity : AppCompatActivity() {
@@ -15,7 +16,7 @@ class LoginActivity : AppCompatActivity() {
 
         val loginFragment = supportFragmentManager
             .findFragmentById(R.id.login_activity_frame)
-        as LoginFragment? ?: LoginFragment.newInstance().also {
+                as LoginFragment? ?: LoginFragment.newInstance().also {
             supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.login_activity_frame, it)
@@ -23,7 +24,8 @@ class LoginActivity : AppCompatActivity() {
         }
 
         loginPresenter = LoginPresenter(
-            loginFragment
+            loginFragment,
+            Injection.provideLoginRepository(applicationContext)
         )
     }
 
@@ -33,7 +35,7 @@ class LoginActivity : AppCompatActivity() {
         })
     }
 
-    companion object{
+    companion object {
         private val LOGIN_USER: String? = null
     }
 }

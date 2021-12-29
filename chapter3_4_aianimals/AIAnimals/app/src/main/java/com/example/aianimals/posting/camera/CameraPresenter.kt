@@ -1,6 +1,6 @@
 package com.example.aianimals.posting.camera
 
-import com.example.aianimals.repository.source.AnimalRepository
+import com.example.aianimals.repository.animal.source.AnimalRepository
 import java.io.File
 
 class CameraPresenter(

@@ -1,4 +1,4 @@
-package com.example.aianimals.repository
+package com.example.aianimals.repository.animal
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

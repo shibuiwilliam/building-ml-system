@@ -15,7 +15,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.aianimals.R
 import com.example.aianimals.listing.detail.AnimalDetailActivity
 import com.example.aianimals.posting.registration.AnimalRegistrationActivity
-import com.example.aianimals.repository.Animal
+import com.example.aianimals.repository.animal.Animal
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class AnimalListFragment : Fragment(), AnimalListContract.View {
