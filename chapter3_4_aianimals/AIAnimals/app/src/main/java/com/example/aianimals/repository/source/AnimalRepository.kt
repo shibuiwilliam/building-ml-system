@@ -8,7 +8,13 @@ import com.example.aianimals.repository.source.local.AnimalLocalDataSource
 class AnimalRepository(
     val animalLocalDataSource: AnimalDataSource
 ) : AnimalDataSource {
+    private val TAG = AnimalRepository::class.java.simpleName
+
     var cachedAnimals: MutableMap<String, Animal> = mutableMapOf()
+
+    override fun createAnimals() {
+        animalLocalDataSource.createAnimals()
+    }
 
     override fun listAnimals(callback: AnimalDataSource.ListAnimalsCallback) {
         if (this.cachedAnimals.isNotEmpty()) {
@@ -23,6 +29,7 @@ class AnimalRepository(
             }
 
             override fun onDataNotAvailable() {
+                createAnimals()
             }
         })
     }

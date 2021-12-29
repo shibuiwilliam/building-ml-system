@@ -8,6 +8,8 @@ class AnimalListPresenter(
     private val animalRepository: AnimalRepository,
     private val animalListView: AnimalListContract.View
 ) : AnimalListContract.Presenter {
+    private val TAG = AnimalListPresenter::class.java.simpleName
+
     init {
         this.animalListView.presenter = this
     }

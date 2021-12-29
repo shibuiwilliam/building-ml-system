@@ -11,15 +11,9 @@ class AnimalLocalDataSource private constructor(
     val appExecutors: AppExecutors,
     val animalDao: AnimalDao
 ) : AnimalDataSource {
-    var animals: MutableMap<String, Animal> = mutableMapOf()
+    private val TAG = AnimalLocalDataSource::class.java.simpleName
 
-    init {
-        this.animals = this.createDummyAnimalList()
-    }
-
-    private fun createDummyAnimalList(): MutableMap<String, Animal> {
-        val animals: MutableMap<String, Animal> = mutableMapOf()
-        val range = (10..50)
+    override fun createAnimals() {
         for (i in 0..20) {
             val id = Utils.generateUUID()
             val animal = Animal(
@@ -30,11 +24,9 @@ class AnimalLocalDataSource private constructor(
                 0,
                 "https://www.anicom-sompo.co.jp/nekonoshiori/wp-content/uploads/2018/12/724-2.jpg"
             )
-            animals[id] = animal
             saveAnimal(animal)
             Log.i("AnimalRepository", "animal: ${animal}")
         }
-        return animals
     }
 
     override fun listAnimals(callback: AnimalDataSource.ListAnimalsCallback) {
@@ -44,7 +36,8 @@ class AnimalLocalDataSource private constructor(
                 if (animals.isEmpty()) {
                     callback.onDataNotAvailable()
                 } else {
-                    callback.onListAnimal(this.animals)
+                    val mAnimals = animals.map { it.id to it }.toMap()
+                    callback.onListAnimal(mAnimals)
                 }
             }
         }

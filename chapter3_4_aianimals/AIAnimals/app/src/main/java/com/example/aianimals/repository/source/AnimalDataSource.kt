@@ -13,6 +13,7 @@ interface AnimalDataSource {
         fun onDataNotAvailable()
     }
 
+    fun createAnimals()
     fun listAnimals(callback: ListAnimalsCallback)
     fun getAnimal(animalID: String, callback: GetAnimalCallback)
     fun saveAnimal(animal: Animal)

@@ -11,6 +11,8 @@ import com.example.aianimals.repository.Animal
 class AnimalListRecyclerViewAdapter(
     animals: Map<String, Animal>
 ) : RecyclerView.Adapter<AnimalListRecyclerViewAdapter.AnimalListRecyclerViewHolder>() {
+    private val TAG = AnimalListRecyclerViewAdapter::class.java.simpleName
+
     var animals: List<Animal> = animals.values.toList()
         set(animals) {
             field = animals

@@ -6,6 +6,8 @@ import com.example.aianimals.Injection
 import com.example.aianimals.R
 
 class AnimalListActivity : AppCompatActivity() {
+    private val TAG = AnimalListActivity::class.java.simpleName
+
     private val CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY"
     private lateinit var animalListPresenter: AnimalListPresenter
 

@@ -2,6 +2,8 @@ package com.example.aianimals.listing.listing
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.aianimals.R
 import com.example.aianimals.listing.detail.AnimalDetailActivity
 import com.example.aianimals.posting.registration.AnimalRegistrationActivity
@@ -16,9 +19,14 @@ import com.example.aianimals.repository.Animal
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class AnimalListFragment : Fragment(), AnimalListContract.View {
+    private val TAG = AnimalListFragment::class.java.simpleName
+
     override lateinit var presenter: AnimalListContract.Presenter
+
     private val animalListRecyclerViewAdapter =
         AnimalListRecyclerViewAdapter(mutableMapOf())
+
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var animalListView: RecyclerView
 
     override fun showAnimals(animals: Map<String, Animal>) {
@@ -44,9 +52,21 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
 
         with(root) {
             activity?.title = getString(R.string.animal_list)
+
+            swipeRefreshLayout = findViewById(R.id.swipe)
+            swipeRefreshLayout.apply {
+                setOnRefreshListener {
+                    Handler(Looper.getMainLooper()).postDelayed(Runnable {
+                        swipeRefreshLayout.isRefreshing = false
+                        presenter.listAnimals()
+                    }, 500)
+                }
+            }
+
             animalListView = findViewById<RecyclerView>(R.id.recycler_view).apply {
                 adapter = animalListRecyclerViewAdapter
             }
+
             val linearLayoutManager = LinearLayoutManager(context)
             animalListView.layoutManager = linearLayoutManager
             animalListView.addItemDecoration(
@@ -55,6 +75,7 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
                     linearLayoutManager.orientation
                 )
             )
+
             animalListRecyclerViewAdapter.setOnAnimalCellClickListener(
                 object : AnimalListRecyclerViewAdapter.OnAnimalCellClickListener {
                     override fun onItemClick(animal: Animal) {

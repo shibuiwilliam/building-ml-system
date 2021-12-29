@@ -13,6 +13,7 @@ interface AnimalRegistrationContract {
             animalDescription: String,
             animalImageUrl: String
         ): Animal
+
         fun getImageUri(): String?
     }
 

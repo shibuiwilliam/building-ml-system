@@ -10,10 +10,12 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.aianimals.R
 import com.example.aianimals.listing.detail.AnimalDetailActivity
+import com.example.aianimals.listing.listing.AnimalListActivity
 import com.example.aianimals.posting.camera.CameraActivity
 import com.example.aianimals.repository.Animal
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -76,7 +78,11 @@ class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
                 setOnClickListener {
                     val imageUri = presenter.getImageUri()
                     if (imageUri == null) {
-                        Toast.makeText(requireContext(), "you must register photo", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            "you must register photo",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         Log.e(TAG, "you must register photo")
                     }
                     val animal = presenter.makeAnimal(
@@ -92,6 +98,15 @@ class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
                     startActivity(intent)
                 }
             }
+
+            requireActivity().onBackPressedDispatcher.addCallback(
+                this@AnimalRegistrationFragment,
+                object : OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        val intent = Intent(context, AnimalListActivity::class.java)
+                        startActivity(intent)
+                    }
+                })
         }
 
         return root

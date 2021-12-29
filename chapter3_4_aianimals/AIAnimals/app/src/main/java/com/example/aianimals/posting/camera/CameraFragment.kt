@@ -47,37 +47,38 @@ class CameraFragment : Fragment(), CameraContract.View {
     override fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
 
-        cameraProviderFuture.addListener(Runnable
-        {
-            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+        cameraProviderFuture.addListener(
+            Runnable
+            {
+                val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
 
-            val preview = Preview
-                .Builder()
-                .build()
-                .also {
-                    it.setSurfaceProvider(previewFinder.surfaceProvider)
+                val preview = Preview
+                    .Builder()
+                    .build()
+                    .also {
+                        it.setSurfaceProvider(previewFinder.surfaceProvider)
+                    }
+
+                this.imageCapture = ImageCapture
+                    .Builder()
+                    .build()
+
+                val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+
+                try {
+                    cameraProvider.unbindAll()
+                    cameraProvider.bindToLifecycle(
+                        this,
+                        cameraSelector,
+                        preview,
+                        this.imageCapture
+                    )
+
+                } catch (e: Exception) {
+                    Log.e(TAG, "Use case binding failed", e)
                 }
 
-            this.imageCapture = ImageCapture
-                .Builder()
-                .build()
-
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-
-            try {
-                cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(
-                    this,
-                    cameraSelector,
-                    preview,
-                    this.imageCapture
-                )
-
-            } catch (e: Exception) {
-                Log.e(TAG, "Use case binding failed", e)
-            }
-
-        }, ContextCompat.getMainExecutor(requireContext())
+            }, ContextCompat.getMainExecutor(requireContext())
         )
     }
 
@@ -145,6 +146,7 @@ class CameraFragment : Fragment(), CameraContract.View {
                     presenter.takePhoto()
                 }
             }
+
         }
         return root
     }
