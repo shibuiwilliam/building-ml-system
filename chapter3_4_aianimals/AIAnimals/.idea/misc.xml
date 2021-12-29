@@ -23,6 +23,8 @@
         <entry key="app/src/main/res/layout/fragment_animal_registration.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_book.xml" value="0.11944444444444445" />
         <entry key="app/src/main/res/layout/fragment_book_list.xml" value="0.19202898550724637" />
+        <entry key="app/src/main/res/layout/login_activity.xml" value="0.16296296296296298" />
+        <entry key="app/src/main/res/layout/login_fragment.xml" value="0.22" />
         <entry key="app/src/main/res/layout/row.xml" value="0.20878623188405798" />
       </map>
     </option>

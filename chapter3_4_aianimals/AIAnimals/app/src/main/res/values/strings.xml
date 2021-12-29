@@ -10,4 +10,7 @@
     <string name="animal_description">animal description</string>
     <string name="take_photo">Take Photo</string>
     <string name="camera">camera</string>
+    <string name="login">login</string>
+    <string name="password">password</string>
+    <string name="id">id</string>
 </resources>
