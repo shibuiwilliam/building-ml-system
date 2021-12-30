@@ -7,8 +7,11 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -23,15 +26,15 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
 
     override lateinit var presenter: AnimalListContract.Presenter
 
-    private val animalListRecyclerViewAdapter =
-        AnimalListRecyclerViewAdapter(mutableMapOf())
+    private lateinit var animalListRecyclerViewAdapter: AnimalListRecyclerViewAdapter
 
+    private lateinit var searchView: SearchView
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
-    private lateinit var animalListView: RecyclerView
+    private lateinit var animalRecyclerView: RecyclerView
 
     override fun showAnimals(animals: Map<String, Animal>) {
         animalListRecyclerViewAdapter.animals = animals.values.toList()
-        animalListView.visibility = View.VISIBLE
+        animalRecyclerView.visibility = View.VISIBLE
     }
 
     override fun onResume() {
@@ -53,6 +56,10 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
         with(root) {
             activity?.title = getString(R.string.animal_list)
 
+            animalListRecyclerViewAdapter =
+                AnimalListRecyclerViewAdapter(context, mutableMapOf())
+
+            searchView = findViewById(R.id.search_view)
             swipeRefreshLayout = findViewById(R.id.swipe)
             swipeRefreshLayout.apply {
                 setOnRefreshListener {
@@ -63,17 +70,28 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
                 }
             }
 
-            animalListView = findViewById<RecyclerView>(R.id.recycler_view).apply {
+            animalRecyclerView = findViewById<RecyclerView>(R.id.recycler_view).apply {
                 adapter = animalListRecyclerViewAdapter
             }
+            animalRecyclerView.layoutManager = GridLayoutManager(
+                context,
+                2,
+                RecyclerView.VERTICAL,
+                false
+            )
 
-            val linearLayoutManager = LinearLayoutManager(context)
-            animalListView.layoutManager = linearLayoutManager
-            animalListView.addItemDecoration(
-                DividerItemDecoration(
-                    context,
-                    linearLayoutManager.orientation
-                )
+            searchView.setOnQueryTextListener(
+                object : SearchView.OnQueryTextListener {
+                    override fun onQueryTextChange(newText: String?): Boolean {
+                        return false
+                    }
+
+                    override fun onQueryTextSubmit(query: String?): Boolean {
+                        Toast.makeText(requireContext(), "search for ${query}", Toast.LENGTH_SHORT)
+                            .show()
+                        return false
+                    }
+                }
             )
 
             animalListRecyclerViewAdapter.setOnAnimalCellClickListener(
