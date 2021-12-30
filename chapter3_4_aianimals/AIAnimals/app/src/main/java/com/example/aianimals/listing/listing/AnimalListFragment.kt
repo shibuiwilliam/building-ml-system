@@ -33,6 +33,7 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
     private lateinit var animalRecyclerView: RecyclerView
 
     override fun showAnimals(animals: Map<String, Animal>) {
+        searchView.visibility = View.VISIBLE
         animalListRecyclerViewAdapter.animals = animals.values.toList()
         animalRecyclerView.visibility = View.VISIBLE
     }
@@ -60,6 +61,20 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
                 AnimalListRecyclerViewAdapter(context, mutableMapOf())
 
             searchView = findViewById(R.id.search_view)
+            searchView.setOnQueryTextListener(
+                object : SearchView.OnQueryTextListener {
+                    override fun onQueryTextChange(newText: String?): Boolean {
+                        return false
+                    }
+
+                    override fun onQueryTextSubmit(query: String?): Boolean {
+                        Toast.makeText(requireContext(), "search for ${query}", Toast.LENGTH_SHORT)
+                            .show()
+                        return false
+                    }
+                }
+            )
+
             swipeRefreshLayout = findViewById(R.id.swipe)
             swipeRefreshLayout.apply {
                 setOnRefreshListener {
@@ -78,20 +93,6 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
                 2,
                 RecyclerView.VERTICAL,
                 false
-            )
-
-            searchView.setOnQueryTextListener(
-                object : SearchView.OnQueryTextListener {
-                    override fun onQueryTextChange(newText: String?): Boolean {
-                        return false
-                    }
-
-                    override fun onQueryTextSubmit(query: String?): Boolean {
-                        Toast.makeText(requireContext(), "search for ${query}", Toast.LENGTH_SHORT)
-                            .show()
-                        return false
-                    }
-                }
             )
 
             animalListRecyclerViewAdapter.setOnAnimalCellClickListener(
