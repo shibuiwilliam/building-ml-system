@@ -21,7 +21,7 @@
         app:layout_constraintVertical_bias="0.4"/>
 
     <EditText
-        android:id="@+id/id_edit"
+        android:id="@+id/user_id_edit"
         android:textSize="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -43,7 +43,7 @@
         android:inputType="textPassword"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/id_edit" />
+        app:layout_constraintTop_toBottomOf="@id/user_id_edit" />
 
     <Button
         android:id="@+id/login_button"

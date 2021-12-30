@@ -22,19 +22,19 @@ class LoginFragment : Fragment(), LoginContract.View {
     override lateinit var presenter: LoginContract.Presenter
 
     private lateinit var loginText: TextView
-    private lateinit var idEdit: EditText
+    private lateinit var userIDEdit: EditText
     private lateinit var passwordEdit: EditText
     private lateinit var loginButton: Button
 
     override fun show() {
         loginText.visibility = View.VISIBLE
-        idEdit.visibility = View.VISIBLE
+        userIDEdit.visibility = View.VISIBLE
         passwordEdit.visibility = View.VISIBLE
         loginButton.visibility = View.VISIBLE
     }
 
     override fun login() {
-        presenter.login(idEdit.text.toString(), passwordEdit.text.toString())
+        presenter.login(userIDEdit.text.toString(), passwordEdit.text.toString())
     }
 
     override fun onResume() {
@@ -52,7 +52,7 @@ class LoginFragment : Fragment(), LoginContract.View {
             activity?.title = getString(R.string.login)
 
             loginText = findViewById(R.id.login_text)
-            idEdit = findViewById(R.id.id_edit)
+            userIDEdit = findViewById(R.id.user_id_edit)
             passwordEdit = findViewById(R.id.password_edit)
             loginButton = findViewById(R.id.login_button)
 
@@ -63,6 +63,7 @@ class LoginFragment : Fragment(), LoginContract.View {
                     Toast.makeText(requireContext(), "login failed", Toast.LENGTH_SHORT).show()
                 }
                 if (loginResult.success != null) {
+                    Toast.makeText(requireContext(), "login", Toast.LENGTH_SHORT).show()
                     val intent = Intent(context, AnimalListActivity::class.java)
                     intent.flags = FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                     startActivity(intent)

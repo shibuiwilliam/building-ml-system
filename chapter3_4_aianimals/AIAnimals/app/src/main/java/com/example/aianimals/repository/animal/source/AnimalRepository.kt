@@ -22,16 +22,18 @@ class AnimalRepository(
             return
         }
 
-        animalLocalDataSource.listAnimals(object : AnimalDataSource.ListAnimalsCallback {
-            override fun onListAnimal(animals: Map<String, Animal>) {
-                cacheAnimals(animals)
-                callback.onListAnimal(cachedAnimals)
-            }
+        animalLocalDataSource.listAnimals(
+            object : AnimalDataSource.ListAnimalsCallback {
+                override fun onListAnimal(animals: Map<String, Animal>) {
+                    cacheAnimals(animals)
+                    callback.onListAnimal(cachedAnimals)
+                }
 
-            override fun onDataNotAvailable() {
-                createAnimals()
+                override fun onDataNotAvailable() {
+                    createAnimals()
+                }
             }
-        })
+        )
     }
 
     override fun getAnimal(
@@ -44,15 +46,17 @@ class AnimalRepository(
             return
         }
 
-        animalLocalDataSource.getAnimal(animalID, object : AnimalDataSource.GetAnimalCallback {
-            override fun onGetAnimal(animal: Animal) {
-                cacheAnimal(animal)
-                callback.onGetAnimal(animal)
-            }
+        animalLocalDataSource.getAnimal(
+            animalID, object : AnimalDataSource.GetAnimalCallback {
+                override fun onGetAnimal(animal: Animal) {
+                    cacheAnimal(animal)
+                    callback.onGetAnimal(animal)
+                }
 
-            override fun onDataNotAvailable() {
+                override fun onDataNotAvailable() {
+                }
             }
-        })
+        )
     }
 
     override fun saveAnimal(animal: Animal) {
