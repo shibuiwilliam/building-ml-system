@@ -96,7 +96,6 @@ class CameraFragment : Fragment(), CameraContract.View {
             .OutputFileOptions
             .Builder(photoFile)
             .build()
-        Log.i(TAG, "taking photo option ${outputOptions}")
 
         imageCapture.takePicture(
             outputOptions,

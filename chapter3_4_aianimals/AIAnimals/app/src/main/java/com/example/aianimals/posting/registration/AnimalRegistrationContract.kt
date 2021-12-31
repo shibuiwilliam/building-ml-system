@@ -11,6 +11,7 @@ interface AnimalRegistrationContract {
         fun getAnimalDescription(): String?
         fun setAnimalDescription(value: String)
         fun getImageUri(): String?
+        fun setImageUri(imageUri: String?)
         fun showImage()
         fun addAnimal(animal: Animal)
         fun makeAnimal(): Animal?

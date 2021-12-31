@@ -13,6 +13,7 @@ class AnimalRegistrationPresenter(
     private val animalRegistrationView: AnimalRegistrationContract.View
 ) : AnimalRegistrationContract.Presenter {
     private val TAG = AnimalRegistrationPresenter::class.java.simpleName
+    private var _imageUrl = imageUri
 
     init {
         this.animalRegistrationView.presenter = this
@@ -37,7 +38,11 @@ class AnimalRegistrationPresenter(
     }
 
     override fun getImageUri(): String? {
-        return imageUri
+        return this._imageUrl
+    }
+
+    override fun setImageUri(imageUri: String?) {
+        this._imageUrl = imageUri
     }
 
     override fun start() {
@@ -51,7 +56,7 @@ class AnimalRegistrationPresenter(
     }
 
     override fun showImage() {
-        this.animalRegistrationView.showImage(imageUri)
+        this.animalRegistrationView.showImage(this._imageUrl)
     }
 
     override fun addAnimal(animal: Animal) {
@@ -60,7 +65,7 @@ class AnimalRegistrationPresenter(
     }
 
     override fun makeAnimal(): Animal? {
-        if (animalName == null || animalDescription == null || imageUri == null) {
+        if (animalName == null || animalDescription == null || this._imageUrl == null) {
             return null
         }
         val id = Utils.generateUUID()
@@ -72,7 +77,7 @@ class AnimalRegistrationPresenter(
             animalDescription!!,
             today,
             0,
-            imageUri
+            this._imageUrl!!
         )
     }
 

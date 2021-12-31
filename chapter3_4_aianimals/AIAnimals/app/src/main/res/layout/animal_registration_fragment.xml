@@ -17,15 +17,37 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"/>
 
-    <Button
-        android:id="@+id/take_photo_button"
-        android:layout_width="200dp"
-        android:layout_height="50dp"
-        android:scaleType="fitCenter"
-        android:text="@string/take_photo"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/select_photo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/registration_image" />
+        app:layout_constraintTop_toBottomOf="@id/registration_image" >
+
+        <Button
+            android:id="@+id/take_photo_button"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:layout_margin="10dp"
+            android:text="@string/take_photo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/select_photo_button"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <Button
+            android:id="@+id/select_photo_button"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:layout_margin="10dp"
+            android:text="@string/select_photo"
+            app:layout_constraintStart_toEndOf="@+id/take_photo_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <EditText
         android:id="@+id/animal_name_edit"
@@ -35,7 +57,7 @@
         android:maxLines="1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/take_photo_button" />
+        app:layout_constraintTop_toBottomOf="@id/select_photo" />
 
     <EditText
         android:id="@+id/animal_description_edit"
@@ -64,6 +86,7 @@
         android:background="@color/gray"
         android:alpha="0.4"
         android:visibility="gone" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 
