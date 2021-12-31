@@ -2,7 +2,6 @@ package com.example.aianimals.posting.registration
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.activity.OnBackPressedCallback
@@ -48,7 +47,8 @@ class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
             Toast.makeText(
                 context,
                 "name, description and image are required",
-                Toast.LENGTH_SHORT)
+                Toast.LENGTH_SHORT
+            )
                 .show()
         } else {
             presenter.addAnimal(animal)
@@ -117,7 +117,8 @@ class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
                 .inflate(
                     R.layout.animal_registration_popup,
                     container,
-                    false)
+                    false
+                )
             registrationPopup = PopupWindow(registrationPopupView)
             registrationPopup.height = registrationPopupView.layoutParams.height
             registrationPopup.width = registrationPopupView.layoutParams.width
