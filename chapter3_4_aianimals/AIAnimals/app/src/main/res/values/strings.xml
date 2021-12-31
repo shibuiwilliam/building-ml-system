@@ -13,4 +13,5 @@
     <string name="login">login</string>
     <string name="password">password</string>
     <string name="id">id</string>
+    <string name="register_animal">register animal</string>
 </resources>

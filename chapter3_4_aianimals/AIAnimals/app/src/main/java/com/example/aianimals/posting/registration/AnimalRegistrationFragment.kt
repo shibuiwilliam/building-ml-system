@@ -27,6 +27,7 @@ class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
     private lateinit var takePhotoButton: Button
     private lateinit var animalNameEdit: TextView
     private lateinit var animalDescriptionEdit: TextView
+    private lateinit var registerButton: Button
 
     override fun showImage(imageUri: String?) {
         if (imageUri == null) {
@@ -89,6 +90,7 @@ class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
             takePhotoButton = findViewById(R.id.take_photo_button)
             animalNameEdit = findViewById(R.id.animal_name_edit)
             animalDescriptionEdit = findViewById(R.id.animal_description_edit)
+            registerButton = findViewById(R.id.register_button)
 
             takePhotoButton.apply {
                 setOnClickListener {
@@ -98,7 +100,7 @@ class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
                 }
             }
 
-            activity?.findViewById<FloatingActionButton>(R.id.add_animal_button)?.apply {
+            registerButton.apply {
                 setOnClickListener {
                     registerAnimal()
                     presenter.clearCurrentValues()
