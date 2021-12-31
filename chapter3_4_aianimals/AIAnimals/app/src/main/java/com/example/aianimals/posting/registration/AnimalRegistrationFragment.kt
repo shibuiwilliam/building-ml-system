@@ -73,6 +73,21 @@ class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
         presenter.setAnimalDescription(animalDescriptionEdit.text.toString())
     }
 
+    override fun popupRegistrationWindow(parentView: View) {
+        popupBackgroundLayout.visibility = View.VISIBLE
+        registrationPopup.showAtLocation(
+            parentView,
+            Gravity.CENTER,
+            0,
+            0
+        )
+    }
+
+    override fun dismissRegistrationWindow() {
+        registrationPopup.dismiss()
+        popupBackgroundLayout.visibility = View.GONE
+    }
+
     override fun onResume() {
         super.onResume()
         presenter.start()
@@ -122,40 +137,32 @@ class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
                 isFocusable = true
 
                 setOnDismissListener {
-                    popupBackgroundLayout.visibility = View.GONE
+                    dismissRegistrationWindow()
                 }
             }
 
             registerButton.apply {
                 setOnClickListener {
-                    popupBackgroundLayout.visibility = View.VISIBLE
-                    registrationPopup.showAtLocation(
-                        root,
-                        Gravity.CENTER,
-                        0,
-                        0)
+                    popupRegistrationWindow(root)
                 }
             }
 
             popupBackgroundLayout.apply {
                 setOnClickListener {
-                    popupBackgroundLayout.visibility = View.GONE
-                    registrationPopup.dismiss()
+                    dismissRegistrationWindow()
                 }
             }
 
             popupConfirmationButton.apply {
                 setOnClickListener {
                     registerAnimal()
-                    popupBackgroundLayout.visibility = View.GONE
-                    registrationPopup.dismiss()
+                    dismissRegistrationWindow()
                 }
             }
 
             popupCancellationButton.apply {
                 setOnClickListener {
-                    popupBackgroundLayout.visibility = View.GONE
-                    registrationPopup.dismiss()
+                    dismissRegistrationWindow()
                 }
             }
 
@@ -167,7 +174,8 @@ class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
                         val intent = Intent(context, AnimalListActivity::class.java)
                         startActivity(intent)
                     }
-                })
+                }
+            )
         }
 
         return root

@@ -1,5 +1,6 @@
 package com.example.aianimals.posting.registration
 
+import android.view.View
 import com.example.aianimals.BasePresenter
 import com.example.aianimals.BaseView
 import com.example.aianimals.repository.animal.Animal
@@ -23,5 +24,7 @@ interface AnimalRegistrationContract {
         fun setAnimalName(animalName: String)
         fun setAnimalDescription(animalDescription: String)
         fun saveCurrentValues()
+        fun popupRegistrationWindow(parentView: android.view.View)
+        fun dismissRegistrationWindow()
     }
 }

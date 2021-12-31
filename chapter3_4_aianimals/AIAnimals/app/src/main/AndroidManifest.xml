@@ -21,9 +21,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AIAnimals">
         <activity
-            android:name=".posting.confirmation.ConfirmationActivity"
-            android:exported="false" />
-        <activity
             android:name=".login.LoginActivity"
             android:exported="true">
             <intent-filter>
