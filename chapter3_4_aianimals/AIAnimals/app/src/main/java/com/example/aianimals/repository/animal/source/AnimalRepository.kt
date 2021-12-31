@@ -4,9 +4,11 @@ package com.example.aianimals.repository.animal.source
 import android.util.Log
 import com.example.aianimals.repository.animal.Animal
 import com.example.aianimals.repository.animal.source.local.AnimalLocalDataSource
+import com.example.aianimals.repository.animal.source.remote.AnimalRemoteDataSource
 
 class AnimalRepository(
-    val animalLocalDataSource: AnimalDataSource
+    val animalLocalDataSource: AnimalDataSource,
+    val animalRemoteDataSource: AnimalRemoteDataSource
 ) : AnimalDataSource {
     private val TAG = AnimalRepository::class.java.simpleName
 
@@ -83,9 +85,13 @@ class AnimalRepository(
 
         @JvmStatic
         fun getInstance(
-            animalLocalDataSource: AnimalLocalDataSource
+            animalLocalDataSource: AnimalLocalDataSource,
+            animalRemoteDataSource: AnimalRemoteDataSource
         ): AnimalRepository {
-            return INSTANCE ?: AnimalRepository(animalLocalDataSource)
+            return INSTANCE ?: AnimalRepository(
+                animalLocalDataSource,
+                animalRemoteDataSource
+            )
                 .apply { INSTANCE = this }
         }
 

@@ -3,10 +3,12 @@ package com.example.aianimals.repository.login.source
 
 import com.example.aianimals.repository.login.Login
 import com.example.aianimals.repository.login.source.local.LoginLocalDataSource
+import com.example.aianimals.repository.login.source.remote.LoginRemoteDataSource
 import java.util.*
 
 class LoginRepository(
-    val loginLocalDataSource: LoginLocalDataSource
+    val loginLocalDataSource: LoginLocalDataSource,
+    val loginRemoteDataSource: LoginRemoteDataSource
 ) : LoginDataSource {
     private val TAG = LoginRepository::class.java.simpleName
 
@@ -48,9 +50,13 @@ class LoginRepository(
 
         @JvmStatic
         fun getInstance(
-            loginLocalDataSource: LoginLocalDataSource
+            loginLocalDataSource: LoginLocalDataSource,
+            loginRemoteDataSource: LoginRemoteDataSource
         ): LoginRepository {
-            return INSTANCE ?: LoginRepository(loginLocalDataSource)
+            return INSTANCE ?: LoginRepository(
+                loginLocalDataSource,
+                loginRemoteDataSource
+            )
                 .apply { INSTANCE = this }
         }
 

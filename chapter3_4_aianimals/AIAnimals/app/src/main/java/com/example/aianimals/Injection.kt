@@ -5,9 +5,14 @@ import com.example.aianimals.middleware.AppExecutors
 import com.example.aianimals.repository.animal.source.AnimalRepository
 import com.example.aianimals.repository.animal.source.local.AnimalDatabase
 import com.example.aianimals.repository.animal.source.local.AnimalLocalDataSource
+import com.example.aianimals.repository.animal.source.remote.AnimalAPIClient
+import com.example.aianimals.repository.animal.source.remote.AnimalAPIInterface
+import com.example.aianimals.repository.animal.source.remote.AnimalRemoteDataSource
 import com.example.aianimals.repository.login.source.LoginRepository
 import com.example.aianimals.repository.login.source.local.LoginDatabase
 import com.example.aianimals.repository.login.source.local.LoginLocalDataSource
+import com.example.aianimals.repository.login.source.remote.LoginAPIClient
+import com.example.aianimals.repository.login.source.remote.LoginRemoteDataSource
 
 object Injection {
     fun provideAnimalRepository(context: Context): AnimalRepository {
@@ -16,6 +21,9 @@ object Injection {
             AnimalLocalDataSource.getInstance(
                 AppExecutors(),
                 database.animalDao()
+            ),
+            AnimalRemoteDataSource.getInstance(
+                AnimalAPIClient.animalAPI
             )
         )
     }
@@ -26,7 +34,8 @@ object Injection {
             LoginLocalDataSource.getInstance(
                 AppExecutors(),
                 database.loginDao()
-            )
+            ),
+            LoginRemoteDataSource.getInstance(LoginAPIClient.loginAPI)
         )
     }
 }
