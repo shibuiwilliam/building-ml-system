@@ -5,13 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.aianimals.R
 import com.example.aianimals.repository.animal.Animal
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class AnimalListRecyclerViewAdapter(
     context: Context,
@@ -61,6 +59,7 @@ class AnimalListRecyclerViewAdapter(
 
     inner class AnimalListRecyclerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var animalImageView: ImageView = itemView.findViewById(R.id.animal_image)
-        var animalLikesButton: ExtendedFloatingActionButton = itemView.findViewById(R.id.animal_likes)
+        var animalLikesButton: ExtendedFloatingActionButton =
+            itemView.findViewById(R.id.animal_likes)
     }
 }

@@ -14,4 +14,8 @@
     <string name="password">password</string>
     <string name="id">id</string>
     <string name="register_animal">register animal</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="cancel">cancel</string>
+    <string name="ask_register_animal">register animaL?</string>
 </resources>

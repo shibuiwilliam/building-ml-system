@@ -2,13 +2,9 @@ package com.example.aianimals.posting.registration
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.util.Log
+import android.view.*
+import android.widget.*
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
@@ -16,7 +12,6 @@ import com.example.aianimals.R
 import com.example.aianimals.listing.detail.AnimalDetailActivity
 import com.example.aianimals.listing.listing.AnimalListActivity
 import com.example.aianimals.posting.camera.CameraActivity
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
     private val TAG = AnimalRegistrationFragment::class.java.simpleName
@@ -28,6 +23,12 @@ class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
     private lateinit var animalNameEdit: TextView
     private lateinit var animalDescriptionEdit: TextView
     private lateinit var registerButton: Button
+    private lateinit var popupBackgroundLayout: FrameLayout
+
+    private lateinit var registrationPopupView: View
+    private lateinit var registrationPopup: PopupWindow
+    private lateinit var popupConfirmationButton: Button
+    private lateinit var popupCancellationButton: Button
 
     override fun showImage(imageUri: String?) {
         if (imageUri == null) {
@@ -44,10 +45,14 @@ class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
 
         val animal = presenter.makeAnimal()
         if (animal == null) {
-            Toast.makeText(context, "name, description and image are required", Toast.LENGTH_SHORT)
+            Toast.makeText(
+                context,
+                "name, description and image are required",
+                Toast.LENGTH_SHORT)
                 .show()
         } else {
             presenter.addAnimal(animal)
+            presenter.clearCurrentValues()
             val intent = Intent(context, AnimalDetailActivity::class.java).apply {
                 putExtra(AnimalDetailActivity.EXTRA_ANIMAL_ID, animal.id)
             }
@@ -92,6 +97,18 @@ class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
             animalDescriptionEdit = findViewById(R.id.animal_description_edit)
             registerButton = findViewById(R.id.register_button)
 
+            popupBackgroundLayout = findViewById(R.id.popup_background)
+            registrationPopupView = LayoutInflater.from(requireContext())
+                .inflate(
+                    R.layout.animal_registration_popup,
+                    container,
+                    false)
+            registrationPopup = PopupWindow(registrationPopupView)
+            registrationPopup.height = registrationPopupView.layoutParams.height
+            registrationPopup.width = registrationPopupView.layoutParams.width
+            popupConfirmationButton = registrationPopupView.findViewById(R.id.confirmation_button)
+            popupCancellationButton = registrationPopupView.findViewById(R.id.cancellation_button)
+
             takePhotoButton.apply {
                 setOnClickListener {
                     saveCurrentValues()
@@ -100,10 +117,45 @@ class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
                 }
             }
 
+            registrationPopup.apply {
+                isOutsideTouchable = true
+                isFocusable = true
+
+                setOnDismissListener {
+                    popupBackgroundLayout.visibility = View.GONE
+                }
+            }
+
             registerButton.apply {
                 setOnClickListener {
+                    popupBackgroundLayout.visibility = View.VISIBLE
+                    registrationPopup.showAtLocation(
+                        root,
+                        Gravity.CENTER,
+                        0,
+                        0)
+                }
+            }
+
+            popupBackgroundLayout.apply {
+                setOnClickListener {
+                    popupBackgroundLayout.visibility = View.GONE
+                    registrationPopup.dismiss()
+                }
+            }
+
+            popupConfirmationButton.apply {
+                setOnClickListener {
                     registerAnimal()
-                    presenter.clearCurrentValues()
+                    popupBackgroundLayout.visibility = View.GONE
+                    registrationPopup.dismiss()
+                }
+            }
+
+            popupCancellationButton.apply {
+                setOnClickListener {
+                    popupBackgroundLayout.visibility = View.GONE
+                    registrationPopup.dismiss()
                 }
             }
 

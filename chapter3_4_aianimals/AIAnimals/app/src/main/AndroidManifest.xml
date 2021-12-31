@@ -21,10 +21,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AIAnimals">
         <activity
+            android:name=".posting.confirmation.ConfirmationActivity"
+            android:exported="false" />
+        <activity
             android:name=".login.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

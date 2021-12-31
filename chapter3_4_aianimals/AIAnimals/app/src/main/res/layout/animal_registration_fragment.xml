@@ -57,4 +57,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/animal_description_edit" />
 
+    <FrameLayout
+        android:id="@+id/popup_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/gray"
+        android:alpha="0.4"
+        android:visibility="gone" />
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+

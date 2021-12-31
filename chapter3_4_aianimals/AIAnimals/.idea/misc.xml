@@ -17,10 +17,13 @@
         <entry key="app/src/main/res/layout/animal_list_fragment_cell.xml" value="0.1" />
         <entry key="app/src/main/res/layout/animal_registration_activity.xml" value="0.1" />
         <entry key="app/src/main/res/layout/animal_registration_fragment.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/animal_registration_popup.xml" value="0.22540983606557377" />
         <entry key="app/src/main/res/layout/camera_activity.xml" value="0.1" />
         <entry key="app/src/main/res/layout/camera_fragment.xml" value="0.1" />
         <entry key="app/src/main/res/layout/cell_animal_list.xml" value="0.1" />
         <entry key="app/src/main/res/layout/cell_book_list.xml" value="0.11944444444444445" />
+        <entry key="app/src/main/res/layout/confirmation_activity.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/confirmation_fragment.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_animal.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_animal_list.xml" value="0.16767983789260385" />
         <entry key="app/src/main/res/layout/fragment_animal_registration.xml" value="0.1" />

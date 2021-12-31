@@ -38,11 +38,6 @@ class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
         animalImageView.visibility = View.VISIBLE
     }
 
-    override fun onResume() {
-        super.onResume()
-        presenter.start()
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -74,6 +69,11 @@ class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
                 })
         }
         return root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        presenter.start()
     }
 
     companion object {

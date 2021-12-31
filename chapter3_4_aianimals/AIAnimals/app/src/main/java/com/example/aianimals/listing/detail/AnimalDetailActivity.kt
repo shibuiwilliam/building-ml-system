@@ -28,19 +28,21 @@ class AnimalDetailActivity : AppCompatActivity() {
             setDisplayHomeAsUpEnabled(true)
         }
 
-        drawerLayout=findViewById(R.id.drawer_layout)
+        drawerLayout = findViewById(R.id.drawer_layout)
         navigationView = findViewById(R.id.navigation_view)
         navigationView.setNavigationItemSelectedListener { menuItem ->
             if (menuItem.itemId == R.id.register_animal) {
                 val intent = Intent(
                     this@AnimalDetailActivity,
-                    AnimalRegistrationActivity::class.java)
+                    AnimalRegistrationActivity::class.java
+                )
                 startActivity(intent)
             }
             if (menuItem.itemId == R.id.list_animal) {
                 val intent = Intent(
                     this@AnimalDetailActivity,
-                    AnimalListActivity::class.java)
+                    AnimalListActivity::class.java
+                )
                 startActivity(intent)
             }
             menuItem.isChecked = true
