@@ -1,9 +1,9 @@
-from logging import getLogger
+from logging import getLogger, log
 from typing import List, Optional
 
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
-from src.entities.user import UserCreate, UserModel, UserQuery
+from src.entities.user import UserCreate, UserLoginAssertion, UserLoginQuery, UserModel, UserQuery
 from src.repository.user_repository import AbstractUserRepository
 from src.schema.table import TABLES
 from src.schema.user import User
@@ -95,3 +95,25 @@ class UserRepository(AbstractUserRepository):
             )
             return result[0]
         return None
+
+    def assert_login(
+        self,
+        session: Session,
+        login_query: UserLoginQuery,
+    ) -> Optional[UserLoginAssertion]:
+        filters = []
+        if login_query.handle_name is not None:
+            filters.append(User.handle_name == login_query.handle_name)
+        if login_query.email_address is not None:
+            filters.append(User.email_address == login_query.email_address)
+        filters.append(User.password == login_query.password)
+        filters.append(User.deactivated == False)
+        result = session.query(User).filter(and_(*filters)).order_by(User.id).first()
+        if result is None:
+            return None
+        data = UserLoginAssertion(
+            handle_name=result.handle_name,
+            email_address=result.email_address,
+            password=result.password,
+        )
+        return data

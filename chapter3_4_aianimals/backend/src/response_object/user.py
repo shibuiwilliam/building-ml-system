@@ -15,3 +15,7 @@ class UserResponse(BaseModel):
 
     class Config:
         extra = Extra.forbid
+
+
+class UserLoginResponse(BaseModel):
+    token: str

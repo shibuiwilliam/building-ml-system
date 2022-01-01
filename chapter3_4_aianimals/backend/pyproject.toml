@@ -18,6 +18,7 @@ psycopg2-binary = "^2.9.2"
 google-cloud-storage = "^1.43.0"
 redis = "^4.0.2"
 elasticsearch = "^7.16.1"
+cryptography = "^36.0.1"
 
 [tool.poetry.dev-dependencies]
 

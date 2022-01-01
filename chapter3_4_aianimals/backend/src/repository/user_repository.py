@@ -3,7 +3,7 @@ from logging import getLogger
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
-from src.entities.user import UserCreate, UserModel, UserQuery
+from src.entities.user import UserCreate, UserLoginAssertion, UserLoginQuery, UserModel, UserQuery
 
 logger = getLogger(__name__)
 
@@ -39,4 +39,12 @@ class AbstractUserRepository(ABC):
         record: UserCreate,
         commit: bool = True,
     ) -> Optional[UserModel]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def assert_login(
+        self,
+        session: Session,
+        login_query: UserLoginQuery,
+    ) -> Optional[UserLoginAssertion]:
         raise NotImplementedError

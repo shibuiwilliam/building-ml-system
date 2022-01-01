@@ -30,6 +30,7 @@ class UserController(AbstractUserController):
                 id=k,
                 handle_name=v["handle_name"],
                 email_address=v["email_address"],
+                password=v["password"],
                 age=v["age"],
                 gender=v["gender"],
                 created_at=datetime.strptime(v["created_at"], "%Y-%m-%dT%H:%M:%S.%f"),

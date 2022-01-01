@@ -1,8 +1,9 @@
 from logging import getLogger
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Header
 from sqlalchemy.orm import Session
+from src.middleware.assert_token import token_assertion
 from src.registry.container import container
 from src.request_object.animal_subcategory import AnimalSubcategoryRequest
 from src.response_object.animal_subcategory import AnimalSubcategoryResponse
@@ -20,8 +21,13 @@ async def get_animal_subcategory(
     animal_category_name_en: Optional[str] = None,
     animal_category_name_ja: Optional[str] = None,
     is_deleted: Optional[bool] = False,
+    token: str = Header(...),
     session: Session = Depends(container.database.get_session),
 ):
+    await token_assertion(
+        token=token,
+        session=session,
+    )
     data = container.animal_subcategory_usecase.retrieve(
         session=session,
         request=AnimalSubcategoryRequest(

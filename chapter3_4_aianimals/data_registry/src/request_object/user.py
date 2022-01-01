@@ -20,6 +20,7 @@ class UserCreateRequest(BaseModel):
     id: str
     handle_name: str
     email_address: str
+    password: str
     age: Optional[int]
     gender: Optional[int]
     created_at: datetime

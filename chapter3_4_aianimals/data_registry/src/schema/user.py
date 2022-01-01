@@ -24,6 +24,11 @@ class User(Base):
         nullable=False,
         unique=True,
     )
+    password = Column(
+        String(128),
+        nullable=False,
+        unique=False,
+    )
     age = Column(
         INT,
         nullable=False,

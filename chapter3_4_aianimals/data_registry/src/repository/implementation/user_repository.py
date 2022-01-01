@@ -43,6 +43,7 @@ class UserRepository(AbstractUserRepository):
                 id=d.id,
                 handle_name=d.handle_name,
                 email_address=d.email_address,
+                password=d.password,
                 age=d.age,
                 gender=d.gender,
                 deactivated=d.deactivated,

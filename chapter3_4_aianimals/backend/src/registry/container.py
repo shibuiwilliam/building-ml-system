@@ -11,6 +11,7 @@ from src.infrastructure.database import AbstractDatabase
 from src.infrastructure.queue import AbstractQueue
 from src.infrastructure.search import AbstractSearch
 from src.infrastructure.storage import AbstractStorage
+from src.middleware.crypt import AbstractCrypt, Crypt
 from src.repository.animal_category_repository import AbstractAnimalCategoryRepository
 from src.repository.animal_repository import AbstractAnimalRepository
 from src.repository.animal_search_repository import AbstractAnimalSearchRepository
@@ -46,11 +47,13 @@ class Container(object):
         database: AbstractDatabase,
         queue: AbstractQueue,
         search_client: AbstractSearch,
+        crypt: AbstractCrypt,
     ):
         self.database = database
         self.storage_client = storage_client
         self.queue = queue
         self.search_client = search_client
+        self.crypt = crypt
 
         self.animal_category_repository: AbstractAnimalCategoryRepository = AnimalCategoryRepository()
         self.animal_subcategory_repository: AbstractAnimalSubcategoryRepository = AnimalSubcategoryRepository()
@@ -70,6 +73,7 @@ class Container(object):
         )
         self.user_usecase: AbstractUserUsecase = UserUsecase(
             user_repository=self.user_repository,
+            crypt=self.crypt,
         )
         self.animal_usecase: AbstractAnimalUsecase = AnimalUsecase(
             animal_repository=self.animal_reposigory,
@@ -96,4 +100,5 @@ container = Container(
     database=PostgreSQLDatabase(),
     queue=RedisQueue(),
     search_client=Elasticsearch(),
+    crypt=Crypt(key_file_path=Configurations.key_file_path),
 )

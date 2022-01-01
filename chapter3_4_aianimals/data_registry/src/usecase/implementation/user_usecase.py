@@ -3,7 +3,6 @@ from typing import List, Optional
 from sqlalchemy.orm import Session
 from src.entities.user import UserCreate, UserQuery
 from src.middleware.logger import configure_logger
-from src.middleware.strings import get_uuid
 from src.repository.user_repository import AbstractUserRepository
 from src.request_object.user import UserCreateRequest, UserRequest
 from src.response_object.user import UserResponse
@@ -60,6 +59,7 @@ class UserUsecase(AbstractUserUsecase):
             id=request.id,
             handle_name=request.handle_name,
             email_address=request.email_address,
+            password=request.password,
             age=request.age,
             gender=request.gender,
         )

@@ -40,3 +40,15 @@ class UserModel(BaseModel):
 
     class Config:
         extra = Extra.forbid
+
+
+class UserLoginQuery(BaseModel):
+    handle_name: Optional[str]
+    email_address: Optional[str]
+    password: str
+
+
+class UserLoginAssertion(BaseModel):
+    handle_name: str
+    email_address: str
+    password: str

@@ -20,6 +20,7 @@ class UserCreate(BaseModel):
     id: str
     handle_name: str
     email_address: str
+    password: str
     age: int
     gender: int
     created_at: Optional[datetime]
@@ -32,6 +33,7 @@ class UserModel(BaseModel):
     id: str
     handle_name: str
     email_address: str
+    password: str
     age: int
     gender: int
     deactivated: bool

@@ -2,9 +2,10 @@ import os
 from logging import getLogger
 from typing import List, Optional
 
-from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, UploadFile
+from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, Header, UploadFile
 from sqlalchemy.orm import Session
 from src.configurations import Configurations
+from src.middleware.assert_token import token_assertion
 from src.middleware.strings import random_str
 from src.registry.container import container
 from src.request_object.animal import AnimalCreateRequest, AnimalRequest, AnimalSearchRequest
@@ -26,8 +27,13 @@ async def get_animal(
     deactivated: Optional[bool] = False,
     limit: int = 100,
     offset: int = 0,
+    token: str = Header(...),
     session: Session = Depends(container.database.get_session),
 ):
+    await token_assertion(
+        token=token,
+        session=session,
+    )
     data = container.animal_usecase.retrieve(
         session=session,
         request=AnimalRequest(
@@ -49,8 +55,13 @@ async def liked_by(
     animal_id: str,
     limit: int = 100,
     offset: int = 0,
+    token: str = Header(...),
     session: Session = Depends(container.database.get_session),
 ):
+    await token_assertion(
+        token=token,
+        session=session,
+    )
     data = container.animal_usecase.liked_by(
         session=session,
         animal_id=animal_id,
@@ -65,8 +76,13 @@ async def post_animal(
     background_tasks: BackgroundTasks,
     request: AnimalCreateRequest = Form(...),
     file: UploadFile = File(...),
+    token: str = Header(...),
     session: Session = Depends(container.database.get_session),
 ):
+    await token_assertion(
+        token=token,
+        session=session,
+    )
     logger.info(f"register animal: {request}")
     os.makedirs(Configurations.work_directory, exist_ok=True)
     local_file_path = os.path.join(Configurations.work_directory, f"{random_str()}.jpg")
@@ -87,7 +103,13 @@ async def search_animal(
     request: Optional[AnimalSearchRequest] = None,
     limit: int = 100,
     offset: int = 0,
+    token: str = Header(...),
+    session: Session = Depends(container.database.get_session),
 ):
+    await token_assertion(
+        token=token,
+        session=session,
+    )
     logger.info(f"search animal: {request}")
     data = container.animal_usecase.search(
         request=request,

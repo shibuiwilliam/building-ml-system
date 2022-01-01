@@ -23,3 +23,9 @@ class UserCreateRequest(BaseModel):
 
     class Config:
         extra = Extra.forbid
+
+
+class UserLoginRequest(BaseModel):
+    handle_name: Optional[str]
+    email_address: Optional[str]
+    password: str

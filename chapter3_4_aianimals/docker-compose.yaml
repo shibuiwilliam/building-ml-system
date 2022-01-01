@@ -52,6 +52,8 @@ services:
   backend:
     container_name: backend
     image: shibui/building-ml-system:ai_animals_backend_0.0.0
+    volumes:
+      - ./backend/secrets/secret.key:/opt/secrets/secret.key
     restart: always
     networks:
       - default
@@ -69,6 +71,7 @@ services:
       - LOG_LEVEL=INFO
       - RUN_ENVIRONMENT=local
       - DATA_DIRECTORY=/opt/dataset
+      - KEY_FILE_PATH=/opt/secrets/secret.key
       - WORKERS=1
       - INITIALIZE=1
       - PORT=8000

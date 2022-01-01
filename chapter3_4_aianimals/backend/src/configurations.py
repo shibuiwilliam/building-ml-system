@@ -9,4 +9,6 @@ class Configurations:
     run_environment = os.getenv("RUN_ENVIRONMENT", "local")
     gcs_bucket = os.getenv("GCS_BUCKET", "aianimals")
 
+    key_file_path = os.environ["KEY_FILE_PATH"]
+
     work_directory = os.getenv("WORK_DIRECTORY", "/tmp")

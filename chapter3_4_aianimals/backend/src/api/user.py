@@ -1,41 +1,26 @@
 from logging import getLogger
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Header
 from sqlalchemy.orm import Session
+from src.middleware.assert_token import token_assertion
 from src.registry.container import container
-from src.request_object.user import UserCreateRequest, UserRequest
-from src.response_object.user import UserResponse
+from src.request_object.user import UserCreateRequest, UserLoginRequest
+from src.response_object.user import UserLoginResponse, UserResponse
 
 logger = getLogger(__name__)
 
 router = APIRouter()
 
 
-@router.get("", response_model=List[UserResponse])
-async def get_user(
-    id: Optional[str] = None,
-    handle_name: Optional[str] = None,
-    email_address: Optional[str] = None,
-    age: Optional[int] = None,
-    gender: Optional[int] = None,
-    deactivated: Optional[bool] = False,
-    limit: int = 100,
-    offset: int = 0,
+@router.post("/login", response_model=Optional[UserLoginResponse])
+async def login_user(
+    user: UserLoginRequest,
     session: Session = Depends(container.database.get_session),
 ):
-    data = container.user_usecase.retrieve(
+    data = container.user_usecase.login(
         session=session,
-        request=UserRequest(
-            id=id,
-            handle_name=handle_name,
-            email_address=email_address,
-            age=age,
-            gender=gender,
-            deactivated=deactivated,
-        ),
-        limit=limit,
-        offset=offset,
+        request=user,
     )
     return data
 
@@ -43,8 +28,13 @@ async def get_user(
 @router.post("", response_model=Optional[UserResponse])
 async def post_user(
     user: UserCreateRequest,
+    token: str = Header(...),
     session: Session = Depends(container.database.get_session),
 ):
+    await token_assertion(
+        token=token,
+        session=session,
+    )
     data = container.user_usecase.register(
         session=session,
         request=user,
