@@ -7,48 +7,45 @@ import com.example.aianimals.repository.animal.Animal
 import com.example.aianimals.repository.animal.source.local.AnimalLocalDataSource
 import com.example.aianimals.repository.animal.source.remote.AnimalRemoteDataSource
 
+data class LastSearchedQuery(
+    val animalCategoryNameEn: String?,
+    val animalCategoryNameJa: String?,
+    val animalSubcategoryNameEn: String?,
+    val animalSubcategoryNameJa: String?,
+    val phrases: String?
+)
+
 class AnimalRepository(
     val animalLocalDataSource: AnimalDataSource,
     val animalRemoteDataSource: AnimalRemoteDataSource
 ) : AnimalDataSource {
     private val TAG = AnimalRepository::class.java.simpleName
 
-    var cachedAnimals: MutableMap<String, Animal> = mutableMapOf()
-
     override suspend fun createAnimals() {}
 
-    override suspend fun listAnimals(
-        query: String?,
-        refresh: Boolean
-    ): Map<String, Animal> {
-        if (!refresh && this.cachedAnimals.isNotEmpty()) {
-            return this.cachedAnimals
-        }
-
+    override suspend fun listAnimals(query: String?): Map<String, Animal> {
         if (BuildConfig.USE_LOCAL_DATA) {
-            val localAnimals = animalLocalDataSource.listAnimals(query, refresh)
+            val localAnimals = animalLocalDataSource.listAnimals(query)
             if (localAnimals.isNotEmpty()) {
-                cacheAnimals(localAnimals)
                 return localAnimals
             }
         }
 
-        val remoteAnimals = animalRemoteDataSource.listAnimals(query, refresh)
+        val remoteAnimals = animalRemoteDataSource.listAnimals(query)
         if (remoteAnimals.isNotEmpty()) {
-            cacheAnimals(remoteAnimals)
             return remoteAnimals
         }
         return mapOf()
     }
 
     override suspend fun getAnimal(animalID: String): Animal? {
-        val animal = getAnimalFromCache(animalID)
-        if (animal != null) {
-            return animal
+        if (BuildConfig.USE_LOCAL_DATA) {
+            val localAnimal = animalLocalDataSource.getAnimal(animalID)
+            return localAnimal
         }
 
-        val localAnimal = animalLocalDataSource.getAnimal(animalID)
-        return localAnimal
+        val animal = animalRemoteDataSource.getAnimal(animalID)
+        return animal
     }
 
     override suspend fun saveAnimal(animal: Animal) {
@@ -58,20 +55,6 @@ class AnimalRepository(
 
     override suspend fun getMetadata(): AnimalMetadata? {
         return animalRemoteDataSource.getMetadata()
-    }
-
-    private fun cacheAnimal(animal: Animal) {
-        this.cachedAnimals[animal.id] = animal
-    }
-
-    private fun cacheAnimals(animals: Map<String, Animal>) {
-        animals.forEach {
-            cacheAnimal(it.value)
-        }
-    }
-
-    private fun getAnimalFromCache(animalID: String): Animal? {
-        return this.cachedAnimals[animalID]
     }
 
     companion object {

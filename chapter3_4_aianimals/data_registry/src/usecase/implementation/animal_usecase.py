@@ -56,7 +56,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
         )
         if len(exists) > 0:
             response = AnimalResponse(**exists[0].dict())
-            logger.info(f"exists: {response}")
+            logger.info(f"data already exists: {response}")
             return response
 
         record = AnimalCreate(
@@ -67,6 +67,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
             name=request.name,
             description=request.description,
             photo_url=request.photo_url,
+            created_at=request.created_at,
         )
         data = self.animal_repository.insert(
             session=session,

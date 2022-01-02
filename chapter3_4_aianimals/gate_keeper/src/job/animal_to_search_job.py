@@ -1,3 +1,5 @@
+from time import sleep
+
 from src.job.abstract_job import AbstractJob
 from src.middleware.logger import configure_logger
 from src.usecase.animal_usecase import AbstractAnimalUsecase
@@ -15,8 +17,14 @@ class AnimalToSearchJob(AbstractJob):
 
     def _run(self):
         logger.info("register index...")
+        i = 0
         while True:
             self.animal_usecase.register_index()
+            i += 1
+            if i >= 10000:
+                logger.info(f"done 10,000 jobs; sleep for 60 seconds...")
+                i = 0
+                sleep(60)
 
     def run(self):
         logger.info("run animal to search job")

@@ -23,19 +23,16 @@ class AnimalListPresenter(
     }
 
     override fun start() {
-        listAnimals(null, true)
+        listAnimals(query)
     }
 
-    override fun listAnimals(
-        query: String?,
-        refresh: Boolean
-    ) = runBlocking {
+    override fun listAnimals(query: String?) = runBlocking {
         this@AnimalListPresenter.query = query
         var animals = mapOf<String, Animal>()
         withContext(appExecutors.ioContext) {
             val metadata = animalRepository.getMetadata()
             Log.i(TAG, "metadata: ${metadata}")
-            animals = animalRepository.listAnimals(this@AnimalListPresenter.query, refresh)
+            animals = animalRepository.listAnimals(this@AnimalListPresenter.query)
         }
         animalListView.showAnimals(animals)
     }

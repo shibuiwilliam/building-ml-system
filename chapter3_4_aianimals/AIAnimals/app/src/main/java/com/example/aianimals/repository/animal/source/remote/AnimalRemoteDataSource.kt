@@ -25,10 +25,7 @@ class AnimalRemoteDataSource private constructor(
 
     override suspend fun createAnimals() {}
 
-    override suspend fun listAnimals(
-        query: String?,
-        refresh: Boolean
-    ): Map<String, Animal> {
+    override suspend fun listAnimals(query: String?): Map<String, Animal> {
         if (token == null) {
             return mapOf()
         }
@@ -56,7 +53,7 @@ class AnimalRemoteDataSource private constructor(
                     id = it.id,
                     name = it.name,
                     description = it.description,
-                    date = Date().toString(),
+                    date = it.created_at,
                     likes = 0,
                     imageUrl = it.photoUrl
                 )
@@ -66,7 +63,28 @@ class AnimalRemoteDataSource private constructor(
     }
 
     override suspend fun getAnimal(animalID: String): Animal? {
-        TODO("Not yet implemented")
+        if (token == null) {
+            return null
+        }
+        var animal: Animal? = null
+        withContext(appExecutors.ioContext) {
+            val response = animalAPI.getAnimal(token!!, animalID, false, 1, 0)
+            if (response.isSuccessful) {
+                val body = response.body()!!
+                if (body.isEmpty()) {
+                    return@withContext
+                }
+                animal = Animal(
+                    id = body[0].id,
+                    name = body[0].name,
+                    description = body[0].description,
+                    date = body[0].created_at,
+                    likes = body[0].like,
+                    imageUrl = body[0].photoUrl
+                )
+            }
+        }
+        return animal
     }
 
     override suspend fun saveAnimal(animal: Animal) {

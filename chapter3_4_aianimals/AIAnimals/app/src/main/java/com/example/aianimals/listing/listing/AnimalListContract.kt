@@ -7,10 +7,7 @@ import com.example.aianimals.repository.animal.Animal
 interface AnimalListContract {
     interface Presenter : BasePresenter {
         var query: String?
-        fun listAnimals(
-            query: String?,
-            refresh: Boolean
-        )
+        fun listAnimals(query: String?)
 
         fun logout()
     }

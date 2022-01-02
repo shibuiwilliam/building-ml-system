@@ -1,21 +1,15 @@
 package com.example.aianimals.repository.animal.source.remote
 
-data class AnimalSearchResult(
-    val score: Float,
+data class AnimalResponse(
     val id: String,
     val name: String,
     val description: String,
     val photoUrl: String,
+    val like: Int,
     val animalCategoryNameEn: String,
     val animalCategoryNameJa: String,
     val animalSubcategoryNameEn: String,
     val animalSubcategoryNameJa: String,
     val userHandleName: String,
     val created_at: String
-)
-
-data class AnimalSearchResponse(
-    val hits: Int,
-    val maxScore: Float,
-    val results: List<AnimalSearchResult>
 )

@@ -120,6 +120,7 @@ class Elasticsearch(AbstractSearch):
                     animal_subcategory_name_en=r["_source"]["animal_subcategory_name_en"],
                     animal_subcategory_name_ja=r["_source"]["animal_subcategory_name_ja"],
                     user_handle_name=r["_source"]["user_handle_name"],
+                    created_at=r["_source"]["created_at"],
                 ),
             )
         return results

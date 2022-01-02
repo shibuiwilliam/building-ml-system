@@ -53,6 +53,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
             animal_subcategory_name_ja=animal.animal_subcategory_name_ja,
             photo_url=animal.photo_url,
             user_handle_name=animal.user_handle_name,
+            created_at=animal.created_at,
         )
         self.animal_repository.create_document(
             id=animal.id,

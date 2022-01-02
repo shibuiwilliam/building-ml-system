@@ -16,7 +16,7 @@ import com.google.android.material.navigation.NavigationView
 class AnimalListActivity : AppCompatActivity() {
     private val TAG = AnimalListActivity::class.java.simpleName
 
-    private val CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY"
+    private val CURRENT_QUERY: String? = null
     private lateinit var animalListPresenter: AnimalListPresenter
 
     private lateinit var drawerLayout: DrawerLayout
@@ -67,12 +67,16 @@ class AnimalListActivity : AppCompatActivity() {
             Injection.provideAnimalRepository(applicationContext),
             Injection.provideLoginRepository(applicationContext),
             animalListFragment
-        )
+        ).apply {
+            if (savedInstanceState != null) {
+                query = savedInstanceState.getString(CURRENT_QUERY)
+            }
+        }
     }
 
     public override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState.apply {
-            putSerializable(CURRENT_FILTERING_KEY, null)
+            putString(CURRENT_QUERY, animalListPresenter.query)
         })
     }
 

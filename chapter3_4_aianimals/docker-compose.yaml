@@ -28,6 +28,8 @@ services:
   data_registry:
     container_name: data_registry
     image: shibui/building-ml-system:ai_animals_data_registry_0.0.0
+    volumes:
+      - ./dataset/:/opt/dataset/
     restart: "no"
     networks:
       - default

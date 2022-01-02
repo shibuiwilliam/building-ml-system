@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -62,14 +61,17 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
             searchView.setOnQueryTextListener(
                 object : SearchView.OnQueryTextListener {
                     override fun onQueryTextChange(newText: String?): Boolean {
+                        if (newText == "") {
+                            presenter.query = null
+                        } else {
+                            presenter.query = newText
+                        }
                         return false
                     }
 
                     override fun onQueryTextSubmit(query: String?): Boolean {
-                        Toast.makeText(requireContext(), "search for ${query}", Toast.LENGTH_SHORT)
-                            .show()
-                        presenter.listAnimals(query, true)
-                        return false
+                        presenter.listAnimals(query)
+                        return true
                     }
                 }
             )
@@ -79,7 +81,7 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
                 setOnRefreshListener {
                     Handler(Looper.getMainLooper()).postDelayed(Runnable {
                         swipeRefreshLayout.isRefreshing = false
-                        presenter.listAnimals(presenter.query, true)
+                        presenter.listAnimals(presenter.query)
                     }, 500)
                 }
             }
@@ -104,6 +106,8 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
                     }
                 }
             )
+
+            searchView.setQuery(presenter.query, true)
         }
 
         requireActivity().findViewById<FloatingActionButton>(R.id.add_animal_button).apply {

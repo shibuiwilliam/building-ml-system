@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from typing import List, Optional
 
 from pydantic import BaseModel, Extra
@@ -84,6 +84,7 @@ class AnimalSearchResult(BaseModel):
     animal_subcategory_name_en: str
     animal_subcategory_name_ja: str
     user_handle_name: str
+    created_at: datetime
 
     class Config:
         extra = Extra.forbid

@@ -53,6 +53,9 @@ ANIMAL_MAPPING = {
             "user_handle_name": {
                 "type": "text",
             },
+            "created_at": {
+                "type": "date",
+            },
         }
     },
 }
@@ -67,6 +70,7 @@ class AnimalDocument(BaseModel):
     animal_subcategory_name_en: str
     animal_subcategory_name_ja: str
     user_handle_name: str
+    created_at: datetime
 
     class Config:
         extra = Extra.forbid

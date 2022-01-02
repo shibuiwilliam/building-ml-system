@@ -31,10 +31,7 @@ class AnimalLocalDataSource private constructor(
         }
     }
 
-    override suspend fun listAnimals(
-        query: String?,
-        refresh: Boolean
-    ): Map<String, Animal> {
+    override suspend fun listAnimals(query: String?): Map<String, Animal> {
         val animalMap = mutableMapOf<String, Animal>()
         withContext(appExecutors.ioContext) {
             val count = animalDao.countAnimals()
