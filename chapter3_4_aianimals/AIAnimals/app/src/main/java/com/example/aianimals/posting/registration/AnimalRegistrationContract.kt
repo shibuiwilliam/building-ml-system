@@ -16,6 +16,7 @@ interface AnimalRegistrationContract {
         fun addAnimal(animal: Animal)
         fun makeAnimal(): Animal?
         fun clearCurrentValues()
+        fun logout()
     }
 
     interface View : BaseView<Presenter> {

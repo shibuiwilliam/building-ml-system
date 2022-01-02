@@ -4,13 +4,20 @@ import android.util.Log
 import com.example.aianimals.middleware.Utils
 import com.example.aianimals.repository.animal.Animal
 import com.example.aianimals.repository.animal.source.AnimalRepository
+import com.example.aianimals.repository.login.source.LoginRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.coroutines.CoroutineContext
 
 class AnimalRegistrationPresenter(
     private val imageUri: String?,
     private val animalRepository: AnimalRepository,
-    private val animalRegistrationView: AnimalRegistrationContract.View
+    private val loginRepository: LoginRepository,
+    private val animalRegistrationView: AnimalRegistrationContract.View,
+    private val context: CoroutineContext = Dispatchers.Default
 ) : AnimalRegistrationContract.Presenter {
     private val TAG = AnimalRegistrationPresenter::class.java.simpleName
     private var _imageUrl = imageUri
@@ -84,5 +91,11 @@ class AnimalRegistrationPresenter(
     override fun clearCurrentValues() {
         animalName = null
         animalDescription = null
+    }
+
+    override fun logout() = runBlocking {
+        withContext(context) {
+            loginRepository.logout()
+        }
     }
 }

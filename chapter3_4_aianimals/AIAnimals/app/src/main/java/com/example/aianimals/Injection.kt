@@ -33,7 +33,10 @@ object Injection {
                 AppExecutors(),
                 database.loginDao()
             ),
-            LoginRemoteDataSource.getInstance(LoginAPIClient.loginAPI)
+            LoginRemoteDataSource.getInstance(
+                AppExecutors(),
+                LoginAPIClient.loginAPI
+            )
         )
     }
 }

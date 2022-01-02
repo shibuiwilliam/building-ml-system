@@ -26,16 +26,20 @@ class LoginActivity : AppCompatActivity() {
         loginPresenter = LoginPresenter(
             loginFragment,
             Injection.provideLoginRepository(applicationContext)
-        )
+        ).apply {
+            if (savedInstanceState != null) {
+                isLoggedIn = savedInstanceState.getBoolean(IS_LOGGED_IN)
+            }
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState.apply {
-            putString(LOGIN_USER, "")
+            this.putBoolean(IS_LOGGED_IN, loginPresenter.isLoggedIn)
         })
     }
 
     companion object {
-        private val LOGIN_USER: String? = null
+        private const val IS_LOGGED_IN = "login"
     }
 }

@@ -7,6 +7,7 @@ import com.example.aianimals.repository.animal.Animal
 interface AnimalListContract {
     interface Presenter : BasePresenter {
         fun listAnimals()
+        fun logout()
     }
 
     interface View : BaseView<Presenter> {

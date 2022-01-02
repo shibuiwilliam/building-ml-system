@@ -10,6 +10,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import com.example.aianimals.Injection
 import com.example.aianimals.R
 import com.example.aianimals.listing.listing.AnimalListActivity
+import com.example.aianimals.login.LoginActivity
 import com.example.aianimals.middleware.setupActionBar
 import com.google.android.material.navigation.NavigationView
 
@@ -40,6 +41,14 @@ class AnimalRegistrationActivity : AppCompatActivity() {
                 )
                 startActivity(intent)
             }
+            if (menuItem.itemId == R.id.logout) {
+                animalRegistrationPresenter.logout()
+                val intent = Intent(
+                    this@AnimalRegistrationActivity,
+                    LoginActivity::class.java
+                )
+                startActivity(intent)
+            }
             menuItem.isChecked = true
             drawerLayout.closeDrawers()
             true
@@ -61,6 +70,7 @@ class AnimalRegistrationActivity : AppCompatActivity() {
         animalRegistrationPresenter = AnimalRegistrationPresenter(
             imageUri,
             Injection.provideAnimalRepository(applicationContext),
+            Injection.provideLoginRepository(applicationContext),
             animalRegistrationFragment
         )
         if (ANIMAL_NAME != null) {

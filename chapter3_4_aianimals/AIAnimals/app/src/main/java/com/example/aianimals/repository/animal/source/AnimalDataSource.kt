@@ -17,4 +17,5 @@ interface AnimalDataSource {
     fun listAnimals(callback: ListAnimalsCallback)
     fun getAnimal(animalID: String, callback: GetAnimalCallback)
     fun saveAnimal(animal: Animal)
+    suspend fun getMetadata(token: String): AnimalMetadata?
 }

@@ -13,7 +13,10 @@ import com.example.aianimals.repository.login.source.local.LoginDao
 
 
 @Database(
-    entities = [Login::class, Animal::class],
+    entities = [
+        Login::class,
+        Animal::class
+    ],
     version = 1,
     exportSchema = false
 )

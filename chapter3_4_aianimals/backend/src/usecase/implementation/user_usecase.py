@@ -76,6 +76,8 @@ class UserUsecase(AbstractUserUsecase):
     ) -> Optional[UserLoginResponse]:
         if request.handle_name is None and request.email_address is None:
             raise ValueError("either handle_name or email_address must be specified")
+        if (request.handle_name == "" or request.email_address == "") and request.password == "":
+            raise ValueError("handle_name and password must be specified")
         login_query = UserLoginQuery(
             handle_name=request.handle_name,
             email_address=request.email_address,

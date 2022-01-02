@@ -4,7 +4,7 @@ package com.example.aianimals.repository.login.source
 import com.example.aianimals.repository.login.Login
 import com.example.aianimals.repository.login.source.local.LoginLocalDataSource
 import com.example.aianimals.repository.login.source.remote.LoginRemoteDataSource
-import java.util.*
+
 
 class LoginRepository(
     val loginLocalDataSource: LoginLocalDataSource,
@@ -15,34 +15,39 @@ class LoginRepository(
     var login: Login? = null
         private set
 
-    val isLoggedIn: Boolean
-        get() = this.login != null
-
     init {
         this.login = null
     }
 
-    override fun login(
+    override suspend fun login(
         handleName: String,
         password: String,
     ): Result<Login> {
-        val login = Login(
-            id = 0,
-            handleName = handleName,
-            emailAddress = "b",
-            token = "",
-            lastLoginAt = Date()
-        )
-        this.login = login
-        return loginLocalDataSource.login(login)
+        val result = loginRemoteDataSource.login(handleName, password)
+        val login = result.getLogin()
+        return when (result) {
+            is Result.Success<*> -> {
+                this.login = login
+                loginLocalDataSource.login(this.login!!)
+            }
+            is Result.Error -> result
+        }
     }
 
-    override fun logout() {
-        if (!isLoggedIn) {
+    override suspend fun logout() {
+        if (isLoggedIn() == null) {
             return
         }
         loginLocalDataSource.logout(this.login!!)
         this.login = null
+    }
+
+    override suspend fun isLoggedIn(): Login? {
+        if (this.login != null) {
+            return this.login
+        }
+        this.login = loginLocalDataSource.isLoggedIn()
+        return this.login
     }
 
     companion object {

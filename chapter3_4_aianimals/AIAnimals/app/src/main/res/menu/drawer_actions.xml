@@ -9,4 +9,8 @@
         android:id="@+id/register_animal"
         android:icon="@drawable/ic_launcher_foreground"
         android:title="@string/animal_registration" />
+    <item
+        android:id="@+id/logout"
+        android:icon="@drawable/ic_launcher_foreground"
+        android:title="@string/logout" />
 </menu>

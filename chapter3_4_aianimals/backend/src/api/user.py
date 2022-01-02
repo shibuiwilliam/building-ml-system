@@ -1,7 +1,8 @@
 from logging import getLogger
-from typing import List, Optional
+from typing import Optional
 
-from fastapi import APIRouter, Depends, Header
+from fastapi import APIRouter, Depends, Header, HTTPException
+from starlette.status import HTTP_403_FORBIDDEN
 from sqlalchemy.orm import Session
 from src.middleware.assert_token import token_assertion
 from src.registry.container import container
@@ -18,11 +19,17 @@ async def login_user(
     user: UserLoginRequest,
     session: Session = Depends(container.database.get_session),
 ):
-    data = container.user_usecase.login(
-        session=session,
-        request=user,
-    )
-    return data
+    try:
+        data = container.user_usecase.login(
+            session=session,
+            request=user,
+        )
+        return data
+    except Exception as e:
+        raise HTTPException(
+            status_code=HTTP_403_FORBIDDEN,
+            detail=f"authorization failed: {e}",
+        )
 
 
 @router.post("", response_model=Optional[UserResponse])

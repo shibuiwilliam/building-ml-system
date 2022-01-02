@@ -6,6 +6,7 @@ import com.example.aianimals.middleware.AppExecutors
 import com.example.aianimals.middleware.Utils
 import com.example.aianimals.repository.animal.Animal
 import com.example.aianimals.repository.animal.source.AnimalDataSource
+import com.example.aianimals.repository.animal.source.AnimalMetadata
 
 class AnimalLocalDataSource private constructor(
     val appExecutors: AppExecutors,
@@ -60,6 +61,10 @@ class AnimalLocalDataSource private constructor(
         appExecutors.diskIO.execute {
             this.animalDao.insertAnimal(animal)
         }
+    }
+
+    override suspend fun getMetadata(token: String): AnimalMetadata? {
+        return null
     }
 
     companion object {

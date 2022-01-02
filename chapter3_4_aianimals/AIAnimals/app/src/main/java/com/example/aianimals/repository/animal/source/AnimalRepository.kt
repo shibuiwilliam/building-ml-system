@@ -66,6 +66,10 @@ class AnimalRepository(
         animalLocalDataSource.saveAnimal(animal)
     }
 
+    override suspend fun getMetadata(token: String): AnimalMetadata? {
+        return animalRemoteDataSource.getMetadata(token)
+    }
+
     private fun cacheAnimal(animal: Animal) {
         this.cachedAnimals[animal.id] = animal
     }
