@@ -3,17 +3,16 @@ package com.example.aianimals.login
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.aianimals.middleware.AppExecutors
 import com.example.aianimals.repository.login.source.LoginRepository
 import com.example.aianimals.repository.login.source.Result
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.CoroutineContext
 
 class LoginPresenter(
     private val loginView: LoginContract.View,
     private val loginRepository: LoginRepository,
-    private val context: CoroutineContext = Dispatchers.Default
+    private val appExecutors: AppExecutors = AppExecutors()
 ) : LoginContract.Presenter {
     private val TAG = LoginPresenter::class.java.simpleName
 
@@ -36,7 +35,7 @@ class LoginPresenter(
         handleName: String,
         password: String
     ) = runBlocking {
-        withContext(context) {
+        withContext(appExecutors.defaultContext) {
             val result = loginRepository.login(handleName, password)
             if (result is Result.Success) {
                 isLoggedIn = true
@@ -49,7 +48,7 @@ class LoginPresenter(
     }
 
     override fun isLoggedIn() = runBlocking {
-        withContext(context) {
+        withContext(appExecutors.defaultContext) {
             Log.i(TAG, "is logged in?")
             val login = loginRepository.isLoggedIn()
             if (login != null) {

@@ -1,53 +1,60 @@
 package com.example.aianimals.listing.listing
 
 import android.util.Log
+import com.example.aianimals.middleware.AppExecutors
 import com.example.aianimals.repository.animal.Animal
-import com.example.aianimals.repository.animal.source.AnimalDataSource
 import com.example.aianimals.repository.animal.source.AnimalRepository
 import com.example.aianimals.repository.login.source.LoginRepository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.CoroutineContext
 
 class AnimalListPresenter(
     private val animalRepository: AnimalRepository,
     private val loginRepository: LoginRepository,
     private val animalListView: AnimalListContract.View,
-    private val context: CoroutineContext = Dispatchers.Default
+    private val appExecutors: AppExecutors = AppExecutors()
 ) : AnimalListContract.Presenter {
     private val TAG = AnimalListPresenter::class.java.simpleName
+
+    override var token: String? = null
+    override var query: String? = null
 
     init {
         this.animalListView.presenter = this
     }
 
     override fun start() {
-        listAnimals()
+        listAnimals(null, true)
     }
 
-    override fun listAnimals()= runBlocking {
-        withContext(context){
-            val login = loginRepository.isLoggedIn()
-            if (login != null){
-                val token = login.token!!
-                Log.i(TAG, "token: ${token}")
-                val metadata = animalRepository.getMetadata(token)
+    override fun listAnimals(
+        query: String?,
+        refresh: Boolean
+    ) = runBlocking {
+        this@AnimalListPresenter.query = query
+        setToken()
+        var animals = mapOf<String, Animal>()
+        withContext(appExecutors.ioContext) {
+            if (token != null) {
+                val metadata = animalRepository.getMetadata(token!!)
                 Log.i(TAG, "metadata: ${metadata}")
             }
-            animalRepository.listAnimals(object : AnimalDataSource.ListAnimalsCallback {
-                override fun onListAnimal(animals: Map<String, Animal>) {
-                    animalListView.showAnimals(animals)
-                }
+            animals = animalRepository.listAnimals(this@AnimalListPresenter.query)
+        }
+        animalListView.showAnimals(animals)
+    }
 
-                override fun onDataNotAvailable() {
-                }
-            })
+    override fun setToken() = runBlocking {
+        withContext(appExecutors.ioContext) {
+            val login = loginRepository.isLoggedIn()
+            if (login != null) {
+                token = login.token!!
+            }
         }
     }
 
     override fun logout() = runBlocking {
-        withContext(context) {
+        withContext(appExecutors.ioContext) {
             loginRepository.logout()
         }
     }

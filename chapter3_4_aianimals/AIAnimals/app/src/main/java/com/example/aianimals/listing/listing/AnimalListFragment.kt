@@ -68,6 +68,7 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
                     override fun onQueryTextSubmit(query: String?): Boolean {
                         Toast.makeText(requireContext(), "search for ${query}", Toast.LENGTH_SHORT)
                             .show()
+                        presenter.listAnimals(query, true)
                         return false
                     }
                 }
@@ -78,7 +79,7 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
                 setOnRefreshListener {
                     Handler(Looper.getMainLooper()).postDelayed(Runnable {
                         swipeRefreshLayout.isRefreshing = false
-                        presenter.listAnimals()
+                        presenter.listAnimals(presenter.query, true)
                     }, 500)
                 }
             }

@@ -7,6 +7,7 @@ import com.example.aianimals.middleware.Utils
 import com.example.aianimals.repository.animal.Animal
 import com.example.aianimals.repository.animal.source.AnimalDataSource
 import com.example.aianimals.repository.animal.source.AnimalMetadata
+import kotlinx.coroutines.withContext
 
 class AnimalLocalDataSource private constructor(
     val appExecutors: AppExecutors,
@@ -14,7 +15,7 @@ class AnimalLocalDataSource private constructor(
 ) : AnimalDataSource {
     private val TAG = AnimalLocalDataSource::class.java.simpleName
 
-    override fun createAnimals() {
+    override suspend fun createAnimals() {
         for (i in 0..20) {
             val id = Utils.generateUUID()
             val animal = Animal(
@@ -23,43 +24,40 @@ class AnimalLocalDataSource private constructor(
                 "かわいい",
                 "2020/11/24",
                 0,
-                "https://www.anicom-sompo.co.jp/nekonoshiori/wp-content/uploads/2018/12/724-2.jpg"
+                "https://storage.googleapis.com/aianimals/images/0016e503d29a4be9a4b852f2a5b44525.jpg"
             )
             saveAnimal(animal)
             Log.i("AnimalRepository", "animal: ${animal}")
         }
     }
 
-    override fun listAnimals(callback: AnimalDataSource.ListAnimalsCallback) {
-        appExecutors.diskIO.execute {
-            val animals = this.animalDao.listAnimals()
-            appExecutors.mainThread.execute {
-                if (animals.isEmpty()) {
-                    callback.onDataNotAvailable()
-                } else {
-                    val mAnimals = animals.map { it.id to it }.toMap()
-                    callback.onListAnimal(mAnimals)
+    override suspend fun listAnimals(
+        query: String?,
+        refresh: Boolean
+    ): Map<String, Animal> {
+        val animalMap = mutableMapOf<String, Animal>()
+        withContext(appExecutors.ioContext) {
+            val animals = animalDao.listAnimals()
+            withContext(appExecutors.defaultContext) {
+                if (animals.isNotEmpty()) {
+                    animals.forEach { animalMap[it.id] = it }
                 }
             }
         }
+        return animalMap
     }
 
-    override fun getAnimal(animalID: String, callback: AnimalDataSource.GetAnimalCallback) {
-        appExecutors.diskIO.execute {
-            val animal = this.animalDao.getAnimal(animalID)
-            appExecutors.mainThread.execute {
-                if (animal != null) {
-                    callback.onGetAnimal(animal)
-                } else {
-                    callback.onDataNotAvailable()
-                }
-            }
+    override suspend fun getAnimal(animalID: String): Animal? {
+        var animal: Animal? = null
+        withContext(appExecutors.ioContext) {
+            animal = animalDao.getAnimal(animalID)
         }
+        return animal
     }
 
-    override fun saveAnimal(animal: Animal) {
-        appExecutors.diskIO.execute {
-            this.animalDao.insertAnimal(animal)
+    override suspend fun saveAnimal(animal: Animal) {
+        withContext(appExecutors.ioContext) {
+            animalDao.insertAnimal(animal)
         }
     }
 

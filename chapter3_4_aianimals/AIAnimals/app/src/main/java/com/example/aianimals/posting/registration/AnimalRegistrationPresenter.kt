@@ -66,7 +66,7 @@ class AnimalRegistrationPresenter(
         this.animalRegistrationView.showImage(this._imageUrl)
     }
 
-    override fun addAnimal(animal: Animal) {
+    override fun addAnimal(animal: Animal) = runBlocking {
         Log.i(TAG, "register ${animal}")
         animalRepository.saveAnimal(animal)
     }

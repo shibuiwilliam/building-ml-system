@@ -14,54 +14,35 @@ class AnimalRepository(
 
     var cachedAnimals: MutableMap<String, Animal> = mutableMapOf()
 
-    override fun createAnimals() {
-        animalLocalDataSource.createAnimals()
-    }
+    override suspend fun createAnimals() {}
 
-    override fun listAnimals(callback: AnimalDataSource.ListAnimalsCallback) {
-        if (this.cachedAnimals.isNotEmpty()) {
-            callback.onListAnimal(this.cachedAnimals)
-            return
+    override suspend fun listAnimals(
+        query: String?,
+        refresh: Boolean
+    ): Map<String, Animal> {
+        if (!refresh && this.cachedAnimals.isNotEmpty()) {
+            return this.cachedAnimals
         }
 
-        animalLocalDataSource.listAnimals(
-            object : AnimalDataSource.ListAnimalsCallback {
-                override fun onListAnimal(animals: Map<String, Animal>) {
-                    cacheAnimals(animals)
-                    callback.onListAnimal(cachedAnimals)
-                }
-
-                override fun onDataNotAvailable() {
-                    createAnimals()
-                }
-            }
-        )
+        val localAnimals = animalLocalDataSource.listAnimals(query, refresh)
+        if (localAnimals.isNotEmpty()) {
+            cacheAnimals(localAnimals)
+            return localAnimals
+        }
+        return mapOf()
     }
 
-    override fun getAnimal(
-        animalID: String,
-        callback: AnimalDataSource.GetAnimalCallback
-    ) {
+    override suspend fun getAnimal(animalID: String): Animal? {
         val animal = getAnimalFromCache(animalID)
         if (animal != null) {
-            callback.onGetAnimal(animal)
-            return
+            return animal
         }
 
-        animalLocalDataSource.getAnimal(
-            animalID, object : AnimalDataSource.GetAnimalCallback {
-                override fun onGetAnimal(animal: Animal) {
-                    cacheAnimal(animal)
-                    callback.onGetAnimal(animal)
-                }
-
-                override fun onDataNotAvailable() {
-                }
-            }
-        )
+        val localAnimal = animalLocalDataSource.getAnimal(animalID)
+        return localAnimal
     }
 
-    override fun saveAnimal(animal: Animal) {
+    override suspend fun saveAnimal(animal: Animal) {
         Log.i("AnimalRepository", "register ${animal}")
         animalLocalDataSource.saveAnimal(animal)
     }

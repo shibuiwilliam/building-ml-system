@@ -21,6 +21,7 @@ object Injection {
                 database.animalDao()
             ),
             AnimalRemoteDataSource.getInstance(
+                AppExecutors(),
                 AnimalAPIClient.animalAPI
             )
         )
