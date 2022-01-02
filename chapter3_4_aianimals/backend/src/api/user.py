@@ -2,12 +2,12 @@ from logging import getLogger
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Header, HTTPException
-from starlette.status import HTTP_403_FORBIDDEN
 from sqlalchemy.orm import Session
 from src.middleware.assert_token import token_assertion
 from src.registry.container import container
 from src.request_object.user import UserCreateRequest, UserLoginRequest
 from src.response_object.user import UserLoginResponse, UserResponse
+from starlette.status import HTTP_403_FORBIDDEN
 
 logger = getLogger(__name__)
 
