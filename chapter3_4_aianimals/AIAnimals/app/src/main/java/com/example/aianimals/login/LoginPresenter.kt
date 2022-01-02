@@ -21,8 +21,11 @@ class LoginPresenter(
         this.loginView.show()
     }
 
-    override fun login(userID: String, password: String) {
-        val result = loginRepository.login(userID, password)
+    override fun login(
+        handleName: String,
+        password: String
+    ) {
+        val result = loginRepository.login(handleName, password)
 
         if (result is Result.Success) {
             _loginResult.value = LoginResult(success = 1)

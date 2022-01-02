@@ -23,13 +23,13 @@ class LoginRepository(
     }
 
     override fun login(
-        userID: String,
+        handleName: String,
         password: String,
     ): Result<Login> {
         val login = Login(
             id = 0,
-            userID = "a",
-            displayName = "b",
+            handleName = handleName,
+            emailAddress = "b",
             token = "",
             lastLoginAt = Date()
         )

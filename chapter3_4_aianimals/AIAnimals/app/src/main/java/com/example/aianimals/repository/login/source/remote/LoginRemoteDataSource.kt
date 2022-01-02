@@ -7,11 +7,11 @@ import com.example.aianimals.repository.login.source.Result
 
 class LoginRemoteDataSource private constructor(
     val loginAPI: LoginAPIInterface
-): LoginDataSource{
+) : LoginDataSource {
     private val TAG = LoginRemoteDataSource::class.java.simpleName
 
     override fun login(
-        userID: String,
+        handleName: String,
         password: String
     ): Result<Login> {
         TODO("Not yet implemented")

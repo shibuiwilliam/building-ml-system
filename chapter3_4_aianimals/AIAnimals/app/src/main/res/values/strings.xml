@@ -19,4 +19,5 @@
     <string name="cancel">cancel</string>
     <string name="ask_register_animal">register animaL?</string>
     <string name="select_photo">select photo</string>
+    <string name="user_name">user name</string>
 </resources>

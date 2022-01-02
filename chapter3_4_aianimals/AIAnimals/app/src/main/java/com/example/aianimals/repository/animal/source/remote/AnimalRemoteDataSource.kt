@@ -6,7 +6,7 @@ import com.example.aianimals.repository.animal.source.AnimalDataSource
 
 class AnimalRemoteDataSource private constructor(
     val animalAPI: AnimalAPIInterface
-): AnimalDataSource{
+) : AnimalDataSource {
     private val TAG = AnimalRemoteDataSource::class.java.simpleName
 
     override fun createAnimals() {}

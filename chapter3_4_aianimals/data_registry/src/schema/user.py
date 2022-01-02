@@ -17,7 +17,7 @@ class User(Base):
     handle_name = Column(
         String(128),
         nullable=False,
-        unique=False,
+        unique=True,
     )
     email_address = Column(
         String(128),

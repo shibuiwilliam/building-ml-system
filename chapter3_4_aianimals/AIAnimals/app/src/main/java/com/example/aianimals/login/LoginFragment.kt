@@ -22,19 +22,22 @@ class LoginFragment : Fragment(), LoginContract.View {
     override lateinit var presenter: LoginContract.Presenter
 
     private lateinit var loginText: TextView
-    private lateinit var userIDEdit: EditText
+    private lateinit var handleNameEdit: EditText
     private lateinit var passwordEdit: EditText
     private lateinit var loginButton: Button
 
     override fun show() {
         loginText.visibility = View.VISIBLE
-        userIDEdit.visibility = View.VISIBLE
+        handleNameEdit.visibility = View.VISIBLE
         passwordEdit.visibility = View.VISIBLE
         loginButton.visibility = View.VISIBLE
     }
 
     override fun login() {
-        presenter.login(userIDEdit.text.toString(), passwordEdit.text.toString())
+        presenter.login(
+            handleNameEdit.text.toString(),
+            passwordEdit.text.toString()
+        )
     }
 
     override fun onResume() {
@@ -52,7 +55,7 @@ class LoginFragment : Fragment(), LoginContract.View {
             activity?.title = getString(R.string.login)
 
             loginText = findViewById(R.id.login_text)
-            userIDEdit = findViewById(R.id.user_id_edit)
+            handleNameEdit = findViewById(R.id.handle_name_edit)
             passwordEdit = findViewById(R.id.password_edit)
             loginButton = findViewById(R.id.login_button)
 

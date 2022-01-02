@@ -6,7 +6,6 @@ import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
@@ -135,7 +134,7 @@ class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
 
             getContentLauncher = registerForActivityResult(
                 ActivityResultContracts.GetContent()
-            ){
+            ) {
                 if (it != null) {
                     val imageUri = it.toString()
                     Log.i(TAG, "selected: ${imageUri}")
@@ -154,7 +153,7 @@ class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
                 }
             }
 
-            selectPhotoButton.apply{
+            selectPhotoButton.apply {
                 setOnClickListener {
                     getContentLauncher.launch("image/*")
                 }

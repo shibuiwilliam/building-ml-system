@@ -7,7 +7,10 @@ import com.example.aianimals.BaseView
 interface LoginContract {
     interface Presenter : BasePresenter {
         val loginResult: LiveData<LoginResult>
-        fun login(userID: String, password: String)
+        fun login(
+            handleName: String,
+            password: String
+        )
     }
 
     interface View : BaseView<Presenter> {
