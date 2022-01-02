@@ -9,6 +9,7 @@ import com.example.aianimals.repository.animal.source.AnimalDataSource
 import com.example.aianimals.repository.animal.source.AnimalMetadata
 import com.example.aianimals.repository.animal.source.AnimalSubcategory
 import kotlinx.coroutines.withContext
+import java.util.*
 
 class AnimalRemoteDataSource private constructor(
     val appExecutors: AppExecutors,
@@ -16,13 +17,52 @@ class AnimalRemoteDataSource private constructor(
 ) : AnimalDataSource {
     private val TAG = AnimalRemoteDataSource::class.java.simpleName
 
+    private var token: String? = null
+
+    fun setToken(token: String?) {
+        this.token = token
+    }
+
     override suspend fun createAnimals() {}
 
     override suspend fun listAnimals(
         query: String?,
         refresh: Boolean
     ): Map<String, Animal> {
-        TODO("Not yet implemented")
+        if (token == null) {
+            return mapOf()
+        }
+        val animals = mutableMapOf<String, Animal>()
+        withContext(appExecutors.ioContext) {
+            val phrases = mutableListOf<String>()
+            if (query != null) {
+                phrases.addAll(query.split(" "))
+            }
+            val animalSearchPost = AnimalSearchPost(
+                animalCategoryNameEn = null,
+                animalCategoryNameJa = null,
+                animalSubcategoryNameEn = null,
+                animalSubcategoryNameJa = null,
+                phrases = phrases
+            )
+            val response = animalAPI.postSearchAnimal(
+                token!!,
+                100,
+                0,
+                animalSearchPost,
+            )
+            response.body()!!.results.forEach {
+                animals[it.id] = Animal(
+                    id = it.id,
+                    name = it.name,
+                    description = it.description,
+                    date = Date().toString(),
+                    likes = 0,
+                    imageUrl = it.photoUrl
+                )
+            }
+        }
+        return animals
     }
 
     override suspend fun getAnimal(animalID: String): Animal? {
@@ -33,10 +73,13 @@ class AnimalRemoteDataSource private constructor(
         TODO("Not yet implemented")
     }
 
-    override suspend fun getMetadata(token: String): AnimalMetadata? {
+    override suspend fun getMetadata(): AnimalMetadata? {
+        if (token == null) {
+            return null
+        }
         var animalMetadata: AnimalMetadata? = null
         withContext(appExecutors.ioContext) {
-            val response = animalAPI.getMetadata(token)
+            val response = animalAPI.getMetadata(token!!)
             if (response.isSuccessful) {
                 val body = response.body()!!
                 val animalCategory = body.animalCategory.map {

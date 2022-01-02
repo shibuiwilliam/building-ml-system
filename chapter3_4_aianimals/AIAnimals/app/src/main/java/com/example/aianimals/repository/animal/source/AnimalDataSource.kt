@@ -8,7 +8,8 @@ interface AnimalDataSource {
         query: String?,
         refresh: Boolean
     ): Map<String, Animal>
+
     suspend fun getAnimal(animalID: String): Animal?
     suspend fun saveAnimal(animal: Animal)
-    suspend fun getMetadata(token: String): AnimalMetadata?
+    suspend fun getMetadata(): AnimalMetadata?
 }

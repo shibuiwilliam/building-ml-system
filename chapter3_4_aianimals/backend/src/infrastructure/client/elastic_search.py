@@ -96,6 +96,12 @@ class Elasticsearch(AbstractSearch):
             from_=from_,
             size=size,
         )
+        if searched["hits"]["total"]["value"] == 0:
+            return AnimalSearchResults(
+                hits=0,
+                max_score=0,
+                results=[],
+            )
         results = AnimalSearchResults(
             hits=searched["hits"]["total"]["value"],
             max_score=searched["hits"]["max_score"],

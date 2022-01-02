@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.aianimals.middleware.AppExecutors
+import com.example.aianimals.repository.animal.source.AnimalRepository
 import com.example.aianimals.repository.login.source.LoginRepository
 import com.example.aianimals.repository.login.source.Result
 import kotlinx.coroutines.runBlocking
@@ -12,6 +13,7 @@ import kotlinx.coroutines.withContext
 class LoginPresenter(
     private val loginView: LoginContract.View,
     private val loginRepository: LoginRepository,
+    private val animalRepository: AnimalRepository,
     private val appExecutors: AppExecutors = AppExecutors()
 ) : LoginContract.Presenter {
     private val TAG = LoginPresenter::class.java.simpleName
@@ -39,6 +41,7 @@ class LoginPresenter(
             val result = loginRepository.login(handleName, password)
             if (result is Result.Success) {
                 isLoggedIn = true
+                animalRepository.animalRemoteDataSource.setToken(result.data.token)
                 _loginResult.postValue(LoginResult(success = 1))
             } else {
                 isLoggedIn = false
@@ -53,6 +56,7 @@ class LoginPresenter(
             val login = loginRepository.isLoggedIn()
             if (login != null) {
                 isLoggedIn = true
+                animalRepository.animalRemoteDataSource.setToken(login.token)
                 _loginResult.postValue(LoginResult(success = 1))
             }
         }

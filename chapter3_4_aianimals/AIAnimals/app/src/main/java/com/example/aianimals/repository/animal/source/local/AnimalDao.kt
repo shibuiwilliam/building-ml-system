@@ -8,6 +8,9 @@ import com.example.aianimals.repository.animal.Animal
 
 @Dao
 interface AnimalDao {
+    @Query("SELECT COUNT(*) FROM animals")
+    fun countAnimals(): Int
+
     @Query("SELECT * FROM animals")
     fun listAnimals(): List<Animal>
 

@@ -37,6 +37,10 @@ class AnimalLocalDataSource private constructor(
     ): Map<String, Animal> {
         val animalMap = mutableMapOf<String, Animal>()
         withContext(appExecutors.ioContext) {
+            val count = animalDao.countAnimals()
+            if (count == 0) {
+                createAnimals()
+            }
             val animals = animalDao.listAnimals()
             withContext(appExecutors.defaultContext) {
                 if (animals.isNotEmpty()) {
@@ -61,7 +65,7 @@ class AnimalLocalDataSource private constructor(
         }
     }
 
-    override suspend fun getMetadata(token: String): AnimalMetadata? {
+    override suspend fun getMetadata(): AnimalMetadata? {
         return null
     }
 

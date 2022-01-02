@@ -16,7 +16,6 @@ class AnimalListPresenter(
 ) : AnimalListContract.Presenter {
     private val TAG = AnimalListPresenter::class.java.simpleName
 
-    override var token: String? = null
     override var query: String? = null
 
     init {
@@ -32,25 +31,13 @@ class AnimalListPresenter(
         refresh: Boolean
     ) = runBlocking {
         this@AnimalListPresenter.query = query
-        setToken()
         var animals = mapOf<String, Animal>()
         withContext(appExecutors.ioContext) {
-            if (token != null) {
-                val metadata = animalRepository.getMetadata(token!!)
-                Log.i(TAG, "metadata: ${metadata}")
-            }
-            animals = animalRepository.listAnimals(this@AnimalListPresenter.query)
+            val metadata = animalRepository.getMetadata()
+            Log.i(TAG, "metadata: ${metadata}")
+            animals = animalRepository.listAnimals(this@AnimalListPresenter.query, refresh)
         }
         animalListView.showAnimals(animals)
-    }
-
-    override fun setToken() = runBlocking {
-        withContext(appExecutors.ioContext) {
-            val login = loginRepository.isLoggedIn()
-            if (login != null) {
-                token = login.token!!
-            }
-        }
     }
 
     override fun logout() = runBlocking {

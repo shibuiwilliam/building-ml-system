@@ -2,6 +2,7 @@ package com.example.aianimals.repository.animal.source
 
 
 import android.util.Log
+import com.example.aianimals.BuildConfig
 import com.example.aianimals.repository.animal.Animal
 import com.example.aianimals.repository.animal.source.local.AnimalLocalDataSource
 import com.example.aianimals.repository.animal.source.remote.AnimalRemoteDataSource
@@ -24,10 +25,18 @@ class AnimalRepository(
             return this.cachedAnimals
         }
 
-        val localAnimals = animalLocalDataSource.listAnimals(query, refresh)
-        if (localAnimals.isNotEmpty()) {
-            cacheAnimals(localAnimals)
-            return localAnimals
+        if (BuildConfig.USE_LOCAL_DATA) {
+            val localAnimals = animalLocalDataSource.listAnimals(query, refresh)
+            if (localAnimals.isNotEmpty()) {
+                cacheAnimals(localAnimals)
+                return localAnimals
+            }
+        }
+
+        val remoteAnimals = animalRemoteDataSource.listAnimals(query, refresh)
+        if (remoteAnimals.isNotEmpty()) {
+            cacheAnimals(remoteAnimals)
+            return remoteAnimals
         }
         return mapOf()
     }
@@ -47,8 +56,8 @@ class AnimalRepository(
         animalLocalDataSource.saveAnimal(animal)
     }
 
-    override suspend fun getMetadata(token: String): AnimalMetadata? {
-        return animalRemoteDataSource.getMetadata(token)
+    override suspend fun getMetadata(): AnimalMetadata? {
+        return animalRemoteDataSource.getMetadata()
     }
 
     private fun cacheAnimal(animal: Animal) {
