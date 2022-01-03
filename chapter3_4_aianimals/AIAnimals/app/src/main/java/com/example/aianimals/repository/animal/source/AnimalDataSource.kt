@@ -11,7 +11,8 @@ interface AnimalDataSource {
         animalCategoryNameJa: String?,
         animalSubcategoryNameEn: String?,
         animalSubcategoryNameJa: String?,
-        query: String?
+        query: String?,
+        offset: Int
     ): Map<String, Animal>
 
     suspend fun getAnimal(animalID: String): Animal?

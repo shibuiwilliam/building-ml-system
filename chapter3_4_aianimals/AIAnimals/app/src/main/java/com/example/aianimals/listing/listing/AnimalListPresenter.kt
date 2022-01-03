@@ -24,6 +24,8 @@ class AnimalListPresenter(
     override lateinit var selectedAnimalSubcategory: String
     override lateinit var selectedSortValue: String
 
+    override var currentPosition: Int = 0
+
     init {
         this.animalListView.presenter = this
         loadAnimalMetadata(true)
@@ -36,8 +38,7 @@ class AnimalListPresenter(
         listAnimals(query)
     }
 
-    override fun listAnimals(query: String?) = runBlocking {
-        this@AnimalListPresenter.query = query
+    override fun searchAnimals(): Map<String, Animal> = runBlocking {
         var animals = mapOf<String, Animal>()
         withContext(appExecutors.ioContext) {
             val animalCategoryNameEn =
@@ -49,10 +50,28 @@ class AnimalListPresenter(
                 null,
                 animalSubcategoryNameEn,
                 null,
-                this@AnimalListPresenter.query
+                this@AnimalListPresenter.query,
+                this@AnimalListPresenter.currentPosition
             )
         }
+        return@runBlocking animals
+    }
+
+    override fun listAnimals(query: String?) = runBlocking {
+        this@AnimalListPresenter.currentPosition = 0
+        this@AnimalListPresenter.query = query
+        val animals = searchAnimals()
+        currentPosition = animals.size
         animalListView.showAnimals(animals)
+    }
+
+    override fun appendAnimals() {
+        val animals = searchAnimals()
+        if (animals.isEmpty()) {
+            return
+        }
+        currentPosition += animals.size
+        animalListView.appendAnimals(animals)
     }
 
     override fun loadAnimalMetadata(refresh: Boolean) = runBlocking {

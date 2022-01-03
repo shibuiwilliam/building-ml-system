@@ -13,7 +13,10 @@ interface AnimalListContract {
         var selectedAnimalCategory: String
         var selectedAnimalSubcategory: String
         var selectedSortValue: String
+        var currentPosition: Int
+        fun searchAnimals(): Map<String, Animal>
         fun listAnimals(query: String?)
+        fun appendAnimals()
         fun loadAnimalMetadata(refresh: Boolean)
         fun loadAnimalCategory()
         fun loadAnimalSubcategory(
@@ -28,5 +31,6 @@ interface AnimalListContract {
 
     interface View : BaseView<Presenter> {
         fun showAnimals(animals: Map<String, Animal>)
+        fun appendAnimals(animals: Map<String, Animal>)
     }
 }

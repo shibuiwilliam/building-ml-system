@@ -7,10 +7,7 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.SearchView
-import android.widget.Spinner
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -37,7 +34,13 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
 
     override fun showAnimals(animals: Map<String, Animal>) {
         searchView.visibility = View.VISIBLE
-        animalListRecyclerViewAdapter.animals = animals.values.toList()
+        animalListRecyclerViewAdapter.animals = animals.values.toMutableList()
+        animalRecyclerView.visibility = View.VISIBLE
+    }
+
+    override fun appendAnimals(animals: Map<String, Animal>) {
+        searchView.visibility = View.VISIBLE
+        animalListRecyclerViewAdapter.animals.addAll(animals.values.toList())
         animalRecyclerView.visibility = View.VISIBLE
     }
 
@@ -174,6 +177,18 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
                 RecyclerView.VERTICAL,
                 false
             )
+//            animalRecyclerView.addOnScrollListener(
+//                object : RecyclerView.OnScrollListener() {
+//                    override fun onScrollStateChanged(
+//                        recyclerView: RecyclerView,
+//                        newState: Int
+//                    ) {
+//                            super.onScrollStateChanged(recyclerView, newState)
+//                            if (recyclerView.canScrollVertically(1) && newState == RecyclerView.SCROLL_STATE_IDLE) {
+//                            }
+//                    }
+//                }
+//            )
 
             animalListRecyclerViewAdapter.setOnAnimalCellClickListener(
                 object : AnimalListRecyclerViewAdapter.OnAnimalCellClickListener {

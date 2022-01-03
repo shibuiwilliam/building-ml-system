@@ -38,7 +38,8 @@ class AnimalLocalDataSource private constructor(
         animalCategoryNameJa: String?,
         animalSubcategoryNameEn: String?,
         animalSubcategoryNameJa: String?,
-        query: String?
+        query: String?,
+        offset: Int
     ): Map<String, Animal> {
         val animalMap = mutableMapOf<String, Animal>()
         withContext(appExecutors.ioContext) {

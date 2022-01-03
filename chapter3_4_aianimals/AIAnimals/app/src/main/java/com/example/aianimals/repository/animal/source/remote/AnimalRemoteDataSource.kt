@@ -33,7 +33,8 @@ class AnimalRemoteDataSource private constructor(
         animalCategoryNameJa: String?,
         animalSubcategoryNameEn: String?,
         animalSubcategoryNameJa: String?,
-        query: String?
+        query: String?,
+        offset: Int
     ): Map<String, Animal> {
         if (token == null) {
             return mapOf()
@@ -54,7 +55,7 @@ class AnimalRemoteDataSource private constructor(
             val response = animalAPI.postSearchAnimal(
                 token!!,
                 100,
-                0,
+                offset,
                 animalSearchPost,
             )
             response.body()!!.results.forEach {

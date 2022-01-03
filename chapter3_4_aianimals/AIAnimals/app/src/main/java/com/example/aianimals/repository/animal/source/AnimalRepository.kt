@@ -22,7 +22,8 @@ class AnimalRepository(
         animalCategoryNameJa: String?,
         animalSubcategoryNameEn: String?,
         animalSubcategoryNameJa: String?,
-        query: String?
+        query: String?,
+        offset: Int
     ): Map<String, Animal> {
         if (BuildConfig.USE_LOCAL_DATA) {
             val localAnimals = animalLocalDataSource.listAnimals(
@@ -30,7 +31,8 @@ class AnimalRepository(
                 animalCategoryNameJa,
                 animalSubcategoryNameEn,
                 animalSubcategoryNameJa,
-                query
+                query,
+                offset
             )
             if (localAnimals.isNotEmpty()) {
                 return localAnimals
@@ -42,7 +44,8 @@ class AnimalRepository(
             animalCategoryNameJa,
             animalSubcategoryNameEn,
             animalSubcategoryNameJa,
-            query
+            query,
+            offset
         )
         if (remoteAnimals.isNotEmpty()) {
             return remoteAnimals
