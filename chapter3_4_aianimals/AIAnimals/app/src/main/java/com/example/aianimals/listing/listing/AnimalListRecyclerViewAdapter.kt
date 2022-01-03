@@ -13,7 +13,8 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 
 class AnimalListRecyclerViewAdapter(
     context: Context,
-    animals: Map<String, Animal>
+    animals: Map<String, Animal>,
+    presenter: AnimalListContract.Presenter
 ) : RecyclerView.Adapter<AnimalListRecyclerViewAdapter.AnimalListRecyclerViewHolder>() {
     private val TAG = AnimalListRecyclerViewAdapter::class.java.simpleName
 
@@ -24,12 +25,14 @@ class AnimalListRecyclerViewAdapter(
         }
 
     private var context: Context = context
+    private var presenter = presenter
 
     private lateinit var onAnimalCellClickListener: OnAnimalCellClickListener
 
     interface OnAnimalCellClickListener {
         fun onItemClick(animal: Animal)
     }
+
 
     fun setOnAnimalCellClickListener(onAnimalCellClickListener: OnAnimalCellClickListener) {
         this.onAnimalCellClickListener = onAnimalCellClickListener
@@ -50,6 +53,9 @@ class AnimalListRecyclerViewAdapter(
         holder.animalLikesButton.text = animal.likes.toString()
         holder.itemView.setOnClickListener {
             onAnimalCellClickListener.onItemClick(animal)
+        }
+        holder.animalLikesButton.setOnClickListener {
+            presenter.likeAnimal(animal)
         }
     }
 

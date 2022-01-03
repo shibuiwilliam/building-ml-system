@@ -112,6 +112,7 @@ class UserRepository(AbstractUserRepository):
         if result is None:
             return None
         data = UserLoginAssertion(
+            id=result.id,
             handle_name=result.handle_name,
             email_address=result.email_address,
             password=result.password,

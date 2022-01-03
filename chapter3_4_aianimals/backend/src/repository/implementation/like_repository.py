@@ -60,7 +60,9 @@ class LikeRepository(AbstractLikeRepository):
             .order_by(Like.animal_id)
             .all()
         )
-        data = {r["animal_id"]: Count(count=r["count"]) for r in results}
+        data = {animal_id: Count(count=0) for animal_id in animal_ids}
+        for r in results:
+            data[r["animal_id"]] = Count(count=r["count"])
         return data
 
     def insert(

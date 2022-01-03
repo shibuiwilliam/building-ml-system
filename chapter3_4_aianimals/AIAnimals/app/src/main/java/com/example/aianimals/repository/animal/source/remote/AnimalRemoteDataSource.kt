@@ -16,9 +16,14 @@ class AnimalRemoteDataSource private constructor(
     private val TAG = AnimalRemoteDataSource::class.java.simpleName
 
     private var token: String? = null
+    private var userID: String? = null
 
     fun setToken(token: String?) {
         this.token = token
+    }
+
+    fun setUserID(userID: String?) {
+        this.userID = userID
     }
 
     override suspend fun createAnimals() {}
@@ -58,7 +63,7 @@ class AnimalRemoteDataSource private constructor(
                     name = it.name,
                     description = it.description,
                     date = it.created_at,
-                    likes = 0,
+                    likes = it.likes,
                     imageUrl = it.photoUrl
                 )
             }
@@ -83,7 +88,7 @@ class AnimalRemoteDataSource private constructor(
                     name = body[0].name,
                     description = body[0].description,
                     date = body[0].created_at,
-                    likes = body[0].like,
+                    likes = body[0].likes,
                     imageUrl = body[0].photoUrl
                 )
             }
@@ -115,6 +120,21 @@ class AnimalRemoteDataSource private constructor(
         nameJa: String?
     ): AnimalSubcategory? {
         TODO("Not yet implemented")
+    }
+
+    override suspend fun likeAnimal(animalID: String) {
+        if (token == null || userID == null) {
+            return
+        }
+        withContext(appExecutors.ioContext) {
+            animalAPI.postLikeAnimal(
+                token!!,
+                AnimalLikePost(
+                    animalID,
+                    userID!!
+                )
+            )
+        }
     }
 
     suspend fun requestAnimalMetadata(): MetadataResponse? {

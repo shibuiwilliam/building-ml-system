@@ -17,6 +17,7 @@ class AnimalResponseBase(BaseModel):
     name: str
     description: str
     photo_url: str
+    likes: int
     deactivated: bool = False
     created_at: datetime
     updated_at: datetime
@@ -24,13 +25,6 @@ class AnimalResponseBase(BaseModel):
 
 class AnimalResponse(AnimalResponseBase):
     pass
-
-    class Config:
-        extra = Extra.forbid
-
-
-class AnimalResponseWithLike(AnimalResponseBase):
-    like: int
 
     class Config:
         extra = Extra.forbid
@@ -47,6 +41,7 @@ class AnimalSearchResponse(BaseModel):
     animal_subcategory_name_en: str
     animal_subcategory_name_ja: str
     user_handle_name: str
+    likes: int
     created_at: datetime
 
     class Config:

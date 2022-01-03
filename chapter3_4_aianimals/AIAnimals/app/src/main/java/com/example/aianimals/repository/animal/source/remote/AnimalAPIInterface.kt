@@ -26,4 +26,11 @@ interface AnimalAPIInterface {
         @Query("limit") limit: Int = 1,
         @Query("offset") offset: Int = 0,
     ): Response<List<AnimalResponse>>
+
+    @Headers("Accept:application/json, Content-Type:application/json")
+    @POST("/v0/like")
+    suspend fun postLikeAnimal(
+        @Header("token") token: String,
+        @Body post: AnimalLikePost
+    ): Response<AnimalLikeResponse>
 }

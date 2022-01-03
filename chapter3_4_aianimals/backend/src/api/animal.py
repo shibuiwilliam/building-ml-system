@@ -9,7 +9,7 @@ from src.middleware.assert_token import token_assertion
 from src.middleware.strings import random_str
 from src.registry.container import container
 from src.request_object.animal import AnimalCreateRequest, AnimalRequest, AnimalSearchRequest
-from src.response_object.animal import AnimalResponse, AnimalResponseWithLike, AnimalSearchResponses
+from src.response_object.animal import AnimalResponse, AnimalSearchResponses
 from src.response_object.user import UserResponse
 
 logger = getLogger(__name__)
@@ -17,7 +17,7 @@ logger = getLogger(__name__)
 router = APIRouter()
 
 
-@router.get("", response_model=List[AnimalResponseWithLike])
+@router.get("", response_model=List[AnimalResponse])
 async def get_animal(
     id: Optional[str] = None,
     name: Optional[str] = None,
@@ -112,6 +112,7 @@ async def search_animal(
     )
     logger.info(f"search animal: {request}")
     data = container.animal_usecase.search(
+        session=session,
         request=request,
         limit=limit,
         offset=offset,

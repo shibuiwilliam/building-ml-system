@@ -11,6 +11,7 @@ data class AnimalSearchResult(
     val animalSubcategoryNameEn: String,
     val animalSubcategoryNameJa: String,
     val userHandleName: String,
+    val likes: Int,
     val created_at: String
 )
 

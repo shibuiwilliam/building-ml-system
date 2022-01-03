@@ -40,8 +40,10 @@ class AnimalListPresenter(
         this@AnimalListPresenter.query = query
         var animals = mapOf<String, Animal>()
         withContext(appExecutors.ioContext) {
-            val animalCategoryNameEn = if(selectedAnimalCategory=="ALL") null else selectedAnimalCategory
-            val animalSubcategoryNameEn = if(selectedAnimalSubcategory=="ALL") null else selectedAnimalSubcategory
+            val animalCategoryNameEn =
+                if (selectedAnimalCategory == "ALL") null else selectedAnimalCategory
+            val animalSubcategoryNameEn =
+                if (selectedAnimalSubcategory == "ALL") null else selectedAnimalSubcategory
             animals = animalRepository.listAnimals(
                 animalCategoryNameEn,
                 null,
@@ -90,6 +92,10 @@ class AnimalListPresenter(
         sortValues.add("Liked")
         sortValues.add("AI")
         selectedSortValue = "Newest"
+    }
+
+    override fun likeAnimal(animal: Animal) = runBlocking {
+        animalRepository.likeAnimal(animal.id)
     }
 
     override fun logout() = runBlocking {

@@ -24,10 +24,20 @@ interface AnimalMetadataDao {
     @Query("SELECT * FROM animal_subcategories WHERE nameJa = :nameJa")
     fun getAnimalSubcategoryByNameJa(nameJa: String): AnimalSubcategory?
 
-    @Query("SELECT * FROM animal_subcategories s LEFT JOIN animal_categories c ON s.animalCategoryId = c.id WHERE c.nameEn = :nameEn")
+    @Query(
+        "SELECT s.id,s.animalCategoryId,s.nameEn,s.nameJa " +
+                "FROM animal_subcategories s " +
+                "LEFT JOIN animal_categories c ON s.animalCategoryId = c.id " +
+                "WHERE c.nameEn = :nameEn"
+    )
     fun listAnimalSubcategoryByAnimalCategoryNameEn(nameEn: String): List<AnimalSubcategory>
 
-    @Query("SELECT * FROM animal_subcategories s LEFT JOIN animal_categories c ON s.animalCategoryId = c.id WHERE c.nameJa = :nameJa")
+    @Query(
+        "SELECT s.id,s.animalCategoryId,s.nameEn,s.nameJa " +
+                "FROM animal_subcategories s " +
+                "LEFT JOIN animal_categories c ON s.animalCategoryId = c.id " +
+                "WHERE c.nameJa = :nameJa"
+    )
     fun listAnimalSubcategoryByAnimalCategoryNameJa(nameJa: String): List<AnimalSubcategory>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -9,13 +9,9 @@ from src.infrastructure.storage import AbstractStorage
 from src.middleware.strings import get_uuid
 from src.repository.animal_repository import AbstractAnimalRepository
 from src.repository.animal_search_repository import AbstractAnimalSearchRepository
+from src.repository.like_repository import AbstractLikeRepository
 from src.request_object.animal import AnimalCreateRequest, AnimalRequest, AnimalSearchRequest
-from src.response_object.animal import (
-    AnimalResponse,
-    AnimalResponseWithLike,
-    AnimalSearchResponse,
-    AnimalSearchResponses,
-)
+from src.response_object.animal import AnimalResponse, AnimalSearchResponse, AnimalSearchResponses
 from src.response_object.user import UserResponse
 from src.usecase.animal_usecase import AbstractAnimalUsecase
 
@@ -27,12 +23,14 @@ class AnimalUsecase(AbstractAnimalUsecase):
         self,
         animal_repository: AbstractAnimalRepository,
         animal_search_repository: AbstractAnimalSearchRepository,
+        like_repository: AbstractLikeRepository,
         storage_client: AbstractStorage,
         queue: AbstractQueue,
     ):
         super().__init__(
             animal_repository=animal_repository,
             animal_search_repository=animal_search_repository,
+            like_repository=like_repository,
             storage_client=storage_client,
             queue=queue,
         )
@@ -43,19 +41,23 @@ class AnimalUsecase(AbstractAnimalUsecase):
         request: Optional[AnimalRequest] = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> List[AnimalResponseWithLike]:
+    ) -> List[AnimalResponse]:
         if limit > 200:
             raise ValueError
         query: Optional[AnimalQuery] = None
         if request is not None:
             query = AnimalQuery(**request.dict())
-        data = self.animal_repository.select_with_like(
+        data = self.animal_repository.select(
             session=session,
             query=query,
             limit=limit,
             offset=offset,
         )
-        response = [AnimalResponseWithLike(**d.dict()) for d in data]
+        likes = self.like_repository.count(
+            session=session,
+            animal_ids=[a.id for a in data],
+        )
+        response = [AnimalResponse(likes=likes[d.id].count, **d.dict()) for d in data]
         return response
 
     def liked_by(
@@ -117,6 +119,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
 
     def search(
         self,
+        session: Session,
         request: Optional[AnimalSearchRequest] = None,
         limit: int = 100,
         offset: int = 0,
@@ -135,9 +138,14 @@ class AnimalUsecase(AbstractAnimalUsecase):
             from_=offset,
             size=limit,
         )
+        animal_ids = [r.id for r in results.results]
+        likes = self.like_repository.count(
+            session=session,
+            animal_ids=animal_ids,
+        )
         searched = AnimalSearchResponses(
             hits=results.hits,
             max_score=results.max_score,
-            results=[AnimalSearchResponse(**r.dict()) for r in results.results],
+            results=[AnimalSearchResponse(likes=likes[r.id].count, **r.dict()) for r in results.results],
         )
         return searched

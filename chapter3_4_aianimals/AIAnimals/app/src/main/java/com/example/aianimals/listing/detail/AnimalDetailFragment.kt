@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.example.aianimals.R
 import com.example.aianimals.listing.listing.AnimalListActivity
 import com.example.aianimals.repository.animal.Animal
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 
 class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
     override lateinit var presenter: AnimalDetailContract.Presenter
@@ -22,6 +23,7 @@ class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
     private lateinit var animalLikesView: TextView
     private lateinit var animalSubmitDateView: TextView
     private lateinit var animalDescriptionView: TextView
+    private lateinit var animalLikeButton: ExtendedFloatingActionButton
 
     override fun showAnimal(animal: Animal) {
         animalNameView.text = animal.name
@@ -36,6 +38,7 @@ class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
 
         Glide.with(this).load(animal.imageUrl).into(animalImageView)
         animalImageView.visibility = View.VISIBLE
+        animalLikeButton.text = animal.likes.toString()
     }
 
     override fun onCreateView(
@@ -58,6 +61,7 @@ class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
             animalLikesView = findViewById(R.id.animal_likes)
             animalSubmitDateView = findViewById(R.id.animal_submit_date)
             animalDescriptionView = findViewById(R.id.animal_description)
+            animalLikeButton = findViewById(R.id.animal_likes_button)
 
             requireActivity().onBackPressedDispatcher.addCallback(
                 this@AnimalDetailFragment,
@@ -66,7 +70,12 @@ class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
                         val intent = Intent(context, AnimalListActivity::class.java)
                         startActivity(intent)
                     }
-                })
+                }
+            )
+
+            animalLikeButton.setOnClickListener {
+                presenter.likeAnimal(presenter.animal!!)
+            }
         }
         return root
     }

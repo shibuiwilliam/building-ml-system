@@ -61,7 +61,7 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
             activity?.title = getString(R.string.animal_list)
 
             animalListRecyclerViewAdapter =
-                AnimalListRecyclerViewAdapter(context, mutableMapOf())
+                AnimalListRecyclerViewAdapter(context, mutableMapOf(), presenter)
 
             searchView = findViewById(R.id.search_view)
             searchView.setOnQueryTextListener(
@@ -99,7 +99,11 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
                     presenter.animalSubcategories
                 )
             val sortSpinnerAdapter =
-                ArrayAdapter(context, android.R.layout.simple_spinner_item, presenter.sortValues)
+                ArrayAdapter(
+                    context,
+                    android.R.layout.simple_spinner_item,
+                    presenter.sortValues
+                )
 
             categorySpinner.adapter = categorySpinnerAdapter
             categorySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -111,6 +115,8 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
                 ) {
                     val spinnerParent = parent as Spinner
                     presenter.selectedAnimalCategory = spinnerParent.selectedItem as String
+                    presenter.loadAnimalSubcategory(presenter.selectedAnimalCategory, null)
+                    presenter.listAnimals(presenter.query)
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -127,6 +133,7 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
                     ) {
                         val spinnerParent = parent as Spinner
                         presenter.selectedAnimalSubcategory = spinnerParent.selectedItem as String
+                        presenter.listAnimals(presenter.query)
                     }
 
                     override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -142,6 +149,7 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
                 ) {
                     val spinnerParent = parent as Spinner
                     presenter.selectedSortValue = spinnerParent.selectedItem as String
+                    presenter.listAnimals(presenter.query)
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {}

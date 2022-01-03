@@ -78,6 +78,7 @@ class Container(object):
         self.animal_usecase: AbstractAnimalUsecase = AnimalUsecase(
             animal_repository=self.animal_reposigory,
             animal_search_repository=self.animal_search_repository,
+            like_repository=self.like_repository,
             storage_client=self.storage_client,
             queue=self.queue,
         )

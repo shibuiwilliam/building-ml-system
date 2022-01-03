@@ -14,6 +14,9 @@ class AnimalDetailPresenter(
     private val animalDetailView: AnimalDetailContract.View,
     private val appExecutors: AppExecutors = AppExecutors()
 ) : AnimalDetailContract.Presenter {
+
+    override var animal: Animal? = null
+
     init {
         this.animalDetailView.presenter = this
     }
@@ -23,13 +26,16 @@ class AnimalDetailPresenter(
     }
 
     override fun getAnimal(animalID: String) = runBlocking {
-        var animal: Animal? = null
         withContext(appExecutors.ioContext) {
             animal = animalRepository.getAnimal(animalID)
         }
         if (animal != null) {
             animalDetailView.showAnimal(animal!!)
         }
+    }
+
+    override fun likeAnimal(animal: Animal) = runBlocking {
+        animalRepository.likeAnimal(animal.id)
     }
 
     override fun logout() = runBlocking {

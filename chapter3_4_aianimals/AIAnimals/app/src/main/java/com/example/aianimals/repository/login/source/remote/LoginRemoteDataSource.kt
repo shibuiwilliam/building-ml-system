@@ -25,6 +25,7 @@ class LoginRemoteDataSource private constructor(
             if (response.isSuccessful) {
                 login = Login(
                     id = 0,
+                    userID = response.body()!!.user_id,
                     handleName = handleName,
                     emailAddress = "",
                     token = response.body()!!.token,

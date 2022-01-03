@@ -92,4 +92,7 @@ class UserUsecase(AbstractUserUsecase):
 
         raw_text = f"{login_assertion.handle_name}{CONSTANTS.TOKEN_SPLITTER}{login_assertion.password}"
         encrypted_text = self.crypt.encrypt(text=raw_text)
-        return UserLoginResponse(token=encrypted_text)
+        return UserLoginResponse(
+            user_id=login_assertion.id,
+            token=encrypted_text,
+        )

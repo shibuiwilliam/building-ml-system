@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import datetime
 from typing import List, Optional
 
 from pydantic import BaseModel, Extra
@@ -50,13 +50,6 @@ class AnimalModelBase(BaseModel):
 
 class AnimalModel(AnimalModelBase):
     pass
-
-    class Config:
-        extra = Extra.forbid
-
-
-class AnimalModelWithLike(AnimalModelBase):
-    like: int
 
     class Config:
         extra = Extra.forbid

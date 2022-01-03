@@ -49,6 +49,7 @@ class UserLoginQuery(BaseModel):
 
 
 class UserLoginAssertion(BaseModel):
+    id: str
     handle_name: str
     email_address: str
     password: str

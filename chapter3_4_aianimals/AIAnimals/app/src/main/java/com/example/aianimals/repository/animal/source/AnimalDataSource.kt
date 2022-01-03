@@ -33,4 +33,6 @@ interface AnimalDataSource {
         nameEn: String?,
         nameJa: String?
     ): AnimalSubcategory?
+
+    suspend fun likeAnimal(animalID: String)
 }

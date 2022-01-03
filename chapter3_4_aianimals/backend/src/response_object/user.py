@@ -18,4 +18,5 @@ class UserResponse(BaseModel):
 
 
 class UserLoginResponse(BaseModel):
+    user_id: str
     token: str

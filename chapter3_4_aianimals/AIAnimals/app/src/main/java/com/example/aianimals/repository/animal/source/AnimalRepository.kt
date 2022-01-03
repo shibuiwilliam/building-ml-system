@@ -117,6 +117,10 @@ class AnimalRepository(
         return animalLocalDataSource.getAnimalSubcategory(nameEn, nameJa)
     }
 
+    override suspend fun likeAnimal(animalID: String) {
+        animalRemoteDataSource.likeAnimal(animalID)
+    }
+
     companion object {
         private var INSTANCE: AnimalRepository? = null
 

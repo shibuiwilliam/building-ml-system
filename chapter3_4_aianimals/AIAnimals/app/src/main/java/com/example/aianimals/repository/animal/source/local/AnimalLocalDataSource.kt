@@ -130,6 +130,10 @@ class AnimalLocalDataSource private constructor(
         return null
     }
 
+    override suspend fun likeAnimal(animalID: String) {
+        TODO("Not yet implemented")
+    }
+
     suspend fun saveAnimalMetadata(
         animalCategories: List<AnimalCategory>,
         animalSubcategories: List<AnimalSubcategory>

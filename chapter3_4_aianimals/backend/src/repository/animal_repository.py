@@ -3,7 +3,7 @@ from logging import getLogger
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
-from src.entities.animal import AnimalCreate, AnimalModel, AnimalModelWithLike, AnimalQuery
+from src.entities.animal import AnimalCreate, AnimalModel, AnimalQuery
 from src.entities.user import UserModel
 
 logger = getLogger(__name__)
@@ -21,17 +21,6 @@ class AbstractAnimalRepository(ABC):
         limit: Optional[int] = 100,
         offset: Optional[int] = 0,
     ) -> List[AnimalModel]:
-        raise NotImplementedError
-
-    @abstractmethod
-    def select_with_like(
-        self,
-        session: Session,
-        query: Optional[AnimalQuery],
-        order_by_like: bool = True,
-        limit: Optional[int] = 100,
-        offset: Optional[int] = 0,
-    ) -> List[AnimalModelWithLike]:
         raise NotImplementedError
 
     @abstractmethod

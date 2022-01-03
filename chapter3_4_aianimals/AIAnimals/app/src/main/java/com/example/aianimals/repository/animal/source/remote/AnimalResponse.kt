@@ -5,7 +5,7 @@ data class AnimalResponse(
     val name: String,
     val description: String,
     val photoUrl: String,
-    val like: Int,
+    val likes: Int,
     val animalCategoryNameEn: String,
     val animalCategoryNameJa: String,
     val animalSubcategoryNameEn: String,

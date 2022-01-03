@@ -22,6 +22,7 @@ interface AnimalListContract {
         )
 
         fun loadSortValues()
+        fun likeAnimal(animal: Animal)
         fun logout()
     }
 

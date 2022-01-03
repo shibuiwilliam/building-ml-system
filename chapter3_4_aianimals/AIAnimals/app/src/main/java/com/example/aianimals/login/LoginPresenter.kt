@@ -42,6 +42,7 @@ class LoginPresenter(
             if (result is Result.Success) {
                 isLoggedIn = true
                 animalRepository.animalRemoteDataSource.setToken(result.data.token)
+                animalRepository.animalRemoteDataSource.setUserID(result.data.userID)
                 _loginResult.postValue(LoginResult(success = 1))
             } else {
                 isLoggedIn = false
@@ -57,6 +58,7 @@ class LoginPresenter(
             if (login != null) {
                 isLoggedIn = true
                 animalRepository.animalRemoteDataSource.setToken(login.token)
+                animalRepository.animalRemoteDataSource.setUserID(login.userID)
                 _loginResult.postValue(LoginResult(success = 1))
             }
         }
