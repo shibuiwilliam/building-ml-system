@@ -9,13 +9,54 @@
         android:id="@+id/search_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:iconifiedByDefault="false"
+        android:iconifiedByDefault="true"
         android:maxLines="1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginHorizontal="5dp"
         android:queryHint="Search" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/search_spinners"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search_view"
+        android:layout_marginHorizontal="5dp" >
+
+        <Spinner
+            android:id="@+id/category_spinner"
+            android:layout_width="120dp"
+            android:layout_height="match_parent"
+            android:spinnerMode="dialog"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/subcategory_spinner"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <Spinner
+            android:id="@+id/subcategory_spinner"
+            android:layout_width="120dp"
+            android:layout_height="match_parent"
+            android:spinnerMode="dialog"
+            app:layout_constraintStart_toEndOf="@+id/category_spinner"
+            app:layout_constraintEnd_toStartOf="@+id/sort_spinner"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <Spinner
+            android:id="@+id/sort_spinner"
+            android:layout_width="120dp"
+            android:layout_height="match_parent"
+            android:spinnerMode="dialog"
+            app:layout_constraintStart_toEndOf="@+id/subcategory_spinner"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe"
@@ -26,7 +67,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/search_view">
+        app:layout_constraintTop_toBottomOf="@+id/search_spinners">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"

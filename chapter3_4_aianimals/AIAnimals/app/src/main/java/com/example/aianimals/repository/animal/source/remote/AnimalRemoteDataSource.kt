@@ -1,13 +1,11 @@
 package com.example.aianimals.repository.animal.source.remote
 
-import android.util.Log
 import androidx.annotation.VisibleForTesting
 import com.example.aianimals.middleware.AppExecutors
 import com.example.aianimals.repository.animal.Animal
-import com.example.aianimals.repository.animal.source.AnimalCategory
+import com.example.aianimals.repository.animal.AnimalCategory
+import com.example.aianimals.repository.animal.AnimalSubcategory
 import com.example.aianimals.repository.animal.source.AnimalDataSource
-import com.example.aianimals.repository.animal.source.AnimalMetadata
-import com.example.aianimals.repository.animal.source.AnimalSubcategory
 import kotlinx.coroutines.withContext
 import java.util.*
 
@@ -25,7 +23,13 @@ class AnimalRemoteDataSource private constructor(
 
     override suspend fun createAnimals() {}
 
-    override suspend fun listAnimals(query: String?): Map<String, Animal> {
+    override suspend fun listAnimals(
+        animalCategoryNameEn: String?,
+        animalCategoryNameJa: String?,
+        animalSubcategoryNameEn: String?,
+        animalSubcategoryNameJa: String?,
+        query: String?
+    ): Map<String, Animal> {
         if (token == null) {
             return mapOf()
         }
@@ -36,10 +40,10 @@ class AnimalRemoteDataSource private constructor(
                 phrases.addAll(query.split(" "))
             }
             val animalSearchPost = AnimalSearchPost(
-                animalCategoryNameEn = null,
-                animalCategoryNameJa = null,
-                animalSubcategoryNameEn = null,
-                animalSubcategoryNameJa = null,
+                animalCategoryNameEn = animalCategoryNameEn,
+                animalCategoryNameJa = animalCategoryNameJa,
+                animalSubcategoryNameEn = animalSubcategoryNameEn,
+                animalSubcategoryNameJa = animalSubcategoryNameJa,
                 phrases = phrases
             )
             val response = animalAPI.postSearchAnimal(
@@ -87,61 +91,44 @@ class AnimalRemoteDataSource private constructor(
         return animal
     }
 
-    override suspend fun saveAnimal(animal: Animal) {
+    override suspend fun saveAnimal(animal: Animal) {}
+
+    override suspend fun loadAnimalMetadata(refresh: Boolean) {}
+
+    override suspend fun listAnimalCategory(): List<AnimalCategory> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getMetadata(): AnimalMetadata? {
+    override suspend fun listAnimalSubcategory(
+        animalCategoryNameEn: String?,
+        animalCategoryNameJa: String?
+    ): List<AnimalSubcategory> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getAnimalCategory(nameEn: String?, nameJa: String?): AnimalCategory? {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getAnimalSubcategory(
+        nameEn: String?,
+        nameJa: String?
+    ): AnimalSubcategory? {
+        TODO("Not yet implemented")
+    }
+
+    suspend fun requestAnimalMetadata(): MetadataResponse? {
         if (token == null) {
             return null
         }
-        var animalMetadata: AnimalMetadata? = null
+        var body: MetadataResponse? = null
         withContext(appExecutors.ioContext) {
             val response = animalAPI.getMetadata(token!!)
             if (response.isSuccessful) {
-                val body = response.body()!!
-                val animalCategory = body.animalCategory.map {
-                    it.id to AnimalCategory(
-                        id = it.id,
-                        nameEn = it.nameEn,
-                        nameJa = it.nameJa
-                    )
-                }.toMap()
-                val animalSubcategory = mutableMapOf<Int, MutableMap<Int, AnimalSubcategory>>()
-                for (s in body.animalSubcategory) {
-                    if (animalSubcategory.containsKey(s.animalCategoryId)) {
-                        animalSubcategory[s.animalCategoryId]!![s.id] = AnimalSubcategory(
-                            id = s.id,
-                            animalCategoryId = s.animalCategoryId,
-                            animalCategoryNameEn = s.animalCategoryNameEn,
-                            animalCategoryNameJa = s.animalCategoryNameJa,
-                            nameEn = s.nameEn,
-                            nameJa = s.nameJa
-                        )
-                    } else {
-                        animalSubcategory[s.animalCategoryId] = mutableMapOf(
-                            s.id to AnimalSubcategory(
-                                id = s.id,
-                                animalCategoryId = s.animalCategoryId,
-                                animalCategoryNameEn = s.animalCategoryNameEn,
-                                animalCategoryNameJa = s.animalCategoryNameJa,
-                                nameEn = s.nameEn,
-                                nameJa = s.nameJa
-                            )
-                        )
-                    }
-                }
-                animalMetadata = AnimalMetadata(
-                    animalCategoryMap = animalCategory,
-                    animalSubcategoryMap = animalSubcategory
-                )
+                body = response.body()!!
             }
         }
-        if (animalMetadata != null) {
-            return animalMetadata
-        }
-        Log.e(TAG, "failed to get metadata")
-        return null
+        return body
     }
 
     companion object {
@@ -154,7 +141,10 @@ class AnimalRemoteDataSource private constructor(
         ): AnimalRemoteDataSource {
             if (INSTANCE == null) {
                 synchronized(AnimalRemoteDataSource::javaClass) {
-                    INSTANCE = AnimalRemoteDataSource(appExecutors, animalAPI)
+                    INSTANCE = AnimalRemoteDataSource(
+                        appExecutors,
+                        animalAPI
+                    )
                 }
             }
             return INSTANCE!!

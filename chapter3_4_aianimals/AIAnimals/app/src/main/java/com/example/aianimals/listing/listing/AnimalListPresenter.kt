@@ -1,6 +1,5 @@
 package com.example.aianimals.listing.listing
 
-import android.util.Log
 import com.example.aianimals.middleware.AppExecutors
 import com.example.aianimals.repository.animal.Animal
 import com.example.aianimals.repository.animal.source.AnimalRepository
@@ -17,9 +16,20 @@ class AnimalListPresenter(
     private val TAG = AnimalListPresenter::class.java.simpleName
 
     override var query: String? = null
+    override var animalCategories: MutableList<String> = mutableListOf()
+    override var animalSubcategories: MutableList<String> = mutableListOf()
+    override var sortValues: MutableList<String> = mutableListOf()
+
+    override lateinit var selectedAnimalCategory: String
+    override lateinit var selectedAnimalSubcategory: String
+    override lateinit var selectedSortValue: String
 
     init {
         this.animalListView.presenter = this
+        loadAnimalMetadata(true)
+        loadAnimalCategory()
+        loadAnimalSubcategory(null, null)
+        loadSortValues()
     }
 
     override fun start() {
@@ -30,11 +40,56 @@ class AnimalListPresenter(
         this@AnimalListPresenter.query = query
         var animals = mapOf<String, Animal>()
         withContext(appExecutors.ioContext) {
-            val metadata = animalRepository.getMetadata()
-            Log.i(TAG, "metadata: ${metadata}")
-            animals = animalRepository.listAnimals(this@AnimalListPresenter.query)
+            val animalCategoryNameEn = if(selectedAnimalCategory=="ALL") null else selectedAnimalCategory
+            val animalSubcategoryNameEn = if(selectedAnimalSubcategory=="ALL") null else selectedAnimalSubcategory
+            animals = animalRepository.listAnimals(
+                animalCategoryNameEn,
+                null,
+                animalSubcategoryNameEn,
+                null,
+                this@AnimalListPresenter.query
+            )
         }
         animalListView.showAnimals(animals)
+    }
+
+    override fun loadAnimalMetadata(refresh: Boolean) = runBlocking {
+        animalRepository.loadAnimalMetadata(refresh)
+    }
+
+    override fun loadAnimalCategory() = runBlocking {
+        animalCategories.clear()
+        animalCategories.add("ALL")
+        withContext(appExecutors.ioContext) {
+            val cs = animalRepository.listAnimalCategory()
+            for (c in cs) {
+                animalCategories.add(c.nameEn)
+            }
+        }
+        selectedAnimalCategory = "ALL"
+    }
+
+    override fun loadAnimalSubcategory(
+        animalCategoryNameEn: String?,
+        animalCategoryNameJa: String?
+    ) = runBlocking {
+        animalSubcategories.clear()
+        animalSubcategories.add("ALL")
+        withContext(appExecutors.ioContext) {
+            val scs =
+                animalRepository.listAnimalSubcategory(animalCategoryNameEn, animalCategoryNameJa)
+            for (sc in scs) {
+                animalSubcategories.add(sc.nameEn)
+            }
+        }
+        selectedAnimalSubcategory = "ALL"
+    }
+
+    override fun loadSortValues() {
+        sortValues.add("Newest")
+        sortValues.add("Liked")
+        sortValues.add("AI")
+        selectedSortValue = "Newest"
     }
 
     override fun logout() = runBlocking {

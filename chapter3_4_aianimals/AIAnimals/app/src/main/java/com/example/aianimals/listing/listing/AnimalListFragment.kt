@@ -7,7 +7,10 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.SearchView
+import android.widget.Spinner
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -26,6 +29,9 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
     private lateinit var animalListRecyclerViewAdapter: AnimalListRecyclerViewAdapter
 
     private lateinit var searchView: SearchView
+    private lateinit var categorySpinner: Spinner
+    private lateinit var subcategorySpinner: Spinner
+    private lateinit var sortSpinner: Spinner
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var animalRecyclerView: RecyclerView
 
@@ -75,6 +81,71 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
                     }
                 }
             )
+
+            categorySpinner = findViewById(R.id.category_spinner)
+            subcategorySpinner = findViewById(R.id.subcategory_spinner)
+            sortSpinner = findViewById(R.id.sort_spinner)
+
+            val categorySpinnerAdapter =
+                ArrayAdapter(
+                    context,
+                    android.R.layout.simple_spinner_item,
+                    presenter.animalCategories
+                )
+            val subcategorySpinnerAdapter =
+                ArrayAdapter(
+                    context,
+                    android.R.layout.simple_spinner_item,
+                    presenter.animalSubcategories
+                )
+            val sortSpinnerAdapter =
+                ArrayAdapter(context, android.R.layout.simple_spinner_item, presenter.sortValues)
+
+            categorySpinner.adapter = categorySpinnerAdapter
+            categorySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    val spinnerParent = parent as Spinner
+                    presenter.selectedAnimalCategory = spinnerParent.selectedItem as String
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
+
+            subcategorySpinner.adapter = subcategorySpinnerAdapter
+            subcategorySpinner.onItemSelectedListener =
+                object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(
+                        parent: AdapterView<*>?,
+                        view: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+                        val spinnerParent = parent as Spinner
+                        presenter.selectedAnimalSubcategory = spinnerParent.selectedItem as String
+                    }
+
+                    override fun onNothingSelected(parent: AdapterView<*>?) {}
+                }
+
+            sortSpinner.adapter = sortSpinnerAdapter
+            sortSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    val spinnerParent = parent as Spinner
+                    presenter.selectedSortValue = spinnerParent.selectedItem as String
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
 
             swipeRefreshLayout = findViewById(R.id.swipe)
             swipeRefreshLayout.apply {

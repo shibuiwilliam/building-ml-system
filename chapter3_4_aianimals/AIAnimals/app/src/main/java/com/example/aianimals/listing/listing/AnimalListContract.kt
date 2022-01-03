@@ -7,8 +7,21 @@ import com.example.aianimals.repository.animal.Animal
 interface AnimalListContract {
     interface Presenter : BasePresenter {
         var query: String?
+        var animalCategories: MutableList<String>
+        var animalSubcategories: MutableList<String>
+        var sortValues: MutableList<String>
+        var selectedAnimalCategory: String
+        var selectedAnimalSubcategory: String
+        var selectedSortValue: String
         fun listAnimals(query: String?)
+        fun loadAnimalMetadata(refresh: Boolean)
+        fun loadAnimalCategory()
+        fun loadAnimalSubcategory(
+            animalCategoryNameEn: String?,
+            animalCategoryNameJa: String?
+        )
 
+        fun loadSortValues()
         fun logout()
     }
 

@@ -18,7 +18,8 @@ object Injection {
         return AnimalRepository.getInstance(
             AnimalLocalDataSource.getInstance(
                 AppExecutors(),
-                database.animalDao()
+                database.animalDao(),
+                database.animalMetadataDao()
             ),
             AnimalRemoteDataSource.getInstance(
                 AppExecutors(),

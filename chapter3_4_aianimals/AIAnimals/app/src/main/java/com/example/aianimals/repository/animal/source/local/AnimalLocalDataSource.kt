@@ -5,13 +5,15 @@ import androidx.annotation.VisibleForTesting
 import com.example.aianimals.middleware.AppExecutors
 import com.example.aianimals.middleware.Utils
 import com.example.aianimals.repository.animal.Animal
+import com.example.aianimals.repository.animal.AnimalCategory
+import com.example.aianimals.repository.animal.AnimalSubcategory
 import com.example.aianimals.repository.animal.source.AnimalDataSource
-import com.example.aianimals.repository.animal.source.AnimalMetadata
 import kotlinx.coroutines.withContext
 
 class AnimalLocalDataSource private constructor(
     val appExecutors: AppExecutors,
-    val animalDao: AnimalDao
+    val animalDao: AnimalDao,
+    val animalMetadataDao: AnimalMetadataDao
 ) : AnimalDataSource {
     private val TAG = AnimalLocalDataSource::class.java.simpleName
 
@@ -31,7 +33,13 @@ class AnimalLocalDataSource private constructor(
         }
     }
 
-    override suspend fun listAnimals(query: String?): Map<String, Animal> {
+    override suspend fun listAnimals(
+        animalCategoryNameEn: String?,
+        animalCategoryNameJa: String?,
+        animalSubcategoryNameEn: String?,
+        animalSubcategoryNameJa: String?,
+        query: String?
+    ): Map<String, Animal> {
         val animalMap = mutableMapOf<String, Animal>()
         withContext(appExecutors.ioContext) {
             val count = animalDao.countAnimals()
@@ -62,8 +70,76 @@ class AnimalLocalDataSource private constructor(
         }
     }
 
-    override suspend fun getMetadata(): AnimalMetadata? {
+    override suspend fun loadAnimalMetadata(refresh: Boolean) {}
+
+    override suspend fun listAnimalCategory(): List<AnimalCategory> {
+        return animalMetadataDao.listAnimalCategories()
+    }
+
+    override suspend fun listAnimalSubcategory(
+        animalCategoryNameEn: String?,
+        animalCategoryNameJa: String?
+    ): List<AnimalSubcategory> {
+        if (animalCategoryNameEn == null && animalCategoryNameJa == null) {
+            return animalMetadataDao.listAnimalSubcategories()
+        } else if (animalCategoryNameEn != null && animalCategoryNameJa != null) {
+            throw IllegalArgumentException("")
+        }
+        if (animalCategoryNameEn != null) {
+            return animalMetadataDao.listAnimalSubcategoryByAnimalCategoryNameEn(
+                animalCategoryNameEn
+            )
+        }
+        if (animalCategoryNameJa != null) {
+            return animalMetadataDao.listAnimalSubcategoryByAnimalCategoryNameJa(
+                animalCategoryNameJa
+            )
+        }
+        return listOf()
+    }
+
+    override suspend fun getAnimalCategory(
+        nameEn: String?,
+        nameJa: String?
+    ): AnimalCategory? {
+        if ((nameEn == null && nameJa == null) || (nameEn != null && nameJa != null)) {
+            throw IllegalArgumentException("")
+        }
+        if (nameEn != null) {
+            return animalMetadataDao.getAnimalCategoryByNameEn(nameEn)
+        }
+        if (nameJa != null) {
+            return animalMetadataDao.getAnimalCategoryByNameJa(nameJa)
+        }
         return null
+    }
+
+    override suspend fun getAnimalSubcategory(
+        nameEn: String?,
+        nameJa: String?
+    ): AnimalSubcategory? {
+        if ((nameEn == null && nameJa == null) || (nameEn != null && nameJa != null)) {
+            throw IllegalArgumentException("")
+        }
+        if (nameEn != null) {
+            return animalMetadataDao.getAnimalSubcategoryByNameEn(nameEn)
+        }
+        if (nameJa != null) {
+            return animalMetadataDao.getAnimalSubcategoryByNameJa(nameJa)
+        }
+        return null
+    }
+
+    suspend fun saveAnimalMetadata(
+        animalCategories: List<AnimalCategory>,
+        animalSubcategories: List<AnimalSubcategory>
+    ) {
+        withContext(appExecutors.ioContext) {
+            animalMetadataDao.deleteAllAnimalCategory()
+            animalMetadataDao.deleteAllAnimalSubcategory()
+            animalMetadataDao.bulkInsertAnimalCategory(animalCategories)
+            animalMetadataDao.bulkInsertAnimalSubcategory(animalSubcategories)
+        }
     }
 
     companion object {
@@ -72,11 +148,16 @@ class AnimalLocalDataSource private constructor(
         @JvmStatic
         fun getInstance(
             appExecutors: AppExecutors,
-            animalDao: AnimalDao
+            animalDao: AnimalDao,
+            animalMetadataDao: AnimalMetadataDao
         ): AnimalLocalDataSource {
             if (INSTANCE == null) {
                 synchronized(AnimalLocalDataSource::javaClass) {
-                    INSTANCE = AnimalLocalDataSource(appExecutors, animalDao)
+                    INSTANCE = AnimalLocalDataSource(
+                        appExecutors,
+                        animalDao,
+                        animalMetadataDao
+                    )
                 }
             }
             return INSTANCE!!

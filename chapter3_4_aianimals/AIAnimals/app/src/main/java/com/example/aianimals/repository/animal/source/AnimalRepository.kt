@@ -4,34 +4,46 @@ package com.example.aianimals.repository.animal.source
 import android.util.Log
 import com.example.aianimals.BuildConfig
 import com.example.aianimals.repository.animal.Animal
+import com.example.aianimals.repository.animal.AnimalCategory
+import com.example.aianimals.repository.animal.AnimalSubcategory
 import com.example.aianimals.repository.animal.source.local.AnimalLocalDataSource
 import com.example.aianimals.repository.animal.source.remote.AnimalRemoteDataSource
 
-data class LastSearchedQuery(
-    val animalCategoryNameEn: String?,
-    val animalCategoryNameJa: String?,
-    val animalSubcategoryNameEn: String?,
-    val animalSubcategoryNameJa: String?,
-    val phrases: String?
-)
-
 class AnimalRepository(
-    val animalLocalDataSource: AnimalDataSource,
+    val animalLocalDataSource: AnimalLocalDataSource,
     val animalRemoteDataSource: AnimalRemoteDataSource
 ) : AnimalDataSource {
     private val TAG = AnimalRepository::class.java.simpleName
 
     override suspend fun createAnimals() {}
 
-    override suspend fun listAnimals(query: String?): Map<String, Animal> {
+    override suspend fun listAnimals(
+        animalCategoryNameEn: String?,
+        animalCategoryNameJa: String?,
+        animalSubcategoryNameEn: String?,
+        animalSubcategoryNameJa: String?,
+        query: String?
+    ): Map<String, Animal> {
         if (BuildConfig.USE_LOCAL_DATA) {
-            val localAnimals = animalLocalDataSource.listAnimals(query)
+            val localAnimals = animalLocalDataSource.listAnimals(
+                animalCategoryNameEn,
+                animalCategoryNameJa,
+                animalSubcategoryNameEn,
+                animalSubcategoryNameJa,
+                query
+            )
             if (localAnimals.isNotEmpty()) {
                 return localAnimals
             }
         }
 
-        val remoteAnimals = animalRemoteDataSource.listAnimals(query)
+        val remoteAnimals = animalRemoteDataSource.listAnimals(
+            animalCategoryNameEn,
+            animalCategoryNameJa,
+            animalSubcategoryNameEn,
+            animalSubcategoryNameJa,
+            query
+        )
         if (remoteAnimals.isNotEmpty()) {
             return remoteAnimals
         }
@@ -53,8 +65,56 @@ class AnimalRepository(
         animalLocalDataSource.saveAnimal(animal)
     }
 
-    override suspend fun getMetadata(): AnimalMetadata? {
-        return animalRemoteDataSource.getMetadata()
+    override suspend fun loadAnimalMetadata(refresh: Boolean) {
+        if (refresh) {
+            val animalMetadata = animalRemoteDataSource.requestAnimalMetadata()
+            if (animalMetadata != null) {
+                val animalCategories = animalMetadata.animalCategory.map {
+                    AnimalCategory(
+                        id = it.id,
+                        nameEn = it.nameEn,
+                        nameJa = it.nameJa
+                    )
+                }
+                val animalSubcategories = animalMetadata.animalSubcategory.map {
+                    AnimalSubcategory(
+                        id = it.id,
+                        animalCategoryId = it.animalCategoryId,
+                        nameEn = it.nameEn,
+                        nameJa = it.nameJa
+                    )
+                }
+                animalLocalDataSource.saveAnimalMetadata(animalCategories, animalSubcategories)
+            }
+        }
+    }
+
+    override suspend fun listAnimalCategory(): List<AnimalCategory> {
+        return animalLocalDataSource.listAnimalCategory()
+    }
+
+    override suspend fun listAnimalSubcategory(
+        animalCategoryNameEn: String?,
+        animalCategoryNameJa: String?
+    ): List<AnimalSubcategory> {
+        return animalLocalDataSource.listAnimalSubcategory(
+            animalCategoryNameEn,
+            animalCategoryNameJa
+        )
+    }
+
+    override suspend fun getAnimalCategory(
+        nameEn: String?,
+        nameJa: String?
+    ): AnimalCategory? {
+        return animalLocalDataSource.getAnimalCategory(nameEn, nameJa)
+    }
+
+    override suspend fun getAnimalSubcategory(
+        nameEn: String?,
+        nameJa: String?
+    ): AnimalSubcategory? {
+        return animalLocalDataSource.getAnimalSubcategory(nameEn, nameJa)
     }
 
     companion object {
