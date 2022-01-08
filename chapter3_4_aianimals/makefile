@@ -11,7 +11,7 @@ K8S_SECRET_DIR := $(K8S_DIR)/secrets
 
 
 ############ DATA REGISTRY COMMANDS ############
-DATA_REGISTRY_DIR := $(DIR)/data_registry
+DATA_REGISTRY_DIR := $(DIR)/batch/data_registry
 DATA_REGISTRY_VERSION := $(shell cd ${DATA_REGISTRY_DIR} && poetry version -s)
 DOCKERFILE_DATA_REGISTRY = $(DATA_REGISTRY_DIR)/$(DOCKERFILE)
 DOCKER_DATA_REGISTRY_TAG = $(TAG)_data_registry
@@ -109,49 +109,6 @@ registry_backend: deploy_backend_ns
 deploy_backend: deploy_backend_ns
 	kubectl apply -f $(BACKEND_MANIFEST_DIR)/postgres.yaml && \
 	kubectl apply -f $(BACKEND_MANIFEST_DIR)/backend.yaml
-
-
-############ GATE KEEPER COMMANDS ############
-GATE_KEEPER_DIR := $(DIR)/gate_keeper
-GATE_KEEPER_VERSION := $(shell cd ${GATE_KEEPER_DIR} && poetry version -s)
-DOCKERFILE_GATE_KEEPER = $(GATE_KEEPER_DIR)/$(DOCKERFILE)
-DOCKER_GATE_KEEPER_TAG = $(TAG)_gate_keeper
-DOCKER_GATE_KEEPER_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_GATE_KEEPER_TAG)_$(GATE_KEEPER_VERSION)
-DOCKER_GATE_KEEPER_IMAGE_NAME_TEST = $(DOCKER_REPOSITORY):$(DOCKER_GATE_KEEPER_TAG)_$(GATE_KEEPER_VERSION)_$(DOCKER_TEST_TAG)
-
-.PHONY: patch_gate_keeper
-patch_gate_keeper:
-	cd $(GATE_KEEPER_DIR) && \
-	poetry version patch
-
-.PHONY: minor_upgrade_gate_keeper
-minor_upgrade_gate_keeper:
-	cd $(GATE_KEEPER_DIR) && \
-	poetry version minor
-
-.PHONY: major_upgrade_gate_keeper
-major_upgrade_gate_keeper:
-	cd $(GATE_KEEPER_DIR) && \
-	poetry version major
-
-.PHONY: req_gate_keeper
-req_gate_keeper:
-	cd $(GATE_KEEPER_DIR) && \
-	poetry export \
-		--without-hashes \
-		-f requirements.txt \
-		--output requirements.txt
-
-.PHONY: build_gate_keeper
-build_gate_keeper: 
-	docker build \
-		-t $(DOCKER_GATE_KEEPER_IMAGE_NAME) \
-		-f $(DOCKERFILE_GATE_KEEPER) \
-		.
-	 
-.PHONY: push_gate_keeper
-push_gate_keeper: 
-	docker push $(DOCKER_GATE_KEEPER_IMAGE_NAME)
 
 
 ############ ARGO COMMANDS ############
@@ -259,19 +216,16 @@ deploy_all: registry_default admin_clusterrole \
 .PHONY: req_all
 req_all: \
 	req_data_registry \
-	req_backend \
-	req_gate_keeper
+	req_backend
 
 .PHONY: build_all
 build_all: \
 	build_data_registry \
 	build_backend \
-	build_gate_keeper \
 	build_es
 
 .PHONY: push_all
 push_all: \
 	push_backend \
 	push_data_registry \
-	push_gate_keeper \
 	push_es

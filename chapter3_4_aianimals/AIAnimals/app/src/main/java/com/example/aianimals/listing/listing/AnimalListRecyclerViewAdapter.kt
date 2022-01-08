@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.aianimals.R
@@ -58,7 +57,7 @@ class AnimalListRecyclerViewAdapter(
         holder.animalLikesButton.setOnClickListener {
             presenter.likeAnimal(animal)
         }
-        if (position == animals.size-1) {
+        if (position == animals.size - 1) {
             presenter.appendAnimals()
         }
     }

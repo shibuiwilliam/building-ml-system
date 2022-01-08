@@ -12,3 +12,5 @@ class Configurations:
     key_file_path = os.environ["KEY_FILE_PATH"]
 
     work_directory = os.getenv("WORK_DIRECTORY", "/tmp")
+
+    animal_registry_queue = os.getenv("ANIMAL_REGISTRY_QUEUE", "animal")

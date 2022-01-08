@@ -25,8 +25,8 @@ services:
     ports:
       - 6379:6379
 
-  data_registry:
-    container_name: data_registry
+  initial_data_registry:
+    container_name: initial_data_registry
     image: shibui/building-ml-system:ai_animals_data_registry_0.0.0
     volumes:
       - ./dataset/:/opt/dataset/
@@ -42,11 +42,14 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_DB=0
+      - ES_HOST=es
+      - ES_SCHEMA=http
+      - ES_PORT=9200
       - LOG_LEVEL=INFO
       - RUN_ENVIRONMENT=local
       - DATA_DIRECTORY=/opt/dataset
     command: >
-      /bin/sh -c "sleep 5s && python -m src.main"
+      /bin/sh -c "sleep 20s && python -m src.main --job initialization_job"
     depends_on:
       - postgres
       - redis
@@ -115,9 +118,9 @@ services:
     depends_on:
       - postgres
 
-  gate_keeper_animal_to_search:
-    container_name: gate_keeper_animal_to_search
-    image: shibui/building-ml-system:ai_animals_gate_keeper_0.0.0
+  search_registry:
+    container_name: search_registry
+    image: shibui/building-ml-system:ai_animals_data_registry_0.0.0
     restart: always
     networks:
       - default

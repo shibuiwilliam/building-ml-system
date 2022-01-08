@@ -3,6 +3,7 @@ from typing import List, Optional
 
 from fastapi import BackgroundTasks
 from sqlalchemy.orm import Session
+from src.configurations import Configurations
 from src.entities.animal import AnimalCreate, AnimalQuery, AnimalSearchQuery
 from src.infrastructure.queue import AbstractQueue
 from src.infrastructure.storage import AbstractStorage
@@ -111,7 +112,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
             response = AnimalResponse(**data.dict())
             background_tasks.add_task(
                 self.queue.enqueue,
-                "animal",
+                Configurations.animal_registry_queue,
                 data.id,
             )
             return response
