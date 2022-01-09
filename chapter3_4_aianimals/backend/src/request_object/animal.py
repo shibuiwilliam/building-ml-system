@@ -43,6 +43,7 @@ class AnimalSearchRequest(BaseModel):
     animal_subcategory_name_en: Optional[str]
     animal_subcategory_name_ja: Optional[str]
     phrases: List[str]
+    sort_by: Optional[str] = "score"
 
     class Config:
         extra = Extra.forbid

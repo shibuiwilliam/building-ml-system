@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel, Extra
 
@@ -17,7 +17,7 @@ class AnimalResponseBase(BaseModel):
     name: str
     description: str
     photo_url: str
-    likes: int
+    like: int
     deactivated: bool = False
     created_at: datetime
     updated_at: datetime
@@ -41,7 +41,7 @@ class AnimalSearchResponse(BaseModel):
     animal_subcategory_name_en: str
     animal_subcategory_name_ja: str
     user_handle_name: str
-    likes: int
+    like: int
     created_at: datetime
 
     class Config:
@@ -50,7 +50,7 @@ class AnimalSearchResponse(BaseModel):
 
 class AnimalSearchResponses(BaseModel):
     hits: int
-    max_score: float
+    max_score: Optional[float]
     results: List[AnimalSearchResponse]
 
     class Config:

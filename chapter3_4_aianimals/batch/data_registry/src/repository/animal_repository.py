@@ -1,32 +1,16 @@
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional
+from typing import List, Optional
 
-from src.entities.animal import (
-    ANIMAL_MAPPING,
-    ANIMAL_MAPPING_NAME,
-    AnimalCreate,
-    AnimalDocument,
-    AnimalModel,
-    AnimalQuery,
-)
+from src.entities.animal import AnimalCreate, AnimalModel, AnimalQuery
 from src.infrastructure.database import AbstractDatabase
-from src.infrastructure.queue import AbstractQueue
-from src.infrastructure.search import AbstractSearch
 from src.middleware.logger import configure_logger
 
 logger = configure_logger(__name__)
 
 
 class AbstractAnimalRepository(ABC):
-    def __init__(
-        self,
-        database: AbstractDatabase,
-        queue: AbstractQueue,
-        search: AbstractSearch,
-    ):
+    def __init__(self, database: AbstractDatabase):
         self.database = database
-        self.queue = queue
-        self.search = search
 
     @abstractmethod
     def select(
@@ -43,29 +27,4 @@ class AbstractAnimalRepository(ABC):
         record: AnimalCreate,
         commit: bool = True,
     ) -> Optional[AnimalModel]:
-        raise NotImplementedError
-
-    @abstractmethod
-    def create_index(
-        self,
-        index: str = ANIMAL_MAPPING_NAME,
-        body: Dict = ANIMAL_MAPPING,
-    ):
-        raise NotImplementedError
-
-    @abstractmethod
-    def get_index(self) -> Dict:
-        raise NotImplementedError
-
-    @abstractmethod
-    def index_exists(self) -> bool:
-        raise NotImplementedError
-
-    @abstractmethod
-    def create_document(
-        self,
-        id: str,
-        document: AnimalDocument,
-        index: str = ANIMAL_MAPPING_NAME,
-    ):
         raise NotImplementedError

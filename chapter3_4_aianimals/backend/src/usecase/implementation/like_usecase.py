@@ -1,8 +1,11 @@
 from logging import getLogger
-from typing import Dict, List, Optional
+from typing import List, Optional
 
+from fastapi import BackgroundTasks
 from sqlalchemy.orm import Session
+from src.configurations import Configurations
 from src.entities.like import LikeCreate, LikeDelete
+from src.infrastructure.queue import AbstractQueue
 from src.middleware.strings import get_uuid
 from src.repository.like_repository import AbstractLikeRepository
 from src.request_object.like import LikeCreateRequest, LikeDeleteRequest, LikeRequest
@@ -16,8 +19,12 @@ class LikeUsecase(AbstractLikeUsecase):
     def __init__(
         self,
         like_repository: AbstractLikeRepository,
+        queue: AbstractQueue,
     ):
-        super().__init__(like_repository=like_repository)
+        super().__init__(
+            like_repository=like_repository,
+            queue=queue,
+        )
 
     def retrieve(
         self,
@@ -44,6 +51,7 @@ class LikeUsecase(AbstractLikeUsecase):
         self,
         session: Session,
         request: LikeCreateRequest,
+        background_tasks: BackgroundTasks,
     ) -> Optional[LikeResponse]:
         query = LikeRequest(
             animal_id=request.animal_id,
@@ -73,6 +81,11 @@ class LikeUsecase(AbstractLikeUsecase):
         logger.info(f"registered: {data}")
         if data is not None:
             response = LikeResponse(**data.dict())
+            background_tasks.add_task(
+                self.queue.enqueue,
+                Configurations.animal_registry_queue,
+                data.animal_id,
+            )
             return response
         return None
 

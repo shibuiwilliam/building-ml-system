@@ -19,7 +19,7 @@ class AnimalToSearchJob(AbstractJob):
         logger.info("register index...")
         i = 0
         while True:
-            self.animal_usecase.register_index_from_queue()
+            self.animal_usecase.register_document_from_queue()
             i += 1
             if i >= 10000:
                 logger.info(f"done 10,000 jobs; sleep for 60 seconds...")

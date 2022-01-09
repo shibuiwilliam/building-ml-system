@@ -1,17 +1,8 @@
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 from sqlalchemy import and_
-from src.entities.animal import (
-    ANIMAL_MAPPING,
-    ANIMAL_MAPPING_NAME,
-    AnimalCreate,
-    AnimalDocument,
-    AnimalModel,
-    AnimalQuery,
-)
+from src.entities.animal import AnimalCreate, AnimalModel, AnimalQuery
 from src.infrastructure.database import AbstractDatabase
-from src.infrastructure.queue import AbstractQueue
-from src.infrastructure.search import AbstractSearch
 from src.middleware.logger import configure_logger
 from src.repository.animal_repository import AbstractAnimalRepository
 from src.schema.animal import Animal
@@ -23,17 +14,8 @@ logger = configure_logger(__name__)
 
 
 class AnimalRepository(AbstractAnimalRepository):
-    def __init__(
-        self,
-        database: AbstractDatabase,
-        queue: AbstractQueue,
-        search: AbstractSearch,
-    ) -> None:
-        super().__init__(
-            database=database,
-            queue=queue,
-            search=search,
-        )
+    def __init__(self, database: AbstractDatabase) -> None:
+        super().__init__(database=database)
 
     def select(
         self,
@@ -42,80 +24,84 @@ class AnimalRepository(AbstractAnimalRepository):
         offset: Optional[int] = 0,
     ) -> List[AnimalModel]:
         session = self.database.get_session().__next__()
-        filters = []
-        if query is not None:
-            if query.id is not None:
-                filters.append(Animal.id == query.id)
-            if query.name is not None:
-                filters.append(Animal.name == query.name)
-            if query.animal_category_id is not None:
-                filters.append(Animal.animal_category_id == query.animal_category_id)
-            if query.animal_subcategory_id is not None:
-                filters.append(Animal.animal_subcategory_id == query.animal_subcategory_id)
-            if query.user_id is not None:
-                filters.append(Animal.id == query.user_id)
-            if query.deactivated is not None:
-                filters.append(Animal.deactivated == query.deactivated)
-        results = (
-            session.query(
-                Animal.id.label("id"),
-                AnimalCategory.id.label("animal_category_id"),
-                AnimalCategory.name_en.label("animal_category_name_en"),
-                AnimalCategory.name_ja.label("animal_category_name_ja"),
-                AnimalSubcategory.id.label("animal_subcategory_id"),
-                AnimalSubcategory.name_en.label("animal_subcategory_name_en"),
-                AnimalSubcategory.name_ja.label("animal_subcategory_name_ja"),
-                Animal.name.label("name"),
-                Animal.description.label("description"),
-                Animal.photo_url.label("photo_url"),
-                Animal.deactivated.label("deactivated"),
-                User.id.label("user_id"),
-                User.handle_name.label("user_handle_name"),
-                Animal.created_at.label("created_at"),
-                Animal.updated_at.label("updated_at"),
+        try:
+            filters = []
+            if query is not None:
+                if query.id is not None:
+                    filters.append(Animal.id == query.id)
+                if query.name is not None:
+                    filters.append(Animal.name == query.name)
+                if query.animal_category_id is not None:
+                    filters.append(Animal.animal_category_id == query.animal_category_id)
+                if query.animal_subcategory_id is not None:
+                    filters.append(Animal.animal_subcategory_id == query.animal_subcategory_id)
+                if query.user_id is not None:
+                    filters.append(Animal.id == query.user_id)
+                if query.deactivated is not None:
+                    filters.append(Animal.deactivated == query.deactivated)
+            results = (
+                session.query(
+                    Animal.id.label("id"),
+                    AnimalCategory.id.label("animal_category_id"),
+                    AnimalCategory.name_en.label("animal_category_name_en"),
+                    AnimalCategory.name_ja.label("animal_category_name_ja"),
+                    AnimalSubcategory.id.label("animal_subcategory_id"),
+                    AnimalSubcategory.name_en.label("animal_subcategory_name_en"),
+                    AnimalSubcategory.name_ja.label("animal_subcategory_name_ja"),
+                    Animal.name.label("name"),
+                    Animal.description.label("description"),
+                    Animal.photo_url.label("photo_url"),
+                    Animal.deactivated.label("deactivated"),
+                    User.id.label("user_id"),
+                    User.handle_name.label("user_handle_name"),
+                    Animal.created_at.label("created_at"),
+                    Animal.updated_at.label("updated_at"),
+                )
+                .join(
+                    AnimalCategory,
+                    AnimalCategory.id == Animal.animal_category_id,
+                    isouter=True,
+                )
+                .join(
+                    AnimalSubcategory,
+                    AnimalSubcategory.id == Animal.animal_subcategory_id,
+                    isouter=True,
+                )
+                .join(
+                    User,
+                    User.id == Animal.user_id,
+                    isouter=True,
+                )
+                .filter(and_(*filters))
+                .order_by(Animal.id)
+                .limit(limit)
+                .offset(offset)
             )
-            .join(
-                AnimalCategory,
-                AnimalCategory.id == Animal.animal_category_id,
-                isouter=True,
-            )
-            .join(
-                AnimalSubcategory,
-                AnimalSubcategory.id == Animal.animal_subcategory_id,
-                isouter=True,
-            )
-            .join(
-                User,
-                User.id == Animal.user_id,
-                isouter=True,
-            )
-            .filter(and_(*filters))
-            .order_by(Animal.id)
-            .limit(limit)
-            .offset(offset)
-        )
-        data = [
-            AnimalModel(
-                id=d[0],
-                animal_category_id=d[1],
-                animal_category_name_en=d[2],
-                animal_category_name_ja=d[3],
-                animal_subcategory_id=d[4],
-                animal_subcategory_name_en=d[5],
-                animal_subcategory_name_ja=d[6],
-                name=d[7],
-                description=d[8],
-                photo_url=d[9],
-                deactivated=d[10],
-                user_id=d[11],
-                user_handle_name=d[12],
-                created_at=d[13],
-                updated_at=d[14],
-            )
-            for d in results
-        ]
-        session.close()
-        return data
+            data = [
+                AnimalModel(
+                    id=d[0],
+                    animal_category_id=d[1],
+                    animal_category_name_en=d[2],
+                    animal_category_name_ja=d[3],
+                    animal_subcategory_id=d[4],
+                    animal_subcategory_name_en=d[5],
+                    animal_subcategory_name_ja=d[6],
+                    name=d[7],
+                    description=d[8],
+                    photo_url=d[9],
+                    deactivated=d[10],
+                    user_id=d[11],
+                    user_handle_name=d[12],
+                    created_at=d[13],
+                    updated_at=d[14],
+                )
+                for d in results
+            ]
+            return data
+        except Exception as e:
+            raise e
+        finally:
+            session.close()
 
     def insert(
         self,
@@ -123,46 +109,21 @@ class AnimalRepository(AbstractAnimalRepository):
         commit: bool = True,
     ) -> Optional[AnimalModel]:
         session = self.database.get_session().__next__()
-        data = Animal(**record.dict())
-        session.add(data)
-        if commit:
-            session.commit()
-            session.refresh(data)
-            result = self.select(
-                query=AnimalQuery(id=data.id),
-                limit=1,
-                offset=0,
-            )
+        try:
+            data = Animal(**record.dict())
+            session.add(data)
+            if commit:
+                session.commit()
+                session.refresh(data)
+                result = self.select(
+                    query=AnimalQuery(id=data.id),
+                    limit=1,
+                    offset=0,
+                )
+                session.close()
+                return result[0]
+            return None
+        except Exception as e:
+            raise e
+        finally:
             session.close()
-            return result[0]
-        session.close()
-        return None
-
-    def create_index(
-        self,
-        index: str = ANIMAL_MAPPING_NAME,
-        body: Dict = ANIMAL_MAPPING,
-    ):
-        self.search.create_index(
-            index=index,
-            body=body,
-        )
-
-    def get_index(self) -> Dict:
-        return self.search.get_index(index=ANIMAL_MAPPING_NAME)
-
-    def index_exists(self) -> bool:
-        return self.search.index_exists(index=ANIMAL_MAPPING_NAME)
-
-    def create_document(
-        self,
-        id: str,
-        document: AnimalDocument,
-        index: str = ANIMAL_MAPPING_NAME,
-    ):
-        body = document.dict()
-        self.search.create_document(
-            index=index,
-            id=id,
-            body=body,
-        )

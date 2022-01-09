@@ -112,7 +112,6 @@ async def search_animal(
     )
     logger.info(f"search animal: {request}")
     data = container.animal_usecase.search(
-        session=session,
         request=request,
         limit=limit,
         offset=offset,

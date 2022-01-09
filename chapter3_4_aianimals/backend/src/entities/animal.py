@@ -1,7 +1,10 @@
 from datetime import datetime
+from enum import Enum
 from typing import List, Optional
 
 from pydantic import BaseModel, Extra
+
+ANIMAL_INDEX = "animal"
 
 
 class AnimalQuery(BaseModel):
@@ -55,12 +58,36 @@ class AnimalModel(AnimalModelBase):
         extra = Extra.forbid
 
 
+class AnimalSearchSortKey(Enum):
+    SCORE = "score"
+    LIKE = "like"
+    CREATED_AT = "create_at"
+
+    @staticmethod
+    def has_value(value: str) -> bool:
+        return value in [v.value for v in AnimalSearchSortKey.__members__.values()]
+
+    @staticmethod
+    def get_list() -> List[str]:
+        return [v.value for v in AnimalSearchSortKey.__members__.values()]
+
+    @staticmethod
+    def value_to_key(value: Optional[str] = None) -> Optional[Enum]:
+        if value is None:
+            return None
+        for v in [v for v in AnimalSearchSortKey.__members__.values()]:
+            if value == v.value:
+                return v
+        return None
+
+
 class AnimalSearchQuery(BaseModel):
     animal_category_name_en: Optional[str]
     animal_category_name_ja: Optional[str]
     animal_subcategory_name_en: Optional[str]
     animal_subcategory_name_ja: Optional[str]
     phrases: List[str]
+    sort_by: AnimalSearchSortKey = AnimalSearchSortKey.SCORE
 
     class Config:
         extra = Extra.forbid
@@ -77,6 +104,7 @@ class AnimalSearchResult(BaseModel):
     animal_subcategory_name_en: str
     animal_subcategory_name_ja: str
     user_handle_name: str
+    like: int
     created_at: datetime
 
     class Config:
@@ -85,7 +113,7 @@ class AnimalSearchResult(BaseModel):
 
 class AnimalSearchResults(BaseModel):
     hits: int
-    max_score: float
+    max_score: Optional[float]
     results: List[AnimalSearchResult]
 
     class Config:

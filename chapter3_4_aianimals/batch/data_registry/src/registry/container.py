@@ -53,11 +53,7 @@ class Container(object):
         self.animal_subcategory_repository: AbstractAnimalSubcategoryRepository = AnimalSubcategoryRepository(
             database=self.database
         )
-        self.animal_reposigory: AbstractAnimalRepository = AnimalRepository(
-            database=self.database,
-            queue=self.queue,
-            search=self.search,
-        )
+        self.animal_reposigory: AbstractAnimalRepository = AnimalRepository(database=self.database)
         self.user_repository: AbstractUserRepository = UserRepository(database=self.database)
         self.like_repository: AbstractLikeRepository = LikeRepository(database=self.database)
 
@@ -73,7 +69,9 @@ class Container(object):
         )
         self.animal_usecase: AbstractAnimalUsecase = AnimalUsecase(
             animal_repository=self.animal_reposigory,
+            like_repository=self.like_repository,
             queue=self.queue,
+            search=self.search,
         )
         self.like_usecase: AbstractLikeUsecase = LikeUsecase(
             like_repository=self.like_repository,

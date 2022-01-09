@@ -1,7 +1,7 @@
 from logging import getLogger
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, Header
+from fastapi import APIRouter, BackgroundTasks, Depends, Header
 from sqlalchemy.orm import Session
 from src.middleware.assert_token import token_assertion
 from src.registry.container import container
@@ -44,6 +44,7 @@ async def get_like(
 
 @router.post("", response_model=Optional[LikeResponse])
 async def post_like(
+    background_tasks: BackgroundTasks,
     request: LikeCreateRequest,
     token: str = Header(...),
     session: Session = Depends(container.database.get_session),
@@ -56,6 +57,7 @@ async def post_like(
     data = container.like_usecase.register(
         session=session,
         request=request,
+        background_tasks=background_tasks,
     )
     return data
 

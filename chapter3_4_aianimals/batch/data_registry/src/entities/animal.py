@@ -57,6 +57,7 @@ class AnimalDocument(BaseModel):
     animal_subcategory_name_en: str
     animal_subcategory_name_ja: str
     user_handle_name: str
+    like: int
     created_at: datetime
 
     class Config:
@@ -112,6 +113,9 @@ ANIMAL_MAPPING = {
             },
             "user_handle_name": {
                 "type": "text",
+            },
+            "like": {
+                "type": "integer",
             },
             "created_at": {
                 "type": "date",

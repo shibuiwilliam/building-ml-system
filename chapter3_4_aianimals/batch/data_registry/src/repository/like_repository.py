@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import Dict, List, Optional
 
+from src.entities.common import Count
 from src.entities.like import LikeCreate, LikeModel, LikeQuery
 from src.infrastructure.database import AbstractDatabase
 from src.middleware.logger import configure_logger
@@ -22,6 +23,13 @@ class AbstractLikeRepository(ABC):
         limit: int = 100,
         offset: int = 0,
     ) -> List[LikeModel]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def count(
+        self,
+        animal_ids: List[str],
+    ) -> Dict[str, Count]:
         raise NotImplementedError
 
     @abstractmethod

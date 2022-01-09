@@ -36,3 +36,20 @@ class AbstractSearch(ABC):
         body: Dict,
     ):
         raise NotImplementedError
+
+    @abstractmethod
+    def update_document(
+        self,
+        index: str,
+        id: Union[str, int],
+        doc: Dict,
+    ):
+        raise NotImplementedError
+
+    @abstractmethod
+    def is_document_exist(
+        self,
+        index: str,
+        id: Union[str, int],
+    ) -> bool:
+        raise NotImplementedError

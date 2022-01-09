@@ -1,9 +1,9 @@
 import os
 from logging import getLogger
-from typing import Dict, Optional
+from typing import Dict, List, Optional, Union
 
 from elasticsearch import Elasticsearch as ES
-from src.entities.animal import AnimalSearchQuery, AnimalSearchResult, AnimalSearchResults
+from src.entities.animal import AnimalSearchQuery, AnimalSearchResult, AnimalSearchResults, AnimalSearchSortKey
 from src.infrastructure.search import AbstractSearch
 
 logger = getLogger(__name__)
@@ -44,6 +44,22 @@ class Elasticsearch(AbstractSearch):
                 }
             ]
         return q
+
+    def __make_sort(
+        self,
+        key: Optional[AnimalSearchSortKey],
+    ) -> List[Union[str, Dict]]:
+        sort: List[Union[str, Dict]] = []
+        if key is not None and key != AnimalSearchSortKey.SCORE:
+            sort.append(
+                {
+                    key.value: {
+                        "order": "desc",
+                    }
+                }
+            )
+        sort.append("_score")
+        return sort
 
     def search(
         self,
@@ -89,10 +105,11 @@ class Elasticsearch(AbstractSearch):
                         "match": {"description": " ".join(query.phrases)},
                     },
                 ]
-        logger.info(f"search query: {q}")
+        sort = self.__make_sort(key=query.sort_by if query is not None else None)
         searched = self.es_client.search(
             index=index,
             query=q,
+            sort=sort,
             from_=from_,
             size=size,
         )
@@ -120,6 +137,7 @@ class Elasticsearch(AbstractSearch):
                     animal_subcategory_name_en=r["_source"]["animal_subcategory_name_en"],
                     animal_subcategory_name_ja=r["_source"]["animal_subcategory_name_ja"],
                     user_handle_name=r["_source"]["user_handle_name"],
+                    like=r["_source"]["like"],
                     created_at=r["_source"]["created_at"],
                 ),
             )

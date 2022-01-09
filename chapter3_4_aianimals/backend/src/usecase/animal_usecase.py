@@ -5,9 +5,9 @@ from typing import List, Optional
 from fastapi import BackgroundTasks
 from sqlalchemy.orm import Session
 from src.infrastructure.queue import AbstractQueue
+from src.infrastructure.search import AbstractSearch
 from src.infrastructure.storage import AbstractStorage
 from src.repository.animal_repository import AbstractAnimalRepository
-from src.repository.animal_search_repository import AbstractAnimalSearchRepository
 from src.repository.like_repository import AbstractLikeRepository
 from src.request_object.animal import AnimalCreateRequest, AnimalRequest, AnimalSearchRequest
 from src.response_object.animal import AnimalResponse, AnimalSearchResponses
@@ -20,16 +20,16 @@ class AbstractAnimalUsecase(ABC):
     def __init__(
         self,
         animal_repository: AbstractAnimalRepository,
-        animal_search_repository: AbstractAnimalSearchRepository,
         like_repository: AbstractLikeRepository,
         storage_client: AbstractStorage,
         queue: AbstractQueue,
+        search_client: AbstractSearch,
     ):
         self.animal_repository = animal_repository
-        self.animal_search_repository = animal_search_repository
         self.like_repository = like_repository
         self.storage_client = storage_client
         self.queue = queue
+        self.search_client = search_client
 
     @abstractmethod
     def retrieve(
@@ -64,7 +64,6 @@ class AbstractAnimalUsecase(ABC):
     @abstractmethod
     def search(
         self,
-        session: Session,
         request: Optional[AnimalSearchRequest] = None,
         limit: int = 100,
         offset: int = 0,

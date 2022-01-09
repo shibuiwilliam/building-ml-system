@@ -58,3 +58,29 @@ class Elasticsearch(AbstractSearch):
             id=id,
             body=body,
         )
+
+    def update_document(
+        self,
+        index: str,
+        id: Union[str, int],
+        doc: Dict,
+    ):
+        logger.info(f"update document in index {index} with id {id} and body {doc}")
+        self.es_client.update(
+            index=index,
+            id=id,
+            doc=doc,
+            refresh=True,
+        )
+
+    def is_document_exist(
+        self,
+        index: str,
+        id: Union[str, int],
+    ) -> bool:
+        exists = self.es_client.exists(
+            index=index,
+            id=id,
+        )
+        logger.info(f"exists: {exists}")
+        return exists

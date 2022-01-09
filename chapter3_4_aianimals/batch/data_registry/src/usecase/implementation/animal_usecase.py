@@ -3,8 +3,10 @@ from typing import Dict, List, Optional
 from src.configurations import Configurations
 from src.entities.animal import ANIMAL_MAPPING, ANIMAL_MAPPING_NAME, AnimalCreate, AnimalDocument, AnimalQuery
 from src.infrastructure.queue import AbstractQueue
+from src.infrastructure.search import AbstractSearch
 from src.middleware.logger import configure_logger
 from src.repository.animal_repository import AbstractAnimalRepository
+from src.repository.like_repository import AbstractLikeRepository
 from src.request_object.animal import AnimalCreateRequest, AnimalRequest
 from src.response_object.animal import AnimalResponse, AnimalResponseWithLike
 from src.usecase.animal_usecase import AbstractAnimalUsecase
@@ -16,11 +18,15 @@ class AnimalUsecase(AbstractAnimalUsecase):
     def __init__(
         self,
         animal_repository: AbstractAnimalRepository,
+        like_repository: AbstractLikeRepository,
         queue: AbstractQueue,
+        search: AbstractSearch,
     ):
         super().__init__(
             animal_repository=animal_repository,
+            like_repository=like_repository,
             queue=queue,
+            search=search,
         )
 
     def retrieve(
@@ -80,18 +86,18 @@ class AnimalUsecase(AbstractAnimalUsecase):
         return None
 
     def create_index(self):
-        self.animal_repository.create_index(
+        self.search.create_index(
             index=ANIMAL_MAPPING_NAME,
             body=ANIMAL_MAPPING,
         )
 
     def get_index(self) -> Dict:
-        return self.animal_repository.get_index()
+        return self.search.get_index(index=ANIMAL_MAPPING_NAME)
 
     def index_exists(self) -> bool:
-        return self.animal_repository.index_exists()
+        return self.search.index_exists(index=ANIMAL_MAPPING_NAME)
 
-    def register_index(
+    def register_document(
         self,
         animal_id: str,
     ):
@@ -108,6 +114,9 @@ class AnimalUsecase(AbstractAnimalUsecase):
         if len(animals) == 0:
             return
         animal = animals[0]
+
+        like = self.like_repository.count(animal_ids=[animal.id])
+
         document = AnimalDocument(
             name=animal.name,
             description=animal.description,
@@ -117,17 +126,28 @@ class AnimalUsecase(AbstractAnimalUsecase):
             animal_subcategory_name_ja=animal.animal_subcategory_name_ja,
             photo_url=animal.photo_url,
             user_handle_name=animal.user_handle_name,
+            like=like[animal.id].count,
             created_at=animal.created_at,
         )
-        self.animal_repository.create_document(
-            id=animal.id,
-            document=document,
+        if self.search.is_document_exist(
             index=ANIMAL_MAPPING_NAME,
-        )
+            id=animal.id,
+        ):
+            self.search.update_document(
+                index=ANIMAL_MAPPING_NAME,
+                id=animal.id,
+                doc=document.dict(),
+            )
+        else:
+            self.search.create_document(
+                index=ANIMAL_MAPPING_NAME,
+                id=animal.id,
+                body=document.dict(),
+            )
         logger.info(f"registered: {animal_id}")
 
-    def register_index_from_queue(self):
+    def register_document_from_queue(self):
         animal_id = self.queue.dequeue(queue_name=Configurations.animal_registry_queue)
         if animal_id is None:
             return
-        self.register_index(animal_id=animal_id)
+        self.register_document(animal_id=animal_id)

@@ -2,8 +2,10 @@ from abc import ABC, abstractmethod
 from typing import Dict, List, Optional
 
 from src.infrastructure.queue import AbstractQueue
+from src.infrastructure.search import AbstractSearch
 from src.middleware.logger import configure_logger
 from src.repository.animal_repository import AbstractAnimalRepository
+from src.repository.like_repository import AbstractLikeRepository
 from src.request_object.animal import AnimalCreateRequest, AnimalRequest
 from src.response_object.animal import AnimalResponse, AnimalResponseWithLike
 
@@ -14,10 +16,14 @@ class AbstractAnimalUsecase(ABC):
     def __init__(
         self,
         animal_repository: AbstractAnimalRepository,
+        like_repository: AbstractLikeRepository,
         queue: AbstractQueue,
+        search: AbstractSearch,
     ):
         self.animal_repository = animal_repository
+        self.like_repository = like_repository
         self.queue = queue
+        self.search = search
 
     @abstractmethod
     def retrieve(
@@ -48,12 +54,12 @@ class AbstractAnimalUsecase(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def register_index(
+    def register_document(
         self,
         animal_id: str,
     ):
         raise NotImplementedError
 
     @abstractmethod
-    def register_index_from_queue(self):
+    def register_document_from_queue(self):
         raise NotImplementedError
