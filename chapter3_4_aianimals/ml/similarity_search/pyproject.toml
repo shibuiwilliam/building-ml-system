@@ -13,6 +13,8 @@ numpy = "^1.22.0"
 click = "^8.0.3"
 mlflow = "^1.22.0"
 Pillow = "^9.0.0"
+google-cloud-storage = "^1.44.0"
+pydantic = "^1.9.0"
 
 [tool.poetry.dev-dependencies]
 
