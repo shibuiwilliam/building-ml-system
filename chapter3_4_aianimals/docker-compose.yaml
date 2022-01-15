@@ -54,11 +54,11 @@ services:
       - postgres
       - redis
 
-  backend:
-    container_name: backend
-    image: shibui/building-ml-system:ai_animals_backend_0.0.0
+  api:
+    container_name: api
+    image: shibui/building-ml-system:ai_animals_api_0.0.0
     volumes:
-      - ./backend/secrets/secret.key:/opt/secrets/secret.key
+      - ./api/secrets/secret.key:/opt/secrets/secret.key
     restart: always
     networks:
       - default
@@ -81,7 +81,7 @@ services:
       - INITIALIZE=1
       - PORT=8000
     command: ./run.sh
-    hostname: backend
+    hostname: api
     depends_on:
       - postgres
       - redis
@@ -144,7 +144,7 @@ services:
     depends_on:
       - postgres
       - redis
-      - backend
+      - api
       - es
 
 networks:

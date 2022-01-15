@@ -1,7 +1,8 @@
-from typing import Dict
 import os
-from google.cloud import storage
 import shutil
+from typing import Dict
+
+from google.cloud import storage
 
 
 def download_images_from_bucket(

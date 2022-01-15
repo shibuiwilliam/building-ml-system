@@ -12,6 +12,8 @@ class TABLES(Enum):
     ANIMAL = "animals"
     USER = "users"
     LIKE = "likes"
+    VIOLATION_TYPE = "violation_types"
+    VIOLATION = "violations"
 
     @staticmethod
     def has_value(value: str) -> bool:

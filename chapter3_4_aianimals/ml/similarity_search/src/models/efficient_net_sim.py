@@ -1,12 +1,13 @@
 from typing import List
+
+import tensorflow as tf
 from pydantic import BaseModel
-from tensorflow_similarity.architectures import EfficientNetSim
-from tensorflow_similarity.losses import CircleLoss
-from tensorflow.keras.optimizers import Adam
-from tensorflow_similarity.samplers import Sampler
 from tensorflow.keras.callbacks import Callback
 from tensorflow.keras.models import load_model
-import tensorflow as tf
+from tensorflow.keras.optimizers import Adam
+from tensorflow_similarity.architectures import EfficientNetSim
+from tensorflow_similarity.losses import CircleLoss
+from tensorflow_similarity.samplers import Sampler
 
 
 class InputShape(BaseModel):

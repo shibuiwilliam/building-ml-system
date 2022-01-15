@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import List
+from typing import Dict, List
 
 from sqlalchemy.engine import Engine
 from src.configurations import Configurations
@@ -10,17 +10,23 @@ from src.request_object.animal import AnimalCreateRequest
 from src.request_object.animal_category import AnimalCategoryCreateRequest
 from src.request_object.animal_subcategory import AnimalSubcategoryCreateRequest
 from src.request_object.user import UserCreateRequest
+from src.request_object.violation import ViolationCreateRequest
+from src.request_object.violation_type import ViolationTypeCreateRequest
 from src.schema.animal import Animal
 from src.schema.animal_category import AnimalCategory
 from src.schema.animal_subcategory import AnimalSubcategory
 from src.schema.base import Base
 from src.schema.like import Like
 from src.schema.user import User
+from src.schema.violation import Violation
+from src.schema.violation_type import ViolationType
 from src.usecase.animal_category_usecase import AbstractAnimalCategoryUsecase
 from src.usecase.animal_subcategory_usecase import AbstractAnimalSubcategoryUsecase
 from src.usecase.animal_usecase import AbstractAnimalUsecase
 from src.usecase.table_usecase import AbstractTableUsecase
 from src.usecase.user_usecase import AbstractUserUsecase
+from src.usecase.violation_type_usecase import AbstractViolationTypeUsecase
+from src.usecase.violation_usecase import AbstractViolationUsecase
 
 logger = configure_logger(__name__)
 
@@ -33,6 +39,8 @@ class InitializationJob(AbstractJob):
         animal_subcategory_usecase: AbstractAnimalSubcategoryUsecase,
         user_usecase: AbstractUserUsecase,
         animal_usecase: AbstractAnimalUsecase,
+        violation_type_usecase: AbstractViolationTypeUsecase,
+        violation_usecase: AbstractViolationUsecase,
         engine: Engine,
     ):
         super().__init__()
@@ -41,10 +49,20 @@ class InitializationJob(AbstractJob):
         self.animal_subcategory_usecase = animal_subcategory_usecase
         self.user_usecase = user_usecase
         self.animal_usecase = animal_usecase
+        self.violation_type_usecase = violation_type_usecase
+        self.violation_usecase = violation_usecase
         self.engine = engine
 
     def __create_table(self):
-        tables: List[Base] = [AnimalCategory, AnimalSubcategory, User, Animal, Like]
+        tables: List[Base] = [
+            AnimalCategory,
+            AnimalSubcategory,
+            User,
+            Animal,
+            Like,
+            ViolationType,
+            Violation,
+        ]
         for table in tables:
             logger.info(f"create table: {table.__table__}")
             self.table_usecase.create_table(
@@ -54,7 +72,23 @@ class InitializationJob(AbstractJob):
             )
             logger.info(f"done create table: {table.__table__}")
 
-    def __create_index(self):
+    def __create_index(
+        self,
+        indices: List[Dict],
+        table: Base,
+    ):
+        for index in indices:
+            logger.info(f"create index: {index}")
+            self.table_usecase.create_index(
+                engine=self.engine,
+                table=table,
+                column=index["column"],
+                checkfirst=True,
+                unique=index["unique"],
+            )
+            logger.info(f"done create index: {index}")
+
+    def __create_indices(self):
         animal_category_indices = [
             {"column": AnimalCategory.name_en, "unique": True},
             {"column": AnimalCategory.name_ja, "unique": True},
@@ -81,57 +115,45 @@ class InitializationJob(AbstractJob):
             {"column": Like.user_id, "unique": False},
             {"column": Like.animal_id, "unique": False},
         ]
+        violation_type_indices = [
+            {"column": ViolationType.name, "unique": True},
+        ]
+        violation_indices = [
+            {"column": Violation.animal_id, "unique": False},
+            {"column": Violation.violation_type_id, "unique": False},
+            {"column": Violation.judge, "unique": False},
+            {"column": Violation.probability, "unique": False},
+            {"column": Violation.is_effective, "unique": False},
+        ]
 
-        for index in animal_category_indices:
-            logger.info(f"create index: {index}")
-            self.table_usecase.create_index(
-                engine=self.engine,
-                table=AnimalCategory,
-                column=index["column"],
-                checkfirst=True,
-                unique=index["unique"],
-            )
-            logger.info(f"done create index: {index}")
-        for index in animal_subcategory_indices:
-            logger.info(f"create index: {index}")
-            self.table_usecase.create_index(
-                engine=self.engine,
-                table=AnimalSubcategory,
-                column=index["column"],
-                checkfirst=True,
-                unique=index["unique"],
-            )
-            logger.info(f"done create index: {index}")
-        for index in user_indices:
-            logger.info(f"create index: {index}")
-            self.table_usecase.create_index(
-                engine=self.engine,
-                table=User,
-                column=index["column"],
-                checkfirst=True,
-                unique=index["unique"],
-            )
-            logger.info(f"done create index: {index}")
-        for index in animal_indices:
-            logger.info(f"create index: {index}")
-            self.table_usecase.create_index(
-                engine=self.engine,
-                table=Animal,
-                column=index["column"],
-                checkfirst=True,
-                unique=index["unique"],
-            )
-            logger.info(f"done create index: {index}")
-        for index in like_indices:
-            logger.info(f"create index: {index}")
-            self.table_usecase.create_index(
-                engine=self.engine,
-                table=Like,
-                column=index["column"],
-                checkfirst=True,
-                unique=index["unique"],
-            )
-            logger.info(f"done create index: {index}")
+        self.__create_index(
+            indices=animal_category_indices,
+            table=AnimalCategory,
+        )
+        self.__create_index(
+            indices=animal_subcategory_indices,
+            table=AnimalSubcategory,
+        )
+        self.__create_index(
+            indices=user_indices,
+            table=User,
+        )
+        self.__create_index(
+            indices=animal_indices,
+            table=Animal,
+        )
+        self.__create_index(
+            indices=like_indices,
+            table=Like,
+        )
+        self.__create_index(
+            indices=violation_type_indices,
+            table=ViolationType,
+        )
+        self.__create_index(
+            indices=violation_indices,
+            table=Violation,
+        )
 
     def __register_animal_category(
         self,
@@ -209,11 +231,46 @@ class InitializationJob(AbstractJob):
             self.animal_usecase.register(request=request)
         logger.info(f"done register animal: {file_path}")
 
+    def __register_violation_type(
+        self,
+        file_path: str,
+    ):
+        logger.info(f"register violation type: {file_path}")
+        with open(file_path, "r") as f:
+            data = json.load(f)
+        for k, v in data.items():
+            request = ViolationTypeCreateRequest(
+                id=k,
+                name=v["name"],
+            )
+            self.violation_type_usecase.register(request=request)
+        logger.info(f"done register violation type: {file_path}")
+
+    def __register_violation(
+        self,
+        file_path: str,
+    ):
+        logger.info(f"register violation: {file_path}")
+        with open(file_path, "r") as f:
+            data = json.load(f)
+        for k, v in data.items():
+            request = ViolationCreateRequest(
+                id=k,
+                animal_id=v["animal_id"],
+                violation_type_id=v["violation_type_id"],
+                probability=v["probability"],
+                judge=v["judge"],
+                is_effective=v["is_effective"],
+            )
+            self.violation_usecase.register(request=request)
+        logger.info(f"done register violation: {file_path}")
+
     def run(self):
         logger.info("run initialize database")
         self.__create_table()
-        self.__create_index()
+        self.__create_indices()
         self.__register_animal_category(file_path=Configurations.animal_category_file)
         self.__register_animal_subcategory(file_path=Configurations.animal_subcategory_file)
         self.__register_user(file_path=Configurations.user_file)
         self.__register_animal(file_path=Configurations.animal_file)
+        self.__register_violation_type(file_path=Configurations.violation_type_file)

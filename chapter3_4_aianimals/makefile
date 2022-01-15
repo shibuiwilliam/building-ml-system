@@ -53,62 +53,62 @@ push_data_registry:
 	docker push $(DOCKER_DATA_REGISTRY_IMAGE_NAME)
 
 
-############ BACKEND COMMANDS ############
-BACKEND_DIR := $(DIR)/backend
-BACKEND_VERSION := $(shell cd ${BACKEND_DIR} && poetry version -s)
-BACKEND_MANIFEST_DIR := $(K8S_DIR)/manifests/backend
-DOCKERFILE_BACKEND = $(BACKEND_DIR)/$(DOCKERFILE)
-DOCKER_BACKEND_TAG = $(TAG)_backend
-DOCKER_BACKEND_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_BACKEND_TAG)_$(BACKEND_VERSION)
-DOCKER_BACKEND_IMAGE_NAME_TEST = $(DOCKER_REPOSITORY):$(DOCKER_BACKEND_TAG)_$(BACKEND_VERSION)_$(DOCKER_TEST_TAG)
+############ API COMMANDS ############
+API_DIR := $(DIR)/api
+API_VERSION := $(shell cd ${API_DIR} && poetry version -s)
+API_MANIFEST_DIR := $(K8S_DIR)/manifests/api
+DOCKERFILE_API = $(API_DIR)/$(DOCKERFILE)
+DOCKER_API_TAG = $(TAG)_api
+DOCKER_API_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_API_TAG)_$(API_VERSION)
+DOCKER_API_IMAGE_NAME_TEST = $(DOCKER_REPOSITORY):$(DOCKER_API_TAG)_$(API_VERSION)_$(DOCKER_TEST_TAG)
 
-.PHONY: patch_backend
-patch_backend:
-	cd $(BACKEND_DIR) && \
+.PHONY: patch_api
+patch_api:
+	cd $(API_DIR) && \
 	poetry version patch
 
-.PHONY: minor_upgrade_backend
-minor_upgrade_backend:
-	cd $(BACKEND_DIR) && \
+.PHONY: minor_upgrade_api
+minor_upgrade_api:
+	cd $(API_DIR) && \
 	poetry version minor
 
-.PHONY: major_upgrade_backend
-major_upgrade_backend:
-	cd $(BACKEND_DIR) && \
+.PHONY: major_upgrade_api
+major_upgrade_api:
+	cd $(API_DIR) && \
 	poetry version major
 
-.PHONY: req_backend
-req_backend:
-	cd $(BACKEND_DIR) && \
+.PHONY: req_api
+req_api:
+	cd $(API_DIR) && \
 	poetry export \
 		--without-hashes \
 		-f requirements.txt \
 		--output requirements.txt
 
-.PHONY: build_backend
-build_backend: 
+.PHONY: build_api
+build_api: 
 	docker build \
-		-t $(DOCKER_BACKEND_IMAGE_NAME) \
-		-f $(DOCKERFILE_BACKEND) \
+		-t $(DOCKER_API_IMAGE_NAME) \
+		-f $(DOCKERFILE_API) \
 		.
 
-.PHONY: push_backend
-push_backend: 
-	docker push $(DOCKER_BACKEND_IMAGE_NAME)
+.PHONY: push_api
+push_api: 
+	docker push $(DOCKER_API_IMAGE_NAME)
 
-.PHONY: deploy_backend_ns
-deploy_backend_ns:
-	kubectl apply -f $(BACKEND_MANIFEST_DIR)/namespace.yaml 
+.PHONY: deploy_api_ns
+deploy_api_ns:
+	kubectl apply -f $(API_MANIFEST_DIR)/namespace.yaml 
 
-.PHONY: registry_backend
-registry_backend: deploy_backend_ns
+.PHONY: registry_api
+registry_api: deploy_api_ns
 	@cd $(K8S_SECRET_DIR) && \
 		NAMESPACE=aianimals ./private_registry_secret.sh
 
-.PHONY: deploy_backend
-deploy_backend: deploy_backend_ns
-	kubectl apply -f $(BACKEND_MANIFEST_DIR)/postgres.yaml && \
-	kubectl apply -f $(BACKEND_MANIFEST_DIR)/backend.yaml
+.PHONY: deploy_api
+deploy_api: deploy_api_ns
+	kubectl apply -f $(API_MANIFEST_DIR)/postgres.yaml && \
+	kubectl apply -f $(API_MANIFEST_DIR)/api.yaml
 
 
 ############ ARGO COMMANDS ############
@@ -207,7 +207,7 @@ admin_clusterrole:
 
 .PHONY: deploy_all
 deploy_all: registry_default admin_clusterrole \
-	registry_backend deploy_backend \
+	registry_api deploy_api \
 	registry_argo deploy_argo \
 	registry_es deploy_es
 
@@ -216,16 +216,16 @@ deploy_all: registry_default admin_clusterrole \
 .PHONY: req_all
 req_all: \
 	req_data_registry \
-	req_backend
+	req_api
 
 .PHONY: build_all
 build_all: \
 	build_data_registry \
-	build_backend \
+	build_api \
 	build_es
 
 .PHONY: push_all
 push_all: \
-	push_backend \
+	push_api \
 	push_data_registry \
 	push_es

@@ -79,7 +79,6 @@ class UserRepository(AbstractUserRepository):
                     limit=1,
                     offset=0,
                 )
-                session.close()
                 return result[0]
             return None
         except Exception as e:
