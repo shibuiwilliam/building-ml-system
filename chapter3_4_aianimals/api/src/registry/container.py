@@ -63,7 +63,7 @@ class Container(object):
 
         self.animal_category_repository: AbstractAnimalCategoryRepository = AnimalCategoryRepository()
         self.animal_subcategory_repository: AbstractAnimalSubcategoryRepository = AnimalSubcategoryRepository()
-        self.animal_reposigory: AbstractAnimalRepository = AnimalRepository()
+        self.animal_repository: AbstractAnimalRepository = AnimalRepository()
         self.user_repository: AbstractUserRepository = UserRepository()
         self.like_repository: AbstractLikeRepository = LikeRepository()
         self.violation_type_repository: AbstractViolationTypeRepository = ViolationTypeRepository()
@@ -81,7 +81,7 @@ class Container(object):
             crypt=self.crypt,
         )
         self.animal_usecase: AbstractAnimalUsecase = AnimalUsecase(
-            animal_repository=self.animal_reposigory,
+            animal_repository=self.animal_repository,
             like_repository=self.like_repository,
             storage_client=self.storage_client,
             queue=self.queue,
