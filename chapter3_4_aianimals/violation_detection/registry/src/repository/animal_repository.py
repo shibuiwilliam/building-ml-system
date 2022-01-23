@@ -16,6 +16,5 @@ class AbstractAnimalRepository(ABC):
     def update(
         self,
         record: AnimalUpdate,
-        commit: bool = True,
     ) -> Optional[AnimalModel]:
         raise NotImplementedError

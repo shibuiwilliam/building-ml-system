@@ -180,6 +180,50 @@ port_forward_kibana:
 	kubectl -n elastic-search port-forward service/kibana-kb-http 5601:5601 &
 
 
+############ VIOLATION_DETECTION_REGISTRY COMMANDS ############
+VIOLATION_DETECTION_REGISTRY_DIR := $(DIR)/violation_detection/registry
+VIOLATION_DETECTION_REGISTRY_VERSION := $(shell cd ${VIOLATION_DETECTION_REGISTRY_DIR} && poetry version -s)
+VIOLATION_DETECTION_REGISTRY_MANIFEST_DIR := $(K8S_DIR)/manifests/violation_detection/registry
+DOCKERFILE_VIOLATION_DETECTION_REGISTRY = $(VIOLATION_DETECTION_REGISTRY_DIR)/$(DOCKERFILE)
+DOCKER_VIOLATION_DETECTION_REGISTRY_TAG = $(TAG)_violation_detection_registry
+DOCKER_VIOLATION_DETECTION_REGISTRY_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_VIOLATION_DETECTION_REGISTRY_TAG)_$(VIOLATION_DETECTION_REGISTRY_VERSION)
+DOCKER_VIOLATION_DETECTION_REGISTRY_IMAGE_NAME_TEST = $(DOCKER_REPOSITORY):$(DOCKER_VIOLATION_DETECTION_REGISTRY_TAG)_$(VIOLATION_DETECTION_REGISTRY_VERSION)_$(DOCKER_TEST_TAG)
+
+.PHONY: patch_violation_detection_registry
+patch_violation_detection_registry:
+	cd $(VIOLATION_DETECTION_REGISTRY_DIR) && \
+	poetry version patch
+
+.PHONY: minor_upgrade_violation_detection_registry
+minor_upgrade_violation_detection_registry:
+	cd $(VIOLATION_DETECTION_REGISTRY_DIR) && \
+	poetry version minor
+
+.PHONY: major_upgrade_violation_detection_registry
+major_upgrade_violation_detection_registry:
+	cd $(VIOLATION_DETECTION_REGISTRY_DIR) && \
+	poetry version major
+
+.PHONY: req_violation_detection_registry
+req_violation_detection_registry:
+	cd $(VIOLATION_DETECTION_REGISTRY_DIR) && \
+	poetry export \
+		--without-hashes \
+		-f requirements.txt \
+		--output requirements.txt
+
+.PHONY: build_violation_detection_registry
+build_violation_detection_registry: 
+	docker build \
+		-t $(DOCKER_VIOLATION_DETECTION_REGISTRY_IMAGE_NAME) \
+		-f $(DOCKERFILE_VIOLATION_DETECTION_REGISTRY) \
+		.
+
+.PHONY: push_violation_detection_registry
+push_violation_detection_registry: 
+	docker push $(DOCKER_VIOLATION_DETECTION_REGISTRY_IMAGE_NAME)
+
+
 ############ DOCKER COMPOSE COMMANDS ############
 .PHONY: up
 up:
@@ -216,16 +260,19 @@ deploy_all: registry_default admin_clusterrole \
 .PHONY: req_all
 req_all: \
 	req_data_registry \
-	req_api
+	req_api \
+	req_violation_detection_registry
 
 .PHONY: build_all
 build_all: \
 	build_data_registry \
 	build_api \
-	build_es
+	build_es \
+	build_violation_detection_registry
 
 .PHONY: push_all
 push_all: \
 	push_api \
 	push_data_registry \
-	push_es
+	push_es \
+	push_violation_detection_registry

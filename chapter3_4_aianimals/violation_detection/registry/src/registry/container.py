@@ -1,7 +1,7 @@
 from src.infrastructure.client.postgresql_database import PostgreSQLDatabase
 from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging
 from src.infrastructure.database import AbstractDatabase
-from src.infrastructure.messaging import AbstractMessaging
+from src.job.register_violation_job import RegisterViolationJob
 from src.middleware.logger import configure_logger
 from src.repository.animal_repository import AbstractAnimalRepository
 from src.repository.implementation.animal_repository import AnimalRepository
@@ -19,7 +19,7 @@ class Container(object):
     def __init__(
         self,
         database: AbstractDatabase,
-        messaging: AbstractMessaging,
+        messaging: RabbitmqMessaging,
     ):
         self.database = database
         self.messaging = messaging
@@ -34,6 +34,11 @@ class Container(object):
             violation_repository=self.violation_repository,
             violation_type_repository=self.violation_type_repository,
             animal_repository=self.animal_repository,
+        )
+
+        self.register_violation_job: RegisterViolationJob = RegisterViolationJob(
+            violation_usecase=self.violation_usecase,
+            messaging=self.messaging,
         )
 
 

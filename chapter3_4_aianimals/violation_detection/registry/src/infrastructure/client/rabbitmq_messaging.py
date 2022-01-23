@@ -2,13 +2,12 @@ import os
 from typing import Optional, Tuple
 
 import pika
-from src.infrastructure.messaging import AbstractMessaging
 from src.middleware.logger import configure_logger
 
 logger = configure_logger(__name__)
 
 
-class RabbitmqMessaging(AbstractMessaging):
+class RabbitmqMessaging(object):
     def __init__(self):
         super().__init__()
         self.__rabbitmq_host = os.getenv("RABBITMQ_HOST", "localhost")
@@ -24,6 +23,10 @@ class RabbitmqMessaging(AbstractMessaging):
             credentials=self.__rabbitmq_credential,
         )
 
-    def init_connection(self) -> pika.adapters.blocking_connection.BlockingConnection:
-        self.rabbitmq_connection = pika.BlockingConnection(self.__params)
-        return self.rabbitmq_connection
+    def init_channel(self):
+        self.connection = pika.BlockingConnection(self.__params)
+        self.channel = self.connection.channel()
+
+    def close(self):
+        self.channel.close()
+        self.connection.close()
