@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
-from logging import getLogger
 from typing import List, Optional
 
+from src.middleware.logger import configure_logger
 from src.repository.violation_type_repository import AbstractViolationTypeRepository
 from src.request_object.violation_type import ViolationTypeCreateRequest, ViolationTypeRequest
 from src.response_object.violation_type import ViolationTypeResponse
 
-logger = getLogger(__name__)
+logger = configure_logger(__name__)
 
 
 class AbstractViolationTypeUsecase(ABC):

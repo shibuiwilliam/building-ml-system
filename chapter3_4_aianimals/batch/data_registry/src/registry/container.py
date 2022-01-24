@@ -92,7 +92,8 @@ class Container(object):
             violation_type_repository=self.violation_type_repository
         )
         self.violation_usecase: AbstractViolationUsecase = ViolationUsecase(
-            violation_repository=self.violation_repository
+            violation_repository=self.violation_repository,
+            animal_repository=self.animal_repository,
         )
 
         self.animal_search_job: AnimalToSearchJob = AnimalToSearchJob(animal_usecase=self.animal_usecase)

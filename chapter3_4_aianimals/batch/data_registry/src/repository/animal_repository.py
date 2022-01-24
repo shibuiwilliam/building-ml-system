@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from src.entities.animal import AnimalCreate, AnimalModel, AnimalQuery
+from src.entities.animal import AnimalCreate, AnimalModel, AnimalQuery, AnimalUpdate
 from src.infrastructure.database import AbstractDatabase
 from src.middleware.logger import configure_logger
 
@@ -27,4 +27,11 @@ class AbstractAnimalRepository(ABC):
         record: AnimalCreate,
         commit: bool = True,
     ) -> Optional[AnimalModel]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def update(
+        self,
+        record: AnimalUpdate,
+    ):
         raise NotImplementedError

@@ -1,13 +1,13 @@
-from logging import getLogger
 from typing import List, Optional
 
 from src.entities.violation_type import ViolationTypeCreate, ViolationTypeQuery
+from src.middleware.logger import configure_logger
 from src.repository.violation_type_repository import AbstractViolationTypeRepository
 from src.request_object.violation_type import ViolationTypeCreateRequest, ViolationTypeRequest
 from src.response_object.violation_type import ViolationTypeResponse
 from src.usecase.violation_type_usecase import AbstractViolationTypeUsecase
 
-logger = getLogger(__name__)
+logger = configure_logger(__name__)
 
 
 class ViolationTypeUsecase(AbstractViolationTypeUsecase):
@@ -35,6 +35,15 @@ class ViolationTypeUsecase(AbstractViolationTypeUsecase):
         self,
         request: ViolationTypeCreateRequest,
     ) -> Optional[ViolationTypeResponse]:
+        logger.info(f"register: {request}")
+        exists = self.violation_type_repository.select(
+            query=ViolationTypeQuery(id=request.id),
+        )
+        if len(exists) > 0:
+            response = ViolationTypeResponse(**exists[0].dict())
+            logger.info(f"exists: {response}")
+            return response
+
         record = ViolationTypeCreate(
             id=request.id,
             name=request.name,
@@ -45,5 +54,6 @@ class ViolationTypeUsecase(AbstractViolationTypeUsecase):
         )
         if data is not None:
             response = ViolationTypeResponse(**data.dict())
+            logger.info(f"done register: {response}")
             return response
         return None

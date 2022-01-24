@@ -274,3 +274,4 @@ class InitializationJob(AbstractJob):
         self.__register_user(file_path=Configurations.user_file)
         self.__register_animal(file_path=Configurations.animal_file)
         self.__register_violation_type(file_path=Configurations.violation_type_file)
+        self.__register_violation(file_path=Configurations.violation_file)

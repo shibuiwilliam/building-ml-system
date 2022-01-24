@@ -10,7 +10,7 @@ class AnimalQuery(BaseModel):
     animal_category_id: Optional[int]
     animal_subcategory_id: Optional[int]
     user_id: Optional[str]
-    deactivated: Optional[bool] = False
+    deactivated: Optional[bool]
 
     class Config:
         extra = Extra.forbid
@@ -24,7 +24,22 @@ class AnimalCreate(BaseModel):
     name: str
     description: str
     photo_url: str
+    deactivated: bool = False
     created_at: Optional[datetime]
+
+    class Config:
+        extra = Extra.forbid
+
+
+class AnimalUpdate(BaseModel):
+    id: str
+    name: Optional[str]
+    animal_category_id: Optional[int]
+    animal_subcategory_id: Optional[int]
+    user_id: Optional[str]
+    description: Optional[str]
+    photo_url: Optional[str]
+    deactivated: Optional[bool]
 
     class Config:
         extra = Extra.forbid

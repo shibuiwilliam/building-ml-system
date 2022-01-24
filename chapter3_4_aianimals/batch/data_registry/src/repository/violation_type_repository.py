@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
-from logging import getLogger
 from typing import List, Optional
 
 from src.entities.violation_type import ViolationTypeCreate, ViolationTypeModel, ViolationTypeQuery
 from src.infrastructure.database import AbstractDatabase
+from src.middleware.logger import configure_logger
 
-logger = getLogger(__name__)
+logger = configure_logger(__name__)
 
 
 class AbstractViolationTypeRepository(ABC):

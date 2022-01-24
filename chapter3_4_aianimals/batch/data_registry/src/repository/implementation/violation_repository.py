@@ -1,14 +1,14 @@
-from logging import getLogger
 from typing import List, Optional
 
 from sqlalchemy import and_
 from src.entities.violation import ViolationCreate, ViolationModel, ViolationQuery
 from src.infrastructure.database import AbstractDatabase
+from src.middleware.logger import configure_logger
 from src.repository.violation_repository import AbstractViolationRepository
 from src.schema.table import TABLES
 from src.schema.violation import Violation
 
-logger = getLogger(__name__)
+logger = configure_logger(__name__)
 
 
 class ViolationRepository(AbstractViolationRepository):

@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from sqlalchemy import and_
-from src.entities.animal import AnimalCreate, AnimalModel, AnimalQuery
+from src.entities.animal import AnimalCreate, AnimalModel, AnimalQuery, AnimalUpdate
 from src.infrastructure.database import AbstractDatabase
 from src.middleware.logger import configure_logger
 from src.repository.animal_repository import AbstractAnimalRepository
@@ -123,6 +123,34 @@ class AnimalRepository(AbstractAnimalRepository):
                 session.close()
                 return result[0]
             return None
+        except Exception as e:
+            raise e
+        finally:
+            session.close()
+
+    def update(
+        self,
+        record: AnimalUpdate,
+    ):
+        session = self.database.get_session().__next__()
+        try:
+            updates = {}
+            if record.name is not None:
+                updates["name"] = record.name
+            if record.animal_category_id is not None:
+                updates["animal_category_id"] = record.animal_category_id
+            if record.animal_subcategory_id is not None:
+                updates["animal_subcategory_id"] = record.animal_subcategory_id
+            if record.user_id is not None:
+                updates["user_id"] = record.user_id
+            if record.description is not None:
+                updates["description"] = record.description
+            if record.photo_url is not None:
+                updates["photo_url"] = record.photo_url
+            if record.deactivated is not None:
+                updates["deactivated"] = record.deactivated
+            session.query(Animal).filter(Animal.id == record.id).update(updates)
+            session.commit()
         except Exception as e:
             raise e
         finally:
