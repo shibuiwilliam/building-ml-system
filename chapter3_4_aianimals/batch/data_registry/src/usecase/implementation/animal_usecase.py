@@ -1,8 +1,9 @@
+import json
 from typing import Dict, List, Optional
 
 from src.configurations import Configurations
 from src.entities.animal import ANIMAL_MAPPING, ANIMAL_MAPPING_NAME, AnimalCreate, AnimalDocument, AnimalQuery
-from src.infrastructure.queue import AbstractQueue
+from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging
 from src.infrastructure.search import AbstractSearch
 from src.middleware.logger import configure_logger
 from src.repository.animal_repository import AbstractAnimalRepository
@@ -19,14 +20,14 @@ class AnimalUsecase(AbstractAnimalUsecase):
         self,
         animal_repository: AbstractAnimalRepository,
         like_repository: AbstractLikeRepository,
-        queue: AbstractQueue,
         search: AbstractSearch,
+        messaging: RabbitmqMessaging,
     ):
         super().__init__(
             animal_repository=animal_repository,
             like_repository=like_repository,
-            queue=queue,
             search=search,
+            messaging=messaging,
         )
 
     def retrieve(
@@ -77,9 +78,13 @@ class AnimalUsecase(AbstractAnimalUsecase):
         )
         if data is not None:
             response = AnimalResponse(**data.dict())
-            self.queue.enqueue(
+            self.messaging.publish(
                 queue_name=Configurations.animal_registry_queue,
-                key=data.id,
+                body={"id": data.id},
+            )
+            self.messaging.publish(
+                queue_name=Configurations.no_animal_violation_queue,
+                body={"id": data.id},
             )
             logger.info(f"done register: {response}")
             return response
@@ -147,7 +152,15 @@ class AnimalUsecase(AbstractAnimalUsecase):
         logger.info(f"registered: {animal_id}")
 
     def register_document_from_queue(self):
-        animal_id = self.queue.dequeue(queue_name=Configurations.animal_registry_queue)
-        if animal_id is None:
-            return
-        self.register_document(animal_id=animal_id)
+        def callback(ch, method, properties, body):
+            data = json.loads(body)
+            logger.info(f"consumed data: {data}")
+            self.register_document(animal_id=data["id"])
+            ch.basic_ack(delivery_tag=method.delivery_tag)
+
+        self.messaging.channel.basic_consume(
+            queue=Configurations.animal_registry_queue,
+            on_message_callback=callback,
+        )
+        logger.info(f"Waiting for {Configurations.animal_registry_queue} queue...")
+        self.messaging.channel.start_consuming()

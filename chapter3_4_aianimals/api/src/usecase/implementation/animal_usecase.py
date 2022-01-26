@@ -5,6 +5,7 @@ from fastapi import BackgroundTasks
 from sqlalchemy.orm import Session
 from src.configurations import Configurations
 from src.entities.animal import ANIMAL_INDEX, AnimalCreate, AnimalQuery, AnimalSearchQuery, AnimalSearchSortKey
+from src.infrastructure.messaging import AbstractMessaging
 from src.infrastructure.queue import AbstractQueue
 from src.infrastructure.search import AbstractSearch
 from src.infrastructure.storage import AbstractStorage
@@ -27,6 +28,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
         storage_client: AbstractStorage,
         queue: AbstractQueue,
         search_client: AbstractSearch,
+        messaging: AbstractMessaging,
     ):
         super().__init__(
             animal_repository=animal_repository,
@@ -34,6 +36,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
             storage_client=storage_client,
             queue=queue,
             search_client=search_client,
+            messaging=messaging,
         )
 
     def retrieve(
@@ -114,6 +117,11 @@ class AnimalUsecase(AbstractAnimalUsecase):
                 self.queue.enqueue,
                 Configurations.animal_registry_queue,
                 data.id,
+            )
+            background_tasks.add_task(
+                self.messaging.publish,
+                Configurations.no_animal_violation_queue,
+                {"id": data.id},
             )
             return response
         return None

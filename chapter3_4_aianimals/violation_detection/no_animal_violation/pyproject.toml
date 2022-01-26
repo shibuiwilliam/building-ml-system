@@ -7,6 +7,11 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.9"
+pika = "^1.2.0"
+pydantic = "^1.9.0"
+SQLAlchemy = "^1.4.31"
+psycopg2-binary = "^2.9.3"
+click = "^8.0.3"
 
 [tool.poetry.dev-dependencies]
 

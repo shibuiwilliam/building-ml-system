@@ -14,3 +14,4 @@ class Configurations:
     work_directory = os.getenv("WORK_DIRECTORY", "/tmp")
 
     animal_registry_queue = os.getenv("ANIMAL_REGISTRY_QUEUE", "animal")
+    no_animal_violation_queue = os.getenv("NO_ANIMAL_VIOLATION_QUEUE", "no_animal_violation")

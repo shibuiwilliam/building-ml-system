@@ -6,8 +6,10 @@ from src.infrastructure.client.elastic_search import Elasticsearch
 from src.infrastructure.client.google_cloud_storage import GoogleCloudStorage
 from src.infrastructure.client.local_storage import LocalStorage
 from src.infrastructure.client.postgresql_database import PostgreSQLDatabase
+from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging
 from src.infrastructure.client.redis_queue import RedisQueue
 from src.infrastructure.database import AbstractDatabase
+from src.infrastructure.messaging import AbstractMessaging
 from src.infrastructure.queue import AbstractQueue
 from src.infrastructure.search import AbstractSearch
 from src.infrastructure.storage import AbstractStorage
@@ -53,12 +55,16 @@ class Container(object):
         database: AbstractDatabase,
         queue: AbstractQueue,
         search_client: AbstractSearch,
+        messaging: AbstractMessaging,
         crypt: AbstractCrypt,
     ):
         self.database = database
         self.storage_client = storage_client
         self.queue = queue
         self.search_client = search_client
+        self.messaging = messaging
+        self.messaging.init_channel()
+        self.messaging.create_queue(queue_name=Configurations.no_animal_violation_queue)
         self.crypt = crypt
 
         self.animal_category_repository: AbstractAnimalCategoryRepository = AnimalCategoryRepository()
@@ -86,6 +92,7 @@ class Container(object):
             storage_client=self.storage_client,
             queue=self.queue,
             search_client=self.search_client,
+            messaging=self.messaging,
         )
         self.like_usecase: AbstractLikeUsecase = LikeUsecase(
             like_repository=self.like_repository,
@@ -113,5 +120,6 @@ container = Container(
     database=PostgreSQLDatabase(),
     queue=RedisQueue(),
     search_client=Elasticsearch(),
+    messaging=RabbitmqMessaging(),
     crypt=Crypt(key_file_path=Configurations.key_file_path),
 )

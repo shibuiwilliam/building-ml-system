@@ -1,13 +1,13 @@
 from logging import getLogger
-from typing import List, Optional
+from typing import Optional
 
 from src.entities.animal import AnimalUpdate
-from src.entities.violation import ViolationCreate, ViolationQuery
+from src.entities.violation import ViolationCreate
 from src.middleware.strings import get_uuid
 from src.repository.animal_repository import AbstractAnimalRepository
 from src.repository.violation_repository import AbstractViolationRepository
 from src.repository.violation_type_repository import AbstractViolationTypeRepository
-from src.request_object.violation import ViolationCreateRequest, ViolationRequest
+from src.request_object.violation import ViolationCreateRequest
 from src.response_object.violation import ViolationResponse
 from src.usecase.violation_usecase import AbstractViolationUsecase
 

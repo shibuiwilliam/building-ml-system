@@ -30,11 +30,16 @@ class RegisterViolationJob(object):
 
         try:
             self.messaging.init_channel()
+            self.messaging.channel.queue_declare(
+                queue=queue_name,
+                durable=True,
+            )
             self.messaging.channel.basic_qos(prefetch_count=1)
             self.messaging.channel.basic_consume(
                 queue=queue_name,
                 on_message_callback=callback,
             )
+            logger.info(f"Waiting for {queue_name} queue...")
             self.messaging.channel.start_consuming()
         except Exception as e:
             logger.exception(e)

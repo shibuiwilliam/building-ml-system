@@ -4,6 +4,7 @@ from typing import List, Optional
 
 from fastapi import BackgroundTasks
 from sqlalchemy.orm import Session
+from src.infrastructure.messaging import AbstractMessaging
 from src.infrastructure.queue import AbstractQueue
 from src.infrastructure.search import AbstractSearch
 from src.infrastructure.storage import AbstractStorage
@@ -24,12 +25,14 @@ class AbstractAnimalUsecase(ABC):
         storage_client: AbstractStorage,
         queue: AbstractQueue,
         search_client: AbstractSearch,
+        messaging: AbstractMessaging,
     ):
         self.animal_repository = animal_repository
         self.like_repository = like_repository
         self.storage_client = storage_client
         self.queue = queue
         self.search_client = search_client
+        self.messaging = messaging
 
     @abstractmethod
     def retrieve(

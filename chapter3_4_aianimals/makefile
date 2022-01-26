@@ -224,6 +224,50 @@ push_violation_detection_registry:
 	docker push $(DOCKER_VIOLATION_DETECTION_REGISTRY_IMAGE_NAME)
 
 
+############ NO_ANIMAL_VIOLATION COMMANDS ############
+NO_ANIMAL_VIOLATION_DIR := $(DIR)/violation_detection/no_animal_violation
+NO_ANIMAL_VIOLATION_VERSION := $(shell cd ${NO_ANIMAL_VIOLATION_DIR} && poetry version -s)
+NO_ANIMAL_VIOLATION_MANIFEST_DIR := $(K8S_DIR)/manifests/violation_detection/no_animal_violation
+DOCKERFILE_NO_ANIMAL_VIOLATION = $(NO_ANIMAL_VIOLATION_DIR)/$(DOCKERFILE)
+DOCKER_NO_ANIMAL_VIOLATION_TAG = $(TAG)_violation_detection_no_animal_violation
+DOCKER_NO_ANIMAL_VIOLATION_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_NO_ANIMAL_VIOLATION_TAG)_$(NO_ANIMAL_VIOLATION_VERSION)
+DOCKER_NO_ANIMAL_VIOLATION_IMAGE_NAME_TEST = $(DOCKER_REPOSITORY):$(DOCKER_NO_ANIMAL_VIOLATION_TAG)_$(NO_ANIMAL_VIOLATION_VERSION)_$(DOCKER_TEST_TAG)
+
+.PHONY: patch_violation_detection_no_animal_violation
+patch_violation_detection_no_animal_violation:
+	cd $(NO_ANIMAL_VIOLATION_DIR) && \
+	poetry version patch
+
+.PHONY: minor_upgrade_violation_detection_no_animal_violation
+minor_upgrade_violation_detection_no_animal_violation:
+	cd $(NO_ANIMAL_VIOLATION_DIR) && \
+	poetry version minor
+
+.PHONY: major_upgrade_violation_detection_no_animal_violation
+major_upgrade_violation_detection_no_animal_violation:
+	cd $(NO_ANIMAL_VIOLATION_DIR) && \
+	poetry version major
+
+.PHONY: req_violation_detection_no_animal_violation
+req_violation_detection_no_animal_violation:
+	cd $(NO_ANIMAL_VIOLATION_DIR) && \
+	poetry export \
+		--without-hashes \
+		-f requirements.txt \
+		--output requirements.txt
+
+.PHONY: build_violation_detection_no_animal_violation
+build_violation_detection_no_animal_violation: 
+	docker build \
+		-t $(DOCKER_NO_ANIMAL_VIOLATION_IMAGE_NAME) \
+		-f $(DOCKERFILE_NO_ANIMAL_VIOLATION) \
+		.
+
+.PHONY: push_violation_detection_no_animal_violation
+push_violation_detection_no_animal_violation: 
+	docker push $(DOCKER_NO_ANIMAL_VIOLATION_IMAGE_NAME)
+
+
 ############ DOCKER COMPOSE COMMANDS ############
 .PHONY: up
 up:
@@ -261,6 +305,7 @@ deploy_all: registry_default admin_clusterrole \
 req_all: \
 	req_data_registry \
 	req_api \
+	req_violation_detection_no_animal_violation \
 	req_violation_detection_registry
 
 .PHONY: build_all
@@ -268,6 +313,7 @@ build_all: \
 	build_data_registry \
 	build_api \
 	build_es \
+	build_violation_detection_no_animal_violation \
 	build_violation_detection_registry
 
 .PHONY: push_all
@@ -275,4 +321,5 @@ push_all: \
 	push_api \
 	push_data_registry \
 	push_es \
+	push_violation_detection_no_animal_violation \
 	push_violation_detection_registry

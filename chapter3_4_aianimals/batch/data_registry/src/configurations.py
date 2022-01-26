@@ -13,3 +13,4 @@ class Configurations:
     violation_file = os.path.join(data_directory, "violation.json")
 
     animal_registry_queue = os.getenv("ANIMAL_REGISTRY_QUEUE", "animal")
+    no_animal_violation_queue = os.getenv("NO_ANIMAL_VIOLATION_QUEUE", "no_animal_violation")

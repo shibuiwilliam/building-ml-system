@@ -22,8 +22,26 @@ services:
   redis:
     container_name: redis
     image: redis:latest
+    restart: always
+    networks:
+      - default
     ports:
       - 6379:6379
+    hostname: redis
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management
+    restart: always
+    networks:
+      - default
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password
+    hostname: rabbitmq
 
   initial_data_registry:
     container_name: initial_data_registry
@@ -42,6 +60,9 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_DB=0
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=user
+      - RABBITMQ_PASSWORD=password
       - ES_HOST=es
       - ES_SCHEMA=http
       - ES_PORT=9200
@@ -73,6 +94,11 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_DB=0
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=user
+      - RABBITMQ_PASSWORD=password
+      - ANIMAL_REGISTRY_QUEUE=animal
+      - NO_ANIMAL_VIOLATION_QUEUE=no_animal_violation
       - LOG_LEVEL=INFO
       - RUN_ENVIRONMENT=local
       - DATA_DIRECTORY=/opt/dataset
@@ -85,6 +111,7 @@ services:
     depends_on:
       - postgres
       - redis
+      - rabbitmq
 
   es:
     container_name: es
@@ -133,6 +160,9 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_DB=0
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=user
+      - RABBITMQ_PASSWORD=password
       - ES_HOST=es
       - ES_SCHEMA=http
       - ES_PORT=9200
@@ -146,6 +176,53 @@ services:
       - redis
       - api
       - es
+
+  no_animal_violation:
+    container_name: no_animal_violation
+    image: shibui/building-ml-system:ai_animals_violation_detection_no_animal_violation_0.0.0
+    restart: always
+    networks:
+      - default
+    environment:
+      - POSTGRES_SERVER=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=aianimals
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=user
+      - RABBITMQ_PASSWORD=password
+      - CONSUMING_QUEUE=no_animal_violation
+      - REGISTRATION_QUEUE=violation
+    command: >
+      /bin/sh -c "sleep 20s && python -m src.main"
+    depends_on:
+      - postgres
+      - rabbitmq
+      - initial_data_registry
+
+  violation_registry:
+    container_name: violation_registry
+    image: shibui/building-ml-system:ai_animals_violation_detection_registry_0.0.0
+    restart: always
+    networks:
+      - default
+    environment:
+      - POSTGRES_SERVER=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=aianimals
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=user
+      - RABBITMQ_PASSWORD=password
+      - VIOLATION_QUEUE=violation
+    command: >
+      /bin/sh -c "sleep 20s && python -m src.main"
+    depends_on:
+      - postgres
+      - rabbitmq
+      - initial_data_registry
 
 networks:
   default:

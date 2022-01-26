@@ -1,4 +1,6 @@
+import json
 import os
+from typing import Dict
 
 import pika
 from src.middleware.logger import configure_logger
@@ -21,6 +23,7 @@ class RabbitmqMessaging(object):
             self.__rabbitmq_host,
             credentials=self.__rabbitmq_credential,
         )
+        self.properties = pika.BasicProperties(content_type="application/json")
 
     def init_channel(self):
         self.connection = pika.BlockingConnection(self.__params)
@@ -29,3 +32,15 @@ class RabbitmqMessaging(object):
     def close(self):
         self.channel.close()
         self.connection.close()
+
+    def publish(
+        self,
+        queue_name: str,
+        body: Dict,
+    ):
+        self.channel.basic_publish(
+            exchange="",
+            routing_key=queue_name,
+            body=json.dumps(body),
+            properties=self.properties,
+        )

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict, List, Optional
 
-from src.infrastructure.queue import AbstractQueue
+from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging
 from src.infrastructure.search import AbstractSearch
 from src.middleware.logger import configure_logger
 from src.repository.animal_repository import AbstractAnimalRepository
@@ -17,13 +17,13 @@ class AbstractAnimalUsecase(ABC):
         self,
         animal_repository: AbstractAnimalRepository,
         like_repository: AbstractLikeRepository,
-        queue: AbstractQueue,
         search: AbstractSearch,
+        messaging: RabbitmqMessaging,
     ):
         self.animal_repository = animal_repository
         self.like_repository = like_repository
-        self.queue = queue
         self.search = search
+        self.messaging = messaging
 
     @abstractmethod
     def retrieve(

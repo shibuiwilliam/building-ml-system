@@ -1,8 +1,7 @@
 from src.infrastructure.client.elastic_search import Elasticsearch
 from src.infrastructure.client.postgresql_database import PostgreSQLDatabase
-from src.infrastructure.client.redis_queue import RedisQueue
+from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging
 from src.infrastructure.database import AbstractDatabase
-from src.infrastructure.queue import AbstractQueue
 from src.infrastructure.search import AbstractSearch
 from src.job.animal_to_search_job import AnimalToSearchJob
 from src.job.initialization_job import InitializationJob
@@ -47,12 +46,12 @@ class Container(object):
     def __init__(
         self,
         database: AbstractDatabase,
-        queue: AbstractQueue,
+        messaging: RabbitmqMessaging,
         search: AbstractSearch,
     ):
         self.database = database
-        self.queue = queue
         self.search = search
+        self.messaging = messaging
 
         self.table_repository: AbstractTableRepository = TableRepository()
         self.animal_category_repository: AbstractAnimalCategoryRepository = AnimalCategoryRepository(
@@ -82,7 +81,7 @@ class Container(object):
         self.animal_usecase: AbstractAnimalUsecase = AnimalUsecase(
             animal_repository=self.animal_repository,
             like_repository=self.like_repository,
-            queue=self.queue,
+            messaging=self.messaging,
             search=self.search,
         )
         self.like_usecase: AbstractLikeUsecase = LikeUsecase(
@@ -96,7 +95,10 @@ class Container(object):
             animal_repository=self.animal_repository,
         )
 
-        self.animal_search_job: AnimalToSearchJob = AnimalToSearchJob(animal_usecase=self.animal_usecase)
+        self.animal_search_job: AnimalToSearchJob = AnimalToSearchJob(
+            animal_usecase=self.animal_usecase,
+            messaging=self.messaging,
+        )
         self.initialization_job: InitializationJob = InitializationJob(
             table_usecase=self.table_usecase,
             animal_category_usecase=self.animal_category_usecase,
@@ -105,12 +107,13 @@ class Container(object):
             animal_usecase=self.animal_usecase,
             violation_type_usecase=self.violation_type_usecase,
             violation_usecase=self.violation_usecase,
+            messaging=self.messaging,
             engine=self.database.engine,
         )
 
 
 container = Container(
     database=PostgreSQLDatabase(),
-    queue=RedisQueue(),
     search=Elasticsearch(),
+    messaging=RabbitmqMessaging(),
 )

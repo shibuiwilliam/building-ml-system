@@ -4,6 +4,7 @@ from typing import Dict, List
 
 from sqlalchemy.engine import Engine
 from src.configurations import Configurations
+from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging
 from src.job.abstract_job import AbstractJob
 from src.middleware.logger import configure_logger
 from src.request_object.animal import AnimalCreateRequest
@@ -41,6 +42,7 @@ class InitializationJob(AbstractJob):
         animal_usecase: AbstractAnimalUsecase,
         violation_type_usecase: AbstractViolationTypeUsecase,
         violation_usecase: AbstractViolationUsecase,
+        messaging: RabbitmqMessaging,
         engine: Engine,
     ):
         super().__init__()
@@ -51,6 +53,7 @@ class InitializationJob(AbstractJob):
         self.animal_usecase = animal_usecase
         self.violation_type_usecase = violation_type_usecase
         self.violation_usecase = violation_usecase
+        self.messaging = messaging
         self.engine = engine
 
     def __create_table(self):
@@ -190,6 +193,21 @@ class InitializationJob(AbstractJob):
             self.animal_subcategory_usecase.register(request=request)
         logger.info(f"done register animal subcategory: {file_path}")
 
+    def __register_violation_type(
+        self,
+        file_path: str,
+    ):
+        logger.info(f"register violation type: {file_path}")
+        with open(file_path, "r") as f:
+            data = json.load(f)
+        for k, v in data.items():
+            request = ViolationTypeCreateRequest(
+                id=k,
+                name=v["name"],
+            )
+            self.violation_type_usecase.register(request=request)
+        logger.info(f"done register violation type: {file_path}")
+
     def __register_user(
         self,
         file_path: str,
@@ -217,34 +235,28 @@ class InitializationJob(AbstractJob):
         logger.info(f"register animal: {file_path}")
         with open(file_path, "r") as f:
             data = json.load(f)
-        for k, v in data.items():
-            request = AnimalCreateRequest(
-                id=k,
-                animal_category_id=v["category"],
-                animal_subcategory_id=v["subcategory"],
-                user_id=v["user_id"],
-                name=v["filename"],
-                description=v["description"],
-                photo_url=v["photo_url"],
-                created_at=datetime.strptime(v["created_at"], "%Y-%m-%dT%H:%M:%S.%f"),
-            )
-            self.animal_usecase.register(request=request)
+        try:
+            self.messaging.init_channel()
+            self.messaging.create_queue(queue_name=Configurations.no_animal_violation_queue)
+            self.messaging.channel.basic_qos(prefetch_count=1)
+            for k, v in data.items():
+                request = AnimalCreateRequest(
+                    id=k,
+                    animal_category_id=v["category"],
+                    animal_subcategory_id=v["subcategory"],
+                    user_id=v["user_id"],
+                    name=v["filename"],
+                    description=v["description"],
+                    photo_url=v["photo_url"],
+                    created_at=datetime.strptime(v["created_at"], "%Y-%m-%dT%H:%M:%S.%f"),
+                )
+                self.animal_usecase.register(request=request)
+        except Exception as e:
+            logger.exception(e)
+            raise e
+        finally:
+            self.messaging.close()
         logger.info(f"done register animal: {file_path}")
-
-    def __register_violation_type(
-        self,
-        file_path: str,
-    ):
-        logger.info(f"register violation type: {file_path}")
-        with open(file_path, "r") as f:
-            data = json.load(f)
-        for k, v in data.items():
-            request = ViolationTypeCreateRequest(
-                id=k,
-                name=v["name"],
-            )
-            self.violation_type_usecase.register(request=request)
-        logger.info(f"done register violation type: {file_path}")
 
     def __register_violation(
         self,
@@ -269,9 +281,9 @@ class InitializationJob(AbstractJob):
         logger.info("run initialize database")
         self.__create_table()
         self.__create_indices()
+        self.__register_violation_type(file_path=Configurations.violation_type_file)
         self.__register_animal_category(file_path=Configurations.animal_category_file)
         self.__register_animal_subcategory(file_path=Configurations.animal_subcategory_file)
         self.__register_user(file_path=Configurations.user_file)
         self.__register_animal(file_path=Configurations.animal_file)
-        self.__register_violation_type(file_path=Configurations.violation_type_file)
         self.__register_violation(file_path=Configurations.violation_file)
