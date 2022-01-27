@@ -100,19 +100,24 @@ async def post_animal(
 
 @router.post("/search", response_model=Optional[AnimalSearchResponses])
 async def search_animal(
+    background_tasks: BackgroundTasks,
     request: Optional[AnimalSearchRequest] = None,
     limit: int = 100,
     offset: int = 0,
     token: str = Header(...),
     session: Session = Depends(container.database.get_session),
 ):
-    await token_assertion(
+    _, handle_name = await token_assertion(
         token=token,
         session=session,
     )
+    if request is None:
+        request = AnimalSearchRequest()
+    request.user_handle_name = handle_name
     logger.info(f"search animal: {request}")
     data = container.animal_usecase.search(
         request=request,
+        background_tasks=background_tasks,
         limit=limit,
         offset=offset,
     )

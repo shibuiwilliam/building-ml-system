@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from src.constants import CONSTANTS
@@ -9,7 +11,7 @@ from starlette.status import HTTP_403_FORBIDDEN
 async def token_assertion(
     token: str,
     session: Session,
-) -> bool:
+) -> Tuple[bool, str]:
     try:
         raw_token = container.crypt.decrypt(enc_text=token)
     except Exception:
@@ -38,4 +40,4 @@ async def token_assertion(
             status_code=HTTP_403_FORBIDDEN,
             detail="authorization failure",
         )
-    return True
+    return True, handle_name

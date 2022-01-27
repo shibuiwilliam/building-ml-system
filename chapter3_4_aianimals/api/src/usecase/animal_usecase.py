@@ -67,7 +67,8 @@ class AbstractAnimalUsecase(ABC):
     @abstractmethod
     def search(
         self,
-        request: Optional[AnimalSearchRequest] = None,
+        request: AnimalSearchRequest,
+        background_tasks: BackgroundTasks,
         limit: int = 100,
         offset: int = 0,
     ) -> AnimalSearchResponses:

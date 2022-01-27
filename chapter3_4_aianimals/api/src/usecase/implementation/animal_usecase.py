@@ -1,9 +1,11 @@
+import pickle
 from logging import getLogger
 from typing import List, Optional
 
 from fastapi import BackgroundTasks
 from sqlalchemy.orm import Session
 from src.configurations import Configurations
+from src.constants import CONSTANTS
 from src.entities.animal import ANIMAL_INDEX, AnimalCreate, AnimalQuery, AnimalSearchQuery, AnimalSearchSortKey
 from src.infrastructure.messaging import AbstractMessaging
 from src.infrastructure.queue import AbstractQueue
@@ -114,11 +116,6 @@ class AnimalUsecase(AbstractAnimalUsecase):
         if data is not None:
             response = AnimalResponse(**data.dict())
             background_tasks.add_task(
-                self.queue.enqueue,
-                Configurations.animal_registry_queue,
-                data.id,
-            )
-            background_tasks.add_task(
                 self.messaging.publish,
                 Configurations.no_animal_violation_queue,
                 {"id": data.id},
@@ -126,24 +123,52 @@ class AnimalUsecase(AbstractAnimalUsecase):
             return response
         return None
 
+    def __make_search_key(
+        self,
+        query: AnimalSearchQuery,
+    ) -> str:
+        key = f"{CONSTANTS.ANIMAL_SEARCH_CACHE_PREFIX}_"
+        key += f"{query.user_handle_name}_"
+        key += f"{query.animal_category_name_en}_"
+        key += f"{query.animal_category_name_ja}_"
+        key += f"{query.animal_subcategory_name_en}_"
+        key += f"{query.animal_subcategory_name_ja}_"
+        key += f"{'_'.join(query.phrases)}_"
+        key += query.sort_by.value
+        return key
+
+    def __set_search_cache(
+        self,
+        key: str,
+        result: AnimalSearchResponses,
+    ):
+        self.queue.set(
+            key=key,
+            value=pickle.dumps(result),
+        )
+
     def search(
         self,
-        request: Optional[AnimalSearchRequest] = None,
+        request: AnimalSearchRequest,
+        background_tasks: BackgroundTasks,
         limit: int = 100,
         offset: int = 0,
     ) -> AnimalSearchResponses:
-        query: Optional[AnimalSearchQuery] = None
-        if request is not None:
-            sort_by = AnimalSearchSortKey.value_to_key(value=request.sort_by)
-            query = AnimalSearchQuery(
-                animal_category_name_en=request.animal_category_name_en,
-                animal_category_name_ja=request.animal_category_name_ja,
-                animal_subcategory_name_en=request.animal_subcategory_name_en,
-                animal_subcategory_name_ja=request.animal_subcategory_name_ja,
-                phrases=request.phrases,
-                sort_by=sort_by,
-            )
+        sort_by = AnimalSearchSortKey.value_to_key(value=request.sort_by)
+        query = AnimalSearchQuery(
+            user_handle_name=request.user_handle_name,
+            animal_category_name_en=request.animal_category_name_en,
+            animal_category_name_ja=request.animal_category_name_ja,
+            animal_subcategory_name_en=request.animal_subcategory_name_en,
+            animal_subcategory_name_ja=request.animal_subcategory_name_ja,
+            phrases=request.phrases,
+            sort_by=sort_by,
+        )
         logger.info(f"search query: {query}")
+        key = self.__make_search_key(query=query)
+        cached = self.queue.get(key=key)
+        if cached is not None and isinstance(cached, bytes):
+            return pickle.loads(cached)
         results = self.search_client.search(
             index=ANIMAL_INDEX,
             query=query,
@@ -154,5 +179,10 @@ class AnimalUsecase(AbstractAnimalUsecase):
             hits=results.hits,
             max_score=results.max_score,
             results=[AnimalSearchResponse(**r.dict()) for r in results.results],
+        )
+        background_tasks.add_task(
+            self.__set_search_cache,
+            key,
+            searched,
         )
         return searched

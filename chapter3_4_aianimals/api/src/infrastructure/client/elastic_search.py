@@ -64,47 +64,46 @@ class Elasticsearch(AbstractSearch):
     def search(
         self,
         index: str,
-        query: Optional[AnimalSearchQuery] = None,
+        query: AnimalSearchQuery,
         from_: int = 0,
         size: int = 20,
     ) -> AnimalSearchResults:
-        if query is None:
+        q: Dict[str, Dict] = {"bool": {}}
+        if query.animal_category_name_en is not None:
+            q = self.__add_must(
+                q=q,
+                key="animal_category_name_en",
+                value=query.animal_category_name_en,
+            )
+        if query.animal_category_name_ja is not None:
+            q = self.__add_must(
+                q=q,
+                key="animal_category_name_ja",
+                value=query.animal_category_name_ja,
+            )
+        if query.animal_subcategory_name_en is not None:
+            q = self.__add_must(
+                q=q,
+                key="animal_subcategory_name_en",
+                value=query.animal_subcategory_name_en,
+            )
+        if query.animal_subcategory_name_ja is not None:
+            q = self.__add_must(
+                q=q,
+                key="animal_subcategory_name_ja",
+                value=query.animal_subcategory_name_ja,
+            )
+        if len(query.phrases) > 0:
+            q["bool"]["should"] = [
+                {
+                    "match": {"name": " ".join(query.phrases)},
+                },
+                {
+                    "match": {"description": " ".join(query.phrases)},
+                },
+            ]
+        if len(q["bool"]) == 0:
             q = {"match_all": {}}
-        else:
-            q = {"bool": {}}
-            if query.animal_category_name_en is not None:
-                q = self.__add_must(
-                    q=q,
-                    key="animal_category_name_en",
-                    value=query.animal_category_name_en,
-                )
-            if query.animal_category_name_ja is not None:
-                q = self.__add_must(
-                    q=q,
-                    key="animal_category_name_ja",
-                    value=query.animal_category_name_ja,
-                )
-            if query.animal_subcategory_name_en is not None:
-                q = self.__add_must(
-                    q=q,
-                    key="animal_subcategory_name_en",
-                    value=query.animal_subcategory_name_en,
-                )
-            if query.animal_subcategory_name_ja is not None:
-                q = self.__add_must(
-                    q=q,
-                    key="animal_subcategory_name_ja",
-                    value=query.animal_subcategory_name_ja,
-                )
-            if len(query.phrases) > 0:
-                q["bool"]["should"] = [
-                    {
-                        "match": {"name": " ".join(query.phrases)},
-                    },
-                    {
-                        "match": {"description": " ".join(query.phrases)},
-                    },
-                ]
         sort = self.__make_sort(key=query.sort_by if query is not None else None)
         searched = self.es_client.search(
             index=index,

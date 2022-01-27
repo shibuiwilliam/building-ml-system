@@ -1,6 +1,6 @@
 import os
 from logging import getLogger
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 import redis
 from src.infrastructure.queue import AbstractQueue
@@ -40,3 +40,22 @@ class RedisQueue(AbstractQueue):
             return self.redis_client.rpop(queue_name)
         else:
             return None
+
+    def set(
+        self,
+        key: str,
+        value: Union[str, int, float, bool, bytes],
+        expire_second: int = 600,
+    ):
+        self.redis_client.set(
+            name=key,
+            value=value,
+            ex=expire_second,
+        )
+
+    def get(
+        self,
+        key: str,
+    ) -> Optional[Union[str, int, float, bool, bytes]]:
+        value = self.redis_client.get(name=key)
+        return value

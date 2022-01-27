@@ -82,6 +82,7 @@ class AnimalSearchSortKey(Enum):
 
 
 class AnimalSearchQuery(BaseModel):
+    user_handle_name: Optional[str]
     animal_category_name_en: Optional[str]
     animal_category_name_ja: Optional[str]
     animal_subcategory_name_en: Optional[str]

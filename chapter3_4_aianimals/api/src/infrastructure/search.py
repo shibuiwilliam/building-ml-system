@@ -15,7 +15,7 @@ class AbstractSearch(ABC):
     def search(
         self,
         index: str,
-        query: Optional[AnimalSearchQuery] = None,
+        query: AnimalSearchQuery,
         from_: int = 0,
         size: int = 20,
     ) -> AnimalSearchResults:

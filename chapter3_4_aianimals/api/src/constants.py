@@ -59,5 +59,9 @@ class _CONSTANTS(object):
     def TOKEN_SPLITTER() -> str:
         return "____"
 
+    @constant
+    def ANIMAL_SEARCH_CACHE_PREFIX() -> str:
+        return "ANIMAL_SEARCH_CACHE"
+
 
 CONSTANTS = _CONSTANTS()
