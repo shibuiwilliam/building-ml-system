@@ -12,6 +12,10 @@ tensorboard = "^2.8.0"
 Pillow = "^9.0.0"
 scikit-learn = "^1.0.2"
 numpy = "^1.22.1"
+hydra-core = "^1.1.1"
+mlflow = "^1.23.1"
+nptyping = "^1.4.4"
+pydantic = "^1.9.0"
 
 [tool.poetry.dev-dependencies]
 
