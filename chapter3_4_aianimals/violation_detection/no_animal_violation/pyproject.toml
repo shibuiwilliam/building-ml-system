@@ -12,6 +12,9 @@ pydantic = "^1.9.0"
 SQLAlchemy = "^1.4.31"
 psycopg2-binary = "^2.9.3"
 click = "^8.0.3"
+hydra-core = "^1.1.1"
+mlflow = "^1.23.1"
+nptyping = "^1.4.4"
 
 [tool.poetry.dev-dependencies]
 
