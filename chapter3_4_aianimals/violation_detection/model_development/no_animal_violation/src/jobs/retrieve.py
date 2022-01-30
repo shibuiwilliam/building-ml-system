@@ -5,7 +5,6 @@ from typing import List
 
 import httpx
 from PIL import Image
-from src.dataset.schema import TrainTestDataset
 
 
 async def download_file(
@@ -46,12 +45,13 @@ def download_dataset(
     bucket: str,
     filepaths: List[str],
     destination_directory: str,
-):
+) -> List[str]:
     urls = [os.path.join("https://storage.googleapis.com/", bucket, f) for f in filepaths]
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(
+    destination_paths = loop.run_until_complete(
         download_files(
             filepaths=urls,
             destination_directory=destination_directory,
         )
     )
+    return destination_paths

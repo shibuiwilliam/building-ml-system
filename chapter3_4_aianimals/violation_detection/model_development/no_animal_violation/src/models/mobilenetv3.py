@@ -1,12 +1,12 @@
 import os
 from datetime import datetime
-from typing import Any, List, Optional
+from typing import Any, List
 
 import tensorflow as tf
 import tensorflow_hub as hub
 from nptyping import NDArray
 from sklearn.metrics import accuracy_score, precision_score, recall_score
-from src.model.abstract_model import AbstractModel, Evaluation, LabelPrediction
+from src.model.abstract_model import AbstractModel, Evaluation
 from src.utils.logger import configure_logger
 from tensorflow import keras
 
@@ -74,29 +74,43 @@ class MobilenetV3(AbstractModel):
         y_train: NDArray[(Any, 2), int],
         x_test: NDArray[(Any, 224, 224, 3), float],
         y_test: NDArray[(Any, 2), int],
-        checkpoint_filepath: str,
-        pretrained_model_filepath: Optional[str] = None,
+        artifact_path: str,
         batch_size: int = 32,
         epochs: int = 100,
+        checkpoint: bool = True,
+        early_stopping: bool = True,
+        tensorboard: bool = True,
     ):
-        checkpoint_callback = keras.callbacks.ModelCheckpoint(
-            checkpoint_filepath,
-            monitor="val_loss",
-            save_best_only=True,
-            save_weights_only=True,
-        )
-        early_stopping = keras.callbacks.EarlyStopping(
-            monitor="val_loss",
-            patience=2,
-            verbose=1,
-            mode="auto",
-            restore_best_weights=True,
-        )
-        log_dir = "logs/fit/" + datetime.now().strftime("%Y%m%d_%H%M%S")
-        tensorboard_callback = keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+        callbacks: List[keras.callbacks] = []
+        if checkpoint:
+            checkpoint_filepath = os.path.join(artifact_path, "checkpoint")
+            callbacks.append(
+                keras.callbacks.ModelCheckpoint(
+                    checkpoint_filepath,
+                    monitor="val_loss",
+                    save_best_only=True,
+                    save_weights_only=True,
+                )
+            )
+        if early_stopping:
+            callbacks.append(
+                keras.callbacks.EarlyStopping(
+                    monitor="val_loss",
+                    patience=2,
+                    verbose=1,
+                    mode="auto",
+                    restore_best_weights=True,
+                )
+            )
+        if tensorboard:
+            log_dir = os.path.join(artifact_path, datetime.now().strftime("%Y%m%d_%H%M%S"))
+            callbacks.append(
+                keras.callbacks.TensorBoard(
+                    log_dir=log_dir,
+                    histogram_freq=1,
+                )
+            )
 
-        if pretrained_model_filepath is not None:
-            self.model.load_weights(pretrained_model_filepath)
         train_generator = self.train_datagen.flow(
             x_train,
             y_train,
@@ -115,11 +129,7 @@ class MobilenetV3(AbstractModel):
             validation_steps=1,
             steps_per_epoch=len(x_train) / batch_size,
             epochs=epochs,
-            callbacks=[
-                checkpoint_callback,
-                early_stopping,
-                tensorboard_callback,
-            ],
+            callbacks=callbacks,
         )
         logger.info(f"train history: {history}")
 
@@ -127,29 +137,17 @@ class MobilenetV3(AbstractModel):
         self,
         x: NDArray[(Any, 224, 224, 3), float],
         y: NDArray[(Any, 2), int],
-        test_files: List[str],
-        threshold: float = 0.95,
+        threshold: float = 0.5,
     ) -> Evaluation:
         predictions = self.model.predict(x).tolist()
         y_pred = [1 if p[1] >= threshold else 0 for p in predictions]
         y_true = y.argmax(axis=1).tolist()
-        label_prediction = []
-        for i, test_file in enumerate(test_files):
-            label_prediction.append(
-                LabelPrediction(
-                    file_name=test_file,
-                    label=y_true[i],
-                    prediction=predictions[i],
-                    predicted_label=y_pred[i],
-                )
-            )
         accuracy = accuracy_score(y_true, y_pred)
         positive_precision = precision_score(y_true, y_pred, pos_label=1)
         positive_recall = recall_score(y_true, y_pred, pos_label=1)
         negative_precision = precision_score(y_true, y_pred, pos_label=0)
         negative_recall = recall_score(y_true, y_pred, pos_label=0)
         evaluation = Evaluation(
-            label_prediction=label_prediction,
             threshold=threshold,
             accuracy=accuracy,
             positive_precision=positive_precision,
@@ -182,6 +180,12 @@ class MobilenetV3(AbstractModel):
         self,
         save_path: str,
     ) -> str:
+        dirname = os.path.dirname(save_path)
+        if not os.path.exists(dirname):
+            os.makedirs(
+                dirname,
+                exist_ok=True,
+            )
         converter = tf.lite.TFLiteConverter.from_keras_model(self.model)
         tflite_model = converter.convert()
         with open(save_path, "wb") as f:

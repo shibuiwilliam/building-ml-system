@@ -1,3 +1,4 @@
+task_name: no_animal_violation_detection
 dataset:
   train:
     negative_file: /opt/dataset/train_animals.txt
@@ -21,7 +22,7 @@ jobs:
     loss: categorical_crossentropy
     metrics:
       - acc
-    threshold: 0.98
+    threshold: 0.5
     augmentation:
       rotation_range: 10
       horizontal_flip: True

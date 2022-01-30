@@ -225,7 +225,7 @@ push_violation_detection_registry:
 
 
 ############ NO_ANIMAL_VIOLATION COMMANDS ############
-NO_ANIMAL_VIOLATION_DIR := $(DIR)/violation_detection/no_animal_violation
+NO_ANIMAL_VIOLATION_DIR := $(DIR)/violation_detection/no_animal_violation/proxy
 NO_ANIMAL_VIOLATION_VERSION := $(shell cd ${NO_ANIMAL_VIOLATION_DIR} && poetry version -s)
 NO_ANIMAL_VIOLATION_MANIFEST_DIR := $(K8S_DIR)/manifests/violation_detection/no_animal_violation
 DOCKERFILE_NO_ANIMAL_VIOLATION = $(NO_ANIMAL_VIOLATION_DIR)/$(DOCKERFILE)

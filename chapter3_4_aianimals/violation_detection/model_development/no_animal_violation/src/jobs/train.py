@@ -1,4 +1,4 @@
-from typing import Any, List, Optional, Tuple
+from typing import Any, List
 
 from nptyping import NDArray
 from src.middleware.logger import configure_logger
@@ -35,9 +35,7 @@ def train_and_evaluate(
     y_train: NDArray[(Any, 2), int],
     x_test: NDArray[(Any, Any, Any, 3), float],
     y_test: NDArray[(Any, 2), int],
-    test_files: List[str],
-    checkpoint_filepath: str,
-    pretrained_model_filepath: Optional[str] = None,
+    artifact_path: str,
     batch_size: int = 32,
     epochs: int = 100,
     rotation_range: int = 10,
@@ -46,7 +44,10 @@ def train_and_evaluate(
     width_shift_range: float = 0.2,
     zoom_range: float = 0.2,
     channel_shift_range: float = 0.2,
-    threshold: float = 0.98,
+    threshold: float = 0.5,
+    checkpoint: bool = True,
+    early_stopping: bool = True,
+    tensorboard: bool = True,
 ) -> Evaluation:
     model.define_augmentation(
         rotation_range=rotation_range,
@@ -61,15 +62,16 @@ def train_and_evaluate(
         y_train=y_train,
         x_test=x_test,
         y_test=y_test,
-        checkpoint_filepath=checkpoint_filepath,
-        pretrained_model_filepath=pretrained_model_filepath,
+        artifact_path=artifact_path,
         batch_size=batch_size,
         epochs=epochs,
+        checkpoint=checkpoint,
+        early_stopping=early_stopping,
+        tensorboard=tensorboard,
     )
     evaluation = model.evaluate(
         x=x_test,
         y=y_test,
-        test_files=test_files,
         threshold=threshold,
     )
     return evaluation

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, List, Optional
+from typing import Any, List
 
 from nptyping import NDArray
 from pydantic import BaseModel
@@ -16,7 +16,6 @@ class LabelPrediction(BaseModel):
 
 
 class Evaluation(BaseModel):
-    label_prediction: List[LabelPrediction]
     threshold: float
     accuracy: float
     positive_precision: float
@@ -61,10 +60,12 @@ class AbstractModel(ABC):
         y_train: NDArray[(Any, 2), int],
         x_test: NDArray[(Any, 299, 299, 3), float],
         y_test: NDArray[(Any, 2), int],
-        checkpoint_filepath: str,
-        pretrained_model_filepath: Optional[str] = None,
+        artifact_path: str,
         batch_size: int = 32,
         epochs: int = 100,
+        checkpoint: bool = True,
+        early_stopping: bool = True,
+        tensorboard: bool = True,
     ):
         raise NotImplementedError
 
@@ -73,8 +74,7 @@ class AbstractModel(ABC):
         self,
         x: NDArray[(Any, 299, 299, 3), float],
         y: NDArray[(Any, 2), int],
-        test_files: List[str],
-        threshold: float = 0.95,
+        threshold: float = 0.5,
     ) -> Evaluation:
         raise NotImplementedError
 
