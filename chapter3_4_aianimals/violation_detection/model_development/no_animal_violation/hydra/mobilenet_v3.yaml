@@ -8,6 +8,7 @@ dataset:
   image:
     height: 224
     width: 224
+  bucket: aianimals
 
 jobs:
   train:
@@ -20,7 +21,7 @@ jobs:
     loss: categorical_crossentropy
     metrics:
       - acc
-    threshold: 0.95
+    threshold: 0.98
     augmentation:
       rotation_range: 10
       horizontal_flip: True
