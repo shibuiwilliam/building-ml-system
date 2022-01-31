@@ -16,7 +16,6 @@ DATA_REGISTRY_VERSION := $(shell cd ${DATA_REGISTRY_DIR} && poetry version -s)
 DOCKERFILE_DATA_REGISTRY = $(DATA_REGISTRY_DIR)/$(DOCKERFILE)
 DOCKER_DATA_REGISTRY_TAG = $(TAG)_data_registry
 DOCKER_DATA_REGISTRY_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_DATA_REGISTRY_TAG)_$(DATA_REGISTRY_VERSION)
-DOCKER_DATA_REGISTRY_IMAGE_NAME_TEST = $(DOCKER_REPOSITORY):$(DOCKER_DATA_REGISTRY_TAG)_$(DATA_REGISTRY_VERSION)_$(DOCKER_TEST_TAG)
 
 .PHONY: patch_data_registry
 patch_data_registry:
@@ -44,6 +43,7 @@ req_data_registry:
 .PHONY: build_data_registry
 build_data_registry: 
 	docker build \
+		--platform x86_64 \
 		-t $(DOCKER_DATA_REGISTRY_IMAGE_NAME) \
 		-f $(DOCKERFILE_DATA_REGISTRY) \
 		.
@@ -60,7 +60,6 @@ API_MANIFEST_DIR := $(K8S_DIR)/manifests/api
 DOCKERFILE_API = $(API_DIR)/$(DOCKERFILE)
 DOCKER_API_TAG = $(TAG)_api
 DOCKER_API_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_API_TAG)_$(API_VERSION)
-DOCKER_API_IMAGE_NAME_TEST = $(DOCKER_REPOSITORY):$(DOCKER_API_TAG)_$(API_VERSION)_$(DOCKER_TEST_TAG)
 
 .PHONY: patch_api
 patch_api:
@@ -88,6 +87,7 @@ req_api:
 .PHONY: build_api
 build_api: 
 	docker build \
+		--platform x86_64 \
 		-t $(DOCKER_API_IMAGE_NAME) \
 		-f $(DOCKERFILE_API) \
 		.
@@ -142,6 +142,7 @@ DOCKER_ES_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_ES_TAG)_$(ES_VERSION)
 .PHONY: build_es
 build_es: 
 	docker build \
+		--platform x86_64 \
 		-t $(DOCKER_ES_IMAGE_NAME) \
 		-f $(DOCKERFILE_ES) \
 		.
@@ -187,7 +188,6 @@ VIOLATION_DETECTION_REGISTRY_MANIFEST_DIR := $(K8S_DIR)/manifests/violation_dete
 DOCKERFILE_VIOLATION_DETECTION_REGISTRY = $(VIOLATION_DETECTION_REGISTRY_DIR)/$(DOCKERFILE)
 DOCKER_VIOLATION_DETECTION_REGISTRY_TAG = $(TAG)_violation_detection_registry
 DOCKER_VIOLATION_DETECTION_REGISTRY_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_VIOLATION_DETECTION_REGISTRY_TAG)_$(VIOLATION_DETECTION_REGISTRY_VERSION)
-DOCKER_VIOLATION_DETECTION_REGISTRY_IMAGE_NAME_TEST = $(DOCKER_REPOSITORY):$(DOCKER_VIOLATION_DETECTION_REGISTRY_TAG)_$(VIOLATION_DETECTION_REGISTRY_VERSION)_$(DOCKER_TEST_TAG)
 
 .PHONY: patch_violation_detection_registry
 patch_violation_detection_registry:
@@ -215,6 +215,7 @@ req_violation_detection_registry:
 .PHONY: build_violation_detection_registry
 build_violation_detection_registry: 
 	docker build \
+		--platform x86_64 \
 		-t $(DOCKER_VIOLATION_DETECTION_REGISTRY_IMAGE_NAME) \
 		-f $(DOCKERFILE_VIOLATION_DETECTION_REGISTRY) \
 		.
@@ -224,48 +225,69 @@ push_violation_detection_registry:
 	docker push $(DOCKER_VIOLATION_DETECTION_REGISTRY_IMAGE_NAME)
 
 
-############ NO_ANIMAL_VIOLATION COMMANDS ############
-NO_ANIMAL_VIOLATION_DIR := $(DIR)/violation_detection/no_animal_violation/proxy
-NO_ANIMAL_VIOLATION_VERSION := $(shell cd ${NO_ANIMAL_VIOLATION_DIR} && poetry version -s)
-NO_ANIMAL_VIOLATION_MANIFEST_DIR := $(K8S_DIR)/manifests/violation_detection/no_animal_violation
-DOCKERFILE_NO_ANIMAL_VIOLATION = $(NO_ANIMAL_VIOLATION_DIR)/$(DOCKERFILE)
-DOCKER_NO_ANIMAL_VIOLATION_TAG = $(TAG)_violation_detection_no_animal_violation
-DOCKER_NO_ANIMAL_VIOLATION_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_NO_ANIMAL_VIOLATION_TAG)_$(NO_ANIMAL_VIOLATION_VERSION)
-DOCKER_NO_ANIMAL_VIOLATION_IMAGE_NAME_TEST = $(DOCKER_REPOSITORY):$(DOCKER_NO_ANIMAL_VIOLATION_TAG)_$(NO_ANIMAL_VIOLATION_VERSION)_$(DOCKER_TEST_TAG)
+############ NO_ANIMAL_VIOLATION_PROXY COMMANDS ############
+NO_ANIMAL_VIOLATION_PROXY_DIR := $(DIR)/violation_detection/no_animal_violation/proxy
+NO_ANIMAL_VIOLATION_PROXY_VERSION := $(shell cd ${NO_ANIMAL_VIOLATION_PROXY_DIR} && poetry version -s)
+NO_ANIMAL_VIOLATION_PROXY_MANIFEST_DIR := $(K8S_DIR)/manifests/violation_detection/no_animal_violation_proxy
+DOCKERFILE_NO_ANIMAL_VIOLATION_PROXY = $(NO_ANIMAL_VIOLATION_PROXY_DIR)/$(DOCKERFILE)
+DOCKER_NO_ANIMAL_VIOLATION_PROXY_TAG = $(TAG)_violation_detection_no_animal_violation_proxy
+DOCKER_NO_ANIMAL_VIOLATION_PROXY_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_NO_ANIMAL_VIOLATION_PROXY_TAG)_$(NO_ANIMAL_VIOLATION_PROXY_VERSION)
 
-.PHONY: patch_violation_detection_no_animal_violation
-patch_violation_detection_no_animal_violation:
-	cd $(NO_ANIMAL_VIOLATION_DIR) && \
+.PHONY: patch_violation_detection_no_animal_violation_proxy
+patch_violation_detection_no_animal_violation_proxy:
+	cd $(NO_ANIMAL_VIOLATION_PROXY_DIR) && \
 	poetry version patch
 
-.PHONY: minor_upgrade_violation_detection_no_animal_violation
-minor_upgrade_violation_detection_no_animal_violation:
-	cd $(NO_ANIMAL_VIOLATION_DIR) && \
+.PHONY: minor_upgrade_violation_detection_no_animal_violation_proxy
+minor_upgrade_violation_detection_no_animal_violation_proxy:
+	cd $(NO_ANIMAL_VIOLATION_PROXY_DIR) && \
 	poetry version minor
 
-.PHONY: major_upgrade_violation_detection_no_animal_violation
-major_upgrade_violation_detection_no_animal_violation:
-	cd $(NO_ANIMAL_VIOLATION_DIR) && \
+.PHONY: major_upgrade_violation_detection_no_animal_violation_proxy
+major_upgrade_violation_detection_no_animal_violation_proxy:
+	cd $(NO_ANIMAL_VIOLATION_PROXY_DIR) && \
 	poetry version major
 
-.PHONY: req_violation_detection_no_animal_violation
-req_violation_detection_no_animal_violation:
-	cd $(NO_ANIMAL_VIOLATION_DIR) && \
+.PHONY: req_violation_detection_no_animal_violation_proxy
+req_violation_detection_no_animal_violation_proxy:
+	cd $(NO_ANIMAL_VIOLATION_PROXY_DIR) && \
 	poetry export \
 		--without-hashes \
 		-f requirements.txt \
 		--output requirements.txt
 
-.PHONY: build_violation_detection_no_animal_violation
-build_violation_detection_no_animal_violation: 
+.PHONY: build_violation_detection_no_animal_violation_proxy
+build_violation_detection_no_animal_violation_proxy: 
 	docker build \
-		-t $(DOCKER_NO_ANIMAL_VIOLATION_IMAGE_NAME) \
-		-f $(DOCKERFILE_NO_ANIMAL_VIOLATION) \
+		--platform x86_64 \
+		-t $(DOCKER_NO_ANIMAL_VIOLATION_PROXY_IMAGE_NAME) \
+		-f $(DOCKERFILE_NO_ANIMAL_VIOLATION_PROXY) \
 		.
 
-.PHONY: push_violation_detection_no_animal_violation
-push_violation_detection_no_animal_violation: 
-	docker push $(DOCKER_NO_ANIMAL_VIOLATION_IMAGE_NAME)
+.PHONY: push_violation_detection_no_animal_violation_proxy
+push_violation_detection_no_animal_violation_proxy: 
+	docker push $(DOCKER_NO_ANIMAL_VIOLATION_PROXY_IMAGE_NAME)
+
+
+############ NO_ANIMAL_VIOLATION_SERVING COMMANDS ############
+NO_ANIMAL_VIOLATION_SERVING_DIR := $(DIR)/violation_detection/no_animal_violation/serving
+NO_ANIMAL_VIOLATION_SERVING_VERSION := 0.0.0
+NO_ANIMAL_VIOLATION_SERVING_MANIFEST_DIR := $(K8S_DIR)/manifests/violation_detection/no_animal_violation_serving
+DOCKERFILE_NO_ANIMAL_VIOLATION_SERVING = $(NO_ANIMAL_VIOLATION_SERVING_DIR)/$(DOCKERFILE)
+DOCKER_NO_ANIMAL_VIOLATION_SERVING_TAG = $(TAG)_violation_detection_no_animal_violation_serving
+DOCKER_NO_ANIMAL_VIOLATION_SERVING_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_NO_ANIMAL_VIOLATION_SERVING_TAG)_$(NO_ANIMAL_VIOLATION_SERVING_VERSION)
+
+.PHONY: build_violation_detection_no_animal_violation_serving
+build_violation_detection_no_animal_violation_serving: 
+	docker build \
+		--platform x86_64 \
+		-t $(DOCKER_NO_ANIMAL_VIOLATION_SERVING_IMAGE_NAME) \
+		-f $(DOCKERFILE_NO_ANIMAL_VIOLATION_SERVING) \
+		.
+
+.PHONY: push_violation_detection_no_animal_violation_serving
+push_violation_detection_no_animal_violation_serving: 
+	docker push $(DOCKER_NO_ANIMAL_VIOLATION_SERVING_IMAGE_NAME)
 
 
 ############ DOCKER COMPOSE COMMANDS ############
@@ -305,7 +327,7 @@ deploy_all: registry_default admin_clusterrole \
 req_all: \
 	req_data_registry \
 	req_api \
-	req_violation_detection_no_animal_violation \
+	req_violation_detection_no_animal_violation_proxy \
 	req_violation_detection_registry
 
 .PHONY: build_all
@@ -313,7 +335,8 @@ build_all: \
 	build_data_registry \
 	build_api \
 	build_es \
-	build_violation_detection_no_animal_violation \
+	build_violation_detection_no_animal_violation_proxy \
+	build_violation_detection_no_animal_violation_serving \
 	build_violation_detection_registry
 
 .PHONY: push_all
@@ -321,5 +344,6 @@ push_all: \
 	push_api \
 	push_data_registry \
 	push_es \
-	push_violation_detection_no_animal_violation \
+	push_violation_detection_no_animal_violation_proxy \
+	push_violation_detection_no_animal_violation_serving \
 	push_violation_detection_registry
