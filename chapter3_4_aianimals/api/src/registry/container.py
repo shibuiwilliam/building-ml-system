@@ -14,9 +14,11 @@ from src.infrastructure.queue import AbstractQueue
 from src.infrastructure.search import AbstractSearch
 from src.infrastructure.storage import AbstractStorage
 from src.middleware.crypt import AbstractCrypt, Crypt
+from src.repository.access_log_repository import AbstractAccessLogRepository
 from src.repository.animal_category_repository import AbstractAnimalCategoryRepository
 from src.repository.animal_repository import AbstractAnimalRepository
 from src.repository.animal_subcategory_repository import AbstractAnimalSubcategoryRepository
+from src.repository.implementation.access_log_repository import AccessLogRepository
 from src.repository.implementation.animal_category_repository import AnimalCategoryRepository
 from src.repository.implementation.animal_repository import AnimalRepository
 from src.repository.implementation.animal_subcategory_repository import AnimalSubcategoryRepository
@@ -28,9 +30,11 @@ from src.repository.like_repository import AbstractLikeRepository
 from src.repository.user_repository import AbstractUserRepository
 from src.repository.violation_repository import AbstractViolationRepository
 from src.repository.violation_type_repository import AbstractViolationTypeRepository
+from src.usecase.access_log_usecase import AbstractAccessLogUsecase
 from src.usecase.animal_category_usecase import AbstractAnimalCategoryUsecase
 from src.usecase.animal_subcategory_usecase import AbstractAnimalSubcategoryUsecase
 from src.usecase.animal_usecase import AbstractAnimalUsecase
+from src.usecase.implementation.access_log_usecase import AccessLogUsecase
 from src.usecase.implementation.animal_category_usecase import AnimalCategoryUsecase
 from src.usecase.implementation.animal_subcategory_usecase import AnimalSubcategoryUsecase
 from src.usecase.implementation.animal_usecase import AnimalUsecase
@@ -74,6 +78,7 @@ class Container(object):
         self.like_repository: AbstractLikeRepository = LikeRepository()
         self.violation_type_repository: AbstractViolationTypeRepository = ViolationTypeRepository()
         self.violation_repository: AbstractViolationRepository = ViolationRepository()
+        self.access_log_repository: AbstractAccessLogRepository = AccessLogRepository()
 
         self.animal_category_usecase: AbstractAnimalCategoryUsecase = AnimalCategoryUsecase(
             animal_category_repository=self.animal_category_repository,
@@ -103,6 +108,10 @@ class Container(object):
         )
         self.violation_usecase: AbstractViolationUsecase = ViolationUsecase(
             violation_repository=self.violation_repository
+        )
+        self.access_log_usecase: AbstractAccessLogUsecase = AccessLogUsecase(
+            access_log_repository=self.access_log_repository,
+            like_repository=self.like_repository,
         )
         self.metadata_usecase: AbstractMetadataUsecase = MetadataUsecase(
             animal_category_repository=self.animal_category_repository,

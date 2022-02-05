@@ -52,6 +52,7 @@ class AnimalSearchResponses(BaseModel):
     hits: int
     max_score: Optional[float]
     results: List[AnimalSearchResponse]
+    offset: int
 
     class Config:
         extra = Extra.forbid

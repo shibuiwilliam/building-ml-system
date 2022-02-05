@@ -2,7 +2,7 @@ from logging import getLogger
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from src.api import animal, animal_category, health_check, like, metadata, user, violation
+from src.api import access_log, animal, animal_category, health_check, like, metadata, user, violation
 from src.configurations import Configurations
 from src.exceptions.custom_exceptions import APINotAllowedException, DatabaseException, StorageClientException
 
@@ -91,6 +91,12 @@ app.include_router(
     violation.router,
     prefix=f"{base_prefix}/violation",
     tags=["violation"],
+)
+
+app.include_router(
+    access_log.router,
+    prefix=f"{base_prefix}/access_log",
+    tags=["access_log"],
 )
 
 app.include_router(

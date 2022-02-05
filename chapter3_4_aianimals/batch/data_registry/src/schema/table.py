@@ -14,6 +14,7 @@ class TABLES(Enum):
     LIKE = "likes"
     VIOLATION_TYPE = "violation_types"
     VIOLATION = "violations"
+    ACCESS_LOG = "access_logs"
 
     @staticmethod
     def has_value(value: str) -> bool:

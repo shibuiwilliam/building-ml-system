@@ -71,7 +71,7 @@ async def liked_by(
     return data
 
 
-@router.post("", response_model=Optional[AnimalResponse])
+@router.post("", response_model=AnimalResponse)
 async def post_animal(
     background_tasks: BackgroundTasks,
     request: AnimalCreateRequest = Form(...),
@@ -98,7 +98,7 @@ async def post_animal(
     return data
 
 
-@router.post("/search", response_model=Optional[AnimalSearchResponses])
+@router.post("/search", response_model=AnimalSearchResponses)
 async def search_animal(
     background_tasks: BackgroundTasks,
     request: Optional[AnimalSearchRequest] = None,
@@ -107,13 +107,13 @@ async def search_animal(
     token: str = Header(...),
     session: Session = Depends(container.database.get_session),
 ):
-    _, handle_name = await token_assertion(
+    _, user_id = await token_assertion(
         token=token,
         session=session,
     )
     if request is None:
         request = AnimalSearchRequest()
-    request.user_handle_name = handle_name
+    request.user_id = user_id
     logger.info(f"search animal: {request}")
     data = container.animal_usecase.search(
         request=request,

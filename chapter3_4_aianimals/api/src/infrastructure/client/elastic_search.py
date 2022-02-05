@@ -66,7 +66,7 @@ class Elasticsearch(AbstractSearch):
         index: str,
         query: AnimalSearchQuery,
         from_: int = 0,
-        size: int = 20,
+        size: int = 100,
     ) -> AnimalSearchResults:
         q: Dict[str, Dict] = {"bool": {}}
         if query.animal_category_name_en is not None:
@@ -117,11 +117,13 @@ class Elasticsearch(AbstractSearch):
                 hits=0,
                 max_score=0,
                 results=[],
+                offset=0,
             )
         results = AnimalSearchResults(
             hits=searched["hits"]["total"]["value"],
             max_score=searched["hits"]["max_score"],
             results=[],
+            offset=from_ + min(size, searched["hits"]["total"]["value"]),
         )
         for r in searched["hits"]["hits"]:
             results.results.append(

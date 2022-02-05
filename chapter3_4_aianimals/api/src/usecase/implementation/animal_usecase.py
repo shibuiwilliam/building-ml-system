@@ -1,4 +1,4 @@
-import pickle
+import json
 from logging import getLogger
 from typing import List, Optional
 
@@ -11,6 +11,7 @@ from src.infrastructure.messaging import AbstractMessaging
 from src.infrastructure.queue import AbstractQueue
 from src.infrastructure.search import AbstractSearch
 from src.infrastructure.storage import AbstractStorage
+from src.middleware.json import json_serial
 from src.middleware.strings import get_uuid
 from src.repository.animal_repository import AbstractAnimalRepository
 from src.repository.like_repository import AbstractLikeRepository
@@ -126,14 +127,18 @@ class AnimalUsecase(AbstractAnimalUsecase):
     def __make_search_key(
         self,
         query: AnimalSearchQuery,
+        limit: int = 100,
+        offset: int = 0,
     ) -> str:
         key = f"{CONSTANTS.ANIMAL_SEARCH_CACHE_PREFIX}_"
-        key += f"{query.user_handle_name}_"
+        key += f"{query.user_id}_"
         key += f"{query.animal_category_name_en}_"
         key += f"{query.animal_category_name_ja}_"
         key += f"{query.animal_subcategory_name_en}_"
         key += f"{query.animal_subcategory_name_ja}_"
         key += f"{'_'.join(query.phrases)}_"
+        key += f"{limit}_"
+        key += f"{offset}_"
         key += query.sort_by.value
         return key
 
@@ -142,9 +147,10 @@ class AnimalUsecase(AbstractAnimalUsecase):
         key: str,
         result: AnimalSearchResponses,
     ):
+        logger.info(f"save cache: {key}")
         self.queue.set(
             key=key,
-            value=pickle.dumps(result),
+            value=json.dumps(result.dict(), default=json_serial),
         )
 
     def search(
@@ -156,7 +162,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
     ) -> AnimalSearchResponses:
         sort_by = AnimalSearchSortKey.value_to_key(value=request.sort_by)
         query = AnimalSearchQuery(
-            user_handle_name=request.user_handle_name,
+            user_id=request.user_id,
             animal_category_name_en=request.animal_category_name_en,
             animal_category_name_ja=request.animal_category_name_ja,
             animal_subcategory_name_en=request.animal_subcategory_name_en,
@@ -165,10 +171,17 @@ class AnimalUsecase(AbstractAnimalUsecase):
             sort_by=sort_by,
         )
         logger.info(f"search query: {query}")
-        key = self.__make_search_key(query=query)
+        key = self.__make_search_key(
+            query=query,
+            limit=limit,
+            offset=offset,
+        )
         cached = self.queue.get(key=key)
-        if cached is not None and isinstance(cached, bytes):
-            return pickle.loads(cached)
+        if cached is not None and isinstance(cached, str):
+            cache = json.loads(cached)
+            logger.info(f"hit cache: {key}")
+            searched = AnimalSearchResponses(**cache)
+            return searched
         results = self.search_client.search(
             index=ANIMAL_INDEX,
             query=query,
@@ -179,6 +192,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
             hits=results.hits,
             max_score=results.max_score,
             results=[AnimalSearchResponse(**r.dict()) for r in results.results],
+            offset=results.offset,
         )
         background_tasks.add_task(
             self.__set_search_cache,

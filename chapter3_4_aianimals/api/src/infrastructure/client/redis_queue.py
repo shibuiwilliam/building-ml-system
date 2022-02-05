@@ -57,5 +57,5 @@ class RedisQueue(AbstractQueue):
         self,
         key: str,
     ) -> Optional[Union[str, int, float, bool, bytes]]:
-        value = self.redis_client.get(name=key)
+        value = self.redis_client.get(key)
         return value

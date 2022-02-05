@@ -4,7 +4,7 @@ from typing import List, Optional
 from fastapi import BackgroundTasks
 from sqlalchemy.orm import Session
 from src.configurations import Configurations
-from src.entities.like import LikeCreate, LikeDelete
+from src.entities.like import LikeCreate, LikeDelete, LikeQuery
 from src.infrastructure.queue import AbstractQueue
 from src.middleware.strings import get_uuid
 from src.repository.like_repository import AbstractLikeRepository
@@ -35,9 +35,9 @@ class LikeUsecase(AbstractLikeUsecase):
     ) -> List[LikeResponse]:
         if limit > 200:
             raise ValueError
-        query: Optional[LikeRequest] = None
+        query: Optional[LikeQuery] = None
         if request is not None:
-            query = LikeRequest(**request.dict())
+            query = LikeQuery(**request.dict())
         data = self.like_repository.select(
             session=session,
             query=query,
@@ -53,7 +53,7 @@ class LikeUsecase(AbstractLikeUsecase):
         request: LikeCreateRequest,
         background_tasks: BackgroundTasks,
     ) -> Optional[LikeResponse]:
-        query = LikeRequest(
+        query = LikeQuery(
             animal_id=request.animal_id,
             user_id=request.user_id,
         )

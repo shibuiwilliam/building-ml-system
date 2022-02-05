@@ -82,7 +82,7 @@ class AnimalSearchSortKey(Enum):
 
 
 class AnimalSearchQuery(BaseModel):
-    user_handle_name: Optional[str]
+    user_id: Optional[str]
     animal_category_name_en: Optional[str]
     animal_category_name_ja: Optional[str]
     animal_subcategory_name_en: Optional[str]
@@ -116,6 +116,7 @@ class AnimalSearchResults(BaseModel):
     hits: int
     max_score: Optional[float]
     results: List[AnimalSearchResult]
+    offset: int
 
     class Config:
         extra = Extra.forbid

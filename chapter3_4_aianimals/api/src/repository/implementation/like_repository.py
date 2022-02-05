@@ -13,7 +13,7 @@ logger = getLogger(__name__)
 
 
 class LikeRepository(AbstractLikeRepository):
-    def __init__(self) -> None:
+    def __init__(self):
         super().__init__()
         self.table_name = TABLES.LIKE.value
 

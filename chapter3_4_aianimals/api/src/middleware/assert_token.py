@@ -25,7 +25,7 @@ async def token_assertion(
             status_code=HTTP_403_FORBIDDEN,
             detail="authorization failure",
         )
-    handle_name, password = raw_token.split(CONSTANTS.TOKEN_SPLITTER)
+    user_id, handle_name, password = raw_token.split(CONSTANTS.TOKEN_SPLITTER)
 
     login_query = UserLoginQuery(
         handle_name=handle_name,
@@ -40,4 +40,4 @@ async def token_assertion(
             status_code=HTTP_403_FORBIDDEN,
             detail="authorization failure",
         )
-    return True, handle_name
+    return True, user_id

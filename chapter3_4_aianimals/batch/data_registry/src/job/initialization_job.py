@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from re import I
 from typing import Dict, List
 
 from sqlalchemy.engine import Engine
@@ -13,6 +14,7 @@ from src.request_object.animal_subcategory import AnimalSubcategoryCreateRequest
 from src.request_object.user import UserCreateRequest
 from src.request_object.violation import ViolationCreateRequest
 from src.request_object.violation_type import ViolationTypeCreateRequest
+from src.schema.access_log import AccessLog
 from src.schema.animal import Animal
 from src.schema.animal_category import AnimalCategory
 from src.schema.animal_subcategory import AnimalSubcategory
@@ -65,6 +67,7 @@ class InitializationJob(AbstractJob):
             Like,
             ViolationType,
             Violation,
+            AccessLog,
         ]
         for table in tables:
             logger.info(f"create table: {table.__table__}")

@@ -142,7 +142,6 @@ DOCKER_ES_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_ES_TAG)_$(ES_VERSION)
 .PHONY: build_es
 build_es: 
 	docker build \
-		--platform x86_64 \
 		-t $(DOCKER_ES_IMAGE_NAME) \
 		-f $(DOCKERFILE_ES) \
 		.

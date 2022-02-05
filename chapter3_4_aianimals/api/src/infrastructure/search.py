@@ -17,6 +17,6 @@ class AbstractSearch(ABC):
         index: str,
         query: AnimalSearchQuery,
         from_: int = 0,
-        size: int = 20,
+        size: int = 100,
     ) -> AnimalSearchResults:
         raise NotImplementedError
