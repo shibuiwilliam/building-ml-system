@@ -84,6 +84,9 @@ hyogen = [
     "はわわわわ",
     "偉そう",
     "わがものがお",
+    "癒やし",
+    "萌え",
+    "萌え萌え",
 ]
 gitai = [
     "ふみふみ",
@@ -1182,6 +1185,8 @@ not_mine_suf = [
     "ときめきました",
     "ドッキューンでした",
     "キュンとしました",
+    "萌え萌えです",
+    "癒やしです",
 ]
 
 
@@ -1213,6 +1218,57 @@ def do_not_mine():
     return str(s), nmp, nmw, mp, nm, nms
 
 
+subcategories = {
+    0: "その他",
+    1: "アビシニアン",
+    2: "ブルドッグ",
+    3: "アメリカンピットブルテリア",
+    4: "バセットハウンド",
+    5: "ビーグル",
+    6: "ベンガル",
+    7: "バーマン",
+    8: "ボンベイ",
+    9: "ボクサー",
+    10: "ブリティッシュショートヘア",
+    11: "チワワ",
+    12: "エジプシャンマウ",
+    13: "イングリッシュコッカースパニエル",
+    14: "イングリッシュセッター",
+    15: "ジャーマンショートヘアードポインター",
+    16: "グレートピレニーズ",
+    17: "ハバニーズ",
+    18: "チン",
+    19: "キースホンド",
+    20: "レオンベルガー",
+    21: "メインクーン",
+    22: "ミニチュアピンシャー",
+    23: "ニューファンドランド",
+    24: "ペルシャ",
+    25: "ポメラニアン",
+    26: "パグ",
+    27: "ラグドール",
+    28: "ロシアンブルー",
+    29: "セントバーナード",
+    30: "サモエド",
+    31: "スコティッシュテリア",
+    32: "シバイヌ",
+    33: "シャム",
+    34: "スフィンクス",
+    35: "スタッフォードシャーブルテリア",
+    36: "ウィートンテリア",
+    37: "ヨークシャーテリア",
+}
+
+
+def katakana_to_hiragana(katakana: str):
+    return "".join(
+        [
+            chr(n - 96) if (12448 < n and n < 12535) or n == 12541 or n == 12542 else chr(n)
+            for n in [ord(c) for c in katakana]
+        ]
+    )
+
+
 with open("animal.json", "r") as f:
     data = json.load(f)
 
@@ -1221,6 +1277,28 @@ for k, v in data.items():
     dd[k] = v
     is_cat = True if v["category"] == 1 else False
     l = []
+
+    subc = subcategories[int(v["subcategory"])]
+    subc_h = katakana_to_hiragana(katakana=subc)
+
+    if random.random() < 0.3:
+        a = ""
+        if random.random() < 0.5:
+            a += random.choice(hyogen)
+        if random.random() < 0.7:
+            if is_cat:
+                s = random.choice(["ねこ", "ネコ", "猫", "猫様", "ねこちゃん", "猫ちゃん", "ネコちゃん"])
+            else:
+                s = random.choice(["いぬ", "犬", "イヌ", "お犬様", "犬様"])
+            e = random.choice(kudoku)
+
+            a += f"{s}です{e}"
+        else:
+            s = random.choice([subc, subc_h])
+            e = random.choice(kudoku)
+
+            a += f"{s}です{e}"
+        l.append(a)
 
     if random.random() > 0.7:
         logger.info("yours")

@@ -14,7 +14,7 @@ class LikeRequest(BaseModel):
 
 class LikeCreateRequest(BaseModel):
     animal_id: str
-    user_id: str
+    user_id: Optional[str]
 
     class Config:
         extra = Extra.forbid

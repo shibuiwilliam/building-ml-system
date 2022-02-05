@@ -136,7 +136,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
         key += f"{query.animal_category_name_ja}_"
         key += f"{query.animal_subcategory_name_en}_"
         key += f"{query.animal_subcategory_name_ja}_"
-        key += f"{'_'.join(query.phrases)}_"
+        key += f"{'_'.join(sorted(query.phrases))}_"
         key += f"{limit}_"
         key += f"{offset}_"
         key += query.sort_by.value

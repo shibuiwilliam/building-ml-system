@@ -5,6 +5,7 @@ from typing import Dict, List, Optional, Union
 from elasticsearch import Elasticsearch as ES
 from src.entities.animal import AnimalSearchQuery, AnimalSearchResult, AnimalSearchResults, AnimalSearchSortKey
 from src.infrastructure.search import AbstractSearch
+from src.middleware.strings import hiragana_to_katakana, katakana_to_hiragana
 
 logger = getLogger(__name__)
 
@@ -51,15 +52,44 @@ class Elasticsearch(AbstractSearch):
     ) -> List[Union[str, Dict]]:
         sort: List[Union[str, Dict]] = []
         if key is not None and key != AnimalSearchSortKey.SCORE:
-            sort.append(
-                {
-                    key.value: {
-                        "order": "desc",
+            if key == AnimalSearchSortKey.RANDOM:
+                sort.append(
+                    {
+                        "_script": {
+                            "script": "Math.random() * 200000",
+                            "type": "number",
+                            "order": "asc",
+                        }
                     }
-                }
-            )
+                )
+            else:
+                sort.append(
+                    {
+                        key.value: {
+                            "order": "desc",
+                        }
+                    }
+                )
         sort.append("_score")
         return sort
+
+    def __augment_query(
+        self,
+        vocab: str,
+    ) -> List[str]:
+        vocabs = [vocab]
+        if vocab in ["ねこ", "猫", "ネコ"]:
+            vocabs.extend(["ねこ", "猫", "ネコ"])
+        if vocab in ["いぬ", "犬", "イヌ"]:
+            vocabs.extend(["いぬ", "犬", "イヌ"])
+        if vocab in ["かわいい", "可愛い", "カワイイ"]:
+            vocabs.extend(["かわいい", "可愛い", "カワイイ"])
+        katakana = hiragana_to_katakana(hiragana=vocab)
+        vocabs.append(katakana)
+        hiragana = katakana_to_hiragana(katakana=vocab)
+        vocabs.append(hiragana)
+
+        return list(set(vocabs))
 
     def search(
         self,
@@ -94,12 +124,17 @@ class Elasticsearch(AbstractSearch):
                 value=query.animal_subcategory_name_ja,
             )
         if len(query.phrases) > 0:
+            phrases = []
+            for p in query.phrases:
+                phrase = self.__augment_query(vocab=p)
+                phrases.extend(phrase)
+            query_phrase = " ".join(phrases)
             q["bool"]["should"] = [
                 {
-                    "match": {"name": " ".join(query.phrases)},
+                    "match": {"name": query_phrase},
                 },
                 {
-                    "match": {"description": " ".join(query.phrases)},
+                    "match": {"description": query_phrase},
                 },
             ]
         if len(q["bool"]) == 0:

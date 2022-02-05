@@ -49,10 +49,11 @@ async def post_like(
     token: str = Header(...),
     session: Session = Depends(container.database.get_session),
 ):
-    await token_assertion(
+    _, user_id = await token_assertion(
         token=token,
         session=session,
     )
+    request.user_id = user_id
     logger.info(f"add like for {request}")
     data = container.like_usecase.register(
         session=session,

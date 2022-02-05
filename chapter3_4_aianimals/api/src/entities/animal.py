@@ -61,7 +61,8 @@ class AnimalModel(AnimalModelBase):
 class AnimalSearchSortKey(Enum):
     SCORE = "score"
     LIKE = "like"
-    CREATED_AT = "create_at"
+    CREATED_AT = "created_at"
+    RANDOM = "random"
 
     @staticmethod
     def has_value(value: str) -> bool:
