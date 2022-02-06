@@ -1,10 +1,10 @@
 import json
-import httpx
 import random
-from datetime import datetime, timedelta, date, time
-from typing import List, Optional
+from datetime import date, datetime, time, timedelta
 from time import sleep
+from typing import List, Optional
 
+import httpx
 from numpy import sort
 
 
@@ -23,7 +23,10 @@ def get_token(
         "password": password,
     }
     print(f"data: {data}")
-    with httpx.Client() as c:
+    with httpx.Client(
+        timeout=30.0,
+        transport=httpx.HTTPTransport(retries=3),
+    ) as c:
         r = c.post(
             headers={
                 "accept": "application/json",
@@ -39,7 +42,10 @@ def get_token(
 
 
 def get_metadata(token: str):
-    with httpx.Client() as c:
+    with httpx.Client(
+        timeout=30.0,
+        transport=httpx.HTTPTransport(retries=3),
+    ) as c:
         r = c.get(
             headers={
                 "accept": "application/json",
@@ -67,7 +73,10 @@ def get_search(
         data["animal_category_name_ja"] = animal_category_name_ja
     if animal_subcategory_name_ja is not None:
         data["animal_subcategory_name_ja"] = animal_subcategory_name_ja
-    with httpx.Client() as c:
+    with httpx.Client(
+        timeout=30.0,
+        transport=httpx.HTTPTransport(retries=3),
+    ) as c:
         r = c.post(
             headers={
                 "accept": "application/json",
@@ -105,7 +114,10 @@ def make_access(
         data["animal_category_id"] = animal_category_id
     if animal_subcategory_id is not None:
         data["animal_subcategory_id"] = animal_subcategory_id
-    with httpx.Client() as c:
+    with httpx.Client(
+        timeout=30.0,
+        transport=httpx.HTTPTransport(retries=3),
+    ) as c:
         c.post(
             headers={
                 "accept": "application/json",
@@ -126,7 +138,10 @@ def make_like(
     animal_subcategory_id: Optional[str] = None,
 ):
     data = {"animal_id": animal_id}
-    with httpx.Client() as c:
+    with httpx.Client(
+        timeout=30.0,
+        transport=httpx.HTTPTransport(retries=3),
+    ) as c:
         r = c.post(
             headers={
                 "accept": "application/json",
@@ -220,6 +235,7 @@ def main():
             "キャットフード",
             "ドッグフード",
             "ダンボール",
+            "ペットショップ",
             "魚",
             "肉",
             "ごはん",
@@ -230,6 +246,35 @@ def main():
             "午後",
             "朝",
             "夜",
+            "遊び",
+            "寝る",
+            "天使",
+            "可愛すぎ",
+            "かわいすぎ",
+            "アイドル",
+            "推し",
+            "家族",
+            "職場",
+            "学校",
+            "道端",
+            "春",
+            "夏",
+            "秋",
+            "冬",
+            "アビシニアン",
+            "チワワ",
+            "ブリティッシュショートヘア",
+            "メインクーン",
+            "ポメラニアン",
+            "ラグドール",
+            "ロシアンブルー",
+            "セントバーナード",
+            "シバイヌ",
+            "ヨークシャーテリア",
+            "シャム",
+            "パグ",
+            "ペルシャ",
+            "ブルドッグ",
         ],
     }
 
@@ -240,8 +285,10 @@ def main():
     i = 0
     for u, (_, user) in enumerate(users.items()):
         j = 0
-        z = random.choice([0.8, 0.9, 0.95, 0.99])
-        y = random.choice([0.4, 0.3, 0.2, 0.05, 0.01])
+        if random.random() < 0.1:
+            continue
+        z = random.choice([0.85, 0.9, 0.95, 0.99])
+        y = random.choice([0.6, 0.5, 0.3, 0.1])
         print(f"USER: {u} / {len(users)}: {user} {z} {y}")
         token = get_token(
             user=user["handle_name"],
@@ -259,7 +306,8 @@ def main():
             if j >= 100:
                 break
             j += 1
-            z *= z
+            if j > 3:
+                z *= z
             phrases = []
             animal_category = None
             animal_subcategory = None
@@ -272,24 +320,36 @@ def main():
                         animal_category = None
                     else:
                         animal_subcategory = None
-            if random.random() < 0.5:
-                if animal_category is None and animal_subcategory is None:
-                    if random.random() < 0.7:
-                        phrases.append(random.choice(vocabs[5]))
-                if random.random() < 0.5:
-                    phrases.append(random.choice(vocabs[4]))
-                if random.random() < 0.2:
+            length = 0
+            lr = random.random()
+            if lr < 0.02:
+                length = 4
+            elif lr < 0.05:
+                length = 3
+            elif lr < 0.2:
+                length = 2
+            elif lr < 0.5:
+                length = 1
+            for _ in range(length):
+                lr = random.random()
+                if lr < 0.05:
+                    phrases.append(random.choice(vocabs[1]))
+                elif lr < 0.1:
+                    phrases.append(random.choice(vocabs[2]))
+                elif lr < 0.25:
                     phrases.append(random.choice(vocabs[3]))
-                if random.random() < 0.1:
-                    phrases.append(random.choice(vocabs[2]))
-                if random.random() < 0.05:
-                    phrases.append(random.choice(vocabs[2]))
+                elif lr < 0.5:
+                    phrases.append(random.choice(vocabs[4]))
+                else:
+                    if animal_category is None and animal_subcategory is None:
+                        phrases.append(random.choice(vocabs[5]))
+
             sr = random.random()
             if sr < 0.3:
                 sort_by = "score"
-            elif sr < 0.5:
+            elif sr < 0.4:
                 sort_by = "like"
-            elif sr < 0.7:
+            elif sr < 0.6:
                 sort_by = "created_at"
             else:
                 sort_by = "random"
@@ -302,7 +362,7 @@ def main():
             )
             k = 0
             for a in animals["results"]:
-                if k >= random.choice([1, 5, 10, 20]):
+                if k >= random.choice([5, 10, 20]):
                     break
                 k += 1
                 animal_date = datetime.strptime(a["created_at"].replace("+00:00", ""), "%Y-%m-%dT%H:%M:%S.%f")

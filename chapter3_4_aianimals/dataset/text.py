@@ -68,6 +68,8 @@ def do_aisatsu():
 
 hyogen = [
     "かわいい",
+    "可愛い",
+    "カワイイ",
     "かっこいい",
     "最高",
     "プリチー",
@@ -320,6 +322,9 @@ suki_suffix = [
     "がなんとなく好きらしいです",
     "がどことなく嫌いじゃないらしいです",
     "がなんとなく嫌いじゃないらしいです",
+    "が推しらしいです",
+    "がなんとなく推しらしいです",
+    "が推しっぽいです",
 ]
 
 
@@ -1086,6 +1091,12 @@ deatta_suffix = [
     "完全に我が子です",
     "完全に家族です",
     "家族の一員です",
+    "まさに天使です",
+    "神々しいです",
+    "可愛すぎです",
+    "推しです",
+    "アイドルです",
+    "エンジェルです",
 ]
 
 
@@ -1281,11 +1292,11 @@ for k, v in data.items():
     subc = subcategories[int(v["subcategory"])]
     subc_h = katakana_to_hiragana(katakana=subc)
 
-    if random.random() < 0.3:
+    if random.random() < 0.75:
         a = ""
         if random.random() < 0.5:
             a += random.choice(hyogen)
-        if random.random() < 0.7:
+        if random.random() < 0.4:
             if is_cat:
                 s = random.choice(["ねこ", "ネコ", "猫", "猫様", "ねこちゃん", "猫ちゃん", "ネコちゃん"])
             else:
