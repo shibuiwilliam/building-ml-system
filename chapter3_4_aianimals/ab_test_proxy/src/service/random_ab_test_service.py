@@ -7,8 +7,8 @@ from typing import Dict
 import httpx
 from pydantic import BaseModel, root_validator
 from src.middleware.json import json_serial
-from src.schema.base_schema import RandomABTestRequest, RandomABTestResponse
-from src.service.ab_test_service import Endpoint
+from src.schema.base_schema import BaseRandomABTestRequest, BaseRandomABTestResponse
+from src.service.ab_test_service import AbstractTestService, Endpoint
 
 logger = getLogger(__name__)
 
@@ -31,48 +31,47 @@ class RandomDistribution(BaseModel):
         return values
 
 
-class AbstractRandomABTestService(ABC):
+class AbstractRandomABTestService(AbstractTestService, ABC):
     def __init__(
         self,
         timeout: float = 10.0,
         retries: int = 2,
     ):
-        self.timeout = timeout
-        self.retries = retries
-        self.transport = httpx.AsyncHTTPTransport(
-            retries=self.retries,
+        super().__init__(
+            timeout=timeout,
+            retries=retries,
         )
-        self.post_header: Dict[str, str] = {
-            "accept": "application/json",
-            "Content-Type": "application/json",
-        }
+
+    @abstractmethod
+    async def test(
+        self,
+        request: BaseRandomABTestRequest,
+    ) -> BaseRandomABTestResponse:
+        raise NotImplementedError
 
     @abstractmethod
     async def route(
         self,
-        request: RandomABTestRequest,
-    ) -> RandomABTestResponse:
+        request: BaseRandomABTestRequest,
+    ) -> BaseRandomABTestResponse:
         raise NotImplementedError
 
     @abstractmethod
     async def route_a(
         self,
-        request: RandomABTestRequest,
-    ) -> RandomABTestResponse:
+        request: BaseRandomABTestRequest,
+    ) -> BaseRandomABTestResponse:
         raise NotImplementedError
 
     @abstractmethod
     async def route_b(
         self,
-        request: RandomABTestRequest,
-    ) -> RandomABTestResponse:
+        request: BaseRandomABTestRequest,
+    ) -> BaseRandomABTestResponse:
         raise NotImplementedError
 
 
 class RandomABTestService(AbstractRandomABTestService):
-    request_type: type = RandomABTestRequest
-    response_type: type = RandomABTestResponse
-
     def __init__(
         self,
         random_distribution: RandomDistribution,
@@ -86,10 +85,19 @@ class RandomABTestService(AbstractRandomABTestService):
         self.random_distribution = random_distribution
         logger.info(f"initialized random distribution: {self.random_distribution}")
 
+    async def test(
+        self,
+        request: BaseRandomABTestRequest,
+    ) -> BaseRandomABTestResponse:
+        return BaseRandomABTestResponse(
+            endpoint="random_test_service",
+            response=request.request,
+        )
+
     async def route(
         self,
-        request: request_type,
-    ) -> response_type:
+        request: BaseRandomABTestRequest,
+    ) -> BaseRandomABTestResponse:
         if random.random() < self.random_distribution.endpoint_a.rate:
             return await self.route_a(request=request)
         else:
@@ -97,8 +105,8 @@ class RandomABTestService(AbstractRandomABTestService):
 
     async def route_a(
         self,
-        request: request_type,
-    ) -> response_type:
+        request: BaseRandomABTestRequest,
+    ) -> BaseRandomABTestResponse:
         return await self.__route(
             request=request,
             endpoint=self.random_distribution.endpoint_a.endpoint,
@@ -106,8 +114,8 @@ class RandomABTestService(AbstractRandomABTestService):
 
     async def route_b(
         self,
-        request: request_type,
-    ) -> response_type:
+        request: BaseRandomABTestRequest,
+    ) -> BaseRandomABTestResponse:
         return await self.__route(
             request=request,
             endpoint=self.random_distribution.endpoint_b.endpoint,
@@ -115,9 +123,9 @@ class RandomABTestService(AbstractRandomABTestService):
 
     async def __route(
         self,
-        request: request_type,
+        request: BaseRandomABTestRequest,
         endpoint: Endpoint,
-    ) -> response_type:
+    ) -> BaseRandomABTestResponse:
         async with httpx.AsyncClient(
             timeout=self.timeout,
             transport=self.transport,
@@ -132,7 +140,7 @@ class RandomABTestService(AbstractRandomABTestService):
             except httpx.HTTPStatusError as e:
                 logger.error(e)
             data = res.json()
-            response = RandomABTestResponse(
+            response = BaseRandomABTestResponse(
                 endpoint=endpoint.endpoint,
                 response=data,
             )

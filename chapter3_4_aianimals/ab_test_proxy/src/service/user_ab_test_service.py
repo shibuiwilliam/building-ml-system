@@ -6,8 +6,8 @@ from typing import Dict
 import httpx
 from pydantic import BaseModel
 from src.middleware.json import json_serial
-from src.schema.base_schema import UserRequest, UserResponse
-from src.service.ab_test_service import Endpoint
+from src.schema.base_schema import BaseUserRequest, BaseUserResponse
+from src.service.ab_test_service import AbstractTestService, Endpoint
 
 logger = getLogger(__name__)
 
@@ -17,27 +17,29 @@ class UserIDs(BaseModel):
     default_endpoint: Endpoint
 
 
-class AbstractUserTestService(ABC):
+class AbstractUserTestService(AbstractTestService, ABC):
     def __init__(
         self,
         timeout: float = 10.0,
         retries: int = 2,
     ):
-        self.timeout = timeout
-        self.retries = retries
-        self.transport = httpx.AsyncHTTPTransport(
-            retries=self.retries,
+        super().__init__(
+            timeout=timeout,
+            retries=retries,
         )
-        self.post_header: Dict[str, str] = {
-            "accept": "application/json",
-            "Content-Type": "application/json",
-        }
+
+    @abstractmethod
+    async def test(
+        self,
+        request: BaseUserRequest,
+    ) -> BaseUserResponse:
+        raise NotImplementedError
 
     @abstractmethod
     async def route(
         self,
-        request: UserRequest,
-    ) -> UserResponse:
+        request: BaseUserRequest,
+    ) -> BaseUserResponse:
         raise NotImplementedError
 
 
@@ -55,21 +57,30 @@ class UserTestService(AbstractUserTestService):
         self.user_ids = user_ids
         logger.info(f"initialized user ab test: {self.user_ids}")
 
+    async def test(
+        self,
+        request: BaseUserRequest,
+    ) -> BaseUserResponse:
+        return BaseUserResponse(
+            endpoint="random_test_service",
+            response=request.request,
+        )
+
     async def route(
         self,
-        request: UserRequest,
-    ) -> UserResponse:
+        request: BaseUserRequest,
+    ) -> BaseUserResponse:
         endpoint = self.user_ids.user_ids.get(request.user_id, self.user_ids.default_endpoint)
-        return self.__route(
+        return await self.__route(
             request=request,
             endpoint=endpoint,
         )
 
     async def __route(
         self,
-        request: UserRequest,
+        request: BaseUserRequest,
         endpoint: Endpoint,
-    ) -> UserResponse:
+    ) -> BaseUserResponse:
         async with httpx.AsyncClient(
             timeout=self.timeout,
             transport=self.transport,
@@ -84,7 +95,7 @@ class UserTestService(AbstractUserTestService):
             except httpx.HTTPStatusError as e:
                 logger.error(e)
             data = res.json()
-            response = UserResponse(
+            response = BaseUserResponse(
                 endpoint=endpoint.endpoint,
                 response=data,
             )

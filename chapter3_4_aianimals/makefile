@@ -111,6 +111,64 @@ deploy_api: deploy_api_ns
 	kubectl apply -f $(API_MANIFEST_DIR)/api.yaml
 
 
+############ AB_TEST_PROXY COMMANDS ############
+AB_TEST_PROXY_DIR := $(DIR)/ab_test_proxy
+AB_TEST_PROXY_VERSION := $(shell cd ${AB_TEST_PROXY_DIR} && poetry version -s)
+AB_TEST_PROXY_MANIFEST_DIR := $(K8S_DIR)/manifests/ab_test_proxy
+DOCKERFILE_AB_TEST_PROXY = $(AB_TEST_PROXY_DIR)/$(DOCKERFILE)
+DOCKER_AB_TEST_PROXY_TAG = $(TAG)_ab_test_proxy
+DOCKER_AB_TEST_PROXY_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_AB_TEST_PROXY_TAG)_$(AB_TEST_PROXY_VERSION)
+
+.PHONY: patch_ab_test_proxy
+patch_ab_test_proxy:
+	cd $(AB_TEST_PROXY_DIR) && \
+	poetry version patch
+
+.PHONY: minor_upgrade_ab_test_proxy
+minor_upgrade_ab_test_proxy:
+	cd $(AB_TEST_PROXY_DIR) && \
+	poetry version minor
+
+.PHONY: major_upgrade_ab_test_proxy
+major_upgrade_ab_test_proxy:
+	cd $(AB_TEST_PROXY_DIR) && \
+	poetry version major
+
+.PHONY: req_ab_test_proxy
+req_ab_test_proxy:
+	cd $(AB_TEST_PROXY_DIR) && \
+	poetry export \
+		--without-hashes \
+		-f requirements.txt \
+		--output requirements.txt
+
+.PHONY: build_ab_test_proxy
+build_ab_test_proxy: 
+	docker build \
+		--platform x86_64 \
+		-t $(DOCKER_AB_TEST_PROXY_IMAGE_NAME) \
+		-f $(DOCKERFILE_AB_TEST_PROXY) \
+		.
+
+.PHONY: push_ab_test_proxy
+push_ab_test_proxy: 
+	docker push $(DOCKER_AB_TEST_PROXY_IMAGE_NAME)
+
+.PHONY: deploy_ab_test_proxy_ns
+deploy_ab_test_proxy_ns:
+	kubectl apply -f $(AB_TEST_PROXY_MANIFEST_DIR)/namespace.yaml 
+
+.PHONY: registry_ab_test_proxy
+registry_ab_test_proxy: deploy_ab_test_proxy_ns
+	@cd $(K8S_SECRET_DIR) && \
+		NAMESPACE=aianimals ./private_registry_secret.sh
+
+.PHONY: deploy_ab_test_proxy
+deploy_ab_test_proxy: deploy_ab_test_proxy_ns
+	kubectl apply -f $(AB_TEST_PROXY_MANIFEST_DIR)/postgres.yaml && \
+	kubectl apply -f $(AB_TEST_PROXY_MANIFEST_DIR)/ab_test_proxy.yaml
+
+
 ############ ARGO COMMANDS ############
 ARGO_MANIFEST_DIR := $(K8S_DIR)/manifests/argo
 
@@ -326,6 +384,7 @@ deploy_all: registry_default admin_clusterrole \
 req_all: \
 	req_data_registry \
 	req_api \
+	req_ab_test_proxy \
 	req_violation_detection_no_animal_violation_proxy \
 	req_violation_detection_registry
 
@@ -333,6 +392,7 @@ req_all: \
 build_all: \
 	build_data_registry \
 	build_api \
+	build_ab_test_proxy \
 	build_es \
 	build_violation_detection_no_animal_violation_proxy \
 	build_violation_detection_no_animal_violation_serving \
@@ -341,6 +401,7 @@ build_all: \
 .PHONY: push_all
 push_all: \
 	push_api \
+	push_ab_test_proxy \
 	push_data_registry \
 	push_es \
 	push_violation_detection_no_animal_violation_proxy \

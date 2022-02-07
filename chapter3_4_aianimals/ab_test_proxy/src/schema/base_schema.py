@@ -1,15 +1,18 @@
-from typing import Dict, List, Union
+from typing import Dict, Generic, List, TypeVar, Union
 
-from pydantic import BaseModel, create_model
+from pydantic import BaseModel
+from pydantic.generics import GenericModel
+
+T = TypeVar("T")
 
 
 class BaseRequest(BaseModel):
-    pass
+    request: Union[Dict, List]
 
 
 class BaseResponse(BaseModel):
     endpoint: str
-    pass
+    response: Union[Dict, List]
 
 
 class BaseRandomABTestRequest(BaseRequest):
@@ -28,31 +31,9 @@ class BaseUserResponse(BaseResponse):
     pass
 
 
-# UserRequest = create_model(
-#     "UserRequest",
-#     __base__=__UserRequest,
-# )
-
-# UserResponse = create_model(
-#     "UserResponse",
-#     __base__=__UserResponse,
-# )
-
-
 class BaseAnimalRequest(BaseRequest):
     animal_id: str
 
 
 class BaseAnimalResponse(BaseResponse):
     pass
-
-
-# AnimalRequest = create_model(
-#     "AnimalRequest",
-#     __base__=__AnimalRequest,
-# )
-
-# AnimalResponse = create_model(
-#     "AnimalResponse",
-#     __base__=__AnimalResponse,
-# )

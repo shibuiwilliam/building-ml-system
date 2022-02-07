@@ -6,8 +6,8 @@ from typing import Dict
 import httpx
 from pydantic import BaseModel
 from src.middleware.json import json_serial
-from src.schema.base_schema import AnimalRequest, AnimalResponse
-from src.service.ab_test_service import Endpoint
+from src.schema.base_schema import BaseAnimalRequest, BaseAnimalResponse
+from src.service.ab_test_service import AbstractTestService, Endpoint
 
 logger = getLogger(__name__)
 
@@ -17,34 +17,36 @@ class AnimalIDs(BaseModel):
     default_endpoint: Endpoint
 
 
-class AbstractAnimalTestService(ABC):
+class AbstractAnimalTestService(AbstractTestService, ABC):
     def __init__(
         self,
         timeout: float = 10.0,
         retries: int = 2,
     ):
-        self.timeout = timeout
-        self.retries = retries
-        self.transport = httpx.AsyncHTTPTransport(
-            retries=self.retries,
+        super().__init__(
+            timeout=timeout,
+            retries=retries,
         )
-        self.post_header: Dict[str, str] = {
-            "accept": "application/json",
-            "Content-Type": "application/json",
-        }
+
+    @abstractmethod
+    async def test(
+        self,
+        request: BaseAnimalRequest,
+    ) -> BaseAnimalResponse:
+        raise NotImplementedError
 
     @abstractmethod
     async def route(
         self,
-        request: AnimalRequest,
-    ) -> AnimalResponse:
+        request: BaseAnimalRequest,
+    ) -> BaseAnimalResponse:
         raise NotImplementedError
 
 
 class AnimalTestService(AbstractAnimalTestService):
     def __init__(
         self,
-        user_ids: AnimalIDs,
+        animal_ids: AnimalIDs,
         timeout: float = 10,
         retries: int = 2,
     ):
@@ -52,24 +54,33 @@ class AnimalTestService(AbstractAnimalTestService):
             timeout=timeout,
             retries=retries,
         )
-        self.user_ids = user_ids
-        logger.info(f"initialized user ab test: {self.user_ids}")
+        self.animal_ids = animal_ids
+        logger.info(f"initialized user ab test: {self.animal_ids}")
+
+    async def test(
+        self,
+        request: BaseAnimalRequest,
+    ) -> BaseAnimalResponse:
+        return BaseAnimalResponse(
+            endpoint="random_test_service",
+            response=request.request,
+        )
 
     async def route(
         self,
-        request: AnimalRequest,
-    ) -> AnimalResponse:
-        endpoint = self.user_ids.user_ids.get(request.user_id, self.user_ids.default_endpoint)
-        return self.__route(
+        request: BaseAnimalRequest,
+    ) -> BaseAnimalResponse:
+        endpoint = self.animal_ids.animal_ids.get(request.animal_id, self.animal_ids.default_endpoint)
+        return await self.__route(
             request=request,
             endpoint=endpoint,
         )
 
     async def __route(
         self,
-        request: AnimalRequest,
+        request: BaseAnimalRequest,
         endpoint: Endpoint,
-    ) -> AnimalResponse:
+    ) -> BaseAnimalResponse:
         async with httpx.AsyncClient(
             timeout=self.timeout,
             transport=self.transport,
@@ -84,7 +95,7 @@ class AnimalTestService(AbstractAnimalTestService):
             except httpx.HTTPStatusError as e:
                 logger.error(e)
             data = res.json()
-            response = AnimalResponse(
+            response = BaseAnimalResponse(
                 endpoint=endpoint.endpoint,
                 response=data,
             )

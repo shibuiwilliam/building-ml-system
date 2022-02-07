@@ -1,8 +1,11 @@
+from abc import ABC, abstractmethod
 from enum import Enum
 from logging import getLogger
-from typing import List, Optional
+from typing import Dict, List, Optional
 
+import httpx
 from pydantic import BaseModel
+from src.schema.base_schema import BaseRequest, BaseResponse
 
 logger = getLogger(__name__)
 
@@ -33,3 +36,34 @@ class ABTestType(Enum):
 class Endpoint(BaseModel):
     name: Optional[str]
     endpoint: str
+
+
+class AbstractTestService(ABC):
+    def __init__(
+        self,
+        timeout: float = 10.0,
+        retries: int = 2,
+    ):
+        self.timeout = timeout
+        self.retries = retries
+        self.transport = httpx.AsyncHTTPTransport(
+            retries=self.retries,
+        )
+        self.post_header: Dict[str, str] = {
+            "accept": "application/json",
+            "Content-Type": "application/json",
+        }
+
+    @abstractmethod
+    async def test(
+        self,
+        request: BaseRequest,
+    ) -> BaseResponse:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def route(
+        self,
+        request: BaseRequest,
+    ) -> BaseResponse:
+        raise NotImplementedError
