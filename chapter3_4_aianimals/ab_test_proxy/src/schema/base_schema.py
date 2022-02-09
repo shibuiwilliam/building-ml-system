@@ -37,3 +37,19 @@ class BaseAnimalRequest(BaseRequest):
 
 class BaseAnimalResponse(BaseResponse):
     pass
+
+
+class GenericRequest(GenericModel, Generic[T]):
+    request: T
+
+
+class Request(GenericRequest[T], Generic[T]):
+    pass
+
+
+class GenericResponse(GenericModel, Generic[T]):
+    response: T
+
+
+class Response(GenericResponse[T], Generic[T]):
+    pass

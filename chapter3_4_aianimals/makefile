@@ -189,6 +189,7 @@ deploy_argo: deploy_argo_ns
 port_forward_argo:
 	kubectl -n argo port-forward service/argo-server 2746:2746 &
 
+
 ############ ELASTICSEARCH COMMANDS ############
 ES_DIR := $(DIR)/elasticsearch
 ES_VERSION := $(shell cd ${ES_DIR} && poetry version -s)

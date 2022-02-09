@@ -5,7 +5,7 @@ from typing import Dict, List, Optional
 
 import httpx
 from pydantic import BaseModel
-from src.schema.base_schema import BaseRequest, BaseResponse
+from src.schema.base_schema import Request, Response
 
 logger = getLogger(__name__)
 
@@ -57,13 +57,13 @@ class AbstractTestService(ABC):
     @abstractmethod
     async def test(
         self,
-        request: BaseRequest,
-    ) -> BaseResponse:
+        request: Request,
+    ) -> Response:
         raise NotImplementedError
 
     @abstractmethod
     async def route(
         self,
-        request: BaseRequest,
-    ) -> BaseResponse:
+        request: Request,
+    ) -> Response:
         raise NotImplementedError

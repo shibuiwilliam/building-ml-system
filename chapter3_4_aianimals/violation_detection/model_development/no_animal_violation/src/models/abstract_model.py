@@ -3,7 +3,7 @@ from typing import Any, List
 
 from nptyping import NDArray
 from pydantic import BaseModel
-from src.utils.logger import configure_logger
+from src.middleware.logger import configure_logger
 
 logger = configure_logger(__name__)
 

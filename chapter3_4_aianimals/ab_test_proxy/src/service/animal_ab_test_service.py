@@ -6,7 +6,7 @@ from typing import Dict
 import httpx
 from pydantic import BaseModel
 from src.middleware.json import json_serial
-from src.schema.base_schema import BaseAnimalRequest, BaseAnimalResponse
+from src.schema.base_schema import BaseAnimalRequest, BaseAnimalResponse, Request, Response
 from src.service.ab_test_service import AbstractTestService, Endpoint
 
 logger = getLogger(__name__)
@@ -31,15 +31,15 @@ class AbstractAnimalTestService(AbstractTestService, ABC):
     @abstractmethod
     async def test(
         self,
-        request: BaseAnimalRequest,
-    ) -> BaseAnimalResponse:
+        request: Request[BaseAnimalRequest],
+    ) -> Response[BaseAnimalResponse]:
         raise NotImplementedError
 
     @abstractmethod
     async def route(
         self,
-        request: BaseAnimalRequest,
-    ) -> BaseAnimalResponse:
+        request: Request[BaseAnimalRequest],
+    ) -> Response[BaseAnimalResponse]:
         raise NotImplementedError
 
 
@@ -59,22 +59,25 @@ class AnimalTestService(AbstractAnimalTestService):
 
     async def test(
         self,
-        request: BaseAnimalRequest,
-    ) -> BaseAnimalResponse:
-        return BaseAnimalResponse(
-            endpoint="random_test_service",
-            response=request.request,
+        request: Request[BaseAnimalRequest],
+    ) -> Response[BaseAnimalResponse]:
+        return Response[BaseAnimalResponse](
+            response=BaseAnimalResponse(
+                endpoint="random_test_service",
+                response=request.request,
+            )
         )
 
     async def route(
         self,
-        request: BaseAnimalRequest,
-    ) -> BaseAnimalResponse:
-        endpoint = self.animal_ids.animal_ids.get(request.animal_id, self.animal_ids.default_endpoint)
-        return await self.__route(
-            request=request,
+        request: Request[BaseAnimalRequest],
+    ) -> Response[BaseAnimalResponse]:
+        endpoint = self.animal_ids.animal_ids.get(request.request.animal_id, self.animal_ids.default_endpoint)
+        response = await self.__route(
+            request=request.request,
             endpoint=endpoint,
         )
+        return Response[BaseAnimalResponse](response=response)
 
     async def __route(
         self,

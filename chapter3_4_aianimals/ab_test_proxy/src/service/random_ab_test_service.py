@@ -2,12 +2,11 @@ import json
 import random
 from abc import ABC, abstractmethod
 from logging import getLogger
-from typing import Dict
 
 import httpx
 from pydantic import BaseModel, root_validator
 from src.middleware.json import json_serial
-from src.schema.base_schema import BaseRandomABTestRequest, BaseRandomABTestResponse
+from src.schema.base_schema import BaseRandomABTestRequest, BaseRandomABTestResponse, Request, Response
 from src.service.ab_test_service import AbstractTestService, Endpoint
 
 logger = getLogger(__name__)
@@ -45,29 +44,29 @@ class AbstractRandomABTestService(AbstractTestService, ABC):
     @abstractmethod
     async def test(
         self,
-        request: BaseRandomABTestRequest,
-    ) -> BaseRandomABTestResponse:
+        request: Request[BaseRandomABTestRequest],
+    ) -> Response[BaseRandomABTestResponse]:
         raise NotImplementedError
 
     @abstractmethod
     async def route(
         self,
-        request: BaseRandomABTestRequest,
-    ) -> BaseRandomABTestResponse:
+        request: Request[BaseRandomABTestRequest],
+    ) -> Response[BaseRandomABTestResponse]:
         raise NotImplementedError
 
     @abstractmethod
     async def route_a(
         self,
-        request: BaseRandomABTestRequest,
-    ) -> BaseRandomABTestResponse:
+        request: Request[BaseRandomABTestRequest],
+    ) -> Response[BaseRandomABTestResponse]:
         raise NotImplementedError
 
     @abstractmethod
     async def route_b(
         self,
-        request: BaseRandomABTestRequest,
-    ) -> BaseRandomABTestResponse:
+        request: Request[BaseRandomABTestRequest],
+    ) -> Response[BaseRandomABTestResponse]:
         raise NotImplementedError
 
 
@@ -87,17 +86,19 @@ class RandomABTestService(AbstractRandomABTestService):
 
     async def test(
         self,
-        request: BaseRandomABTestRequest,
-    ) -> BaseRandomABTestResponse:
-        return BaseRandomABTestResponse(
-            endpoint="random_test_service",
-            response=request.request,
+        request: Request[BaseRandomABTestRequest],
+    ) -> Response[BaseRandomABTestResponse]:
+        return Response[BaseRandomABTestResponse](
+            response=BaseRandomABTestResponse(
+                endpoint="random_test_service",
+                response=request.request,
+            )
         )
 
     async def route(
         self,
-        request: BaseRandomABTestRequest,
-    ) -> BaseRandomABTestResponse:
+        request: Request[BaseRandomABTestRequest],
+    ) -> Response[BaseRandomABTestResponse]:
         if random.random() < self.random_distribution.endpoint_a.rate:
             return await self.route_a(request=request)
         else:
@@ -105,21 +106,23 @@ class RandomABTestService(AbstractRandomABTestService):
 
     async def route_a(
         self,
-        request: BaseRandomABTestRequest,
-    ) -> BaseRandomABTestResponse:
-        return await self.__route(
-            request=request,
+        request: Request[BaseRandomABTestRequest],
+    ) -> Response[BaseRandomABTestResponse]:
+        response = await self.__route(
+            request=request.request,
             endpoint=self.random_distribution.endpoint_a.endpoint,
         )
+        return Response[BaseRandomABTestResponse](response=response)
 
     async def route_b(
         self,
-        request: BaseRandomABTestRequest,
-    ) -> BaseRandomABTestResponse:
-        return await self.__route(
-            request=request,
+        request: Request[BaseRandomABTestRequest],
+    ) -> Response[BaseRandomABTestResponse]:
+        response = await self.__route(
+            request=request.request,
             endpoint=self.random_distribution.endpoint_b.endpoint,
         )
+        return Response[BaseRandomABTestResponse](response=response)
 
     async def __route(
         self,

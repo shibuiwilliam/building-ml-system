@@ -1,7 +1,6 @@
 from logging import getLogger
 
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI
 from src.configurations import Configurations
 from src.proxy import proxy
 

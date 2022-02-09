@@ -6,7 +6,7 @@ from typing import Dict
 import httpx
 from pydantic import BaseModel
 from src.middleware.json import json_serial
-from src.schema.base_schema import BaseUserRequest, BaseUserResponse
+from src.schema.base_schema import BaseUserRequest, BaseUserResponse, Request, Response
 from src.service.ab_test_service import AbstractTestService, Endpoint
 
 logger = getLogger(__name__)
@@ -31,15 +31,15 @@ class AbstractUserTestService(AbstractTestService, ABC):
     @abstractmethod
     async def test(
         self,
-        request: BaseUserRequest,
-    ) -> BaseUserResponse:
+        request: Request[BaseUserRequest],
+    ) -> Response[BaseUserResponse]:
         raise NotImplementedError
 
     @abstractmethod
     async def route(
         self,
-        request: BaseUserRequest,
-    ) -> BaseUserResponse:
+        request: Request[BaseUserRequest],
+    ) -> Response[BaseUserResponse]:
         raise NotImplementedError
 
 
@@ -59,22 +59,25 @@ class UserTestService(AbstractUserTestService):
 
     async def test(
         self,
-        request: BaseUserRequest,
-    ) -> BaseUserResponse:
-        return BaseUserResponse(
-            endpoint="random_test_service",
-            response=request.request,
+        request: Request[BaseUserRequest],
+    ) -> Response[BaseUserResponse]:
+        return Response[BaseUserResponse](
+            response=BaseUserResponse(
+                endpoint="random_test_service",
+                response=request.request,
+            ),
         )
 
     async def route(
         self,
-        request: BaseUserRequest,
-    ) -> BaseUserResponse:
-        endpoint = self.user_ids.user_ids.get(request.user_id, self.user_ids.default_endpoint)
-        return await self.__route(
-            request=request,
+        request: Request[BaseUserRequest],
+    ) -> Response[BaseUserResponse]:
+        endpoint = self.user_ids.user_ids.get(request.request.user_id, self.user_ids.default_endpoint)
+        response = await self.__route(
+            request=request.request,
             endpoint=endpoint,
         )
+        return Response[BaseUserResponse](response=response)
 
     async def __route(
         self,
