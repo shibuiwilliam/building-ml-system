@@ -1,0 +1,19 @@
+flatbuffers==2.0
+joblib==1.1.0; python_version >= "3.7"
+lightgbm==3.3.2
+mecab-python3==1.0.4
+numpy==1.22.2; python_version >= "3.8"
+onnx==1.10.2
+onnxconverter-common==1.9.0
+onnxmltools==1.10.0
+onnxruntime==1.10.0
+pandas==1.4.0; python_version >= "3.8"
+protobuf==3.19.4; python_version >= "3.5"
+python-dateutil==2.8.2; python_version >= "3.8" and python_full_version < "3.0.0" or python_full_version >= "3.3.0" and python_version >= "3.8"
+pytz==2021.3; python_version >= "3.8"
+scikit-learn==1.0.2; python_version >= "3.7"
+scipy==1.6.1; python_version >= "3.7"
+six==1.16.0; python_version >= "3.8" and python_full_version < "3.0.0" or python_full_version >= "3.3.0" and python_version >= "3.8"
+skl2onnx==1.10.4
+threadpoolctl==3.1.0; python_version >= "3.7"
+typing-extensions==4.0.1; python_version >= "3.6"
