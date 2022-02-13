@@ -31,3 +31,11 @@ class AbstractUserRepository(ABC):
         commit: bool = True,
     ) -> Optional[UserModel]:
         raise NotImplementedError
+
+    @abstractmethod
+    def bulk_insert(
+        self,
+        records: List[UserCreate],
+        commit: bool = True,
+    ):
+        raise NotImplementedError

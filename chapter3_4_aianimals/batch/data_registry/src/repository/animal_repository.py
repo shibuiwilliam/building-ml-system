@@ -35,3 +35,11 @@ class AbstractAnimalRepository(ABC):
         record: AnimalUpdate,
     ):
         raise NotImplementedError
+
+    @abstractmethod
+    def bulk_insert(
+        self,
+        records: List[AnimalCreate],
+        commit: bool = True,
+    ):
+        raise NotImplementedError

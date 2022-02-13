@@ -6,9 +6,11 @@ from src.infrastructure.search import AbstractSearch
 from src.job.animal_to_search_job import AnimalToSearchJob
 from src.job.initialization_job import InitializationJob
 from src.middleware.logger import configure_logger
+from src.repository.access_log_repository import AbstractAccessLogRepository
 from src.repository.animal_category_repository import AbstractAnimalCategoryRepository
 from src.repository.animal_repository import AbstractAnimalRepository
 from src.repository.animal_subcategory_repository import AbstractAnimalSubcategoryRepository
+from src.repository.implementation.access_log_repository import AccessLogRepository
 from src.repository.implementation.animal_category_repository import AnimalCategoryRepository
 from src.repository.implementation.animal_repository import AnimalRepository
 from src.repository.implementation.animal_subcategory_repository import AnimalSubcategoryRepository
@@ -22,9 +24,11 @@ from src.repository.table_repository import AbstractTableRepository
 from src.repository.user_repository import AbstractUserRepository
 from src.repository.violation_repository import AbstractViolationRepository
 from src.repository.violation_type_repository import AbstractViolationTypeRepository
+from src.usecase.access_log_usecase import AbstractAccessLogUsecase
 from src.usecase.animal_category_usecase import AbstractAnimalCategoryUsecase
 from src.usecase.animal_subcategory_usecase import AbstractAnimalSubcategoryUsecase
 from src.usecase.animal_usecase import AbstractAnimalUsecase
+from src.usecase.implementation.access_log_usecase import AccessLogUsecase
 from src.usecase.implementation.animal_category_usecase import AnimalCategoryUsecase
 from src.usecase.implementation.animal_subcategory_usecase import AnimalSubcategoryUsecase
 from src.usecase.implementation.animal_usecase import AnimalUsecase
@@ -67,6 +71,7 @@ class Container(object):
             database=self.database
         )
         self.violation_repository: AbstractViolationRepository = ViolationRepository(database=database)
+        self.access_log_repository: AbstractAccessLogRepository = AccessLogRepository(database=database)
 
         self.table_usecase: AbstractTableUsecase = TableUsecase(table_repository=self.table_repository)
         self.animal_category_usecase: AbstractAnimalCategoryUsecase = AnimalCategoryUsecase(
@@ -94,6 +99,9 @@ class Container(object):
             violation_repository=self.violation_repository,
             animal_repository=self.animal_repository,
         )
+        self.access_log_usecase: AbstractAccessLogUsecase = AccessLogUsecase(
+            access_log_repository=self.access_log_repository
+        )
 
         self.animal_search_job: AnimalToSearchJob = AnimalToSearchJob(
             animal_usecase=self.animal_usecase,
@@ -107,6 +115,7 @@ class Container(object):
             animal_usecase=self.animal_usecase,
             violation_type_usecase=self.violation_type_usecase,
             violation_usecase=self.violation_usecase,
+            access_log_usecase=self.access_log_usecase,
             messaging=self.messaging,
             engine=self.database.engine,
         )

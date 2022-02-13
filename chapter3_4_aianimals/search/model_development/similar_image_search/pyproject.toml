@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "similar_image_search"
+version = "0.0.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "3.9.7"
+tensorflow = "^2.7.0"
+numpy = "^1.22.0"
+click = "^8.0.3"
+mlflow = "^1.22.0"
+Pillow = "^9.0.0"
+pydantic = "^1.9.0"
+scann = "^1.2.5"
+tensorflow-recommenders = "^0.6.0"
+tensorflow-hub = "^0.12.0"
+tensorflow-datasets = "^4.5.2"
+tensorboard = "^2.8.0"
+hydra-core = "^1.1.1"
+httpx = "^0.22.0"
+nptyping = "^1.4.4"
+scikit-learn = "^1.0.2"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

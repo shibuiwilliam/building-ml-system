@@ -24,6 +24,7 @@ class UserCreate(BaseModel):
     age: int
     gender: int
     created_at: Optional[datetime]
+    updated_at: Optional[datetime]
 
     class Config:
         extra = Extra.forbid

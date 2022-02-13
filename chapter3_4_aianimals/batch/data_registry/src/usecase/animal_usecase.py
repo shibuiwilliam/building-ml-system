@@ -63,3 +63,10 @@ class AbstractAnimalUsecase(ABC):
     @abstractmethod
     def register_document_from_queue(self):
         raise NotImplementedError
+
+    @abstractmethod
+    def bulk_register(
+        self,
+        requests: List[AnimalCreateRequest],
+    ):
+        raise NotImplementedError

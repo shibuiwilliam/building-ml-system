@@ -31,3 +31,10 @@ class AbstractUserUsecase(ABC):
         request: UserCreateRequest,
     ) -> Optional[UserResponse]:
         raise NotImplementedError
+
+    @abstractmethod
+    def bulk_register(
+        self,
+        requests: List[UserCreateRequest],
+    ):
+        raise NotImplementedError

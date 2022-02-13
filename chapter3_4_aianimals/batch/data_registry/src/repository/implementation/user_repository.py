@@ -85,3 +85,19 @@ class UserRepository(AbstractUserRepository):
             raise e
         finally:
             session.close()
+
+    def bulk_insert(
+        self,
+        records: List[UserCreate],
+        commit: bool = True,
+    ):
+        session = self.database.get_session().__next__()
+        try:
+            data = [d.dict() for d in records]
+            session.execute(User.__table__.insert(), data)
+            if commit:
+                session.commit()
+        except Exception as e:
+            raise e
+        finally:
+            session.close()

@@ -1,7 +1,8 @@
-from logging import getLogger
 from typing import List
 
-logger = getLogger(__name__)
+from src.middleware.logger import configure_logger
+
+logger = configure_logger(__name__)
 
 
 def read_text(filepath: str) -> List[str]:

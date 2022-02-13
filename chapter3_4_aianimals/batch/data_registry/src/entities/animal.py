@@ -26,6 +26,7 @@ class AnimalCreate(BaseModel):
     photo_url: str
     deactivated: bool = False
     created_at: Optional[datetime]
+    updated_at: Optional[datetime]
 
     class Config:
         extra = Extra.forbid

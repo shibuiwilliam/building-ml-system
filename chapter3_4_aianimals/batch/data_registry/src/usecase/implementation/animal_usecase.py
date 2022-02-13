@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from typing import Dict, List, Optional
 
 from src.configurations import Configurations
@@ -164,3 +165,38 @@ class AnimalUsecase(AbstractAnimalUsecase):
         )
         logger.info(f"Waiting for {Configurations.animal_registry_queue} queue...")
         self.messaging.channel.start_consuming()
+
+    def bulk_register(
+        self,
+        requests: List[AnimalCreateRequest],
+    ):
+        records = [
+            AnimalCreate(
+                id=request.id,
+                animal_category_id=request.animal_category_id,
+                animal_subcategory_id=request.animal_subcategory_id,
+                user_id=request.user_id,
+                name=request.name,
+                description=request.description,
+                photo_url=request.photo_url,
+                created_at=request.created_at,
+                updated_at=datetime.now(),
+            )
+            for request in requests
+        ]
+        for i in range(0, len(records), 200):
+            _records = records[i : i + 200]
+            self.animal_repository.bulk_insert(
+                records=_records,
+                commit=True,
+            )
+            logger.info(f"bulk register animal: {i} to {i+200}")
+            for r in _records:
+                self.messaging.publish(
+                    queue_name=Configurations.animal_registry_queue,
+                    body={"id": r.id},
+                )
+                self.messaging.publish(
+                    queue_name=Configurations.no_animal_violation_queue,
+                    body={"id": r.id},
+                )

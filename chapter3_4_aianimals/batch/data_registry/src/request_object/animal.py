@@ -26,6 +26,7 @@ class AnimalCreateRequest(BaseModel):
     description: str
     photo_url: str
     created_at: Optional[datetime]
+    updated_at: Optional[datetime]
 
     class Config:
         extra = Extra.forbid

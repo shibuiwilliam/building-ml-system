@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Optional
 
 from src.entities.user import UserCreate, UserQuery
@@ -6,6 +7,7 @@ from src.repository.user_repository import AbstractUserRepository
 from src.request_object.user import UserCreateRequest, UserRequest
 from src.response_object.user import UserResponse
 from src.usecase.user_usecase import AbstractUserUsecase
+from this import d
 
 logger = configure_logger(__name__)
 
@@ -67,3 +69,27 @@ class UserUsecase(AbstractUserUsecase):
             logger.info(f"done register: {response}")
             return response
         return None
+
+    def bulk_register(
+        self,
+        requests: List[UserCreateRequest],
+    ):
+        records = [
+            UserCreate(
+                id=request.id,
+                handle_name=request.handle_name,
+                email_address=request.email_address,
+                password=request.password,
+                age=request.age,
+                gender=request.gender,
+                created_at=request.created_at,
+                updated_at=datetime.now(),
+            )
+            for request in requests
+        ]
+        for i in range(0, len(records), 200):
+            self.user_repository.bulk_insert(
+                records=records[i : i + 200],
+                commit=True,
+            )
+            logger.info(f"bulk register user: {i} to {i+200}")

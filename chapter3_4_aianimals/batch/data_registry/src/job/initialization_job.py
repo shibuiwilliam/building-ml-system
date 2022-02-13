@@ -8,6 +8,7 @@ from src.configurations import Configurations
 from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging
 from src.job.abstract_job import AbstractJob
 from src.middleware.logger import configure_logger
+from src.request_object.access_log import AccessLogCreateRequest
 from src.request_object.animal import AnimalCreateRequest
 from src.request_object.animal_category import AnimalCategoryCreateRequest
 from src.request_object.animal_subcategory import AnimalSubcategoryCreateRequest
@@ -23,6 +24,7 @@ from src.schema.like import Like
 from src.schema.user import User
 from src.schema.violation import Violation
 from src.schema.violation_type import ViolationType
+from src.usecase.access_log_usecase import AbstractAccessLogUsecase
 from src.usecase.animal_category_usecase import AbstractAnimalCategoryUsecase
 from src.usecase.animal_subcategory_usecase import AbstractAnimalSubcategoryUsecase
 from src.usecase.animal_usecase import AbstractAnimalUsecase
@@ -44,6 +46,7 @@ class InitializationJob(AbstractJob):
         animal_usecase: AbstractAnimalUsecase,
         violation_type_usecase: AbstractViolationTypeUsecase,
         violation_usecase: AbstractViolationUsecase,
+        access_log_usecase: AbstractAccessLogUsecase,
         messaging: RabbitmqMessaging,
         engine: Engine,
     ):
@@ -55,6 +58,7 @@ class InitializationJob(AbstractJob):
         self.animal_usecase = animal_usecase
         self.violation_type_usecase = violation_type_usecase
         self.violation_usecase = violation_usecase
+        self.access_log_usecase = access_log_usecase
         self.messaging = messaging
         self.engine = engine
 
@@ -218,17 +222,20 @@ class InitializationJob(AbstractJob):
         logger.info(f"register user: {file_path}")
         with open(file_path, "r") as f:
             data = json.load(f)
+        requests = []
         for k, v in data.items():
-            request = UserCreateRequest(
-                id=k,
-                handle_name=v["handle_name"],
-                email_address=v["email_address"],
-                password=v["password"],
-                age=v["age"],
-                gender=v["gender"],
-                created_at=datetime.strptime(v["created_at"], "%Y-%m-%dT%H:%M:%S.%f"),
+            requests.append(
+                UserCreateRequest(
+                    id=k,
+                    handle_name=v["handle_name"],
+                    email_address=v["email_address"],
+                    password=v["password"],
+                    age=v["age"],
+                    gender=v["gender"],
+                    created_at=datetime.strptime(v["created_at"], "%Y-%m-%dT%H:%M:%S.%f"),
+                )
             )
-            self.user_usecase.register(request=request)
+        self.user_usecase.bulk_register(requests=requests)
         logger.info(f"done register user: {file_path}")
 
     def __register_animal(
@@ -242,18 +249,21 @@ class InitializationJob(AbstractJob):
             self.messaging.init_channel()
             self.messaging.create_queue(queue_name=Configurations.no_animal_violation_queue)
             self.messaging.channel.basic_qos(prefetch_count=1)
+            requests = []
             for k, v in data.items():
-                request = AnimalCreateRequest(
-                    id=k,
-                    animal_category_id=v["category"],
-                    animal_subcategory_id=v["subcategory"],
-                    user_id=v["user_id"],
-                    name=v["filename"],
-                    description=v["description"],
-                    photo_url=v["photo_url"],
-                    created_at=datetime.strptime(v["created_at"], "%Y-%m-%dT%H:%M:%S.%f"),
+                requests.append(
+                    AnimalCreateRequest(
+                        id=k,
+                        animal_category_id=v["category"],
+                        animal_subcategory_id=v["subcategory"],
+                        user_id=v["user_id"],
+                        name=v["filename"],
+                        description=v["description"],
+                        photo_url=v["photo_url"],
+                        created_at=datetime.strptime(v["created_at"], "%Y-%m-%dT%H:%M:%S.%f"),
+                    )
                 )
-                self.animal_usecase.register(request=request)
+            self.animal_usecase.bulk_register(requests=requests)
         except Exception as e:
             logger.exception(e)
             raise e
@@ -280,6 +290,31 @@ class InitializationJob(AbstractJob):
             self.violation_usecase.register(request=request)
         logger.info(f"done register violation: {file_path}")
 
+    def __register_access_log(
+        self,
+        file_path: str,
+    ):
+        logger.info(f"register access log: {file_path}")
+        with open(file_path, "r") as f:
+            data = json.load(f)
+        requests = []
+        for v in data["access_logs"]:
+            requests.append(
+                AccessLogCreateRequest(
+                    id=v["id"],
+                    phrases=v["phrases"],
+                    animal_category_id=v["animal_category_id"],
+                    animal_subcategory_id=v["animal_subcategory_id"],
+                    user_id=v["user_id"],
+                    likes=v["likes"],
+                    animal_id=v["animal_id"],
+                    action=v["action"],
+                    created_at=datetime.strptime(v["created_at"], "%Y-%m-%d %H:%M:%S.%f"),
+                )
+            )
+        self.access_log_usecase.bulk_register(requests=requests)
+        logger.info(f"done register access_log: {file_path}")
+
     def run(self):
         logger.info("run initialize database")
         self.__create_table()
@@ -290,3 +325,4 @@ class InitializationJob(AbstractJob):
         self.__register_user(file_path=Configurations.user_file)
         self.__register_animal(file_path=Configurations.animal_file)
         self.__register_violation(file_path=Configurations.violation_file)
+        self.__register_access_log(file_path=Configurations.access_log_file)
