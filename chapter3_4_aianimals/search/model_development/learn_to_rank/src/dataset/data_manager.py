@@ -1,159 +1,111 @@
-from datetime import datetime
-from enum import Enum
-from typing import List, Optional
+from abc import ABC, abstractmethod
+from typing import Any, Dict, List, Optional, Tuple
 
-from pydantic import BaseModel, Extra
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String, Text, and_
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.sql.functions import current_timestamp
-from sqlalchemy.sql.sqltypes import INT
-from src.infrastructure.postgresql_database import PostgreSQLDatabase
+import psycopg2
+from psycopg2.extras import DictCursor
+from src.configurations import Configurations
+from src.dataset.schema import TABLES, AccessLog
 from src.middleware.logger import configure_logger
 
 logger = configure_logger(__name__)
 
 
-class TABLES(Enum):
-    ANIMAL_CATEGORY = "animal_categories"
-    ANIMAL_SUBCATEGORY = "animal_subcategories"
-    ANIMAL = "animals"
-    USER = "users"
+class AbstractDBClient(ABC):
+    def __init__(self):
+        pass
 
-    @staticmethod
-    def has_value(value: str) -> bool:
-        return value in [v.value for v in TABLES.__members__.values()]
-
-    @staticmethod
-    def get_list() -> List[str]:
-        return [v.value for v in TABLES.__members__.values()]
+    @abstractmethod
+    def get_connection(self):
+        raise NotImplementedError
 
 
-Base = declarative_base()
+class DBClient(AbstractDBClient):
+    def __init__(self):
+        self.__connection_string = Configurations.connection_string
+
+    def get_connection(self):
+        return psycopg2.connect(self.__connection_string)
 
 
-class Animal(Base):
-    __tablename__ = TABLES.ANIMAL.value
-    id = Column(
-        String(32),
-        primary_key=True,
-    )
-    name = Column(
-        String(128),
-        nullable=False,
-        unique=False,
-    )
-    animal_category_id = Column(
-        INT,
-        ForeignKey(f"{TABLES.ANIMAL_CATEGORY.value}.id"),
-        nullable=False,
-        unique=False,
-    )
-    animal_subcategory_id = Column(
-        INT,
-        ForeignKey(f"{TABLES.ANIMAL_SUBCATEGORY.value}.id"),
-        nullable=False,
-        unique=False,
-    )
-    user_id = Column(
-        String(32),
-        ForeignKey(f"{TABLES.USER.value}.id"),
-        nullable=False,
-        unique=False,
-    )
-    description = Column(
-        Text,
-        nullable=False,
-        unique=False,
-    )
-    photo_url = Column(
-        Text,
-        nullable=False,
-        unique=False,
-    )
-    deactivated = Column(
-        Boolean,
-        nullable=False,
-        unique=False,
-        default=False,
-    )
-    created_at = Column(
-        DateTime(timezone=True),
-        server_default=current_timestamp(),
-        nullable=False,
-    )
-    updated_at = Column(
-        DateTime(timezone=True),
-        server_default=current_timestamp(),
-        nullable=False,
-    )
+class BaseRepository(object):
+    def __init__(
+        self,
+        db_client: AbstractDBClient,
+    ):
+        self.db_client = db_client
+
+    def execute_select_query(
+        self,
+        query: str,
+        parameters: Optional[Tuple] = None,
+    ) -> List[Dict[str, Any]]:
+        logger.info(f"select query: {query}, parameters: {parameters}")
+        with self.db_client.get_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cursor:
+                cursor.execute(query, parameters)
+                rows = cursor.fetchall()
+        return rows
 
 
-class AnimalQuery(BaseModel):
-    id: Optional[str]
-    name: Optional[str]
-    animal_category_id: Optional[int]
-    animal_subcategory_id: Optional[int]
-    deactivated: Optional[bool]
-
-    class Config:
-        extra = Extra.forbid
-
-
-class AnimalModel(BaseModel):
-    id: str
-    animal_category_id: int
-    animal_subcategory_id: int
-    name: str
-    description: str
-    photo_url: str
-    deactivated: bool = False
-    user_id: str
-    created_at: datetime
-    updated_at: datetime
-
-
-class AnimalRepository(object):
-    def __init__(self, database: PostgreSQLDatabase) -> None:
-        self.database = database
+class AccessLogRepository(BaseRepository):
+    def __init__(
+        self,
+        db_client: AbstractDBClient,
+    ):
+        super().__init__(db_client=db_client)
+        self.access_log_table = TABLES.ACCESS_LOG.value
+        self.animal_table = TABLES.ANIMAL.value
 
     def select(
         self,
-        query: Optional[AnimalQuery],
-        limit: Optional[int] = 100,
-        offset: Optional[int] = 0,
-    ) -> List[AnimalModel]:
-        session = self.database.get_session().__next__()
-        try:
-            filters = []
-            if query is not None:
-                if query.id is not None:
-                    filters.append(Animal.id == query.id)
-                if query.name is not None:
-                    filters.append(Animal.name == query.name)
-                if query.animal_category_id is not None:
-                    filters.append(Animal.animal_category_id == query.animal_category_id)
-                if query.animal_subcategory_id is not None:
-                    filters.append(Animal.animal_subcategory_id == query.animal_subcategory_id)
-                if query.deactivated is not None:
-                    filters.append(Animal.deactivated == query.deactivated)
-            results = session.query(Animal).filter(and_(*filters)).order_by(Animal.id).limit(limit).offset(offset)
-            data = [
-                AnimalModel(
-                    id=d.id,
-                    animal_category_id=d.animal_category_id,
-                    animal_subcategory_id=d.animal_subcategory_id,
-                    name=d.name,
-                    description=d.description,
-                    photo_url=d.photo_url,
-                    deactivated=d.deactivated,
-                    user_id=d.user_id,
-                    created_at=d.created_at,
-                    updated_at=d.updated_at,
-                )
-                for d in results
-            ]
-            return data
-        except Exception as e:
-            raise e
-        finally:
-            session.close()
+        limit: int = 200,
+        offset: int = 0,
+    ) -> List[AccessLog]:
+        query = f"""
+SELECT
+    {self.access_log_table}.id AS id,
+    {self.access_log_table}.phrases AS query_phrases,
+    {self.access_log_table}.animal_category_id AS query_animal_category_id,
+    {self.access_log_table}.animal_subcategory_id AS query_animal_subcategory_id,
+    {self.access_log_table}.user_id AS user_id,
+    {self.access_log_table}.likes AS likes,
+    {self.access_log_table}.action AS action,
+    {self.access_log_table}.animal_id AS animal_id,
+    {self.animal_table}.animal_category_id AS animal_category_id,
+    {self.animal_table}.animal_subcategory_id AS animal_subcategory_id,
+    {self.animal_table}.name AS name,
+    {self.animal_table}.description AS description
+FROM 
+    {self.access_log_table}
+LEFT JOIN
+    {self.animal_table}
+ON
+    {self.access_log_table}.animal_id = {self.animal_table}.id
+LIMIT
+    {limit}
+OFFSET
+    {offset}
+;
+        """
+
+        records = self.execute_select_query(query=query)
+        data = [AccessLog(**r) for r in records]
+        return data
+
+    def select_all(
+        self,
+    ) -> List[AccessLog]:
+        limit = 200
+        offset = 0
+        records = []
+        while True:
+            r = self.select(
+                limit=limit,
+                offset=offset,
+            )
+            if len(r) > 0:
+                records.extend(r)
+            else:
+                break
+            offset += limit
+        return records

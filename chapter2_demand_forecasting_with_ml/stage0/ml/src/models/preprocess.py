@@ -294,7 +294,7 @@ class DataPreprocessPipeline(BasePreprocessPipeline):
         self,
         x: pd.DataFrame,
         y=None,
-    ) -> np.ndarray:
+    ) -> pd.DataFrame:
         if self.pipeline is None:
             raise AttributeError
         x = WEEKLY_SCHEMA.validate(x)
