@@ -1,5 +1,8 @@
-from typing import List
+from dataclasses import dataclass
 from enum import Enum
+from typing import List
+
+import numpy as np
 from pydantic import BaseModel, Extra
 
 
@@ -22,3 +25,18 @@ class Animal(BaseModel):
 
     class Config:
         extra = Extra.forbid
+
+
+class DownloadedImage(BaseModel):
+    id: str
+    path: str
+
+
+class DownloadedImages(BaseModel):
+    images: List[DownloadedImage]
+
+
+@dataclass
+class Dataset(object):
+    data: np.ndarray
+    ids: List[str]

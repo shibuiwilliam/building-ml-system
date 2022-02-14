@@ -170,7 +170,7 @@ class MobilenetV3(AbstractModel):
         save_dir: str,
         version: int = 0,
     ) -> str:
-        saved_model = os.path.join(save_dir, "raindrop_mobilenetv3", str(version))
+        saved_model = os.path.join(save_dir, "no_animal_violation_mobilenetv3", str(version))
         keras.backend.set_learning_phase(0)
         tf.saved_model.save(self.model, saved_model)
         logger.info(f"saved model: {saved_model}")

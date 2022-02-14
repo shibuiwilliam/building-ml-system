@@ -68,7 +68,7 @@ SELECT
 FROM 
     {self.animal_table}
 WHERE
-    {self.animal_table}.deactivated == false
+    {self.animal_table}.deactivated = FALSE
 LIMIT
     {limit}
 OFFSET
