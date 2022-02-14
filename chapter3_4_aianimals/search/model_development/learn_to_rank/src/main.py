@@ -31,27 +31,21 @@ def main(cfg: DictConfig):
     mlflow.set_experiment(cfg.name)
     with mlflow.start_run(run_name=run_name):
         db_client = DBClient()
-        train_data, target, qids = retrieve_access_logs(db_client=db_client)
+        raw_data = retrieve_access_logs(db_client=db_client)
         if cfg.jobs.data.split_by_qid:
-            x_train, x_test, y_train, y_test, q_train, q_test = split_by_qid(
-                x=train_data,
-                y=target,
-                qids=qids,
+            dataset = split_by_qid(
+                raw_data=raw_data,
                 test_size=0.3,
                 shuffle=True,
             )
         else:
-            x_train, x_test, y_train, y_test = random_split(
-                x=train_data,
-                y=target,
+            dataset = random_split(
+                raw_data=raw_data,
                 test_size=0.3,
                 shuffle=True,
             )
-            q_train = None
-            q_test = None
 
         pipeline = Preprocess()
-
         _model = MODELS.get_model(name=cfg.jobs.model.name)
         model = _model.model(
             early_stopping_rounds=cfg.jobs.model.params.early_stopping_rounds,
@@ -70,12 +64,12 @@ def main(cfg: DictConfig):
             model=model,
             preprocess_save_file_path=preprocess_save_file_path,
             model_save_file_path=model_save_file_path,
-            x_train=x_train,
-            y_train=y_train,
-            x_test=x_test,
-            y_test=y_test,
-            q_train=q_train,
-            q_test=q_test,
+            x_train=dataset.x_train,
+            y_train=dataset.y_train,
+            x_test=dataset.x_test,
+            y_test=dataset.y_test,
+            q_train=dataset.q_train,
+            q_test=dataset.q_test,
         )
         mlflow.log_artifact(artifact.preprocess_file_path, "preprocess")
         mlflow.log_artifact(artifact.model_file_path, "model")

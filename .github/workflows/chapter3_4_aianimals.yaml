@@ -24,5 +24,20 @@ jobs:
         env:
           DOCKER_BUILDKIT: 1
         run: |
-          make build_all
-          make push_all
+          build_data_registry
+          build_api
+          build_ab_test_proxy
+          build_es
+          build_violation_detection_no_animal_violation_proxy
+          build_violation_detection_registry
+          build_violation_detection_no_animal_violation_train
+          build_search_learn_to_rank_train
+          push_api
+          push_ab_test_proxy
+          push_data_registry
+          push_es
+          push_violation_detection_no_animal_violation_proxy
+          push_violation_detection_no_animal_violation_serving
+          push_violation_detection_registry
+          push_violation_detection_no_animal_violation_train
+          push_search_learn_to_rank_train

@@ -1,7 +1,10 @@
+from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional
+from typing import Dict, List, Optional
 
+import numpy as np
+import pandas as pd
 from pydantic import BaseModel, Extra
 
 
@@ -76,3 +79,18 @@ class AccessLog(AccessLogBase):
 
     class Config:
         extra = Extra.forbid
+
+
+class RawData(BaseModel):
+    data: List[Dict]
+    target: List[List[int]]
+
+
+@dataclass
+class SplitData(object):
+    x_train: pd.DataFrame
+    x_test: pd.DataFrame
+    y_train: np.ndarray
+    y_test: np.ndarray
+    q_train: Optional[List[int]]
+    q_test: Optional[List[int]]

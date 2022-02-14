@@ -239,6 +239,50 @@ port_forward_kibana:
 	kubectl -n elastic-search port-forward service/kibana-kb-http 5601:5601 &
 
 
+############ SEARCH_LEARN_TO_RANK_TRAIN COMMANDS ############
+SEARCH_LEARN_TO_RANK_TRAIN_DIR := $(DIR)/search/model_development/learn_to_rank
+SEARCH_LEARN_TO_RANK_TRAIN_VERSION := $(shell cd ${SEARCH_LEARN_TO_RANK_TRAIN_DIR} && poetry version -s)
+SEARCH_LEARN_TO_RANK_TRAIN_MANIFEST_DIR := $(K8S_DIR)/manifests/search/learn_to_rank_train
+DOCKERFILE_SEARCH_LEARN_TO_RANK_TRAIN = $(SEARCH_LEARN_TO_RANK_TRAIN_DIR)/$(DOCKERFILE)
+DOCKER_SEARCH_LEARN_TO_RANK_TRAIN_TAG = $(TAG)_search_learn_to_rank_train
+DOCKER_SEARCH_LEARN_TO_RANK_TRAIN_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_SEARCH_LEARN_TO_RANK_TRAIN_TAG)_$(SEARCH_LEARN_TO_RANK_TRAIN_VERSION)
+
+.PHONY: patch_search_learn_to_rank_train
+patch_search_learn_to_rank_train:
+	cd $(SEARCH_LEARN_TO_RANK_TRAIN_DIR) && \
+	poetry version patch
+
+.PHONY: minor_upgrade_search_learn_to_rank_train
+minor_upgrade_search_learn_to_rank_train:
+	cd $(SEARCH_LEARN_TO_RANK_TRAIN_DIR) && \
+	poetry version minor
+
+.PHONY: major_upgrade_search_learn_to_rank_train
+major_upgrade_search_learn_to_rank_train:
+	cd $(SEARCH_LEARN_TO_RANK_TRAIN_DIR) && \
+	poetry version major
+
+.PHONY: req_search_learn_to_rank_train
+req_search_learn_to_rank_train:
+	cd $(SEARCH_LEARN_TO_RANK_TRAIN_DIR) && \
+	poetry export \
+		--without-hashes \
+		-f requirements.txt \
+		--output requirements.txt
+
+.PHONY: build_search_learn_to_rank_train
+build_search_learn_to_rank_train: 
+	docker build \
+		--platform x86_64 \
+		-t $(DOCKER_SEARCH_LEARN_TO_RANK_TRAIN_IMAGE_NAME) \
+		-f $(DOCKERFILE_SEARCH_LEARN_TO_RANK_TRAIN) \
+		.
+
+.PHONY: push_search_learn_to_rank_train
+push_search_learn_to_rank_train: 
+	docker push $(DOCKER_SEARCH_LEARN_TO_RANK_TRAIN_IMAGE_NAME)
+
+
 ############ VIOLATION_DETECTION_REGISTRY COMMANDS ############
 VIOLATION_DETECTION_REGISTRY_DIR := $(DIR)/violation_detection/registry
 VIOLATION_DETECTION_REGISTRY_VERSION := $(shell cd ${VIOLATION_DETECTION_REGISTRY_DIR} && poetry version -s)
@@ -281,6 +325,50 @@ build_violation_detection_registry:
 .PHONY: push_violation_detection_registry
 push_violation_detection_registry: 
 	docker push $(DOCKER_VIOLATION_DETECTION_REGISTRY_IMAGE_NAME)
+
+
+############ NO_ANIMAL_VIOLATION_TRAIN COMMANDS ############
+NO_ANIMAL_VIOLATION_TRAIN_DIR := $(DIR)/violation_detection/model_development/no_animal_violation
+NO_ANIMAL_VIOLATION_TRAIN_VERSION := $(shell cd ${NO_ANIMAL_VIOLATION_TRAIN_DIR} && poetry version -s)
+NO_ANIMAL_VIOLATION_TRAIN_MANIFEST_DIR := $(K8S_DIR)/manifests/violation_detection/no_animal_violation_train
+DOCKERFILE_NO_ANIMAL_VIOLATION_TRAIN = $(NO_ANIMAL_VIOLATION_TRAIN_DIR)/$(DOCKERFILE)
+DOCKER_NO_ANIMAL_VIOLATION_TRAIN_TAG = $(TAG)_violation_detection_no_animal_violation_train
+DOCKER_NO_ANIMAL_VIOLATION_TRAIN_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_NO_ANIMAL_VIOLATION_TRAIN_TAG)_$(NO_ANIMAL_VIOLATION_TRAIN_VERSION)
+
+.PHONY: patch_violation_detection_no_animal_violation_train
+patch_violation_detection_no_animal_violation_train:
+	cd $(NO_ANIMAL_VIOLATION_TRAIN_DIR) && \
+	poetry version patch
+
+.PHONY: minor_upgrade_violation_detection_no_animal_violation_train
+minor_upgrade_violation_detection_no_animal_violation_train:
+	cd $(NO_ANIMAL_VIOLATION_TRAIN_DIR) && \
+	poetry version minor
+
+.PHONY: major_upgrade_violation_detection_no_animal_violation_train
+major_upgrade_violation_detection_no_animal_violation_train:
+	cd $(NO_ANIMAL_VIOLATION_TRAIN_DIR) && \
+	poetry version major
+
+.PHONY: req_violation_detection_no_animal_violation_train
+req_violation_detection_no_animal_violation_train:
+	cd $(NO_ANIMAL_VIOLATION_TRAIN_DIR) && \
+	poetry export \
+		--without-hashes \
+		-f requirements.txt \
+		--output requirements.txt
+
+.PHONY: build_violation_detection_no_animal_violation_train
+build_violation_detection_no_animal_violation_train: 
+	docker build \
+		--platform x86_64 \
+		-t $(DOCKER_NO_ANIMAL_VIOLATION_TRAIN_IMAGE_NAME) \
+		-f $(DOCKERFILE_NO_ANIMAL_VIOLATION_TRAIN) \
+		.
+
+.PHONY: push_violation_detection_no_animal_violation_train
+push_violation_detection_no_animal_violation_train: 
+	docker push $(DOCKER_NO_ANIMAL_VIOLATION_TRAIN_IMAGE_NAME)
 
 
 ############ NO_ANIMAL_VIOLATION_PROXY COMMANDS ############
@@ -387,7 +475,9 @@ req_all: \
 	req_api \
 	req_ab_test_proxy \
 	req_violation_detection_no_animal_violation_proxy \
-	req_violation_detection_registry
+	req_violation_detection_registry \
+	req_violation_detection_no_animal_violation_train \
+	req_search_learn_to_rank_train
 
 .PHONY: build_all
 build_all: \
@@ -397,7 +487,9 @@ build_all: \
 	build_es \
 	build_violation_detection_no_animal_violation_proxy \
 	build_violation_detection_no_animal_violation_serving \
-	build_violation_detection_registry
+	build_violation_detection_registry \
+	build_violation_detection_no_animal_violation_train \
+	build_search_learn_to_rank_train
 
 .PHONY: push_all
 push_all: \
@@ -407,4 +499,7 @@ push_all: \
 	push_es \
 	push_violation_detection_no_animal_violation_proxy \
 	push_violation_detection_no_animal_violation_serving \
-	push_violation_detection_registry
+	push_violation_detection_registry \
+	push_violation_detection_no_animal_violation_train \
+	push_search_learn_to_rank_train
+	
