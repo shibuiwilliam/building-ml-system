@@ -29,8 +29,8 @@ jobs:
         env:
           DOCKER_BUILDKIT: 1
         run: |
-          apt -y update
-          apt -y install curl
+          apt-get -y update
+          apt-get -y install curl
           curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
           make build_data_registry
           make build_api
