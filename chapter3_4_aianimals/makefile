@@ -283,6 +283,50 @@ push_search_learn_to_rank_train:
 	docker push $(DOCKER_SEARCH_LEARN_TO_RANK_TRAIN_IMAGE_NAME)
 
 
+############ SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN COMMANDS ############
+SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_DIR := $(DIR)/search/model_development/similar_image_search
+SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_VERSION := $(shell cd ${SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_DIR} && poetry version -s)
+SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_MANIFEST_DIR := $(K8S_DIR)/manifests/search/similar_image_search
+DOCKERFILE_SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN = $(SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_DIR)/$(DOCKERFILE)
+DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_TAG = $(TAG)_search_similar_image_search
+DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_TAG)_$(SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_VERSION)
+
+.PHONY: patch_search_similar_image_search
+patch_search_similar_image_search:
+	cd $(SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_DIR) && \
+	poetry version patch
+
+.PHONY: minor_upgrade_search_similar_image_search
+minor_upgrade_search_similar_image_search:
+	cd $(SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_DIR) && \
+	poetry version minor
+
+.PHONY: major_upgrade_search_similar_image_search
+major_upgrade_search_similar_image_search:
+	cd $(SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_DIR) && \
+	poetry version major
+
+.PHONY: req_search_similar_image_search
+req_search_similar_image_search:
+	cd $(SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_DIR) && \
+	poetry export \
+		--without-hashes \
+		-f requirements.txt \
+		--output requirements.txt
+
+.PHONY: build_search_similar_image_search
+build_search_similar_image_search: 
+	docker build \
+		--platform x86_64 \
+		-t $(DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_IMAGE_NAME) \
+		-f $(DOCKERFILE_SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN) \
+		.
+
+.PHONY: push_search_similar_image_search
+push_search_similar_image_search: 
+	docker push $(DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_IMAGE_NAME)
+
+
 ############ VIOLATION_DETECTION_REGISTRY COMMANDS ############
 VIOLATION_DETECTION_REGISTRY_DIR := $(DIR)/violation_detection/registry
 VIOLATION_DETECTION_REGISTRY_VERSION := $(shell cd ${VIOLATION_DETECTION_REGISTRY_DIR} && poetry version -s)
@@ -477,7 +521,8 @@ req_all: \
 	req_violation_detection_no_animal_violation_proxy \
 	req_violation_detection_registry \
 	req_violation_detection_no_animal_violation_train \
-	req_search_learn_to_rank_train
+	req_search_learn_to_rank_train \
+	req_search_similar_image_search
 
 .PHONY: build_all
 build_all: \
@@ -489,7 +534,8 @@ build_all: \
 	build_violation_detection_no_animal_violation_serving \
 	build_violation_detection_registry \
 	build_violation_detection_no_animal_violation_train \
-	build_search_learn_to_rank_train
+	build_search_learn_to_rank_train \
+	build_search_similar_image_search
 
 .PHONY: push_all
 push_all: \
@@ -501,5 +547,5 @@ push_all: \
 	push_violation_detection_no_animal_violation_serving \
 	push_violation_detection_registry \
 	push_violation_detection_no_animal_violation_train \
-	push_search_learn_to_rank_train
-	
+	push_search_learn_to_rank_train \
+	push_search_similar_image_search

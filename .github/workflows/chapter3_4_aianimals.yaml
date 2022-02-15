@@ -19,19 +19,25 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.9"
+          architecture: "x64"
       - name: Build and push api image
         working-directory: ./chapter3_4_aianimals
         env:
           DOCKER_BUILDKIT: 1
         run: |
+          apt -y update
+          apt -y install curl
+          curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
           make build_data_registry
           make build_api
           make build_ab_test_proxy
           make build_es
           make build_violation_detection_no_animal_violation_proxy
           make build_violation_detection_registry
-          make build_violation_detection_no_animal_violation_train
-          make build_search_learn_to_rank_train
           make push_api
           make push_ab_test_proxy
           make push_data_registry
@@ -39,5 +45,3 @@ jobs:
           make push_violation_detection_no_animal_violation_proxy
           make push_violation_detection_no_animal_violation_serving
           make push_violation_detection_registry
-          make push_violation_detection_no_animal_violation_train
-          make push_search_learn_to_rank_train

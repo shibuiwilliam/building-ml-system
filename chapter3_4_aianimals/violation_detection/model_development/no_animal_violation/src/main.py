@@ -21,7 +21,7 @@ logger = configure_logger(__name__)
 def main(cfg: DictConfig):
     logger.info(f"config: {cfg}")
     cwd = os.getcwd()
-    run_name = "-".join(cwd.split("/")[-2:])
+    run_name = cfg.task_name
     logger.info(f"current working directory: {cwd}")
     logger.info(f"run_name: {run_name}")
 

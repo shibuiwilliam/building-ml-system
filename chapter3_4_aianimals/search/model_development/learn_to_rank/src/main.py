@@ -16,19 +16,19 @@ logger = configure_logger(__name__)
 
 @hydra.main(
     config_path="/opt/hydra",
-    config_name="learn_to_rank_regression",
+    config_name="learn_to_rank_lightgbm_regression",
 )
 def main(cfg: DictConfig):
     logger.info("start ml...")
     logger.info(f"config: {cfg}")
     cwd = os.getcwd()
-    run_name = "-".join(cwd.split("/")[-2:])
+    run_name = cfg.task_name
 
     logger.info(f"current working directory: {cwd}")
     logger.info(f"run_name: {run_name}")
 
     mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000"))
-    mlflow.set_experiment(cfg.name)
+    mlflow.set_experiment(os.getenv("MLFLOW_EXPERIMENT", "learn_to_rank"))
     with mlflow.start_run(run_name=run_name):
         db_client = DBClient()
         raw_data = retrieve_access_logs(db_client=db_client)
@@ -71,6 +71,7 @@ def main(cfg: DictConfig):
             q_train=dataset.q_train,
             q_test=dataset.q_test,
         )
+
         mlflow.log_artifact(artifact.preprocess_file_path, "preprocess")
         mlflow.log_artifact(artifact.model_file_path, "model")
         mlflow.log_artifact(artifact.onnx_file_path, "onnx")
@@ -78,6 +79,7 @@ def main(cfg: DictConfig):
         mlflow.log_artifact(os.path.join(cwd, ".hydra/config.yaml"), "hydra_config.yaml")
         mlflow.log_artifact(os.path.join(cwd, ".hydra/hydra.yaml"), "hydra_hydra.yaml")
         mlflow.log_artifact(os.path.join(cwd, ".hydra/overrides.yaml"), "hydra_overrides.yaml")
+        mlflow.log_artifact(os.path.join(cwd, "main.log"))
 
         mlflow.log_param("model", model.name)
         mlflow.log_params(model.params)

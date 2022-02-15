@@ -11,7 +11,7 @@ from tensorflow import keras
 logger = configure_logger(__name__)
 
 
-class Scann(tf.keras.Model):
+class Scann(keras.Model):
     def __init__(
         self,
         feature_extraction,
@@ -48,7 +48,7 @@ class Scann(tf.keras.Model):
         export_path: str = "./saved_model/scann/0",
     ):
         signatures = {"serving_default": self.serving_fn}
-        tf.keras.backend.set_learning_phase(0)
+        keras.backend.set_learning_phase(0)
         tf.saved_model.save(self, export_path, signatures=signatures)
 
 
@@ -121,8 +121,8 @@ class ScannModel(object):
 
     def save_as_saved_model(
         self,
-        export_path: str = "./saved_model/scann/0",
+        saved_model: str = "./saved_model/scann/0",
     ) -> str:
-        self.scann.save(export_path=export_path)
-        logger.info(f"saved model: {export_path}")
-        return export_path
+        self.scann.save(export_path=saved_model)
+        logger.info(f"saved model: {saved_model}")
+        return saved_model

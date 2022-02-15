@@ -16,12 +16,12 @@ class Model(object):
 
 class MODELS(Enum):
     LIGHT_GBM_LEARN_TO_RANK_REGRESSION = Model(
-        name="learn_to_rank_regression",
+        name="learn_to_rank_lightgbm_regression",
         model=LightGBMLearnToRankRegression,
         params=LIGHT_GBM_LEARN_TO_RANK_REGRESSION,
     )
     LIGHT_GBM_LEARN_TO_RANK_RANKER = Model(
-        name="learn_to_rank_ranker",
+        name="learn_to_rank_lightgbm_ranker",
         model=LightGBMLearnToRankRanker,
         params=LIGHT_GBM_LEARN_TO_RANK_RANKER,
     )
