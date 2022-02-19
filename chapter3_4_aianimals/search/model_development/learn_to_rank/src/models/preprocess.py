@@ -1,6 +1,6 @@
 import os
 import random
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import joblib
 import MeCab
@@ -57,7 +57,7 @@ def split_by_qid(
     y_test = []
     q_train = []
     q_test = []
-    _data = {}
+    _data: Dict[str, List[Tuple]] = {}
     for r, t in zip(raw_data.data, raw_data.target):
         qid = make_query_id(
             phrases=".".join(sorted(r["query_phrases"])),

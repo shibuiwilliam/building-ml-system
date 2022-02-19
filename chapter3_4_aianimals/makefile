@@ -10,6 +10,26 @@ K8S_DIR := $(ABSOLUTE_PATH)/infrastructure
 K8S_SECRET_DIR := $(K8S_DIR)/secrets
 
 
+############ MLflow COMMANDS ############
+MLFLOW_DIR := $(DIR)/mlflow
+MLFLOW_VERSION := 0.0.0
+DOCKERFILE_MLFLOW = $(MLFLOW_DIR)/$(DOCKERFILE)
+DOCKER_MLFLOW_TAG = $(TAG)_mlflow
+DOCKER_MLFLOW_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_MLFLOW_TAG)_$(MLFLOW_VERSION)
+
+.PHONY: build_mlflow
+build_mlflow: 
+	docker build \
+		--platform x86_64 \
+		-t $(DOCKER_MLFLOW_IMAGE_NAME) \
+		-f $(DOCKERFILE_MLFLOW) \
+		.
+	 
+.PHONY: push_mlflow
+push_mlflow: 
+	docker push $(DOCKER_MLFLOW_IMAGE_NAME)
+
+
 ############ DATA REGISTRY COMMANDS ############
 DATA_REGISTRY_DIR := $(DIR)/batch/data_registry
 DATA_REGISTRY_VERSION := $(shell cd ${DATA_REGISTRY_DIR} && poetry version -s)
@@ -526,6 +546,7 @@ req_all: \
 
 .PHONY: build_all
 build_all: \
+	build_mlflow \
 	build_data_registry \
 	build_api \
 	build_ab_test_proxy \
@@ -539,6 +560,7 @@ build_all: \
 
 .PHONY: push_all
 push_all: \
+	push_mlflow \
 	push_api \
 	push_ab_test_proxy \
 	push_data_registry \
