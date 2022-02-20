@@ -9,10 +9,7 @@ jobs:
       objective: lambdarank
       metric: ndcg
       lambdarank_truncation_level: 10
-      ndcg_eval_at:
-        - 10
-        - 5
-        - 20
+      ndcg_eval_at: [10, 5, 20]
       n_estimators: 10000
       boosting_type: gbdt
       num_leaves: 50

@@ -65,15 +65,17 @@ class LightGBMLearnToRankRanker(BaseLearnToRankModel):
     ):
         logger.info(f"start train for model: {self.model}")
         eval_set = [(x_train, y_train)]
-        if x_test is not None and y_test is not None:
+        eval_group = [q_train]
+        if x_test is not None and y_test is not None and q_test is not None:
             eval_set.append((x_test, y_test))
+            eval_group.append(q_test)
         self.model.fit(
             X=x_train,
             y=y_train,
             group=q_train,
             eval_set=eval_set,
+            eval_group=eval_group,
             early_stopping_rounds=self.early_stopping_rounds,
-            eval_group=[q_train, q_test],
             eval_metric=self.eval_metrics,
             verbose=self.verbose_eval,
         )
