@@ -36,6 +36,7 @@ async def download_file(
     if img.mode == "RGBA":
         img_rgb = Image.new("RGB", (img.height, img.width), (255, 255, 255))
         img_rgb.paste(img, mask=img.split()[3])
+        img = img_rgb
     img.save(destination_path)
     return id, destination_path
 
@@ -100,6 +101,8 @@ def load_images(
         img_array = np.array(img_resized).astype(np.float32) / 255.0
         data[i] = img_array
         ids.append(image.id)
+        if len(ids) % 100 == 0:
+            logger.info(f"loaded: {len(ids)} images")
     return Dataset(
         data=data,
         ids=ids,
