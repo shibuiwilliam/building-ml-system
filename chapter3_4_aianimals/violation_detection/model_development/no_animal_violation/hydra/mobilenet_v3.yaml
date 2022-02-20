@@ -1,11 +1,11 @@
 task_name: no_animal_violation_detection
 dataset:
   train:
-    negative_file: /opt/dataset/train_animals.txt
-    positive_file: /opt/dataset/train_no_animals.txt
+    negative_file: /opt/data/train_animals.txt
+    positive_file: /opt/data/train_no_animals.txt
   test:
-    negative_file: /opt/dataset/test_animals.txt
-    positive_file: /opt/dataset/test_no_animals.txt
+    negative_file: /opt/data/test_animals.txt
+    positive_file: /opt/data/test_no_animals.txt
   image:
     height: 224
     width: 224

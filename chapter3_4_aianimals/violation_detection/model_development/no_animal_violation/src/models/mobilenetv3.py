@@ -6,8 +6,8 @@ import tensorflow as tf
 import tensorflow_hub as hub
 from nptyping import NDArray
 from sklearn.metrics import accuracy_score, precision_score, recall_score
+from src.middleware.logger import configure_logger
 from src.model.abstract_model import AbstractModel, Evaluation
-from src.utils.logger import configure_logger
 from tensorflow import keras
 
 logger = configure_logger(__name__)
@@ -167,7 +167,7 @@ class MobilenetV3(AbstractModel):
 
     def save_as_saved_model(
         self,
-        save_dir: str,
+        save_dir: str = "/opt/outputs/saved_model/0",
         version: int = 0,
     ) -> str:
         saved_model = os.path.join(save_dir, "no_animal_violation_mobilenetv3", str(version))
@@ -178,7 +178,7 @@ class MobilenetV3(AbstractModel):
 
     def save_as_tflite(
         self,
-        save_path: str,
+        save_path: str = "/opt/outputs/no_animal_violation_detection.tflite",
     ) -> str:
         dirname = os.path.dirname(save_path)
         if not os.path.exists(dirname):

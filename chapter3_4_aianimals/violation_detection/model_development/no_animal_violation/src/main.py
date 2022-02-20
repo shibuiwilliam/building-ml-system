@@ -46,22 +46,22 @@ def main(cfg: DictConfig):
         download_dataset(
             bucket=cfg.dataset.bucket,
             filepaths=train_test_dataset.train_dataset.negative_filepaths,
-            destination_directory="/opt/dataset/train/images",
+            destination_directory="/opt/data/train/images",
         )
         download_dataset(
             bucket=cfg.dataset.bucket,
             filepaths=train_test_dataset.train_dataset.positive_filepaths,
-            destination_directory="/opt/dataset/train/no_animal_images",
+            destination_directory="/opt/data/train/no_animal_images",
         )
         download_dataset(
             bucket=cfg.dataset.bucket,
             filepaths=train_test_dataset.test_dataset.negative_filepaths,
-            destination_directory="/opt/dataset/test/images",
+            destination_directory="/opt/data/test/images",
         )
         download_dataset(
             bucket=cfg.dataset.bucket,
             filepaths=train_test_dataset.test_dataset.positive_filepaths,
-            destination_directory="/opt/dataset/test/no_animal_images",
+            destination_directory="/opt/data/test/no_animal_images",
         )
 
         (x_train, y_train), (x_test, y_test) = load_dataset(
