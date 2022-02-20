@@ -4,10 +4,10 @@ import hydra
 import mlflow
 from omegaconf import DictConfig
 from src.dataset.schema import Dataset, ImageShape, TrainTestDataset
-from src.job.load_data import load_dataset
-from src.job.retrieve import download_dataset
-from src.job.save import save_as_saved_model, save_as_tflite
-from src.job.train import initialize_model, train_and_evaluate
+from src.jobs.load_data import load_dataset
+from src.jobs.retrieve import download_dataset
+from src.jobs.save import save_as_saved_model, save_as_tflite
+from src.jobs.train import initialize_model, train_and_evaluate
 from src.middleware.file_utils import read_text
 from src.middleware.logger import configure_logger
 
