@@ -20,6 +20,7 @@ SQLAlchemy = "^1.4.31"
 pydantic = "^1.9.0"
 mlflow = "^1.23.1"
 hydra-core = "^1.1.1"
+psycopg2-binary = "^2.9.3"
 
 [tool.poetry.dev-dependencies]
 
