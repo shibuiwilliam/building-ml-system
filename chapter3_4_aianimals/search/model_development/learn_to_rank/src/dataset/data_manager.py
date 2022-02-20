@@ -1,7 +1,7 @@
 import os
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Tuple
 from datetime import date
+from typing import Any, Dict, List, Optional, Tuple
 
 import psycopg2
 from psycopg2.extras import DictCursor
