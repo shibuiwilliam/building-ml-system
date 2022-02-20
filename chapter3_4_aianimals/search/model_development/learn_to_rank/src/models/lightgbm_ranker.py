@@ -73,7 +73,7 @@ class LightGBMLearnToRankRanker(BaseLearnToRankModel):
             group=q_train,
             eval_set=eval_set,
             early_stopping_rounds=self.early_stopping_rounds,
-            eval_group=[q_test],
+            eval_group=[q_train, q_test],
             eval_metric=self.eval_metrics,
             verbose=self.verbose_eval,
         )
