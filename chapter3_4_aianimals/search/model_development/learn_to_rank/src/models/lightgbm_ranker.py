@@ -104,4 +104,5 @@ class LightGBMLearnToRankRanker(BaseLearnToRankModel):
         file_path: str,
     ):
         logger.info(f"load model: {file_path}")
-        self.model = joblib.load(file_path)
+        with open(file_path, "rb") as f:
+            self.model = cloudpickle.load(f)

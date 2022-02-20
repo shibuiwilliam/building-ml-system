@@ -38,10 +38,10 @@ def random_split(
         shuffle=True,
     )
     return SplitData(
-        x_train=x_train,
-        x_test=x_test,
-        y_train=y_train,
-        y_test=y_test,
+        x_train=pd.DataFrame(x_train),
+        x_test=pd.DataFrame(x_test),
+        y_train=np.array(y_train),
+        y_test=np.array(y_test),
         q_train=None,
         q_test=None,
     )
@@ -91,8 +91,8 @@ def split_by_qid(
     return SplitData(
         x_train=pd.DataFrame(x_train),
         x_test=pd.DataFrame(x_test),
-        y_train=np.ndarray(y_train),
-        y_test=np.ndarray(y_test),
+        y_train=np.array(y_train),
+        y_test=np.array(y_test),
         q_train=q_train,
         q_test=q_test,
     )
@@ -491,19 +491,19 @@ class Preprocess(BaseEstimator, TransformerMixin):
                         "query_phrases",
                         "query_animal_category_id",
                         "query_animal_subcategory_id",
-                        "data_category",
-                        "data_subcategory",
+                        "animal_category_id",
+                        "animal_subcategory_id",
                     ],
                 ),
                 (
                     "description",
                     description_pipeline,
-                    "data_description",
+                    "description",
                 ),
                 (
                     "name",
                     name_pipeline,
-                    "data_name",
+                    "name",
                 ),
             ],
             verbose_feature_names_out=True,

@@ -22,10 +22,6 @@ class BaseLearnToRankModel(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def define_default_search_params(self):
-        raise NotImplementedError
-
-    @abstractmethod
     def train(
         self,
         x_train: Union[np.ndarray, pd.DataFrame],
@@ -35,13 +31,6 @@ class BaseLearnToRankModel(ABC):
         q_train: Optional[List[int]] = None,
         q_test: Optional[List[int]] = None,
     ):
-        raise NotImplementedError
-
-    @abstractmethod
-    def predict(
-        self,
-        x: Union[np.ndarray, pd.DataFrame],
-    ) -> Union[np.ndarray, pd.DataFrame]:
         raise NotImplementedError
 
     @abstractmethod

@@ -44,11 +44,12 @@ def main(cfg: DictConfig):
             )
 
         pipeline = Preprocess()
+
         _model = MODELS.get_model(name=cfg.jobs.model.name)
         model = _model.model(
-            early_stopping_rounds=cfg.jobs.model.params.early_stopping_rounds,
-            eval_metrics=cfg.jobs.model.params.eval_metrics,
-            verbose_eval=cfg.jobs.model.params.verbose_eval,
+            early_stopping_rounds=cfg.jobs.model.params.get("early_stopping_rounds", 5),
+            eval_metrics=cfg.jobs.model.params.get("eval_metrics", "mse"),
+            verbose_eval=cfg.jobs.model.params.get("verbose_eval", 1),
         )
         if "params" in cfg.jobs.model.keys():
             model.reset_model(params=cfg.jobs.model.params)

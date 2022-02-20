@@ -257,7 +257,7 @@ class InitializationJob(AbstractJob):
                         animal_category_id=v["category"],
                         animal_subcategory_id=v["subcategory"],
                         user_id=v["user_id"],
-                        name=v["filename"],
+                        name=v["name"],
                         description=v["description"],
                         photo_url=v["photo_url"],
                         created_at=datetime.strptime(v["created_at"], "%Y-%m-%dT%H:%M:%S.%f"),

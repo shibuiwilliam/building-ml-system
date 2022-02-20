@@ -1,8 +1,7 @@
 import dataclasses
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Dict, List
 
-from src.models.base_model import BaseLearnToRankModel
 from src.models.lightgbm_ranker import LIGHT_GBM_LEARN_TO_RANK_RANKER, LightGBMLearnToRankRanker
 from src.models.lightgbm_regression import LIGHT_GBM_LEARN_TO_RANK_REGRESSION, LightGBMLearnToRankRegression
 
@@ -10,7 +9,7 @@ from src.models.lightgbm_regression import LIGHT_GBM_LEARN_TO_RANK_REGRESSION, L
 @dataclasses.dataclass(frozen=True)
 class Model(object):
     name: str
-    model: BaseLearnToRankModel
+    model: type
     params: Dict
 
 
@@ -35,8 +34,8 @@ class MODELS(Enum):
         return [v.value for v in MODELS.__members__.values()]
 
     @staticmethod
-    def get_model(name: str) -> Optional[Model]:
+    def get_model(name: str) -> Model:
         for model in [v.value for v in MODELS.__members__.values()]:
             if model.name == name:
                 return model
-        raise ValueError
+        raise ValueError("invalid model name")

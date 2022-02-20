@@ -33,8 +33,26 @@ class Trainer(object):
         q_train: Optional[List[int]] = None,
         q_test: Optional[List[int]] = None,
     ):
+        logger.info(
+            f"""
+data before preprocess
+x_train: {x_train.shape}
+y_train: {y_train.shape}
+x_test: {x_test.shape}
+y_test: {y_test.shape}
+        """
+        )
         _x_train = pipeline.fit_transform(x_train)
         _x_test = pipeline.transform(x_test)
+        logger.info(
+            f"""
+data after preprocess
+x_train: {_x_train.shape}
+y_train: {y_train.shape}
+x_test: {_x_test.shape}
+y_test: {y_test.shape}
+        """
+        )
         model.train(
             x_train=_x_train,
             y_train=y_train,
