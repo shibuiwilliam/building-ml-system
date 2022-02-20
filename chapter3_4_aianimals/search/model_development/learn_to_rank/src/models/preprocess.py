@@ -31,6 +31,7 @@ def random_split(
     raw_data: RawData,
     test_size: float = 0.3,
 ) -> SplitData:
+    logger.info("random split")
     x_train, x_test, y_train, y_test = train_test_split(
         raw_data.data,
         raw_data.target,
@@ -51,6 +52,7 @@ def split_by_qid(
     raw_data: RawData,
     test_size: float = 0.3,
 ) -> SplitData:
+    logger.info("split by qid")
     x_train = []
     y_train = []
     x_test = []
@@ -75,10 +77,10 @@ def split_by_qid(
             q_train.append(1)
         else:
             l = len(rts)
-            if len(rts) > 10000:
+            if l > 10000:
                 l = 10000
             _rts = random.sample(rts, l)
-            train_size = int(len(rts) * (1 - test_size))
+            train_size = int(l * (1 - test_size))
             for i, rt in enumerate(_rts):
                 if i < train_size:
                     x_train.append(rt[0])
