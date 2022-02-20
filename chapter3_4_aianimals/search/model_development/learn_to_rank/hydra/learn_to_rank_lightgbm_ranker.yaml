@@ -4,6 +4,7 @@ jobs:
     split_by_qid: true
   model:
     name: learn_to_rank_lightgbm_ranker
+    save_onnx: false
     params:
       task: train
       objective: lambdarank

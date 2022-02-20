@@ -74,7 +74,8 @@ def main(cfg: DictConfig):
 
         mlflow.log_artifact(artifact.preprocess_file_path, "preprocess")
         mlflow.log_artifact(artifact.model_file_path, "model")
-        mlflow.log_artifact(artifact.onnx_file_path, "onnx")
+        if cfg.jobs.model.get("save_onnx", False):
+            mlflow.log_artifact(artifact.onnx_file_path, "onnx")
 
         mlflow.log_artifact(os.path.join(cwd, ".hydra/config.yaml"), "hydra_config.yaml")
         mlflow.log_artifact(os.path.join(cwd, ".hydra/hydra.yaml"), "hydra_hydra.yaml")

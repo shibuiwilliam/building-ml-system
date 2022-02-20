@@ -4,6 +4,7 @@ jobs:
     split_by_qid: false
   model:
     name: learn_to_rank_lightgbm_regression
+    save_onnx: true
     params:
       task: train
       boosting: gbdt
