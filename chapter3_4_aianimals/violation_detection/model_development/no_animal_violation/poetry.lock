@@ -989,6 +989,22 @@ typing-extensions = ">=3.6.6"
 wrapt = ">=1.11.0"
 
 [[package]]
+name = "tensorflow-hub"
+version = "0.12.0"
+description = "TensorFlow Hub is a library to foster the publication, discovery, and consumption of reusable parts of machine learning models."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+numpy = ">=1.12.0"
+protobuf = ">=3.8.0"
+
+[package.extras]
+make_image_classifier = ["keras-preprocessing"]
+make_nearest_neighbour_index = ["apache-beam", "annoy"]
+
+[[package]]
 name = "tensorflow-io-gcs-filesystem"
 version = "0.24.0"
 description = "TensorFlow IO"
@@ -1118,7 +1134,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "3.9.7"
-content-hash = "571330aa74a867dd2b254605a969f37f8db026f4cb638cb92210520a893823de"
+content-hash = "eac35fdab73449d822d644d57ad380aa3f549ff1aa470b426d056d9baf600f58"
 
 [metadata.files]
 absl-py = [
@@ -1922,6 +1938,9 @@ tensorflow = [
     {file = "tensorflow-2.8.0-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:52f225fecc688281b3ae2cba2b52d3ed6215ed4a3ffb686b9cfd09885ca65563"},
     {file = "tensorflow-2.8.0-cp39-cp39-manylinux2010_x86_64.whl", hash = "sha256:9d91a989e5455ae713c03fd7236071ab3f232ad8ff2831f2658072933546091f"},
     {file = "tensorflow-2.8.0-cp39-cp39-win_amd64.whl", hash = "sha256:b360c13b3e58b9a5c0780cbdb6b549eea73f620275fa203f8508fe418ae02735"},
+]
+tensorflow-hub = [
+    {file = "tensorflow_hub-0.12.0-py2.py3-none-any.whl", hash = "sha256:822fe5f7338c95efcc3a534011c6689e4309ba2459def87194179c4de8a6e1fc"},
 ]
 tensorflow-io-gcs-filesystem = [
     {file = "tensorflow_io_gcs_filesystem-0.24.0-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:9c00f9a9880477b1dff0c71ee6734421ce99ac484ca2151793ebf2681fc0cb4c"},
