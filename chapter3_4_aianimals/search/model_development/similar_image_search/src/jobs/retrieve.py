@@ -58,9 +58,10 @@ async def download_files(
             basename = os.path.basename(animal.photo_url)
             d = os.path.join(destination_directory, basename)
             tasks.append(download_file(client, animal.id, animal.photo_url, d))
-        ids, destination_paths = await asyncio.gather(*tasks)
+        data = await asyncio.gather(*tasks)
+    logger.info(f"data: {data}")
     downloaded_images = []
-    for id, destination_path in zip(ids, destination_paths):
+    for id, destination_path in data:
         downloaded_images.append(
             DownloadedImage(
                 id=id,
@@ -74,6 +75,8 @@ def download_dataset(
     animals: List[Animal],
     destination_directory: str,
 ) -> DownloadedImages:
+    logger.info("start downloading image")
+    os.makedirs(destination_directory, exist_ok=True)
     loop = asyncio.get_event_loop()
     destination_paths = loop.run_until_complete(
         download_files(
@@ -81,6 +84,7 @@ def download_dataset(
             destination_directory=destination_directory,
         )
     )
+    logger.info("done downloading image")
     return destination_paths
 
 
@@ -89,6 +93,7 @@ def load_images(
     height: int,
     width: int,
 ) -> Dataset:
+    logger.info("start loading image")
     data = np.zeros((len(images.images), height, width, 3)).astype(np.float32)
     ids = []
     for i, image in enumerate(images.images):
@@ -103,6 +108,7 @@ def load_images(
         ids.append(image.id)
         if len(ids) % 100 == 0:
             logger.info(f"loaded: {len(ids)} images")
+    logger.info("done loading image")
     return Dataset(
         data=data,
         ids=ids,

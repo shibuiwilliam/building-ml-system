@@ -31,7 +31,7 @@ def main(cfg: DictConfig):
         animals = retrieve_animals(db_client=db_client)
         downloaded_images = download_dataset(
             animals=animals,
-            destination_directory="/tmp/",
+            destination_directory="/opt/outputs/images",
         )
         dataset = load_images(
             images=downloaded_images,
