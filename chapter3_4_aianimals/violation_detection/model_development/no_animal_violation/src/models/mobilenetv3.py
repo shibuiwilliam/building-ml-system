@@ -7,7 +7,7 @@ import tensorflow_hub as hub
 from nptyping import NDArray
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 from src.middleware.logger import configure_logger
-from src.model.abstract_model import AbstractModel, Evaluation
+from src.models.abstract_model import AbstractModel, Evaluation
 from tensorflow import keras
 
 logger = configure_logger(__name__)

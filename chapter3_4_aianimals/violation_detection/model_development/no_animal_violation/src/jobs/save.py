@@ -1,5 +1,5 @@
 from src.middleware.logger import configure_logger
-from src.model.abstract_model import AbstractModel
+from src.models.abstract_model import AbstractModel
 
 logger = configure_logger(__name__)
 
