@@ -478,7 +478,7 @@ class Preprocess(BaseEstimator, TransformerMixin):
             ]
         )
         self.pipeline = ColumnTransformer(
-            [
+            transformers=[
                 (
                     "numerical",
                     numerical_pipeline,
@@ -506,6 +506,8 @@ class Preprocess(BaseEstimator, TransformerMixin):
                     "name",
                 ),
             ],
+            remainder="drop",
+            n_jobs=1,
             verbose_feature_names_out=True,
         )
         logger.info(f"pipeline: {self.pipeline}")
@@ -549,17 +551,34 @@ class Preprocess(BaseEstimator, TransformerMixin):
             tokens.append(w)
         return tokens
 
+    def preprocess(self, x: pd.DataFrame) -> pd.DataFrame:
+        types = {
+            "animal_id": "str",
+            "query_phrases": "str",
+            "query_animal_category_id": "str",
+            "query_animal_subcategory_id": "str",
+            "likes": "int64",
+            "animal_category_id": "str",
+            "animal_subcategory_id": "str",
+            "name": "str",
+            "description": "str",
+        }
+        x = x.astype(types)
+        return x
+
     def fit(
         self,
         x: pd.DataFrame,
         y: Optional[Any] = None,
     ):
+        x = self.preprocess(x=x)
         self.pipeline.fit(x)
 
     def transform(
         self,
         x: pd.DataFrame,
     ):
+        x = self.preprocess(x=x)
         return self.pipeline.transform(x)
 
     def fit_transform(
@@ -567,6 +586,7 @@ class Preprocess(BaseEstimator, TransformerMixin):
         x: pd.DataFrame,
         y=None,
     ):
+        x = self.preprocess(x=x)
         return self.pipeline.fit_transform(x)
 
     def save(
@@ -578,7 +598,7 @@ class Preprocess(BaseEstimator, TransformerMixin):
             file_path = f"{file}.pkl"
         logger.info(f"save preprocess pipeline: {file_path}")
         with open(file_path, "wb") as f:
-            cloudpickle.dump(self.pipeline, f)
+            cloudpickle.dump(self, f)
         return file_path
 
     def load(
@@ -587,4 +607,4 @@ class Preprocess(BaseEstimator, TransformerMixin):
     ):
         logger.info(f"load preprocess pipeline: {file_path}")
         with open(file_path, "wb") as f:
-            self.pipeline = cloudpickle.load(f)
+            self = cloudpickle.load(f)

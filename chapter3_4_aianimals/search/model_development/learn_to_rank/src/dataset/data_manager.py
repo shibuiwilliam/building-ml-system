@@ -1,6 +1,7 @@
 import os
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Tuple
+from datetime import date
 
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -63,9 +64,11 @@ class AccessLogRepository(BaseRepository):
 
     def select(
         self,
+        date_from: Optional[date] = None,
         limit: int = 1000,
         offset: int = 0,
     ) -> List[AccessLog]:
+        parameters = []
         query = f"""
 SELECT
     {self.access_log_table}.id AS id,
@@ -86,19 +89,35 @@ LEFT JOIN
     {self.animal_table}
 ON
     {self.access_log_table}.animal_id = {self.animal_table}.id
+        """
+
+        if date_from is not None:
+            query += f"""
+WHERE
+    {self.access_log_table}.created_at >= %s
+            """
+            parameters.append(date_from)
+
+        query += f"""
+ORDER BY
+    {self.access_log_table}.created_at
 LIMIT
     {limit}
 OFFSET
     {offset}
 ;
-        """
+"""
 
-        records = self.execute_select_query(query=query)
+        records = self.execute_select_query(
+            query=query,
+            parameters=parameters,
+        )
         data = [AccessLog(**r) for r in records]
         return data
 
     def select_all(
         self,
+        date_from: Optional[date] = None,
     ) -> List[AccessLog]:
         limit = 1000
         offset = 0

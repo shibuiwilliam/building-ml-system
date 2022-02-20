@@ -37,11 +37,14 @@ class Trainer(object):
             f"""
 data before preprocess
 x_train: {x_train.shape}
+x_train_column: {x_train.columns}
 y_train: {y_train.shape}
 x_test: {x_test.shape}
+x_test_column: {x_test.columns}
 y_test: {y_test.shape}
         """
         )
+
         _x_train = pipeline.fit_transform(x_train)
         _x_test = pipeline.transform(x_test)
         logger.info(
@@ -53,6 +56,7 @@ x_test: {_x_test.shape}
 y_test: {y_test.shape}
         """
         )
+
         model.train(
             x_train=_x_train,
             y_train=y_train,

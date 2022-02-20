@@ -57,6 +57,7 @@ def main(cfg: DictConfig):
         now = datetime.now().strftime("%Y%m%d_%H%M%S")
         preprocess_save_file_path = os.path.join(cwd, f"{model.name}_{now}")
         model_save_file_path = os.path.join(cwd, f"{model.name}_{now}")
+
         trainer = Trainer()
         artifact = trainer.train(
             pipeline=pipeline,
