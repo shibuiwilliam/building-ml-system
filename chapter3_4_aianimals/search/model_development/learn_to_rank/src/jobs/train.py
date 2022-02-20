@@ -42,8 +42,8 @@ y_train: {y_train.shape}
 x_test: {x_test.shape}
 x_test_column: {x_test.columns}
 y_test: {y_test.shape}
-q_train: {len(q_train) if q_train is not None else None}
-q_test: {len(q_test) if q_test is not None else None}
+q_train: {sum(q_train) if q_train is not None else None}
+q_test: {sum(q_test) if q_test is not None else None}
         """
         )
 
@@ -56,8 +56,8 @@ x_train: {_x_train.shape}
 y_train: {y_train.shape}
 x_test: {_x_test.shape}
 y_test: {y_test.shape}
-q_train: {len(q_train) if q_train is not None else None}
-q_test: {len(q_test) if q_test is not None else None}
+q_train: {sum(q_train) if q_train is not None else None}
+q_test: {sum(q_test) if q_test is not None else None}
         """
         )
 
