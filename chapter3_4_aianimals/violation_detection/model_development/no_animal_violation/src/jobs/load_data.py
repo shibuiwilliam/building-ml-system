@@ -1,6 +1,7 @@
-from typing import Any, List, Tuple
+from typing import Any, List, Tuple, Optional
 
 import numpy as np
+import os
 from nptyping import NDArray
 from PIL import Image
 from src.dataset.schema import ImageShape, TrainTestDataset
@@ -13,11 +14,13 @@ def load_image_and_label(
     filepath: str,
     label: int,
     image_shape: ImageShape,
-) -> Tuple[NDArray[(Any, Any, Any, Any), float], int]:
-    img = Image.open(filepath).convert(image_shape.color)
-    img = img.resize((image_shape.height, image_shape.width))
-    arr = np.array(img) / 255.0
-    return arr, label
+) -> Tuple[Optional[NDArray[(Any, Any, Any, Any), float]], Optional[int]]:
+    if os.path.exists(filepath):
+        img = Image.open(filepath).convert(image_shape.color)
+        img = img.resize((image_shape.height, image_shape.width))
+        arr = np.array(img) / 255.0
+        return arr, label
+    return None, None
 
 
 def load_images_and_labels(
@@ -47,22 +50,24 @@ def load_images_and_labels(
             label=0,
             image_shape=image_shape,
         )
-        x[i] = arr
-        y[i] = label
-        i += 1
-        if i % 100 == 0:
-            logger.info(f"loaded: {i} images")
+        if arr is not None and label is not None:
+            x[i] = arr
+            y[i] = label
+            i += 1
+            if i % 100 == 0:
+                logger.info(f"loaded: {i} images")
     for f in positive_filepaths:
         arr, label = load_image_and_label(
             filepath=f,
             label=1,
             image_shape=image_shape,
         )
-        x[i] = arr
-        y[i] = label
-        i += 1
-        if i % 100 == 0:
-            logger.info(f"loaded: {i} images")
+        if arr is not None and label is not None:
+            x[i] = arr
+            y[i] = label
+            i += 1
+            if i % 100 == 0:
+                logger.info(f"loaded: {i} images")
     return x, y
 
 
