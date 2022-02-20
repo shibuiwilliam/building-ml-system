@@ -308,42 +308,42 @@ SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_DIR := $(DIR)/search/model_development/similar
 SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_VERSION := $(shell cd ${SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_DIR} && poetry version -s)
 SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_MANIFEST_DIR := $(K8S_DIR)/manifests/search/similar_image_search
 DOCKERFILE_SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN = $(SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_DIR)/$(DOCKERFILE)
-DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_TAG = $(TAG)_search_similar_image_search
+DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_TAG = $(TAG)_search_similar_image_search_train
 DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_TAG)_$(SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_VERSION)
 
-.PHONY: patch_search_similar_image_search
-patch_search_similar_image_search:
+.PHONY: patch_search_similar_image_search_train
+patch_search_similar_image_search_train:
 	cd $(SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_DIR) && \
 	poetry version patch
 
-.PHONY: minor_upgrade_search_similar_image_search
-minor_upgrade_search_similar_image_search:
+.PHONY: minor_upgrade_search_similar_image_search_train
+minor_upgrade_search_similar_image_search_train:
 	cd $(SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_DIR) && \
 	poetry version minor
 
-.PHONY: major_upgrade_search_similar_image_search
-major_upgrade_search_similar_image_search:
+.PHONY: major_upgrade_search_similar_image_search_train
+major_upgrade_search_similar_image_search_train:
 	cd $(SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_DIR) && \
 	poetry version major
 
-.PHONY: req_search_similar_image_search
-req_search_similar_image_search:
+.PHONY: req_search_similar_image_search_train
+req_search_similar_image_search_train:
 	cd $(SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_DIR) && \
 	poetry export \
 		--without-hashes \
 		-f requirements.txt \
 		--output requirements.txt
 
-.PHONY: build_search_similar_image_search
-build_search_similar_image_search: 
+.PHONY: build_search_similar_image_search_train
+build_search_similar_image_search_train:
 	docker build \
 		--platform x86_64 \
 		-t $(DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_IMAGE_NAME) \
 		-f $(DOCKERFILE_SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN) \
 		.
 
-.PHONY: push_search_similar_image_search
-push_search_similar_image_search: 
+.PHONY: push_search_similar_image_search_train
+push_search_similar_image_search_train: 
 	docker push $(DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_IMAGE_NAME)
 
 
@@ -542,7 +542,7 @@ req_all: \
 	req_violation_detection_registry \
 	req_violation_detection_no_animal_violation_train \
 	req_search_learn_to_rank_train \
-	req_search_similar_image_search
+	req_search_similar_image_search_train
 
 .PHONY: build_all
 build_all: \
@@ -556,7 +556,7 @@ build_all: \
 	build_violation_detection_registry \
 	build_violation_detection_no_animal_violation_train \
 	build_search_learn_to_rank_train \
-	build_search_similar_image_search
+	build_search_similar_image_search_train
 
 .PHONY: push_all
 push_all: \
@@ -570,4 +570,4 @@ push_all: \
 	push_violation_detection_registry \
 	push_violation_detection_no_animal_violation_train \
 	push_search_learn_to_rank_train \
-	push_search_similar_image_search
+	push_search_similar_image_search_train
