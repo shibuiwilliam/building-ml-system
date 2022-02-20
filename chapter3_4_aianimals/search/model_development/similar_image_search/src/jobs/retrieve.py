@@ -24,7 +24,7 @@ async def download_file(
     destination_path: str,
 ) -> Tuple[str, str]:
     if os.path.exists(destination_path):
-        return destination_path
+        return id, destination_path
     res = await client.get(source_path)
     if res.status_code != 200:
         raise Exception(f"failed to download {source_path}")
@@ -49,7 +49,7 @@ async def download_files(
         for animal in animals:
             basename = os.path.basename(animal.photo_url)
             d = os.path.join(destination_directory, basename)
-            tasks.append(download_file(client, animal.photo_url, d))
+            tasks.append(download_file(client, animal.id, animal.photo_url, d))
         ids, destination_paths = await asyncio.gather(*tasks)
     downloaded_images = []
     for id, destination_path in zip(ids, destination_paths):
