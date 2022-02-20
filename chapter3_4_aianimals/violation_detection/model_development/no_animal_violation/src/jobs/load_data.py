@@ -18,7 +18,7 @@ def load_image_and_label(
     if os.path.exists(filepath):
         img = Image.open(filepath).convert(image_shape.color)
         img = img.resize((image_shape.height, image_shape.width))
-        arr = np.array(img) / 255.0
+        arr = np.array(img).astype(np.float32) / 255.0
         return arr, label
     return None, None
 
@@ -52,10 +52,10 @@ def load_images_and_labels(
         )
         if arr is not None and label is not None:
             x[i] = arr
-            y[i] = label
+            y[i, 0] = 1
             i += 1
-            if i % 100 == 0:
-                logger.info(f"loaded: {i} images")
+        if i % 100 == 0:
+            logger.info(f"loaded: {i} images")
     for f in positive_filepaths:
         arr, label = load_image_and_label(
             filepath=f,
@@ -64,10 +64,10 @@ def load_images_and_labels(
         )
         if arr is not None and label is not None:
             x[i] = arr
-            y[i] = label
+            y[i, 1] = 1
             i += 1
-            if i % 100 == 0:
-                logger.info(f"loaded: {i} images")
+        if i % 100 == 0:
+            logger.info(f"loaded: {i} images")
     return x, y
 
 
