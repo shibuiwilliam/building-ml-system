@@ -103,6 +103,7 @@ class LightGBMLearnToRankRegression(BaseLearnToRankModel):
             self.model,
             initial_types=initial_types,
         )
+        logger.info(f"save model: {file_path}")
         onnxmltools.utils.save_model(onnx_model, file_path)
         return file_path
 

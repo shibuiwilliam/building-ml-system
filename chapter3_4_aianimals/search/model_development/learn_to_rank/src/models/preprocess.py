@@ -507,7 +507,6 @@ class Preprocess(BaseEstimator, TransformerMixin):
                 ),
             ],
             remainder="drop",
-            n_jobs=1,
             verbose_feature_names_out=True,
         )
         logger.info(f"pipeline: {self.pipeline}")
