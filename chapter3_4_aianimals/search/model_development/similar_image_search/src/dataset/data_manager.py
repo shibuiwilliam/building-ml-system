@@ -4,7 +4,6 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import psycopg2
 from psycopg2.extras import DictCursor
-from src.configurations import Configurations
 from src.dataset.schema import TABLES, Animal
 from src.middleware.logger import configure_logger
 
