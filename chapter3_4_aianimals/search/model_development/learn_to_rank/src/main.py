@@ -55,7 +55,7 @@ def main(cfg: DictConfig):
             model.reset_model(params=cfg.jobs.model.params)
 
         now = datetime.now().strftime("%Y%m%d_%H%M%S")
-        preprocess_save_file_path = os.path.join(cwd, f"{model.name}_{now}")
+        preprocess_save_file_path = os.path.join(cwd, f"{model.name}_preprocess_{now}")
         model_save_file_path = os.path.join(cwd, f"{model.name}_{now}")
 
         trainer = Trainer()
