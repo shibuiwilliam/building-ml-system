@@ -106,7 +106,5 @@ Loaded dataset:
         Positives: {len(dataset.test_dataset.positive_filepaths)}
     """
     )
-    logger.info(f"AAAAAAAAAAAA {x_test}")
-    logger.info(f"AAAAAAAAAAAA {y_test}")
     logger.info("done loading image")
     return (x_train, y_train), (x_test, y_test)
