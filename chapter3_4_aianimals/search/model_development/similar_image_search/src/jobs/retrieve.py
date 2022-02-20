@@ -8,6 +8,9 @@ import numpy as np
 from PIL import Image
 from src.dataset.data_manager import AbstractDBClient, AnimalRepository
 from src.dataset.schema import Animal, Dataset, DownloadedImage, DownloadedImages
+from src.middleware.logger import configure_logger
+
+logger = configure_logger(__name__)
 
 
 def retrieve_animals(
@@ -23,12 +26,16 @@ async def download_file(
     source_path: str,
     destination_path: str,
 ) -> Tuple[str, str]:
+    logger.info(f"download: {source_path} to {destination_path}")
     if os.path.exists(destination_path):
         return id, destination_path
     res = await client.get(source_path)
     if res.status_code != 200:
         raise Exception(f"failed to download {source_path}")
     img = Image.open(BytesIO(res.content))
+    if img.mode == "RGBA":
+        img_rgb = Image.new("RGB", (img.height, img.width), (255, 255, 255))
+        img_rgb.paste(img, mask=img.split()[3])
     img.save(destination_path)
     return id, destination_path
 

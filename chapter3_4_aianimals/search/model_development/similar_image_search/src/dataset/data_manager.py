@@ -62,7 +62,7 @@ class AnimalRepository(BaseRepository):
 
     def select(
         self,
-        limit: int = 200,
+        limit: int = 1000,
         offset: int = 0,
     ) -> List[Animal]:
         query = f"""
@@ -88,7 +88,7 @@ OFFSET
     def select_all(
         self,
     ) -> List[Animal]:
-        limit = 200
+        limit = 1000
         offset = 0
         records = []
         while True:
