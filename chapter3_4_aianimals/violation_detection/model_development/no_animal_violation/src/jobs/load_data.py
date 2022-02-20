@@ -79,6 +79,7 @@ def load_dataset(
         NDArray[(Any, 2), int],
     ],
 ]:
+    logger.info("start loading image")
     x_train, y_train = load_images_and_labels(
         negative_filepaths=dataset.train_dataset.negative_filepaths,
         positive_filepaths=dataset.train_dataset.positive_filepaths,
@@ -100,4 +101,5 @@ Loaded dataset:
         Positives: {len(dataset.test_dataset.positive_filepaths)}
     """
     )
+    logger.info("done loading image")
     return (x_train, y_train), (x_test, y_test)

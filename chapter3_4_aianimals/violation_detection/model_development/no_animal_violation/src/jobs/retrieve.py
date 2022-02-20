@@ -60,6 +60,7 @@ def download_dataset(
     filepaths: List[str],
     destination_directory: str,
 ) -> List[str]:
+    logger.info("start downloading image")
     os.makedirs(destination_directory, exist_ok=True)
     urls = [os.path.join("https://storage.googleapis.com/", bucket, f) for f in filepaths]
     loop = asyncio.get_event_loop()
@@ -69,4 +70,5 @@ def download_dataset(
             destination_directory=destination_directory,
         )
     )
+    logger.info("done downloading image")
     return destination_paths
