@@ -23,6 +23,8 @@ async def download_file(
     source_path: str,
     destination_path: str,
 ) -> Tuple[str, str]:
+    if os.path.exists(destination_path):
+        return destination_path
     res = await client.get(source_path)
     if res.status_code != 200:
         raise Exception(f"failed to download {source_path}")
