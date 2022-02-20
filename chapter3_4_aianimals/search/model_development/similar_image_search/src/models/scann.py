@@ -67,7 +67,7 @@ class ScannModel(object):
             [
                 hub.KerasLayer(
                     self.tfhub_url,
-                    trainable=false,
+                    trainable=False,
                 ),
             ],
         )

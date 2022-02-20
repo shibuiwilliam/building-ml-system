@@ -59,7 +59,6 @@ async def download_files(
             d = os.path.join(destination_directory, basename)
             tasks.append(download_file(client, animal.id, animal.photo_url, d))
         data = await asyncio.gather(*tasks)
-    logger.info(f"data: {data}")
     downloaded_images = []
     for id, destination_path in data:
         downloaded_images.append(
