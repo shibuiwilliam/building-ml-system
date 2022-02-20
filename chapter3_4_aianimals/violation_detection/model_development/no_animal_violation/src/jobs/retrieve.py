@@ -22,10 +22,14 @@ async def download_file(
     if res.status_code != 200:
         raise Exception(f"failed to download {source_path}")
     img = Image.open(BytesIO(res.content))
-    if img.mode == "RGBA":
+    if img.mode == "RGB":
+        img = img
+    elif img.mode == "RGBA":
         img_rgb = Image.new("RGB", (img.height, img.width), (255, 255, 255))
         img_rgb.paste(img, mask=img.split()[3])
         img = img_rgb
+    else:
+        return ""
     img.save(destination_path)
     return destination_path
 
