@@ -1,7 +1,7 @@
 import asyncio
 import os
 from io import BytesIO
-from typing import List
+from typing import List, Optional
 
 import httpx
 from PIL import Image
@@ -14,7 +14,7 @@ async def download_file(
     client: httpx.AsyncClient,
     source_path: str,
     destination_path: str,
-) -> str:
+) -> Optional[str]:
     logger.info(f"download {source_path}: {destination_path}")
     if os.path.exists(destination_path):
         return destination_path
@@ -29,7 +29,7 @@ async def download_file(
         img_rgb.paste(img, mask=img.split()[3])
         img = img_rgb
     else:
-        return ""
+        return None
     img.save(destination_path)
     return destination_path
 
@@ -71,4 +71,5 @@ def download_dataset(
         )
     )
     logger.info("done downloading image")
+    destination_paths = [f for f in destination_paths if f is not None]
     return destination_paths

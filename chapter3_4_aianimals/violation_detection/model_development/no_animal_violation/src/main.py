@@ -43,25 +43,35 @@ def main(cfg: DictConfig):
                 positive_filepaths=positive_test_files,
             ),
         )
-        download_dataset(
+        downloaded_negative_train_files = download_dataset(
             bucket=cfg.dataset.bucket,
             filepaths=train_test_dataset.train_dataset.negative_filepaths,
             destination_directory="/opt/data/train/images",
         )
-        download_dataset(
+        downloaded_positive_train_files = download_dataset(
             bucket=cfg.dataset.bucket,
             filepaths=train_test_dataset.train_dataset.positive_filepaths,
             destination_directory="/opt/data/train/no_animal_images",
         )
-        download_dataset(
+        downloaded_negative_test_files = download_dataset(
             bucket=cfg.dataset.bucket,
             filepaths=train_test_dataset.test_dataset.negative_filepaths,
             destination_directory="/opt/data/test/images",
         )
-        download_dataset(
+        downloaded_positive_test_files = download_dataset(
             bucket=cfg.dataset.bucket,
             filepaths=train_test_dataset.test_dataset.positive_filepaths,
             destination_directory="/opt/data/test/no_animal_images",
+        )
+        train_test_dataset = TrainTestDataset(
+            train_dataset=Dataset(
+                negative_filepaths=downloaded_negative_train_files,
+                positive_filepaths=downloaded_positive_train_files,
+            ),
+            test_dataset=Dataset(
+                negative_filepaths=downloaded_negative_test_files,
+                positive_filepaths=downloaded_positive_test_files,
+            ),
         )
 
         (x_train, y_train), (x_test, y_test) = load_dataset(
