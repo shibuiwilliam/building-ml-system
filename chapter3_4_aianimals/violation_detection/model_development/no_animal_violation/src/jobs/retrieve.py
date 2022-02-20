@@ -25,6 +25,7 @@ async def download_file(
     if img.mode == "RGBA":
         img_rgb = Image.new("RGB", (img.height, img.width), (255, 255, 255))
         img_rgb.paste(img, mask=img.split()[3])
+        img = img_rgb
     img.save(destination_path)
     return destination_path
 
