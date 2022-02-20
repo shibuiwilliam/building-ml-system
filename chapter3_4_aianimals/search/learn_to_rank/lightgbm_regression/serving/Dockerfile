@@ -6,9 +6,9 @@ ENV MODEL_BASE_PATH=${PROJECT_DIR}/model
 
 WORKDIR /${PROJECT_DIR}
 
-COPY /${SERVER_DIR}/model/learning_to_rank_lightgbm_regression.onnx /${MODEL_BASE_PATH}/learning_to_rank_lightgbm_regression.onnx
+COPY /${SERVER_DIR}/model/learn_to_rank_regression.onnx /${MODEL_BASE_PATH}/learn_to_rank_regression.onnx
 
-ENV MODEL_PATH /${MODEL_BASE_PATH}/learning_to_rank_lightgbm_regression.onnx
+ENV MODEL_PATH /${MODEL_BASE_PATH}/learn_to_rank_regression.onnx
 
 WORKDIR /onnxruntime/server/
 COPY ./${SERVER_DIR}/onnx_runtime_server_entrypoint.sh ./onnx_runtime_server_entrypoint.sh

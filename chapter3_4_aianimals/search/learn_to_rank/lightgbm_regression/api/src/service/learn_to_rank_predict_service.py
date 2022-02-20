@@ -3,15 +3,18 @@ from logging import getLogger
 from typing import List, Tuple
 
 import cloudpickle
-import numpy as np
 import pandas as pd
+from src.infrastructure.predictor_client import AbstractPredictor
 
 logger = getLogger(__name__)
 
 
 class AbstractLearnToRankPredictService(ABC):
-    def __init__(self):
-        pass
+    def __init__(
+        self,
+        predictor: AbstractPredictor,
+    ):
+        self.predictor = predictor
 
     @abstractmethod
     def _preprocess(
@@ -23,15 +26,15 @@ class AbstractLearnToRankPredictService(ABC):
     @abstractmethod
     def _predict(
         self,
-        input: pd.DataFrame,
-    ) -> np.ndarray:
+        input: List[List[float]],
+    ) -> List[float]:
         raise NotImplementedError
 
     @abstractmethod
     def _postprocess(
         self,
         input: pd.DataFrame,
-        prediction: np.ndarray,
+        prediction: List[float],
     ) -> List[Tuple[str, float]]:
         raise NotImplementedError
 
@@ -46,22 +49,16 @@ class AbstractLearnToRankPredictService(ABC):
 class LearnToRankPredictService(AbstractLearnToRankPredictService):
     def __init__(
         self,
+        predictor: AbstractPredictor,
         preprocess_file_path: str,
-        predictor_file_path: str,
     ):
-        super().__init__()
+        super().__init__(predictor=predictor)
         self.preprocess_file_path = preprocess_file_path
-        self.predictor_file_path = predictor_file_path
         self.__load_preprocess()
-        self.__load_predictor()
 
     def __load_preprocess(self):
         with open(self.preprocess_file_path, "rb") as f:
             self.preprocess = cloudpickle.load(f)
-
-    def __load_predictor(self):
-        with open(self.predictor_file_path, "rb") as f:
-            self.predictor = cloudpickle.load(f)
 
     def _preprocess(
         self,
@@ -71,14 +68,14 @@ class LearnToRankPredictService(AbstractLearnToRankPredictService):
 
     def _predict(
         self,
-        input: pd.DataFrame,
-    ) -> np.ndarray:
+        input: List[List[float]],
+    ) -> List[float]:
         return self.predictor.predict(input)
 
     def _postprocess(
         self,
         input: pd.DataFrame,
-        prediction: np.ndarray,
+        prediction: List[float],
     ) -> List[Tuple[str, float]]:
         id_prediction = {id: prob for id, prob in zip(input.animal_id, prediction)}
         sort_orders = sorted(id_prediction.items(), key=lambda x: x[1], reverse=True)

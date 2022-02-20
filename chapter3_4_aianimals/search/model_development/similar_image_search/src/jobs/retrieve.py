@@ -1,7 +1,7 @@
 import asyncio
 import os
 from io import BytesIO
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 import httpx
 import numpy as np
@@ -25,10 +25,11 @@ async def download_file(
     id: str,
     source_path: str,
     destination_path: str,
-) -> Tuple[str, str]:
+) -> Tuple[Optional[str], Optional[str]]:
     logger.info(f"download: {source_path} to {destination_path}")
     if os.path.exists(destination_path):
-        return id, destination_path
+        logger.error(f"failed to download data: {source_path}")
+        return None, None
     res = await client.get(source_path)
     if res.status_code != 200:
         raise Exception(f"failed to download {source_path}")
@@ -61,12 +62,13 @@ async def download_files(
         data = await asyncio.gather(*tasks)
     downloaded_images = []
     for id, destination_path in data:
-        downloaded_images.append(
-            DownloadedImage(
-                id=id,
-                path=destination_path,
+        if id is not None and destination_path is not None:
+            downloaded_images.append(
+                DownloadedImage(
+                    id=id,
+                    path=destination_path,
+                )
             )
-        )
     return DownloadedImages(images=downloaded_images)
 
 

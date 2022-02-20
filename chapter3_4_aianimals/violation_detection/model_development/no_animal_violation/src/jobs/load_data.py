@@ -1,7 +1,7 @@
-from typing import Any, List, Tuple, Optional
+import os
+from typing import Any, List, Optional, Tuple
 
 import numpy as np
-import os
 from nptyping import NDArray
 from PIL import Image
 from src.dataset.schema import ImageShape, TrainTestDataset

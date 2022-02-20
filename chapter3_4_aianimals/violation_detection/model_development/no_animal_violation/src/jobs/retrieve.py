@@ -20,7 +20,8 @@ async def download_file(
         return destination_path
     res = await client.get(source_path)
     if res.status_code != 200:
-        raise Exception(f"failed to download {source_path}")
+        logger.error(f"failed to download data: {source_path}")
+        return None
     img = Image.open(BytesIO(res.content))
     if img.mode == "RGB":
         img = img
