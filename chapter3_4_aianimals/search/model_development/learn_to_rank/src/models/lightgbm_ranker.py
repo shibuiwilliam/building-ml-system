@@ -1,7 +1,7 @@
 import os
 from typing import Dict, List, Optional, Union
 
-import joblib
+import cloudpickle
 import numpy as np
 import pandas as pd
 from lightgbm import LGBMRanker
@@ -86,7 +86,8 @@ class LightGBMLearnToRankRanker(BaseLearnToRankModel):
         if ext != ".pkl":
             file_path = f"{file}.pkl"
         logger.info(f"save model: {file_path}")
-        joblib.dump(self.model, file_path)
+        with open(file_path, "wb") as f:
+            cloudpickle.dump(self.model, f)
         return file_path
 
     def save_onnx(

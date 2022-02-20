@@ -224,6 +224,27 @@ services:
       - rabbitmq
       - initial_data_registry
 
+  mlflow:
+    container_name: mlflow
+    image: shibui/building-ml-system:ai_animals_mlflow_0.0.0
+    volumes:
+      - ./mlflow/outputs:/opt/outputs
+    command:
+      - "mlflow"
+      - "server"
+      - "--backend-store-uri"
+      - "/opt/outputs"
+      - "--default-artifact-root"
+      - "/opt/outputs"
+      - "--host"
+      - "0.0.0.0"
+    ports:
+      - 15000:5000
+    restart: always
+    hostname: mlflow
+    depends_on:
+      - postgres
+
 networks:
   default:
     name: aianimals

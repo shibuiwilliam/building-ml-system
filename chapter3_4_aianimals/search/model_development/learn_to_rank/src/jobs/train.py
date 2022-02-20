@@ -5,7 +5,7 @@ import pandas as pd
 from pydantic import BaseModel
 from src.middleware.logger import configure_logger
 from src.models.base_model import BaseLearnToRankModel
-from src.models.preprocess import Preprocess, dump_pipeline
+from src.models.preprocess import Preprocess
 
 logger = configure_logger(name=__name__)
 
@@ -43,10 +43,8 @@ class Trainer(object):
             q_train=q_train,
             q_test=q_test,
         )
-        preprocess_file_path = dump_pipeline(
-            file_path=preprocess_save_file_path,
-            preprocess=pipeline,
-        )
+
+        preprocess_file_path = pipeline.save(file_path=preprocess_save_file_path)
         model_file_path = model.save(file_path=model_save_file_path)
         onnx_file_path = model.save_onnx(
             file_path=model_save_file_path,

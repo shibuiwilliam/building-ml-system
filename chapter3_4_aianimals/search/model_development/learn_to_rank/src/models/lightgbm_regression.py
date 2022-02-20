@@ -1,7 +1,7 @@
 import os
 from typing import Dict, List, Optional, Union
 
-import joblib
+import cloudpickle
 import numpy as np
 import onnxmltools
 import pandas as pd
@@ -59,8 +59,8 @@ class LightGBMLearnToRankRegression(BaseLearnToRankModel):
         y_train: Union[np.ndarray, pd.DataFrame],
         x_test: Optional[Union[np.ndarray, pd.DataFrame]] = None,
         y_test: Optional[Union[np.ndarray, pd.DataFrame]] = None,
-        q_train: Optional[int] = None,
-        q_test: Optional[int] = None,
+        q_train: Optional[List[int]] = None,
+        q_test: Optional[List[int]] = None,
     ):
         logger.info(f"start train for model: {self.model}")
         eval_set = [(x_train, y_train)]
@@ -83,7 +83,8 @@ class LightGBMLearnToRankRegression(BaseLearnToRankModel):
         if ext != ".pkl":
             file_path = f"{file}.pkl"
         logger.info(f"save model: {file_path}")
-        joblib.dump(self.model, file_path)
+        with open(file_path, "wb") as f:
+            cloudpickle.dump(self.model, f)
         return file_path
 
     def save_onnx(

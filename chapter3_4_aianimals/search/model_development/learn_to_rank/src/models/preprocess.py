@@ -2,7 +2,7 @@ import os
 import random
 from typing import Any, Dict, List, Optional, Tuple
 
-import joblib
+import cloudpickle
 import MeCab
 import numpy as np
 import pandas as pd
@@ -569,19 +569,22 @@ class Preprocess(BaseEstimator, TransformerMixin):
     ):
         return self.pipeline.fit_transform(x)
 
+    def save(
+        self,
+        file_path: str,
+    ) -> str:
+        file, ext = os.path.splitext(file_path)
+        if ext != ".pkl":
+            file_path = f"{file}.pkl"
+        logger.info(f"save preprocess pipeline: {file_path}")
+        with open(file_path, "wb") as f:
+            cloudpickle.dump(self.pipeline, f)
+        return file_path
 
-def dump_pipeline(
-    file_path: str,
-    preprocess: Preprocess,
-) -> str:
-    file, ext = os.path.splitext(file_path)
-    if ext != ".pkl":
-        file_path = f"{file}.pkl"
-    logger.info(f"save preprocess pipeline: {file_path}")
-    joblib.dump(preprocess, file_path)
-    return file_path
-
-
-def load_pipeline(file_path: str) -> Preprocess:
-    logger.info(f"load preprocess pipeline: {file_path}")
-    return joblib.load(file_path)
+    def load(
+        self,
+        file_path: str,
+    ):
+        logger.info(f"load preprocess pipeline: {file_path}")
+        with open(file_path, "wb") as f:
+            self.pipeline = cloudpickle.load(f)
