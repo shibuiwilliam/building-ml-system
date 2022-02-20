@@ -50,6 +50,8 @@ def load_images_and_labels(
         x[i] = arr
         y[i] = label
         i += 1
+        if i % 100 == 0:
+            logger.info(f"loaded: {i} images")
     for f in positive_filepaths:
         arr, label = load_image_and_label(
             filepath=f,
@@ -59,6 +61,8 @@ def load_images_and_labels(
         x[i] = arr
         y[i] = label
         i += 1
+        if i % 100 == 0:
+            logger.info(f"loaded: {i} images")
     return x, y
 
 
