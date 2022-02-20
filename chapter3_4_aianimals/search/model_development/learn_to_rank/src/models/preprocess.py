@@ -100,7 +100,7 @@ def split_by_qid(
 
 class Preprocess(BaseEstimator, TransformerMixin):
     def __init__(self):
-        self.tokenizer = MeCab.Tagger()
+        # self.tokenizer = MeCab.Tagger()
         self.stop_words = [
             "あそこ",
             "あたり",
@@ -516,7 +516,8 @@ class Preprocess(BaseEstimator, TransformerMixin):
         self,
         text: str,
     ) -> List[str]:
-        ts = self.tokenizer.parse(text)
+        tokenizer = MeCab.Tagger()
+        ts = tokenizer.parse(text)
         ts = ts.split("\n")
         tokens = []
         for t in ts:
@@ -538,7 +539,8 @@ class Preprocess(BaseEstimator, TransformerMixin):
         self,
         text: str,
     ) -> List[str]:
-        ts = self.tokenizer.parse(text)
+        tokenizer = MeCab.Tagger()
+        ts = tokenizer.parse(text)
         ts = ts.split("\n")
         tokens = []
         for t in ts:
@@ -587,7 +589,8 @@ class Preprocess(BaseEstimator, TransformerMixin):
         y=None,
     ):
         x = self.preprocess(x=x)
-        return self.pipeline.fit_transform(x)
+        X = self.pipeline.fit_transform(x)
+        return X
 
     def save(
         self,
