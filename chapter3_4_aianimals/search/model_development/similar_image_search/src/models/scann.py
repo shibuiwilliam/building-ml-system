@@ -3,7 +3,6 @@ from typing import List
 import tensorflow as tf
 import tensorflow_hub as hub
 import tensorflow_recommenders as tfrs
-from sqlalchemy import false
 from src.dataset.schema import Dataset
 from src.middleware.logger import configure_logger
 from tensorflow import keras
@@ -45,7 +44,7 @@ class Scann(keras.Model):
 
     def save(
         self,
-        export_path: str = "./saved_model/scann/0",
+        export_path: str = "/opt/outputs/saved_model/scann/0",
     ):
         signatures = {"serving_default": self.serving_fn}
         keras.backend.set_learning_phase(0)
@@ -98,6 +97,7 @@ class ScannModel(object):
             num_leaves_to_search=num_leaves_to_search,
             num_reordering_candidates=num_reordering_candidates,
         )
+        self.model.index_from_dataset(self.x_train_embedding)
 
     def make_similarity_search_model(
         self,
@@ -121,7 +121,7 @@ class ScannModel(object):
 
     def save_as_saved_model(
         self,
-        saved_model: str = "./saved_model/scann/0",
+        saved_model: str = "/opt/outputs/saved_model/scann/0",
     ) -> str:
         self.scann.save(export_path=saved_model)
         logger.info(f"saved model: {saved_model}")
