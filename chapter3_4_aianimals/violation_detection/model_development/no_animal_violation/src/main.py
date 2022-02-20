@@ -25,7 +25,7 @@ def main(cfg: DictConfig):
     logger.info(f"current working directory: {cwd}")
     logger.info(f"run_name: {run_name}")
 
-    mlflow.set_tracking_uri(os.environ["MLFLOW_TRACKING_URI"])
+    mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:15000"))
     mlflow.set_experiment(os.getenv("MLFLOW_EXPERIMENT", "no_animal_violation_detection"))
     with mlflow.start_run(run_name=run_name):
         negative_train_files = read_text(filepath=cfg.dataset.train.negative_file)

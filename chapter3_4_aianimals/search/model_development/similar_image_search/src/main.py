@@ -24,7 +24,7 @@ def main(cfg: DictConfig):
     logger.info(f"current working directory: {cwd}")
     logger.info(f"run_name: {run_name}")
 
-    mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000"))
+    mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:15000"))
     mlflow.set_experiment(os.getenv("MLFLOW_EXPERIMENT", "similar_image_search"))
     with mlflow.start_run(run_name=run_name):
         db_client = DBClient()
