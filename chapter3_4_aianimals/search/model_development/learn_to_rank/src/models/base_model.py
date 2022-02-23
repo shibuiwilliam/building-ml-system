@@ -1,9 +1,13 @@
+import sys
 from abc import ABC, abstractmethod
 from typing import Dict, List, Optional, Union
 
+import cloudpickle
 import numpy as np
 import pandas as pd
 from src.middleware.logger import configure_logger
+
+cloudpickle.register_pickle_by_value(sys.modules[__name__])
 
 logger = configure_logger(__name__)
 

@@ -1,9 +1,13 @@
 import dataclasses
+import sys
 from enum import Enum
 from typing import Dict, List
 
+import cloudpickle
 from src.models.lightgbm_ranker import LIGHT_GBM_LEARN_TO_RANK_RANKER, LightGBMLearnToRankRanker
 from src.models.lightgbm_regression import LIGHT_GBM_LEARN_TO_RANK_REGRESSION, LightGBMLearnToRankRegression
+
+cloudpickle.register_pickle_by_value(sys.modules[__name__])
 
 
 @dataclasses.dataclass(frozen=True)

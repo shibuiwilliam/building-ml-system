@@ -1,4 +1,5 @@
 import os
+import sys
 from typing import Dict, List, Optional, Union
 
 import cloudpickle
@@ -7,6 +8,8 @@ import pandas as pd
 from lightgbm import LGBMRanker
 from src.middleware.logger import configure_logger
 from src.models.base_model import BaseLearnToRankModel
+
+cloudpickle.register_pickle_by_value(sys.modules[__name__])
 
 logger = configure_logger(__name__)
 
