@@ -18,7 +18,10 @@ async def download_file(
     logger.info(f"download {source_path}: {destination_path}")
     if os.path.exists(destination_path):
         return destination_path
-    res = await client.get(source_path)
+    try:
+        res = await client.get(source_path)
+    except httpx.PoolTimeout as e:
+        logger.error(f"failed to download data: {source_path}")
     if res.status_code != 200:
         logger.error(f"failed to download data: {source_path}")
         return None
@@ -63,11 +66,10 @@ def download_dataset(
 ) -> List[str]:
     logger.info("start downloading image")
     os.makedirs(destination_directory, exist_ok=True)
-    urls = [os.path.join("https://storage.googleapis.com/", bucket, f) for f in filepaths]
     loop = asyncio.get_event_loop()
     destination_paths = loop.run_until_complete(
         download_files(
-            filepaths=urls,
+            filepaths=filepaths,
             destination_directory=destination_directory,
         )
     )
