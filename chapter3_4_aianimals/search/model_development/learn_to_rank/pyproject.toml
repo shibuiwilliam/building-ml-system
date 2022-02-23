@@ -7,21 +7,16 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-scikit-learn = "^1.0.2"
 numpy = "^1.22.2"
 pandas = "^1.4.0"
-lightgbm = "^3.3.2"
-onnx = "^1.10.2"
 skl2onnx = "^1.10.4"
 onnxruntime = "^1.10.0"
 onnxmltools = "^1.10.0"
-mecab-python3 = "^1.0.4"
 SQLAlchemy = "^1.4.31"
 pydantic = "^1.9.0"
 mlflow = "^1.23.1"
 hydra-core = "^1.1.1"
 psycopg2-binary = "^2.9.3"
-cloudpickle = "^2.0.0"
 
 [tool.poetry.dev-dependencies]
 
