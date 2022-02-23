@@ -2,7 +2,7 @@ ARG FROM_IMAGE=python:3.9.7-slim
 
 FROM ${FROM_IMAGE}
 
-ARG LOCAL_DIR=search/learn_to_rank/lightgbm_ranker/api
+ARG LOCAL_DIR=search/learn_to_rank/api
 
 ENV PROJECT_DIR opt
 WORKDIR /${PROJECT_DIR}

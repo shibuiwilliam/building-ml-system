@@ -5,14 +5,18 @@ cloudpickle==2.0.0; python_version >= "3.6"
 colorama==0.4.4; python_version >= "3.7" and python_full_version < "3.0.0" and platform_system == "Windows" or platform_system == "Windows" and python_version >= "3.7" and python_full_version >= "3.5.0"
 deprecated==1.2.13; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version >= "3.6"
 fastapi==0.74.0; python_full_version >= "3.6.1"
+flatbuffers==2.0
 gunicorn==20.1.0; python_version >= "3.5"
 h11==0.13.0; python_version >= "3.7"
 idna==3.3; python_version >= "3.6" and python_full_version >= "3.6.2"
 joblib==1.1.0; python_version >= "3.7"
 lightgbm==3.3.2
 numpy==1.22.2; python_version >= "3.8"
+onnx==1.11.0
+onnxruntime==1.10.0
 packaging==21.3; python_version >= "3.6"
 pandas==1.4.1; python_version >= "3.8"
+protobuf==3.19.4; python_version >= "3.5"
 psycopg2-binary==2.9.3; python_version >= "3.6"
 pydantic==1.9.0; python_full_version >= "3.6.1"
 pyparsing==3.0.7; python_version >= "3.6"

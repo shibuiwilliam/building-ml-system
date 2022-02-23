@@ -1,5 +1,6 @@
 import os
 import random
+import sys
 from typing import Any, Dict, List, Optional, Tuple
 
 import cloudpickle
@@ -17,6 +18,8 @@ from src.dataset.schema import RawData, SplitData
 from src.middleware.logger import configure_logger
 
 logger = configure_logger(__name__)
+
+cloudpickle.register_pickle_by_value(sys.modules[__name__])
 
 
 def make_query_id(

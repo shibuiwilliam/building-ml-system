@@ -177,9 +177,9 @@ services:
       - api
       - es
 
-  search_learn_to_rank_lgbm_ranker_api:
-    container_name: search_learn_to_rank_lgbm_ranker_api
-    image: shibui/building-ml-system:ai_animals_search_learn_to_rank_lgbm_ranker_api_0.0.0
+  search_learn_to_rank_lgbm_api:
+    container_name: search_learn_to_rank_lgbm_api
+    image: shibui/building-ml-system:ai_animals_search_learn_to_rank_lgbm_api_0.0.0
     restart: always
     networks:
       - default

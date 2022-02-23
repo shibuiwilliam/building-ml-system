@@ -140,7 +140,6 @@ registry_ab_test_proxy: deploy_ab_test_proxy_ns
 
 .PHONY: deploy_ab_test_proxy
 deploy_ab_test_proxy: deploy_ab_test_proxy_ns
-	kubectl apply -f $(AB_TEST_PROXY_MANIFEST_DIR)/postgres.yaml && \
 	kubectl apply -f $(AB_TEST_PROXY_MANIFEST_DIR)/ab_test_proxy.yaml
 
 
@@ -273,7 +272,6 @@ push_search_learn_to_rank_lgbm_api:
 
 .PHONY: deploy_search_learn_to_rank_lgbm_api
 deploy_search_learn_to_rank_lgbm_api: 
-	kubectl apply -f $(SEARCH_LEARN_TO_RANK_LGBM_API_MANIFEST_DIR)/postgres.yaml && \
 	kubectl apply -f $(SEARCH_LEARN_TO_RANK_LGBM_API_MANIFEST_DIR)/search_learn_to_rank_lgbm_api.yaml
 
 
