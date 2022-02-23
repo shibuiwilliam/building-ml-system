@@ -20,6 +20,7 @@ redis = "^4.1.4"
 cloudpickle = "^2.0.0"
 onnx = "^1.11.0"
 onnxruntime = "^1.10.0"
+mecab-python3 = "^1.0.5"
 
 [tool.poetry.dev-dependencies]
 
