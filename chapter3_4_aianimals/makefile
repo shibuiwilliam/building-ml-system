@@ -243,98 +243,38 @@ push_search_learn_to_rank_train:
 	docker push $(DOCKER_SEARCH_LEARN_TO_RANK_TRAIN_IMAGE_NAME)
 
 
-############ SEARCH_LEARN_TO_RANK_LGBM_RANKER_API COMMANDS ############
-SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_DIR := $(DIR)/search/learn_to_rank/lightgbm_ranker/api
-SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_VERSION := $(shell cd ${SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_DIR} && poetry version -s)
-SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_MANIFEST_DIR := $(K8S_DIR)/manifests/search_learn_to_rank_lgbm_ranker_api
-DOCKERFILE_SEARCH_LEARN_TO_RANK_LGBM_RANKER_API = $(SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_DIR)/$(DOCKERFILE)
-DOCKER_SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_TAG = $(TAG)_search_learn_to_rank_lgbm_ranker_api
-DOCKER_SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_TAG)_$(SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_VERSION)
+############ SEARCH_LEARN_TO_RANK_LGBM_API COMMANDS ############
+SEARCH_LEARN_TO_RANK_LGBM_API_DIR := $(DIR)/search/learn_to_rank/api
+SEARCH_LEARN_TO_RANK_LGBM_API_VERSION := $(shell cd ${SEARCH_LEARN_TO_RANK_LGBM_API_DIR} && poetry version -s)
+SEARCH_LEARN_TO_RANK_LGBM_API_MANIFEST_DIR := $(K8S_DIR)/manifests/search_learn_to_rank_lgbm_api
+DOCKERFILE_SEARCH_LEARN_TO_RANK_LGBM_API = $(SEARCH_LEARN_TO_RANK_LGBM_API_DIR)/$(DOCKERFILE)
+DOCKER_SEARCH_LEARN_TO_RANK_LGBM_API_TAG = $(TAG)_search_learn_to_rank_lgbm_api
+DOCKER_SEARCH_LEARN_TO_RANK_LGBM_API_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_API_TAG)_$(SEARCH_LEARN_TO_RANK_LGBM_API_VERSION)
 
-.PHONY: req_search_learn_to_rank_lgbm_ranker_api
-req_search_learn_to_rank_lgbm_ranker_api:
-	cd $(SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_DIR) && \
+.PHONY: req_search_learn_to_rank_lgbm_api
+req_search_learn_to_rank_lgbm_api:
+	cd $(SEARCH_LEARN_TO_RANK_LGBM_API_DIR) && \
 	poetry export \
 		--without-hashes \
 		-f requirements.txt \
 		--output requirements.txt
 
-.PHONY: build_search_learn_to_rank_lgbm_ranker_api
-build_search_learn_to_rank_lgbm_ranker_api: 
+.PHONY: build_search_learn_to_rank_lgbm_api
+build_search_learn_to_rank_lgbm_api: 
 	docker build \
 		--platform x86_64 \
-		-t $(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_IMAGE_NAME) \
-		-f $(DOCKERFILE_SEARCH_LEARN_TO_RANK_LGBM_RANKER_API) \
+		-t $(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_API_IMAGE_NAME) \
+		-f $(DOCKERFILE_SEARCH_LEARN_TO_RANK_LGBM_API) \
 		.
 
-.PHONY: push_search_learn_to_rank_lgbm_ranker_api
-push_search_learn_to_rank_lgbm_ranker_api: 
-	docker push $(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_IMAGE_NAME)
+.PHONY: push_search_learn_to_rank_lgbm_api
+push_search_learn_to_rank_lgbm_api: 
+	docker push $(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_API_IMAGE_NAME)
 
-.PHONY: deploy_search_learn_to_rank_lgbm_ranker_api
-deploy_search_learn_to_rank_lgbm_ranker_api: 
-	kubectl apply -f $(SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_MANIFEST_DIR)/postgres.yaml && \
-	kubectl apply -f $(SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_MANIFEST_DIR)/search_learn_to_rank_lgbm_ranker_api.yaml
-
-
-############ SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API COMMANDS ############
-SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_DIR := $(DIR)/search/learn_to_rank/lightgbm_regression/api
-SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_VERSION := $(shell cd ${SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_DIR} && poetry version -s)
-SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_MANIFEST_DIR := $(K8S_DIR)/manifests/search_learn_to_rank_lgbm_regression_api
-DOCKERFILE_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API = $(SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_DIR)/$(DOCKERFILE)
-DOCKER_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_TAG = $(TAG)_search_learn_to_rank_lgbm_regression_api
-DOCKER_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_TAG)_$(SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_VERSION)
-
-.PHONY: req_search_learn_to_rank_lgbm_regression_api
-req_search_learn_to_rank_lgbm_regression_api:
-	cd $(SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_DIR) && \
-	poetry export \
-		--without-hashes \
-		-f requirements.txt \
-		--output requirements.txt
-
-.PHONY: build_search_learn_to_rank_lgbm_regression_api
-build_search_learn_to_rank_lgbm_regression_api: 
-	docker build \
-		--platform x86_64 \
-		-t $(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_IMAGE_NAME) \
-		-f $(DOCKERFILE_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API) \
-		.
-
-.PHONY: push_search_learn_to_rank_lgbm_regression_api
-push_search_learn_to_rank_lgbm_regression_api: 
-	docker push $(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_IMAGE_NAME)
-
-.PHONY: deploy_search_learn_to_rank_lgbm_regression_api
-deploy_search_learn_to_rank_lgbm_regression_api: 
-	kubectl apply -f $(SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_MANIFEST_DIR)/postgres.yaml && \
-	kubectl apply -f $(SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_MANIFEST_DIR)/search_learn_to_rank_lgbm_regression_api.yaml
-
-
-############ SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING COMMANDS ############
-SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING_DIR := $(DIR)/search/learn_to_rank/lightgbm_regression/serving
-SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING_VERSION := $(shell cd ${SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_DIR} && poetry version -s)
-SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING_MANIFEST_DIR := $(K8S_DIR)/manifests/search_learn_to_rank_lgbm_regression_serving
-DOCKERFILE_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING = $(SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING_DIR)/$(DOCKERFILE)
-DOCKER_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING_TAG = $(TAG)_search_learn_to_rank_lgbm_regression_serving
-DOCKER_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING_TAG)_$(SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING_VERSION)
-
-.PHONY: build_search_learn_to_rank_lgbm_regression_serving
-build_search_learn_to_rank_lgbm_regression_serving: 
-	docker build \
-		--platform x86_64 \
-		-t $(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING_IMAGE_NAME) \
-		-f $(DOCKERFILE_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING) \
-		.
-
-.PHONY: push_search_learn_to_rank_lgbm_regression_searving
-push_search_learn_to_rank_lgbm_regression_searving: 
-	docker push $(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING_IMAGE_NAME)
-
-.PHONY: deploy_search_learn_to_rank_lgbm_regression_serving
-deploy_search_learn_to_rank_lgbm_regression_serving:
-	kubectl apply -f $(SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING_MANIFEST_DIR)/postgres.yaml && \
-	kubectl apply -f $(SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING_MANIFEST_DIR)/search_learn_to_rank_lgbm_regression_serving.yaml
+.PHONY: deploy_search_learn_to_rank_lgbm_api
+deploy_search_learn_to_rank_lgbm_api: 
+	kubectl apply -f $(SEARCH_LEARN_TO_RANK_LGBM_API_MANIFEST_DIR)/postgres.yaml && \
+	kubectl apply -f $(SEARCH_LEARN_TO_RANK_LGBM_API_MANIFEST_DIR)/search_learn_to_rank_lgbm_api.yaml
 
 
 ############ SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN COMMANDS ############
@@ -517,9 +457,8 @@ req_all: \
 	req_violation_detection_no_animal_violation_train \
 	req_search_learn_to_rank_train \
 	req_search_similar_image_search_train \
-	req_search_learn_to_rank_lgbm_ranker_api \
-	req_search_learn_to_rank_lgbm_regression_api
-
+	req_search_learn_to_rank_lgbm_api
+	
 .PHONY: build_all
 build_all: \
 	build_mlflow \
@@ -533,10 +472,8 @@ build_all: \
 	build_violation_detection_no_animal_violation_train \
 	build_search_learn_to_rank_train \
 	build_search_similar_image_search_train \
-	build_search_learn_to_rank_lgbm_ranker_api \
-	build_search_learn_to_rank_lgbm_regression_api \
-	build_search_learn_to_rank_lgbm_regression_serving
-
+	build_search_learn_to_rank_lgbm_api
+	
 .PHONY: push_all
 push_all: \
 	push_mlflow \
@@ -550,6 +487,5 @@ push_all: \
 	push_violation_detection_no_animal_violation_train \
 	push_search_learn_to_rank_train \
 	push_search_similar_image_search_train \
-	push_search_learn_to_rank_lgbm_ranker_api \
-	push_search_learn_to_rank_lgbm_regression_api \
-	push_search_learn_to_rank_lgbm_regression_searving
+	push_search_learn_to_rank_lgbm_api
+	
