@@ -2,7 +2,7 @@ ARG FROM_IMAGE=python:3.9.7-slim
 
 FROM ${FROM_IMAGE}
 
-ARG LOCAL_DIR=search/learn_to_rank/lightgbm_regression
+ARG LOCAL_DIR=search/learn_to_rank/lightgbm_regression/api
 
 ENV PROJECT_DIR opt
 WORKDIR /${PROJECT_DIR}
@@ -17,4 +17,6 @@ RUN apt-get -y update && \
 
 COPY ${LOCAL_DIR}/src/ /${PROJECT_DIR}/src/
 
-CMD [ "python", "-m", "src.main" ]
+COPY ${LOCAL_DIR}/run.sh /${PROJECT_DIR}/run.sh
+RUN chmod +x /${PROJECT_DIR}/run.sh
+CMD [ "./run.sh" ]

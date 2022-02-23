@@ -246,8 +246,6 @@ class InitializationJob(AbstractJob):
         with open(file_path, "r") as f:
             data = json.load(f)
         try:
-            self.messaging.init_channel()
-            self.messaging.create_queue(queue_name=Configurations.no_animal_violation_queue)
             self.messaging.channel.basic_qos(prefetch_count=1)
             requests = []
             for k, v in data.items():

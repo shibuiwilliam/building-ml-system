@@ -41,6 +41,7 @@ class ViolationDetectionJob(object):
                 offset=0,
             )
             if len(animal) > 0:
+                # TODO: fix to actually predict by no animal violation ml serving
                 self.messaging.publish(
                     queue_name=registration_queue,
                     body={

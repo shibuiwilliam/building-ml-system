@@ -116,11 +116,12 @@ class AnimalUsecase(AbstractAnimalUsecase):
         )
         if data is not None:
             response = AnimalResponse(**data.dict())
-            background_tasks.add_task(
-                self.messaging.publish,
-                Configurations.no_animal_violation_queue,
-                {"id": data.id},
-            )
+            for q in Configurations.animal_violation_queues:
+                background_tasks.add_task(
+                    self.messaging.publish,
+                    q,
+                    {"id": data.id},
+                )
             return response
         return None
 

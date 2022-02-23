@@ -63,6 +63,7 @@ services:
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_USER=user
       - RABBITMQ_PASSWORD=password
+      - ANIMAL_VIOLATION_QUEUE_NO_ANIMAL_VIOLATION=no_animal_violation
       - ES_HOST=es
       - ES_SCHEMA=http
       - ES_PORT=9200
@@ -98,13 +99,12 @@ services:
       - RABBITMQ_USER=user
       - RABBITMQ_PASSWORD=password
       - ANIMAL_REGISTRY_QUEUE=animal
-      - NO_ANIMAL_VIOLATION_QUEUE=no_animal_violation
+      - ANIMAL_VIOLATION_QUEUE_NO_ANIMAL_VIOLATION=no_animal_violation
       - LOG_LEVEL=INFO
       - RUN_ENVIRONMENT=local
       - DATA_DIRECTORY=/opt/dataset
       - KEY_FILE_PATH=/opt/secrets/secret.key
       - WORKERS=1
-      - INITIALIZE=1
       - PORT=8000
     command: ./run.sh
     hostname: api
@@ -177,9 +177,36 @@ services:
       - api
       - es
 
+  search_learn_to_rank_lgbm_ranker_api:
+    container_name: search_learn_to_rank_lgbm_ranker_api
+    image: shibui/building-ml-system:ai_animals_search_learn_to_rank_lgbm_ranker_api_0.0.0
+    restart: always
+    networks:
+      - default
+    ports:
+      - 9000:9000
+    environment:
+      - POSTGRES_SERVER=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=aianimals
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - LOG_LEVEL=INFO
+      - RUN_ENVIRONMENT=local
+      - WORKERS=1
+      - PORT=9000
+    command: ./run.sh
+    hostname: api
+    depends_on:
+      - postgres
+      - redis
+
   no_animal_violation:
     container_name: no_animal_violation
-    image: shibui/building-ml-system:ai_animals_violation_detection_no_animal_violation_0.0.0
+    image: shibui/building-ml-system:ai_animals_violation_detection_no_animal_violation_proxy_0.0.0
     restart: always
     networks:
       - default
@@ -195,7 +222,7 @@ services:
       - CONSUMING_QUEUE=no_animal_violation
       - REGISTRATION_QUEUE=violation
     command: >
-      /bin/sh -c "sleep 20s && python -m src.main"
+      /bin/sh -c "sleep 60s && python -m src.main"
     depends_on:
       - postgres
       - rabbitmq

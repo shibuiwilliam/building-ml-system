@@ -37,21 +37,6 @@ DOCKERFILE_DATA_REGISTRY = $(DATA_REGISTRY_DIR)/$(DOCKERFILE)
 DOCKER_DATA_REGISTRY_TAG = $(TAG)_data_registry
 DOCKER_DATA_REGISTRY_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_DATA_REGISTRY_TAG)_$(DATA_REGISTRY_VERSION)
 
-.PHONY: patch_data_registry
-patch_data_registry:
-	cd $(DATA_REGISTRY_DIR) && \
-	poetry version patch
-
-.PHONY: minor_upgrade_data_registry
-minor_upgrade_data_registry:
-	cd $(DATA_REGISTRY_DIR) && \
-	poetry version minor
-
-.PHONY: major_upgrade_data_registry
-major_upgrade_data_registry:
-	cd $(DATA_REGISTRY_DIR) && \
-	poetry version major
-
 .PHONY: req_data_registry
 req_data_registry:
 	cd $(DATA_REGISTRY_DIR) && \
@@ -80,21 +65,6 @@ API_MANIFEST_DIR := $(K8S_DIR)/manifests/api
 DOCKERFILE_API = $(API_DIR)/$(DOCKERFILE)
 DOCKER_API_TAG = $(TAG)_api
 DOCKER_API_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_API_TAG)_$(API_VERSION)
-
-.PHONY: patch_api
-patch_api:
-	cd $(API_DIR) && \
-	poetry version patch
-
-.PHONY: minor_upgrade_api
-minor_upgrade_api:
-	cd $(API_DIR) && \
-	poetry version minor
-
-.PHONY: major_upgrade_api
-major_upgrade_api:
-	cd $(API_DIR) && \
-	poetry version major
 
 .PHONY: req_api
 req_api:
@@ -138,21 +108,6 @@ AB_TEST_PROXY_MANIFEST_DIR := $(K8S_DIR)/manifests/ab_test_proxy
 DOCKERFILE_AB_TEST_PROXY = $(AB_TEST_PROXY_DIR)/$(DOCKERFILE)
 DOCKER_AB_TEST_PROXY_TAG = $(TAG)_ab_test_proxy
 DOCKER_AB_TEST_PROXY_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_AB_TEST_PROXY_TAG)_$(AB_TEST_PROXY_VERSION)
-
-.PHONY: patch_ab_test_proxy
-patch_ab_test_proxy:
-	cd $(AB_TEST_PROXY_DIR) && \
-	poetry version patch
-
-.PHONY: minor_upgrade_ab_test_proxy
-minor_upgrade_ab_test_proxy:
-	cd $(AB_TEST_PROXY_DIR) && \
-	poetry version minor
-
-.PHONY: major_upgrade_ab_test_proxy
-major_upgrade_ab_test_proxy:
-	cd $(AB_TEST_PROXY_DIR) && \
-	poetry version major
 
 .PHONY: req_ab_test_proxy
 req_ab_test_proxy:
@@ -212,7 +167,7 @@ port_forward_argo:
 
 ############ ELASTICSEARCH COMMANDS ############
 ES_DIR := $(DIR)/elasticsearch
-ES_VERSION := $(shell cd ${ES_DIR} && poetry version -s)
+ES_VERSION := 0.0.0
 ES_MANIFEST_DIR := $(K8S_DIR)/manifests/elasticsearch
 DOCKERFILE_ES = $(ES_DIR)/$(DOCKERFILE)
 DOCKER_ES_TAG = $(TAG)_elasticsearch
@@ -267,21 +222,6 @@ DOCKERFILE_SEARCH_LEARN_TO_RANK_TRAIN = $(SEARCH_LEARN_TO_RANK_TRAIN_DIR)/$(DOCK
 DOCKER_SEARCH_LEARN_TO_RANK_TRAIN_TAG = $(TAG)_search_learn_to_rank_train
 DOCKER_SEARCH_LEARN_TO_RANK_TRAIN_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_SEARCH_LEARN_TO_RANK_TRAIN_TAG)_$(SEARCH_LEARN_TO_RANK_TRAIN_VERSION)
 
-.PHONY: patch_search_learn_to_rank_train
-patch_search_learn_to_rank_train:
-	cd $(SEARCH_LEARN_TO_RANK_TRAIN_DIR) && \
-	poetry version patch
-
-.PHONY: minor_upgrade_search_learn_to_rank_train
-minor_upgrade_search_learn_to_rank_train:
-	cd $(SEARCH_LEARN_TO_RANK_TRAIN_DIR) && \
-	poetry version minor
-
-.PHONY: major_upgrade_search_learn_to_rank_train
-major_upgrade_search_learn_to_rank_train:
-	cd $(SEARCH_LEARN_TO_RANK_TRAIN_DIR) && \
-	poetry version major
-
 .PHONY: req_search_learn_to_rank_train
 req_search_learn_to_rank_train:
 	cd $(SEARCH_LEARN_TO_RANK_TRAIN_DIR) && \
@@ -303,6 +243,100 @@ push_search_learn_to_rank_train:
 	docker push $(DOCKER_SEARCH_LEARN_TO_RANK_TRAIN_IMAGE_NAME)
 
 
+############ SEARCH_LEARN_TO_RANK_LGBM_RANKER_API COMMANDS ############
+SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_DIR := $(DIR)/search/learn_to_rank/lightgbm_ranker/api
+SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_VERSION := $(shell cd ${SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_DIR} && poetry version -s)
+SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_MANIFEST_DIR := $(K8S_DIR)/manifests/search_learn_to_rank_lgbm_ranker_api
+DOCKERFILE_SEARCH_LEARN_TO_RANK_LGBM_RANKER_API = $(SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_DIR)/$(DOCKERFILE)
+DOCKER_SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_TAG = $(TAG)_search_learn_to_rank_lgbm_ranker_api
+DOCKER_SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_TAG)_$(SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_VERSION)
+
+.PHONY: req_search_learn_to_rank_lgbm_ranker_api
+req_search_learn_to_rank_lgbm_ranker_api:
+	cd $(SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_DIR) && \
+	poetry export \
+		--without-hashes \
+		-f requirements.txt \
+		--output requirements.txt
+
+.PHONY: build_search_learn_to_rank_lgbm_ranker_api
+build_search_learn_to_rank_lgbm_ranker_api: 
+	docker build \
+		--platform x86_64 \
+		-t $(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_IMAGE_NAME) \
+		-f $(DOCKERFILE_SEARCH_LEARN_TO_RANK_LGBM_RANKER_API) \
+		.
+
+.PHONY: push_search_learn_to_rank_lgbm_ranker_api
+push_search_learn_to_rank_lgbm_ranker_api: 
+	docker push $(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_IMAGE_NAME)
+
+.PHONY: deploy_search_learn_to_rank_lgbm_ranker_api
+deploy_search_learn_to_rank_lgbm_ranker_api: 
+	kubectl apply -f $(SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_MANIFEST_DIR)/postgres.yaml && \
+	kubectl apply -f $(SEARCH_LEARN_TO_RANK_LGBM_RANKER_API_MANIFEST_DIR)/search_learn_to_rank_lgbm_ranker_api.yaml
+
+
+############ SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API COMMANDS ############
+SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_DIR := $(DIR)/search/learn_to_rank/lightgbm_regression/api
+SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_VERSION := $(shell cd ${SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_DIR} && poetry version -s)
+SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_MANIFEST_DIR := $(K8S_DIR)/manifests/search_learn_to_rank_lgbm_regression_api
+DOCKERFILE_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API = $(SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_DIR)/$(DOCKERFILE)
+DOCKER_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_TAG = $(TAG)_search_learn_to_rank_lgbm_regression_api
+DOCKER_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_TAG)_$(SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_VERSION)
+
+.PHONY: req_search_learn_to_rank_lgbm_regression_api
+req_search_learn_to_rank_lgbm_regression_api:
+	cd $(SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_DIR) && \
+	poetry export \
+		--without-hashes \
+		-f requirements.txt \
+		--output requirements.txt
+
+.PHONY: build_search_learn_to_rank_lgbm_regression_api
+build_search_learn_to_rank_lgbm_regression_api: 
+	docker build \
+		--platform x86_64 \
+		-t $(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_IMAGE_NAME) \
+		-f $(DOCKERFILE_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API) \
+		.
+
+.PHONY: push_search_learn_to_rank_lgbm_regression_api
+push_search_learn_to_rank_lgbm_regression_api: 
+	docker push $(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_IMAGE_NAME)
+
+.PHONY: deploy_search_learn_to_rank_lgbm_regression_api
+deploy_search_learn_to_rank_lgbm_regression_api: 
+	kubectl apply -f $(SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_MANIFEST_DIR)/postgres.yaml && \
+	kubectl apply -f $(SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_MANIFEST_DIR)/search_learn_to_rank_lgbm_regression_api.yaml
+
+
+############ SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING COMMANDS ############
+SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING_DIR := $(DIR)/search/learn_to_rank/lightgbm_regression/serving
+SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING_VERSION := $(shell cd ${SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_API_DIR} && poetry version -s)
+SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING_MANIFEST_DIR := $(K8S_DIR)/manifests/search_learn_to_rank_lgbm_regression_serving
+DOCKERFILE_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING = $(SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING_DIR)/$(DOCKERFILE)
+DOCKER_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING_TAG = $(TAG)_search_learn_to_rank_lgbm_regression_serving
+DOCKER_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING_TAG)_$(SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING_VERSION)
+
+.PHONY: build_search_learn_to_rank_lgbm_regression_serving
+build_search_learn_to_rank_lgbm_regression_serving: 
+	docker build \
+		--platform x86_64 \
+		-t $(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING_IMAGE_NAME) \
+		-f $(DOCKERFILE_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING) \
+		.
+
+.PHONY: push_search_learn_to_rank_lgbm_regression_searving
+push_search_learn_to_rank_lgbm_regression_searving: 
+	docker push $(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING_IMAGE_NAME)
+
+.PHONY: deploy_search_learn_to_rank_lgbm_regression_serving
+deploy_search_learn_to_rank_lgbm_regression_serving:
+	kubectl apply -f $(SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING_MANIFEST_DIR)/postgres.yaml && \
+	kubectl apply -f $(SEARCH_LEARN_TO_RANK_LGBM_REGRESSION_SERVING_MANIFEST_DIR)/search_learn_to_rank_lgbm_regression_serving.yaml
+
+
 ############ SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN COMMANDS ############
 SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_DIR := $(DIR)/search/model_development/similar_image_search
 SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_VERSION := $(shell cd ${SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_DIR} && poetry version -s)
@@ -310,21 +344,6 @@ SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_MANIFEST_DIR := $(K8S_DIR)/manifests/search/si
 DOCKERFILE_SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN = $(SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_DIR)/$(DOCKERFILE)
 DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_TAG = $(TAG)_search_similar_image_search_train
 DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_TAG)_$(SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_VERSION)
-
-.PHONY: patch_search_similar_image_search_train
-patch_search_similar_image_search_train:
-	cd $(SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_DIR) && \
-	poetry version patch
-
-.PHONY: minor_upgrade_search_similar_image_search_train
-minor_upgrade_search_similar_image_search_train:
-	cd $(SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_DIR) && \
-	poetry version minor
-
-.PHONY: major_upgrade_search_similar_image_search_train
-major_upgrade_search_similar_image_search_train:
-	cd $(SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_DIR) && \
-	poetry version major
 
 .PHONY: req_search_similar_image_search_train
 req_search_similar_image_search_train:
@@ -355,21 +374,6 @@ DOCKERFILE_VIOLATION_DETECTION_REGISTRY = $(VIOLATION_DETECTION_REGISTRY_DIR)/$(
 DOCKER_VIOLATION_DETECTION_REGISTRY_TAG = $(TAG)_violation_detection_registry
 DOCKER_VIOLATION_DETECTION_REGISTRY_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_VIOLATION_DETECTION_REGISTRY_TAG)_$(VIOLATION_DETECTION_REGISTRY_VERSION)
 
-.PHONY: patch_violation_detection_registry
-patch_violation_detection_registry:
-	cd $(VIOLATION_DETECTION_REGISTRY_DIR) && \
-	poetry version patch
-
-.PHONY: minor_upgrade_violation_detection_registry
-minor_upgrade_violation_detection_registry:
-	cd $(VIOLATION_DETECTION_REGISTRY_DIR) && \
-	poetry version minor
-
-.PHONY: major_upgrade_violation_detection_registry
-major_upgrade_violation_detection_registry:
-	cd $(VIOLATION_DETECTION_REGISTRY_DIR) && \
-	poetry version major
-
 .PHONY: req_violation_detection_registry
 req_violation_detection_registry:
 	cd $(VIOLATION_DETECTION_REGISTRY_DIR) && \
@@ -399,21 +403,6 @@ DOCKERFILE_NO_ANIMAL_VIOLATION_TRAIN = $(NO_ANIMAL_VIOLATION_TRAIN_DIR)/$(DOCKER
 DOCKER_NO_ANIMAL_VIOLATION_TRAIN_TAG = $(TAG)_violation_detection_no_animal_violation_train
 DOCKER_NO_ANIMAL_VIOLATION_TRAIN_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_NO_ANIMAL_VIOLATION_TRAIN_TAG)_$(NO_ANIMAL_VIOLATION_TRAIN_VERSION)
 
-.PHONY: patch_violation_detection_no_animal_violation_train
-patch_violation_detection_no_animal_violation_train:
-	cd $(NO_ANIMAL_VIOLATION_TRAIN_DIR) && \
-	poetry version patch
-
-.PHONY: minor_upgrade_violation_detection_no_animal_violation_train
-minor_upgrade_violation_detection_no_animal_violation_train:
-	cd $(NO_ANIMAL_VIOLATION_TRAIN_DIR) && \
-	poetry version minor
-
-.PHONY: major_upgrade_violation_detection_no_animal_violation_train
-major_upgrade_violation_detection_no_animal_violation_train:
-	cd $(NO_ANIMAL_VIOLATION_TRAIN_DIR) && \
-	poetry version major
-
 .PHONY: req_violation_detection_no_animal_violation_train
 req_violation_detection_no_animal_violation_train:
 	cd $(NO_ANIMAL_VIOLATION_TRAIN_DIR) && \
@@ -442,21 +431,6 @@ NO_ANIMAL_VIOLATION_PROXY_MANIFEST_DIR := $(K8S_DIR)/manifests/violation_detecti
 DOCKERFILE_NO_ANIMAL_VIOLATION_PROXY = $(NO_ANIMAL_VIOLATION_PROXY_DIR)/$(DOCKERFILE)
 DOCKER_NO_ANIMAL_VIOLATION_PROXY_TAG = $(TAG)_violation_detection_no_animal_violation_proxy
 DOCKER_NO_ANIMAL_VIOLATION_PROXY_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_NO_ANIMAL_VIOLATION_PROXY_TAG)_$(NO_ANIMAL_VIOLATION_PROXY_VERSION)
-
-.PHONY: patch_violation_detection_no_animal_violation_proxy
-patch_violation_detection_no_animal_violation_proxy:
-	cd $(NO_ANIMAL_VIOLATION_PROXY_DIR) && \
-	poetry version patch
-
-.PHONY: minor_upgrade_violation_detection_no_animal_violation_proxy
-minor_upgrade_violation_detection_no_animal_violation_proxy:
-	cd $(NO_ANIMAL_VIOLATION_PROXY_DIR) && \
-	poetry version minor
-
-.PHONY: major_upgrade_violation_detection_no_animal_violation_proxy
-major_upgrade_violation_detection_no_animal_violation_proxy:
-	cd $(NO_ANIMAL_VIOLATION_PROXY_DIR) && \
-	poetry version major
 
 .PHONY: req_violation_detection_no_animal_violation_proxy
 req_violation_detection_no_animal_violation_proxy:
@@ -542,7 +516,9 @@ req_all: \
 	req_violation_detection_registry \
 	req_violation_detection_no_animal_violation_train \
 	req_search_learn_to_rank_train \
-	req_search_similar_image_search_train
+	req_search_similar_image_search_train \
+	req_search_learn_to_rank_lgbm_ranker_api \
+	req_search_learn_to_rank_lgbm_regression_api
 
 .PHONY: build_all
 build_all: \
@@ -556,7 +532,10 @@ build_all: \
 	build_violation_detection_registry \
 	build_violation_detection_no_animal_violation_train \
 	build_search_learn_to_rank_train \
-	build_search_similar_image_search_train
+	build_search_similar_image_search_train \
+	build_search_learn_to_rank_lgbm_ranker_api \
+	build_search_learn_to_rank_lgbm_regression_api \
+	build_search_learn_to_rank_lgbm_regression_serving
 
 .PHONY: push_all
 push_all: \
@@ -570,4 +549,7 @@ push_all: \
 	push_violation_detection_registry \
 	push_violation_detection_no_animal_violation_train \
 	push_search_learn_to_rank_train \
-	push_search_similar_image_search_train
+	push_search_similar_image_search_train \
+	push_search_learn_to_rank_lgbm_ranker_api \
+	push_search_learn_to_rank_lgbm_regression_api \
+	push_search_learn_to_rank_lgbm_regression_searving

@@ -1,11 +1,11 @@
 from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple
+from logging import getLogger
 
 from psycopg2.extras import DictCursor
 from src.infrastructure.db_client import AbstractDBClient
-from src.middleware.logger import configure_logger
 
-logger = configure_logger(__name__)
+logger = getLogger(__name__)
 
 
 class TABLES(Enum):

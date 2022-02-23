@@ -83,10 +83,11 @@ class AnimalUsecase(AbstractAnimalUsecase):
                 queue_name=Configurations.animal_registry_queue,
                 body={"id": data.id},
             )
-            self.messaging.publish(
-                queue_name=Configurations.no_animal_violation_queue,
-                body={"id": data.id},
-            )
+            for q in Configurations.animal_violation_queues:
+                self.messaging.publish(
+                    queue_name=q,
+                    body={"id": data.id},
+                )
             logger.info(f"done register: {response}")
             return response
         return None
@@ -196,7 +197,8 @@ class AnimalUsecase(AbstractAnimalUsecase):
                     queue_name=Configurations.animal_registry_queue,
                     body={"id": r.id},
                 )
-                self.messaging.publish(
-                    queue_name=Configurations.no_animal_violation_queue,
-                    body={"id": r.id},
-                )
+                for q in Configurations.animal_violation_queues:
+                    self.messaging.publish(
+                        queue_name=q,
+                        body={"id": r.id},
+                    )
