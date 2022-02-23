@@ -14,7 +14,7 @@ spec:
         image: shibui/building-ml-system:ai_animals_data_registry_0.0.0
         command: [python, -m, src.main]
         env:
-          - name: POSTGRES_SERVER
+          - name: POSTGRES_HOST
             value: postgres.aianimals.svc.cluster.local
           - name: POSTGRES_PORT
             value: "5432"

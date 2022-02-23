@@ -17,7 +17,7 @@ class PostgreSQLDatabase(AbstractDatabase):
         self.__postgres_password = os.getenv("POSTGRES_PASSWORD")
         self.__postgres_port = int(os.getenv("POSTGRES_PORT", 5432))
         self.__postgres_db = os.getenv("POSTGRES_DB")
-        self.__postgres_server = os.getenv("POSTGRES_SERVER")
+        self.__postgres_server = os.getenv("POSTGRES_HOST")
 
         self.__sql_alchemy_database_url = f"postgresql://{self.__postgres_username}:{self.__postgres_password}@{self.__postgres_server}:{self.__postgres_port}/{self.__postgres_db}?client_encoding=utf8"
 
