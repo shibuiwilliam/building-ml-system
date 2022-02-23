@@ -10,6 +10,7 @@ from src.middleware.logger import configure_logger
 from src.models.base_model import BaseLearnToRankModel
 
 cloudpickle.register_pickle_by_value(sys.modules[__name__])
+cloudpickle.register_pickle_by_value(LGBMRanker)
 
 logger = configure_logger(__name__)
 
