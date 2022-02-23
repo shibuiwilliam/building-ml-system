@@ -213,6 +213,34 @@ port_forward_kibana:
 	kubectl -n elastic-search port-forward service/kibana-kb-http 5601:5601 &
 
 
+############ SEARCH_LEARN_TO_RANK_BASE COMMANDS ############
+SEARCH_LEARN_TO_RANK_BASE_DIR := $(DIR)/search/learn_to_rank/base
+SEARCH_LEARN_TO_RANK_BASE_VERSION := $(shell cd ${SEARCH_LEARN_TO_RANK_BASE_DIR} && poetry version -s)
+DOCKERFILE_SEARCH_LEARN_TO_RANK_BASE = $(SEARCH_LEARN_TO_RANK_BASE_DIR)/$(DOCKERFILE)
+DOCKER_SEARCH_LEARN_TO_RANK_BASE_TAG = $(TAG)_search_learn_to_rank_base
+DOCKER_SEARCH_LEARN_TO_RANK_BASE_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_SEARCH_LEARN_TO_RANK_BASE_TAG)_$(SEARCH_LEARN_TO_RANK_BASE_VERSION)
+
+.PHONY: req_search_learn_to_rank_base
+req_search_learn_to_rank_base:
+	cd $(SEARCH_LEARN_TO_RANK_BASE_DIR) && \
+	poetry export \
+		--without-hashes \
+		-f requirements.txt \
+		--output requirements.txt
+
+.PHONY: build_search_learn_to_rank_base
+build_search_learn_to_rank_base: 
+	docker build \
+		--platform x86_64 \
+		-t $(DOCKER_SEARCH_LEARN_TO_RANK_BASE_IMAGE_NAME) \
+		-f $(DOCKERFILE_SEARCH_LEARN_TO_RANK_BASE) \
+		.
+
+.PHONY: push_search_learn_to_rank_base
+push_search_learn_to_rank_base: 
+	docker push $(DOCKER_SEARCH_LEARN_TO_RANK_BASE_IMAGE_NAME)
+
+
 ############ SEARCH_LEARN_TO_RANK_TRAIN COMMANDS ############
 SEARCH_LEARN_TO_RANK_TRAIN_DIR := $(DIR)/search/model_development/learn_to_rank
 SEARCH_LEARN_TO_RANK_TRAIN_VERSION := $(shell cd ${SEARCH_LEARN_TO_RANK_TRAIN_DIR} && poetry version -s)
@@ -233,6 +261,7 @@ req_search_learn_to_rank_train:
 build_search_learn_to_rank_train: 
 	docker build \
 		--platform x86_64 \
+		--build-arg FROM_IMAGE=$(DOCKER_SEARCH_LEARN_TO_RANK_BASE_IMAGE_NAME) \
 		-t $(DOCKER_SEARCH_LEARN_TO_RANK_TRAIN_IMAGE_NAME) \
 		-f $(DOCKERFILE_SEARCH_LEARN_TO_RANK_TRAIN) \
 		.
@@ -262,6 +291,7 @@ req_search_learn_to_rank_lgbm_api:
 build_search_learn_to_rank_lgbm_api: 
 	docker build \
 		--platform x86_64 \
+		--build-arg FROM_IMAGE=$(DOCKER_SEARCH_LEARN_TO_RANK_BASE_IMAGE_NAME) \
 		-t $(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_API_IMAGE_NAME) \
 		-f $(DOCKERFILE_SEARCH_LEARN_TO_RANK_LGBM_API) \
 		.

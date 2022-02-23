@@ -20,10 +20,8 @@ importlib-metadata==4.11.1; python_version >= "3.7"
 itsdangerous==2.1.0; python_version >= "3.7"
 jinja2==3.0.3; python_version >= "3.6"
 joblib==1.1.0; python_version >= "3.7"
-lightgbm==3.3.2
 mako==1.1.6; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version >= "3.6"
 markupsafe==2.1.0; python_version >= "3.7" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version >= "3.7"
-mecab-python3==1.0.5
 mlflow==1.23.1; python_version >= "3.6"
 numpy==1.22.2; python_version >= "3.8"
 omegaconf==2.1.1; python_version >= "3.6"
