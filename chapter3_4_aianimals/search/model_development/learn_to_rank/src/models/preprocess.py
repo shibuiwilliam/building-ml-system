@@ -20,7 +20,6 @@ from src.middleware.logger import configure_logger
 logger = configure_logger(__name__)
 
 cloudpickle.register_pickle_by_value(sys.modules[__name__])
-cloudpickle.register_pickle_by_value(MeCab)
 
 
 def make_query_id(
