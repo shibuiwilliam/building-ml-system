@@ -22,6 +22,7 @@ async def download_file(
         res = await client.get(source_path)
     except httpx.PoolTimeout as e:
         logger.error(f"failed to download data: {source_path}")
+        return None
     if res.status_code != 200:
         logger.error(f"failed to download data: {source_path}")
         return None
