@@ -37,7 +37,7 @@ def train_and_evaluate(
     y_test: NDArray[(Any, 2), int],
     artifact_path: str,
     batch_size: int = 32,
-    epochs: int = 100,
+    epochs: int = 10,
     rotation_range: int = 10,
     horizontal_flip: bool = True,
     height_shift_range: float = 0.2,

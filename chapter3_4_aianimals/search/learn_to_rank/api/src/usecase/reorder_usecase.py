@@ -88,13 +88,14 @@ class ReorderUsecase(AbstractReorderUsecase):
         input_dict = [
             dict(
                 animal_id=a.id,
+                query_phrases=query_phrases,
+                query_animal_category_id=request.query_animal_category_id,
+                query_animal_subcategory_id=request.query_animal_subcategory_id,
                 animal_category_id=a.animal_category_id,
                 animal_subcategory_id=a.animal_subcategory_id,
                 name=a.name,
                 description=a.description,
-                query_phrases=query_phrases,
-                query_animal_category_id=request.query_animal_category_id,
-                query_animal_subcategory_id=request.query_animal_subcategory_id,
+                likes=a.likes,
             )
             for a in animals
         ]

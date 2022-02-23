@@ -17,7 +17,7 @@ jobs:
     tfhub_url: "https://tfhub.dev/google/imagenet/mobilenet_v3_large_100_224/classification/5"
     train_tfhub: true
     batch_size: 32
-    epochs: 100
+    epochs: 10
     learning_rate: 0.0005
     loss: categorical_crossentropy
     metrics:

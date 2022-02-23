@@ -76,7 +76,7 @@ class MobilenetV3(AbstractModel):
         y_test: NDArray[(Any, 2), int],
         artifact_path: str,
         batch_size: int = 32,
-        epochs: int = 100,
+        epochs: int = 10,
         checkpoint: bool = True,
         early_stopping: bool = True,
         tensorboard: bool = True,

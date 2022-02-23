@@ -10,6 +10,7 @@ logger = getLogger(__name__)
 
 class TABLES(Enum):
     ANIMAL = "animals"
+    LIKE = "likes"
 
     @staticmethod
     def has_value(value: str) -> bool:

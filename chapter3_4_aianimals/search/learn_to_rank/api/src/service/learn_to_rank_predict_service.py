@@ -3,6 +3,7 @@ from logging import getLogger
 from typing import List, Tuple
 
 import cloudpickle
+import MeCab
 import numpy as np
 import pandas as pd
 
@@ -63,10 +64,26 @@ class LearnToRankPredictService(AbstractLearnToRankPredictService):
         with open(self.predictor_file_path, "rb") as f:
             self.predictor = cloudpickle.load(f)
 
+    def __preprocess(self, input: pd.DataFrame) -> pd.DataFrame:
+        types = {
+            "animal_id": "str",
+            "query_phrases": "str",
+            "query_animal_category_id": "str",
+            "query_animal_subcategory_id": "str",
+            "likes": "int64",
+            "animal_category_id": "str",
+            "animal_subcategory_id": "str",
+            "name": "str",
+            "description": "str",
+        }
+        input = input.astype(types)
+        return input
+
     def _preprocess(
         self,
         input: pd.DataFrame,
     ) -> pd.DataFrame:
+        input = self.__preprocess(input=input)
         return self.preprocess.transform(input)
 
     def _predict(
