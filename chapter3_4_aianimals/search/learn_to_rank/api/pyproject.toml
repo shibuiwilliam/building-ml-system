@@ -18,6 +18,8 @@ gunicorn = "^20.1.0"
 fastapi = "^0.74.0"
 redis = "^4.1.4"
 cloudpickle = "^2.0.0"
+onnx = "^1.11.0"
+onnxruntime = "^1.10.0"
 
 [tool.poetry.dev-dependencies]
 
