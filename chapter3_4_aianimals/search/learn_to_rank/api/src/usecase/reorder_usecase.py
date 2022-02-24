@@ -7,6 +7,7 @@ from fastapi import BackgroundTasks
 from src.configurations import Configurations
 from src.infrastructure.cache_client import AbstractCacheClient
 from src.infrastructure.db_client import AbstractDBClient
+from src.middleware.string import get_md5_hash
 from src.repository.animal_repository import AnimalQuery, AnimalRepository
 from src.schema.animal import AnimalRequest, AnimalResponse
 from src.service.learn_to_rank_predict_service import AbstractLearnToRankPredictService
@@ -15,11 +16,14 @@ logger = getLogger(__name__)
 
 
 def make_query_id(
+    animal_ids: List[str],
     phrases: str,
     animal_category_id: Optional[int],
     animal_subcategory_id: Optional[int],
 ) -> str:
-    return f"{Configurations.model_name}_{phrases}_{animal_category_id}_{animal_subcategory_id}"
+    animal_idstring = ".".join(sorted(animal_ids))
+    query_key = f"{Configurations.model_name}_{phrases}_{animal_category_id}_{animal_subcategory_id}_{animal_idstring}"
+    return get_md5_hash(string=query_key)
 
 
 class AbstractReorderUsecase(ABC):
@@ -76,6 +80,7 @@ class ReorderUsecase(AbstractReorderUsecase):
     ) -> AnimalResponse:
         query_phrases = ".".join(request.query_phrases)
         query_id = make_query_id(
+            animal_ids=request.ids,
             phrases=query_phrases,
             animal_category_id=request.query_animal_category_id,
             animal_subcategory_id=request.query_animal_subcategory_id,
