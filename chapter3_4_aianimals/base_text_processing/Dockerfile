@@ -2,7 +2,7 @@ ARG FROM_IMAGE=python:3.9.7-slim
 
 FROM ${FROM_IMAGE}
 
-ARG LOCAL_DIR=search/learn_to_rank/base
+ARG LOCAL_DIR=base_text_processing
 
 ENV PROJECT_DIR opt
 WORKDIR /${PROJECT_DIR}
