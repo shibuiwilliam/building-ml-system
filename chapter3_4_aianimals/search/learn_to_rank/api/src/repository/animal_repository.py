@@ -1,6 +1,5 @@
-from datetime import datetime
 from logging import getLogger
-from typing import List, Optional
+from typing import Dict, List, Optional, Union
 
 from pydantic import BaseModel, Extra
 from src.infrastructure.db_client import AbstractDBClient
@@ -20,14 +19,11 @@ class Animal(BaseModel):
     id: str
     animal_category_id: int
     animal_subcategory_id: int
-    user_id: str
     name: str
     description: str
-    photo_url: str
     likes: int = 0
-    deactivated: bool = False
-    created_at: datetime
-    updated_at: datetime
+    name_vector: Union[Dict, List]
+    description_vector: Union[Dict, List]
 
     class Config:
         extra = Extra.forbid
@@ -41,6 +37,7 @@ class AnimalRepository(BaseRepository):
         super().__init__(db_client=db_client)
         self.animal_table = TABLES.ANIMAL.value
         self.like_table = TABLES.LIKE.value
+        self.animal_feature_table = TABLES.ANIMAL_FEATURE.value
 
     def select(
         self,
@@ -73,14 +70,11 @@ class AnimalRepository(BaseRepository):
                 {self.animal_table}.id,
                 {self.animal_table}.animal_category_id,
                 {self.animal_table}.animal_subcategory_id,
-                {self.animal_table}.user_id,
                 {self.animal_table}.name,
                 {self.animal_table}.description,
-                {self.animal_table}.photo_url,
                 (CASE WHEN likes.likes is NULL THEN 0 ELSE likes.likes END) AS likes,
-                {self.animal_table}.deactivated,
-                {self.animal_table}.created_at,
-                {self.animal_table}.updated_at
+                {self.animal_feature_table}.name_vector AS name_vector,
+                {self.animal_feature_table}.description_vector AS description_vector
             FROM 
                 {self.animal_table}
             LEFT JOIN
@@ -89,6 +83,10 @@ class AnimalRepository(BaseRepository):
                 ) likes
             ON
                 likes.animal_id = {self.animal_table}.id
+            LEFT JOIN
+                {self.animal_feature_table}
+            ON
+                {self.animal_table}.id = {self.animal_feature_table}.id
         """
 
         if animal_query is not None and len(animal_query.ids) > 0:

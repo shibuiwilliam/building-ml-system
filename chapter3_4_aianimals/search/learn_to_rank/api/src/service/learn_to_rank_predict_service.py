@@ -3,7 +3,6 @@ from logging import getLogger
 from typing import List, Optional, Tuple
 
 import cloudpickle
-import MeCab
 import numpy as np
 import onnxruntime
 import pandas as pd
@@ -88,21 +87,6 @@ class LearnToRankPredictService(AbstractLearnToRankPredictService):
             raise ValueError
         logger.info(f"loaded: {self.predictor_file_path}")
 
-    def _astype(self, input: pd.DataFrame) -> pd.DataFrame:
-        types = {
-            "animal_id": "str",
-            "query_phrases": "str",
-            "query_animal_category_id": "str",
-            "query_animal_subcategory_id": "str",
-            "likes": "int64",
-            "animal_category_id": "str",
-            "animal_subcategory_id": "str",
-            "name": "str",
-            "description": "str",
-        }
-        input = input.astype(types)
-        return input
-
     def _preprocess(
         self,
         input: pd.DataFrame,
@@ -156,8 +140,7 @@ class LearnToRankPredictService(AbstractLearnToRankPredictService):
         self,
         input: pd.DataFrame,
     ) -> List[Tuple[str, float]]:
-        typed_input = self._astype(input=input)
-        preprocessed_input = self._preprocess(input=typed_input)
+        preprocessed_input = self._preprocess(input=input)
         prediction = self._predict(input=preprocessed_input)
         id_prediction = self._postprocess(input=input, prediction=prediction)
         return id_prediction

@@ -90,8 +90,9 @@ class ReorderUsecase(AbstractReorderUsecase):
             return AnimalResponse(ids=cached_data.split(","))
         animal_query = AnimalQuery(ids=request.ids)
         animals = self.animal_repository.select_all(animal_query=animal_query)
-        input_dict = [
-            dict(
+        input_dicts = []
+        for a in animals:
+            d = dict(
                 animal_id=a.id,
                 query_phrases=query_phrases,
                 query_animal_category_id=request.query_animal_category_id,
@@ -102,9 +103,12 @@ class ReorderUsecase(AbstractReorderUsecase):
                 description=a.description,
                 likes=a.likes,
             )
-            for a in animals
-        ]
-        input_df = pd.DataFrame(input_dict)
+            for i, v in enumerate(a.name_vector):
+                d[f"name_vector_{i}"] = v
+            for i, v in enumerate(a.description_vector):
+                d[f"description_vector_{i}"] = v
+            input_dicts.append(d)
+        input_df = pd.DataFrame(input_dicts)
         prediction = self.learn_to_rank_predict_service.predict(input=input_df)
         ordered_animal_ids = [p[0] for p in prediction]
         background_tasks.add_task(
