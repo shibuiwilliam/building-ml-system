@@ -81,6 +81,7 @@ services:
     image: shibui/building-ml-system:ai_animals_api_0.0.0
     volumes:
       - ./api/secrets/secret.key:/opt/secrets/secret.key
+      - ./dataset/:/opt/dataset/
     restart: always
     networks:
       - default
@@ -148,6 +149,8 @@ services:
   search_registry:
     container_name: search_registry
     image: shibui/building-ml-system:ai_animals_data_registry_0.0.0
+    volumes:
+      - ./dataset/:/opt/dataset/
     restart: always
     networks:
       - default
@@ -174,6 +177,42 @@ services:
     depends_on:
       - postgres
       - redis
+      - api
+      - es
+
+  animal_feature_registration:
+    container_name: animal_feature_registration
+    image: shibui/building-ml-system:ai_animals_data_registry_0.0.0
+    volumes:
+      - ./dataset/:/opt/dataset/
+      - ./batch/data_registry/model/:/opt/model/
+      - ./batch/data_registry/outputs/:/opt/outputs/
+    restart: always
+    networks:
+      - default
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=aianimals
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=user
+      - RABBITMQ_PASSWORD=password
+      - ES_HOST=es
+      - ES_SCHEMA=http
+      - ES_PORT=9200
+      - LOG_LEVEL=INFO
+      - RUN_ENVIRONMENT=local
+      - DATA_DIRECTORY=/opt/dataset
+      - SAVE_DIRECTORY=/opt/model
+    command: >
+      /bin/sh -c "sleep 120s && python -m src.main --job animal_feature_registration_job"
+    depends_on:
+      - postgres
       - api
       - es
 

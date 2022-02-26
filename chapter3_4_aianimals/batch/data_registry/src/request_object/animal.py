@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, Extra
 
@@ -40,3 +40,10 @@ class AnimalCreateRequest(BaseModel):
         if isinstance(value, str):
             return cls(**json.loads(value))
         return value
+
+
+class AnimalFeatureCreateRequest(BaseModel):
+    ids: List[str]
+
+    class Config:
+        extra = Extra.forbid

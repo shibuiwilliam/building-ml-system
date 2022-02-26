@@ -1,48 +1,36 @@
 from src.configurations import Configurations
+from src.domain.text_processing import DescriptionTokenizer, DescriptionVectorizer, NameTokenizer, NameVectorizer
 from src.infrastructure.client.elastic_search import Elasticsearch
 from src.infrastructure.client.postgresql_database import PostgreSQLDatabase
 from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging
 from src.infrastructure.database import AbstractDatabase
 from src.infrastructure.search import AbstractSearch
+from src.job.animal_feature_registration_job import AnimalFeatureRegistrationJob
 from src.job.animal_to_search_job import AnimalToSearchJob
 from src.job.initialization_job import InitializationJob
 from src.middleware.logger import configure_logger
-from src.repository.access_log_repository import AbstractAccessLogRepository
-from src.repository.animal_category_repository import AbstractAnimalCategoryRepository
-from src.repository.animal_repository import AbstractAnimalRepository
-from src.repository.animal_subcategory_repository import AbstractAnimalSubcategoryRepository
-from src.repository.implementation.access_log_repository import AccessLogRepository
-from src.repository.implementation.animal_category_repository import AnimalCategoryRepository
-from src.repository.implementation.animal_repository import AnimalRepository
-from src.repository.implementation.animal_subcategory_repository import AnimalSubcategoryRepository
-from src.repository.implementation.like_repository import LikeRepository
-from src.repository.implementation.table_repository import TableRepository
-from src.repository.implementation.user_repository import UserRepository
-from src.repository.implementation.violation_repository import ViolationRepository
-from src.repository.implementation.violation_type_repository import ViolationTypeRepository
-from src.repository.like_repository import AbstractLikeRepository
-from src.repository.table_repository import AbstractTableRepository
-from src.repository.user_repository import AbstractUserRepository
-from src.repository.violation_repository import AbstractViolationRepository
-from src.repository.violation_type_repository import AbstractViolationTypeRepository
-from src.usecase.access_log_usecase import AbstractAccessLogUsecase
-from src.usecase.animal_category_usecase import AbstractAnimalCategoryUsecase
-from src.usecase.animal_subcategory_usecase import AbstractAnimalSubcategoryUsecase
-from src.usecase.animal_usecase import AbstractAnimalUsecase
-from src.usecase.implementation.access_log_usecase import AccessLogUsecase
-from src.usecase.implementation.animal_category_usecase import AnimalCategoryUsecase
-from src.usecase.implementation.animal_subcategory_usecase import AnimalSubcategoryUsecase
-from src.usecase.implementation.animal_usecase import AnimalUsecase
-from src.usecase.implementation.like_usecase import LikeUsecase
-from src.usecase.implementation.table_usecase import TableUsecase
-from src.usecase.implementation.user_usecase import UserUsecase
-from src.usecase.implementation.violation_type_usecase import ViolationTypeUsecase
-from src.usecase.implementation.violation_usecase import ViolationUsecase
-from src.usecase.like_usecase import AbstractLikeUsecase
-from src.usecase.table_usecase import AbstractTableUsecase
-from src.usecase.user_usecase import AbstractUserUsecase
-from src.usecase.violation_type_usecase import AbstractViolationTypeUsecase
-from src.usecase.violation_usecase import AbstractViolationUsecase
+from src.repository.access_log_repository import AbstractAccessLogRepository, AccessLogRepository
+from src.repository.animal_category_repository import AbstractAnimalCategoryRepository, AnimalCategoryRepository
+from src.repository.animal_feature_repository import AbstractAnimalFeatureRepository, AnimalFeatureRepository
+from src.repository.animal_repository import AbstractAnimalRepository, AnimalRepository
+from src.repository.animal_subcategory_repository import (
+    AbstractAnimalSubcategoryRepository,
+    AnimalSubcategoryRepository,
+)
+from src.repository.like_repository import AbstractLikeRepository, LikeRepository
+from src.repository.table_repository import AbstractTableRepository, TableRepository
+from src.repository.user_repository import AbstractUserRepository, UserRepository
+from src.repository.violation_repository import AbstractViolationRepository, ViolationRepository
+from src.repository.violation_type_repository import AbstractViolationTypeRepository, ViolationTypeRepository
+from src.usecase.access_log_usecase import AbstractAccessLogUsecase, AccessLogUsecase
+from src.usecase.animal_category_usecase import AbstractAnimalCategoryUsecase, AnimalCategoryUsecase
+from src.usecase.animal_subcategory_usecase import AbstractAnimalSubcategoryUsecase, AnimalSubcategoryUsecase
+from src.usecase.animal_usecase import AbstractAnimalUsecase, AnimalUsecase
+from src.usecase.like_usecase import AbstractLikeUsecase, LikeUsecase
+from src.usecase.table_usecase import AbstractTableUsecase, TableUsecase
+from src.usecase.user_usecase import AbstractUserUsecase, UserUsecase
+from src.usecase.violation_type_usecase import AbstractViolationTypeUsecase, ViolationTypeUsecase
+from src.usecase.violation_usecase import AbstractViolationUsecase, ViolationUsecase
 
 logger = configure_logger(__name__)
 
@@ -53,6 +41,10 @@ class Container(object):
         database: AbstractDatabase,
         messaging: RabbitmqMessaging,
         search: AbstractSearch,
+        description_tokenizer: DescriptionTokenizer,
+        name_tokenizer: NameTokenizer,
+        description_vectorizer: DescriptionVectorizer,
+        name_vectorizer: NameVectorizer,
     ):
         self.database = database
         self.search = search
@@ -60,6 +52,13 @@ class Container(object):
         self.messaging.init_channel()
         for q in Configurations.animal_violation_queues:
             self.messaging.create_queue(queue_name=q)
+        self.messaging.create_queue(queue_name=Configurations.animal_registry_queue)
+        self.messaging.create_queue(queue_name=Configurations.animal_feature_registry_queue)
+
+        self.description_tokenizer = description_tokenizer
+        self.name_tokenizer = name_tokenizer
+        self.description_vectorizer = description_vectorizer
+        self.name_vectorizer = name_vectorizer
 
         self.table_repository: AbstractTableRepository = TableRepository()
         self.animal_category_repository: AbstractAnimalCategoryRepository = AnimalCategoryRepository(
@@ -74,8 +73,11 @@ class Container(object):
         self.violation_type_repository: AbstractViolationTypeRepository = ViolationTypeRepository(
             database=self.database
         )
-        self.violation_repository: AbstractViolationRepository = ViolationRepository(database=database)
-        self.access_log_repository: AbstractAccessLogRepository = AccessLogRepository(database=database)
+        self.violation_repository: AbstractViolationRepository = ViolationRepository(database=self.database)
+        self.access_log_repository: AbstractAccessLogRepository = AccessLogRepository(database=self.database)
+        self.animal_feature_repository: AbstractAnimalFeatureRepository = AnimalFeatureRepository(
+            database=self.database
+        )
 
         self.table_usecase: AbstractTableUsecase = TableUsecase(table_repository=self.table_repository)
         self.animal_category_usecase: AbstractAnimalCategoryUsecase = AnimalCategoryUsecase(
@@ -90,8 +92,13 @@ class Container(object):
         self.animal_usecase: AbstractAnimalUsecase = AnimalUsecase(
             animal_repository=self.animal_repository,
             like_repository=self.like_repository,
+            animal_feature_repository=self.animal_feature_repository,
             messaging=self.messaging,
             search=self.search,
+            description_tokenizer=self.description_tokenizer,
+            name_tokenizer=self.name_tokenizer,
+            description_vectorizer=self.description_vectorizer,
+            name_vectorizer=self.name_vectorizer,
         )
         self.like_usecase: AbstractLikeUsecase = LikeUsecase(
             like_repository=self.like_repository,
@@ -107,10 +114,6 @@ class Container(object):
             access_log_repository=self.access_log_repository
         )
 
-        self.animal_search_job: AnimalToSearchJob = AnimalToSearchJob(
-            animal_usecase=self.animal_usecase,
-            messaging=self.messaging,
-        )
         self.initialization_job: InitializationJob = InitializationJob(
             table_usecase=self.table_usecase,
             animal_category_usecase=self.animal_category_usecase,
@@ -123,10 +126,22 @@ class Container(object):
             messaging=self.messaging,
             engine=self.database.engine,
         )
+        self.animal_search_job: AnimalToSearchJob = AnimalToSearchJob(
+            animal_usecase=self.animal_usecase,
+            messaging=self.messaging,
+        )
+        self.animal_feature_registration_job: AnimalFeatureRegistrationJob = AnimalFeatureRegistrationJob(
+            animal_usecase=self.animal_usecase,
+            messaging=self.messaging,
+        )
 
 
 container = Container(
     database=PostgreSQLDatabase(),
     search=Elasticsearch(),
     messaging=RabbitmqMessaging(),
+    description_tokenizer=DescriptionTokenizer(),
+    name_tokenizer=NameTokenizer(),
+    description_vectorizer=DescriptionVectorizer(),
+    name_vectorizer=NameVectorizer(),
 )
