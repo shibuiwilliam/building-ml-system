@@ -5,7 +5,6 @@ from sqlalchemy import and_
 from src.entities.violation_type import ViolationTypeCreate, ViolationTypeModel, ViolationTypeQuery
 from src.infrastructure.database import AbstractDatabase
 from src.middleware.logger import configure_logger
-from src.repository.violation_type_repository import AbstractViolationTypeRepository
 from src.schema.table import TABLES
 from src.schema.violation_type import ViolationType
 

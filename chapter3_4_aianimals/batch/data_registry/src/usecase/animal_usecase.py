@@ -5,7 +5,7 @@ from typing import Dict, List, Optional
 
 import cloudpickle
 from src.configurations import Configurations
-from src.domain.text_processing import DescriptionTokenizer, DescriptionVectorizer, NameTokenizer, NameVectorizer
+from src.service.text_processing import DescriptionTokenizer, DescriptionVectorizer, NameTokenizer, NameVectorizer
 from src.entities.animal import AnimalCreate, AnimalQuery
 from src.entities.animal_feature import AnimalFeatureCreate, AnimalFeatureQuery, AnimalFeatureUpdate
 from src.entities.animal_search import ANIMAL_MAPPING, ANIMAL_MAPPING_NAME, AnimalDocument
@@ -311,18 +311,25 @@ class AnimalUsecase(AbstractAnimalUsecase):
                 break
             animals.extend(_animals)
             offset += limit
+            logger.info(f"retrieved {len(animals)} data")
+        logger.info(f"data size: {len(animals)}")
+        if len(animals) == 0:
+            logger.info("no data to fit and register")
+            return
         ids = [a.id for a in animals]
         descriptions = [a.description for a in animals]
         names = [a.name for a in animals]
-        tokenized_description = self.description_tokenizer.fit_transform(X=descriptions).tolist()
-        tokenized_name = self.name_tokenizer.fit_transform(X=names).tolist()
-        vectorized_description = self.description_vectorizer.fit_transform(X=descriptions).toarray().tolist()
-        vectorized_name = self.name_vectorizer.fit_transform(X=names).toarray().tolist()
 
-        with open(Configurations.description_tokenizer_file, "wb") as f:
-            cloudpickle.dump(self.description_tokenizer, f)
-        with open(Configurations.name_tokenizer_file, "wb") as f:
-            cloudpickle.dump(self.name_tokenizer, f)
+        logger.info("tokenize description")
+        tokenized_description = self.description_tokenizer.fit_transform(X=descriptions).tolist()
+        logger.info("tokenize name")
+        tokenized_name = self.name_tokenizer.fit_transform(X=names).tolist()
+
+        logger.info("vectorize description")
+        vectorized_description = self.description_vectorizer.fit_transform(X=tokenized_description).toarray().tolist()
+        logger.info("vectorize name")
+        vectorized_name = self.name_vectorizer.fit_transform(X=tokenized_name).toarray().tolist()
+
         with open(Configurations.description_vectorizer_file, "wb") as f:
             cloudpickle.dump(self.description_vectorizer, f)
         with open(Configurations.name_vectorizer_file, "wb") as f:
@@ -338,10 +345,6 @@ class AnimalUsecase(AbstractAnimalUsecase):
         )
 
     def register_animal_feature(self):
-        with open(Configurations.description_tokenizer_file, "rb") as f:
-            self.description_tokenizer = cloudpickle.load(f)
-        with open(Configurations.name_tokenizer_file, "rb") as f:
-            self.name_tokenizer = cloudpickle.load(f)
         with open(Configurations.description_vectorizer_file, "rb") as f:
             self.description_vectorizer = cloudpickle.load(f)
         with open(Configurations.name_vectorizer_file, "rb") as f:
@@ -366,8 +369,9 @@ class AnimalUsecase(AbstractAnimalUsecase):
 
             tokenized_description = self.description_tokenizer.transform(X=descriptions).tolist()
             tokenized_name = self.name_tokenizer.transform(X=names).tolist()
-            vectorized_description = self.description_vectorizer.transform(X=descriptions).toarray().tolist()
-            vectorized_name = self.name_vectorizer.transform(X=names).toarray().tolist()
+
+            vectorized_description = self.description_vectorizer.transform(X=tokenized_description).toarray().tolist()
+            vectorized_name = self.name_vectorizer.transform(X=tokenized_name).toarray().tolist()
 
             self.__register_animal_features(
                 ids=ids,
@@ -398,10 +402,10 @@ class AnimalUsecase(AbstractAnimalUsecase):
         data = [
             dict(
                 id=id,
-                name_words=tn.split(" "),
-                name_vector=vn,
                 description_words=td.split(" "),
+                name_words=tn.split(" "),
                 description_vector=vd,
+                name_vector=vn,
             )
             for id, td, tn, vd, vn in zip(
                 ids,
@@ -419,8 +423,10 @@ class AnimalUsecase(AbstractAnimalUsecase):
             )
             existing_ids = [f.id for f in existing_features]
             for d in target_data:
+                logger.info(f"AAAAAAAAAAAAAAAAA {d}")
                 if d["id"] in existing_ids:
                     if update:
                         self.animal_feature_repository.update(record=AnimalFeatureUpdate(**d))
                 else:
                     self.animal_feature_repository.insert(record=AnimalFeatureCreate(**d))
+            logger.info(f"registered: {i} animal features")

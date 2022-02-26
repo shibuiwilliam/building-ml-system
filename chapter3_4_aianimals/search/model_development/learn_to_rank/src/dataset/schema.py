@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -79,6 +79,16 @@ class AccessLog(AccessLogBase):
 
     class Config:
         extra = Extra.forbid
+
+
+class AnimalFeature(BaseModel):
+    id: str
+    name_words: Union[Dict, List]
+    name_vector: Union[Dict, List]
+    description_words: Union[Dict, List]
+    description_vector: Union[Dict, List]
+    created_at: datetime
+    updated_at: datetime
 
 
 class RawData(BaseModel):

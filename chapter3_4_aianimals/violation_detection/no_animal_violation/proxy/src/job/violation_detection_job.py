@@ -47,7 +47,7 @@ class ViolationDetectionJob(object):
                     body={
                         "animal_id": animal[0].id,
                         "violation_type_id": self.violation_type_id,
-                        "probability": 0.95,
+                        "probability": 0.05,
                         "judge": "administrator",
                         "is_effective": True,
                     },

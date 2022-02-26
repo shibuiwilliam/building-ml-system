@@ -66,14 +66,13 @@ class AnimalSubcategoryUsecase(AbstractAnimalSubcategoryUsecase):
             logger.info(f"exists: {response}")
             return response
 
-        record = AnimalSubcategoryCreate(
-            id=request.id,
-            animal_category_id=request.animal_category_id,
-            name_en=request.name_en,
-            name_ja=request.name_ja,
-        )
         data = self.animal_subcategory_repository.insert(
-            record=record,
+            record=AnimalSubcategoryCreate(
+                id=request.id,
+                animal_category_id=request.animal_category_id,
+                name_en=request.name_en,
+                name_ja=request.name_ja,
+            ),
             commit=True,
         )
         if data is not None:

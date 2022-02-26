@@ -45,11 +45,12 @@ class ViolationUsecase(AbstractViolationUsecase):
             commit=True,
         )
 
-        animal_update = AnimalUpdate(
-            id=request.animal_id,
-            deactivated=True,
-        )
-        self.animal_repository.update(record=animal_update)
+        if record.is_effective and record.probability > 0.9:
+            animal_update = AnimalUpdate(
+                id=request.animal_id,
+                deactivated=True,
+            )
+            self.animal_repository.update(record=animal_update)
         if data is not None:
             response = ViolationResponse(**data.dict())
             return response

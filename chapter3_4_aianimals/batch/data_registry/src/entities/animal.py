@@ -6,7 +6,6 @@ from pydantic import BaseModel, Extra
 
 class AnimalQuery(BaseModel):
     id: Optional[str]
-    ids: Optional[List[str]]
     name: Optional[str]
     animal_category_id: Optional[int]
     animal_subcategory_id: Optional[int]

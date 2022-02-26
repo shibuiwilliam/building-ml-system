@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from src.entities.access_log import AccessLog, AccessLogCreate
+from src.entities.access_log import AccessLogCreate
 from src.infrastructure.database import AbstractDatabase
 from src.middleware.logger import configure_logger
+from src.schema.access_log import AccessLog
 from src.schema.table import TABLES
 
 logger = configure_logger(__name__)

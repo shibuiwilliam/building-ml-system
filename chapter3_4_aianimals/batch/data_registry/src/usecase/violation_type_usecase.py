@@ -66,12 +66,11 @@ class ViolationTypeUsecase(AbstractViolationTypeUsecase):
             logger.info(f"exists: {response}")
             return response
 
-        record = ViolationTypeCreate(
-            id=request.id,
-            name=request.name,
-        )
         data = self.violation_type_repository.insert(
-            record=record,
+            record=ViolationTypeCreate(
+                id=request.id,
+                name=request.name,
+            ),
             commit=True,
         )
         if data is not None:

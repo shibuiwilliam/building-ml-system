@@ -47,19 +47,19 @@ class AccessLogUsecase(AbstractAccessLogUsecase):
         if action is None:
             logger.error(f"invalid action: {request.action}")
             return
-        record = AccessLogCreate(
-            id=request.id,
-            phrases=request.phrases,
-            animal_category_id=request.animal_category_id,
-            animal_subcategory_id=request.animal_subcategory_id,
-            user_id=request.user_id,
-            likes=request.likes,
-            animal_id=request.animal_id,
-            action=request.action,
-            created_at=request.created_at,
-        )
+
         self.access_log_repository.insert(
-            record=record,
+            record=AccessLogCreate(
+                id=request.id,
+                phrases=request.phrases,
+                animal_category_id=request.animal_category_id,
+                animal_subcategory_id=request.animal_subcategory_id,
+                user_id=request.user_id,
+                likes=request.likes,
+                animal_id=request.animal_id,
+                action=request.action,
+                created_at=request.created_at,
+            ),
             commit=True,
         )
 

@@ -33,7 +33,7 @@ class AbstractAnimalFeatureRepository(ABC):
         self,
         record: AnimalFeatureCreate,
         commit: bool = True,
-    ) -> Optional[AnimalFeatureModel]:
+    ):
         raise NotImplementedError
 
     @abstractmethod
@@ -100,26 +100,18 @@ class AnimalFeatureRepository(AbstractAnimalFeatureRepository):
         self,
         record: AnimalFeatureCreate,
         commit: bool = True,
-    ) -> Optional[AnimalFeatureModel]:
+    ):
         session = self.database.get_session().__next__()
         try:
             data = record.dict()
-            data["name_words"] = json.dumps(data["name_words"])
-            data["name_vector"] = json.dumps(data["name_vector"])
-            data["description_words"] = json.dumps(data["description_words"])
-            data["description_vector"] = json.dumps(data["description_vector"])
+            data["name_words"] = data["name_words"]
+            data["name_vector"] = data["name_vector"]
+            data["description_words"] = data["description_words"]
+            data["description_vector"] = data["description_vector"]
             data = AnimalFeature(**data)
             session.add(data)
             if commit:
                 session.commit()
-                session.refresh(data)
-                result = self.select(
-                    query=AnimalFeatureQuery(ids=[data.id]),
-                    limit=1,
-                    offset=0,
-                )
-                return result[0]
-            return None
         except Exception as e:
             raise e
         finally:
@@ -133,15 +125,13 @@ class AnimalFeatureRepository(AbstractAnimalFeatureRepository):
         try:
             updates = {}
             if record.name_words is not None:
-                updates["name_words"] = json.dumps(record.name_words)
+                updates["name_words"] = record.name_words
             if record.name_vector is not None:
-                updates["name_vector"] = json.dumps(record.name_vector)
+                updates["name_vector"] = record.name_vector
             if record.description_words is not None:
-                updates["description_words"] = json.dumps(record.description_words)
+                updates["description_words"] = record.description_words
             if record.description_vector is not None:
-                updates["description_vector"] = json.dumps(record.description_vector)
-            if record.deactivated is not None:
-                updates["deactivated"] = record.deactivated
+                updates["description_vector"] = record.description_vector
             session.query(AnimalFeature).filter(AnimalFeature.id == record.id).update(updates)
             session.commit()
         except Exception as e:

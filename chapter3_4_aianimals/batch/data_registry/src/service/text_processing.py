@@ -21,15 +21,14 @@ class DescriptionTokenizer(BaseEstimator, TransformerMixin):
         stop_words=STOP_WORDS,
     ):
         self.stop_words = stop_words
-        self.is_fitted = False
+        self.tokenizer = MeCab.Tagger()
 
     def tokenize_description(
         self,
         text: str,
         stop_words: List[str] = [],
     ) -> List[str]:
-        tokenizer = MeCab.Tagger()
-        ts = tokenizer.parse(text)
+        ts = self.tokenizer.parse(text)
         ts = ts.split("\n")
         tokens = []
         for t in ts:
@@ -61,7 +60,6 @@ class DescriptionTokenizer(BaseEstimator, TransformerMixin):
         return np.array(y)
 
     def fit(self, X, y=None):
-        self.is_fitted = True
         return self
 
     def fit_transform(self, X, y=None) -> np.ndarray:
@@ -75,15 +73,14 @@ class NameTokenizer(BaseEstimator, TransformerMixin):
         stop_words=STOP_WORDS,
     ):
         self.stop_words = stop_words
-        self.is_fitted = False
+        self.tokenizer = MeCab.Tagger()
 
     def tokenize_name(
         self,
         text: str,
         stop_words: List[str] = [],
     ) -> List[str]:
-        tokenizer = MeCab.Tagger()
-        ts = tokenizer.parse(text)
+        ts = self.tokenizer.parse(text)
         ts = ts.split("\n")
         tokens = []
         for t in ts:
@@ -113,7 +110,6 @@ class NameTokenizer(BaseEstimator, TransformerMixin):
         return np.array(y)
 
     def fit(self, X, y=None):
-        self.is_fitted = True
         return self
 
     def fit_transform(self, X, y=None) -> np.ndarray:
@@ -124,10 +120,8 @@ class NameTokenizer(BaseEstimator, TransformerMixin):
 class DescriptionVectorizer(BaseEstimator, TransformerMixin):
     def __init__(
         self,
-        stop_words: List[str] = STOP_WORDS,
         max_features: int = 500,
     ):
-        self.stop_words = stop_words
         self.max_features = max_features
         self.define_pipeline()
         self.is_fitted = False
@@ -135,10 +129,6 @@ class DescriptionVectorizer(BaseEstimator, TransformerMixin):
     def define_pipeline(self):
         self.pipeline = Pipeline(
             [
-                (
-                    "description_tokenizer",
-                    DescriptionTokenizer(stop_words=self.stop_words),
-                ),
                 (
                     "description_tfids_vectorizer",
                     TfidfVectorizer(max_features=self.max_features),
@@ -160,10 +150,8 @@ class DescriptionVectorizer(BaseEstimator, TransformerMixin):
 class NameVectorizer(BaseEstimator, TransformerMixin):
     def __init__(
         self,
-        stop_words: List[str] = STOP_WORDS,
         max_features: int = 300,
     ):
-        self.stop_words = stop_words
         self.max_features = max_features
         self.define_pipeline()
         self.is_fitted = False
@@ -171,10 +159,6 @@ class NameVectorizer(BaseEstimator, TransformerMixin):
     def define_pipeline(self):
         self.pipeline = Pipeline(
             [
-                (
-                    "name_tokenizer",
-                    DescriptionTokenizer(stop_words=self.stop_words),
-                ),
                 (
                     "name_tfids_vectorizer",
                     TfidfVectorizer(max_features=self.max_features),

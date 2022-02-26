@@ -82,16 +82,15 @@ class UserUsecase(AbstractUserUsecase):
             logger.info(f"exists: {response}")
             return response
 
-        record = UserCreate(
-            id=request.id,
-            handle_name=request.handle_name,
-            email_address=request.email_address,
-            password=request.password,
-            age=request.age,
-            gender=request.gender,
-        )
         data = self.user_repository.insert(
-            record=record,
+            record=UserCreate(
+                id=request.id,
+                handle_name=request.handle_name,
+                email_address=request.email_address,
+                password=request.password,
+                age=request.age,
+                gender=request.gender,
+            ),
             commit=True,
         )
         if data is not None:

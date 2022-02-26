@@ -82,23 +82,24 @@ class ViolationUsecase(AbstractViolationUsecase):
             logger.info(f"exists: {response}")
             return response
 
-        record = ViolationCreate(
-            id=request.id,
-            animal_id=request.animal_id,
-            violation_type_id=request.violation_type_id,
-            probability=request.probability,
-            judge=request.judge,
-            is_effective=request.is_effective,
-        )
         data = self.violation_repository.insert(
-            record=record,
+            record=ViolationCreate(
+                id=request.id,
+                animal_id=request.animal_id,
+                violation_type_id=request.violation_type_id,
+                probability=request.probability,
+                judge=request.judge,
+                is_effective=request.is_effective,
+            ),
             commit=True,
         )
-        animal_update = AnimalUpdate(
-            id=request.animal_id,
-            deactivated=True,
+
+        self.animal_repository.update(
+            record=AnimalUpdate(
+                id=request.animal_id,
+                deactivated=True,
+            )
         )
-        self.animal_repository.update(record=animal_update)
         if data is not None:
             response = ViolationResponse(**data.dict())
             logger.info(f"done register: {response}")

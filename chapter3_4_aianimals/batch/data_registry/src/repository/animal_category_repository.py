@@ -2,9 +2,10 @@ from abc import ABC, abstractmethod
 from typing import List, Optional
 
 from sqlalchemy import and_
-from src.entities.animal_category import AnimalCategory, AnimalCategoryCreate, AnimalCategoryModel, AnimalCategoryQuery
+from src.entities.animal_category import AnimalCategoryCreate, AnimalCategoryModel, AnimalCategoryQuery
 from src.infrastructure.database import AbstractDatabase
 from src.middleware.logger import configure_logger
+from src.schema.animal_category import AnimalCategory
 from src.schema.table import TABLES
 
 logger = configure_logger(__name__)

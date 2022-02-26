@@ -77,13 +77,12 @@ class LikeUsecase(AbstractLikeUsecase):
             logger.info(f"exists: {response}")
             return response
 
-        record = LikeCreate(
-            id=get_uuid(),
-            animal_id=request.animal_id,
-            user_id=request.user_id,
-        )
         data = self.like_repository.insert(
-            record=record,
+            record=LikeCreate(
+                id=get_uuid(),
+                animal_id=request.animal_id,
+                user_id=request.user_id,
+            ),
             commit=True,
         )
         logger.info(f"registered: {data}")

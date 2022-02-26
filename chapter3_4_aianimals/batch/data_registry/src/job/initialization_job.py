@@ -22,6 +22,7 @@ from src.schema.animal_subcategory import AnimalSubcategory
 from src.schema.base import Base
 from src.schema.like import Like
 from src.schema.user import User
+from src.schema.animal_feature import AnimalFeature
 from src.schema.violation import Violation
 from src.schema.violation_type import ViolationType
 from src.usecase.access_log_usecase import AbstractAccessLogUsecase
@@ -72,6 +73,7 @@ class InitializationJob(AbstractJob):
             ViolationType,
             Violation,
             AccessLog,
+            AnimalFeature,
         ]
         for table in tables:
             logger.info(f"create table: {table.__table__}")

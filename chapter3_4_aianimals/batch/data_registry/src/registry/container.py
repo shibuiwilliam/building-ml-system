@@ -1,5 +1,5 @@
 from src.configurations import Configurations
-from src.domain.text_processing import DescriptionTokenizer, DescriptionVectorizer, NameTokenizer, NameVectorizer
+from src.service.text_processing import DescriptionTokenizer, DescriptionVectorizer, NameTokenizer, NameVectorizer
 from src.infrastructure.client.elastic_search import Elasticsearch
 from src.infrastructure.client.postgresql_database import PostgreSQLDatabase
 from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging

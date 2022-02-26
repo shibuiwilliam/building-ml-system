@@ -66,8 +66,6 @@ class AnimalRepository(AbstractAnimalRepository):
             if query is not None:
                 if query.id is not None:
                     filters.append(Animal.id == query.id)
-                if query.ids is not None:
-                    filters.append(Animal.id.in_(query.ids))
                 if query.name is not None:
                     filters.append(Animal.name == query.name)
                 if query.animal_category_id is not None:
