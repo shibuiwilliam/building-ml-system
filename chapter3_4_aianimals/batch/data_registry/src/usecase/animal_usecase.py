@@ -416,8 +416,8 @@ class AnimalUsecase(AbstractAnimalUsecase):
             )
         ]
 
-        for i in range(0, len(data), 100):
-            target_data = data[i : i + 100]
+        for i in range(0, len(data), 1000):
+            target_data = data[i : i + 1000]
             existing_features = self.animal_feature_repository.select(
                 query=AnimalFeatureQuery(ids=[d["id"] for d in target_data])
             )

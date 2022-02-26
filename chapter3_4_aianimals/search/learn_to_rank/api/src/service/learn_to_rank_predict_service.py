@@ -91,7 +91,7 @@ class LearnToRankPredictService(AbstractLearnToRankPredictService):
         self,
         input: pd.DataFrame,
     ) -> np.ndarray:
-        return self.preprocess.transform(input).toarray()
+        return self.preprocess.transform(input)
 
     def _predict_sklearn(
         self,
@@ -133,6 +133,7 @@ class LearnToRankPredictService(AbstractLearnToRankPredictService):
         prediction: List[float],
     ) -> List[Tuple[str, float]]:
         id_prediction = {id: prob for id, prob in zip(input.animal_id, prediction)}
+        logger.info(f"AAAAAAAAAAAAa: {id_prediction}")
         sort_orders = sorted(id_prediction.items(), key=lambda x: x[1], reverse=True)
         return sort_orders
 
@@ -141,6 +142,7 @@ class LearnToRankPredictService(AbstractLearnToRankPredictService):
         input: pd.DataFrame,
     ) -> List[Tuple[str, float]]:
         preprocessed_input = self._preprocess(input=input)
+        logger.info(f"DDDDDDDDDDDDDd: {preprocessed_input.shape}")
         prediction = self._predict(input=preprocessed_input)
         id_prediction = self._postprocess(input=input, prediction=prediction)
         return id_prediction

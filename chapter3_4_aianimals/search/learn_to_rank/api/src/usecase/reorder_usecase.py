@@ -99,8 +99,6 @@ class ReorderUsecase(AbstractReorderUsecase):
                 query_animal_subcategory_id=request.query_animal_subcategory_id,
                 animal_category_id=a.animal_category_id,
                 animal_subcategory_id=a.animal_subcategory_id,
-                name=a.name,
-                description=a.description,
                 likes=a.likes,
             )
             for i, v in enumerate(a.name_vector):
@@ -108,7 +106,9 @@ class ReorderUsecase(AbstractReorderUsecase):
             for i, v in enumerate(a.description_vector):
                 d[f"description_vector_{i}"] = v
             input_dicts.append(d)
+        logger.info(f"BBBBBBBBBBBBBB {input_dicts[0]}")
         input_df = pd.DataFrame(input_dicts)
+        logger.info(f"CCCCCCCCCCCCCCCCCCC {input_df.shape}")
         prediction = self.learn_to_rank_predict_service.predict(input=input_df)
         ordered_animal_ids = [p[0] for p in prediction]
         background_tasks.add_task(

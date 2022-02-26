@@ -19,8 +19,6 @@ class Animal(BaseModel):
     id: str
     animal_category_id: int
     animal_subcategory_id: int
-    name: str
-    description: str
     likes: int = 0
     name_vector: Union[Dict, List]
     description_vector: Union[Dict, List]
@@ -41,7 +39,7 @@ class AnimalRepository(BaseRepository):
 
     def select(
         self,
-        animal_query: Optional[AnimalQuery] = None,
+        animal_query: AnimalQuery,
         limit: int = 200,
         offset: int = 0,
     ) -> List[Animal]:
@@ -70,8 +68,6 @@ class AnimalRepository(BaseRepository):
                 {self.animal_table}.id,
                 {self.animal_table}.animal_category_id,
                 {self.animal_table}.animal_subcategory_id,
-                {self.animal_table}.name,
-                {self.animal_table}.description,
                 (CASE WHEN likes.likes is NULL THEN 0 ELSE likes.likes END) AS likes,
                 {self.animal_feature_table}.name_vector AS name_vector,
                 {self.animal_feature_table}.description_vector AS description_vector
@@ -114,7 +110,7 @@ class AnimalRepository(BaseRepository):
 
     def select_all(
         self,
-        animal_query: Optional[AnimalQuery] = None,
+        animal_query: AnimalQuery,
     ) -> List[Animal]:
         limit = 200
         offset = 0
@@ -125,6 +121,9 @@ class AnimalRepository(BaseRepository):
                 limit=limit,
                 offset=offset,
             )
+            if len(r) == len(animal_query.ids):
+                records.extend(r)
+                break
             if len(r) > 0:
                 records.extend(r)
             else:
