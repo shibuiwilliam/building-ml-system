@@ -34,6 +34,7 @@ class Action(Enum):
 class TABLES(Enum):
     ANIMAL = "animals"
     ACCESS_LOG = "access_logs"
+    ANIMAL_FEATURE = "animal_features"
 
     @staticmethod
     def has_value(value: str) -> bool:
@@ -60,6 +61,16 @@ class Animal(BaseModel):
         extra = Extra.forbid
 
 
+class AnimalFeature(BaseModel):
+    id: str
+    name_words: Union[Dict, List]
+    name_vector: Union[Dict, List]
+    description_words: Union[Dict, List]
+    description_vector: Union[Dict, List]
+    created_at: datetime
+    updated_at: datetime
+
+
 class AccessLogBase(BaseModel):
     id: str
     query_phrases: List[str]
@@ -74,26 +85,17 @@ class AccessLogBase(BaseModel):
 class AccessLog(AccessLogBase):
     animal_category_id: int
     animal_subcategory_id: int
-    name: str
-    description: str
+    name_vector: Union[Dict, List]
+    description_vector: Union[Dict, List]
 
     class Config:
         extra = Extra.forbid
 
 
-class AnimalFeature(BaseModel):
-    id: str
-    name_words: Union[Dict, List]
-    name_vector: Union[Dict, List]
-    description_words: Union[Dict, List]
-    description_vector: Union[Dict, List]
-    created_at: datetime
-    updated_at: datetime
-
-
 class RawData(BaseModel):
     data: List[Dict]
     target: List[List[int]]
+    keys: List[str]
 
 
 @dataclass

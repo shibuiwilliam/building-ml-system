@@ -22,9 +22,12 @@ def retrieve_access_logs(
             likes=record.likes,
             animal_category_id=record.animal_category_id,
             animal_subcategory_id=record.animal_subcategory_id,
-            name=record.name,
-            description=record.description,
         )
+        for i, v in enumerate(record.name_vector):
+            d[f"name_vector_{i}"] = v
+        for i, v in enumerate(record.description_vector):
+            d[f"description_vector_{i}"] = v
+
         data.append(d)
         if record.action == Action.SELECT.value:
             target.append([1])
@@ -42,4 +45,5 @@ target: {target[0]}
     return RawData(
         data=data,
         target=target,
+        keys=list(data[0].keys()),
     )

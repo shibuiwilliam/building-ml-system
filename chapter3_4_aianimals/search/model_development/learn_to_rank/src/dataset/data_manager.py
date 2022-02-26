@@ -61,6 +61,7 @@ class AccessLogRepository(BaseRepository):
         super().__init__(db_client=db_client)
         self.access_log_table = TABLES.ACCESS_LOG.value
         self.animal_table = TABLES.ANIMAL.value
+        self.animal_feature_table = TABLES.ANIMAL_FEATURE.value
 
     def select(
         self,
@@ -81,19 +82,25 @@ SELECT
     {self.access_log_table}.animal_id AS animal_id,
     {self.animal_table}.animal_category_id AS animal_category_id,
     {self.animal_table}.animal_subcategory_id AS animal_subcategory_id,
-    {self.animal_table}.name AS name,
-    {self.animal_table}.description AS description
+    {self.animal_feature_table}.name_vector AS name_vector,
+    {self.animal_feature_table}.description_vector AS description_vector
 FROM 
     {self.access_log_table}
 LEFT JOIN
     {self.animal_table}
 ON
     {self.access_log_table}.animal_id = {self.animal_table}.id
+LEFT JOIN
+    {self.animal_feature_table}
+ON
+    {self.access_log_table}.animal_id = {self.animal_feature_table}.id
+WHERE
+    {self.animal_table}.deactivated = false
         """
 
         if date_from is not None:
             query += f"""
-WHERE
+AND
     {self.access_log_table}.created_at >= %s
             """
             parameters.append(date_from)

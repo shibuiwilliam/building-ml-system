@@ -298,7 +298,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
                     )
 
     def fit_register_animal_feature(self):
-        limit = 100
+        limit = 1000
         offset = 0
         animals = []
         while True:
@@ -423,7 +423,6 @@ class AnimalUsecase(AbstractAnimalUsecase):
             )
             existing_ids = [f.id for f in existing_features]
             for d in target_data:
-                logger.info(f"AAAAAAAAAAAAAAAAA {d}")
                 if d["id"] in existing_ids:
                     if update:
                         self.animal_feature_repository.update(record=AnimalFeatureUpdate(**d))

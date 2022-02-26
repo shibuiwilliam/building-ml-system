@@ -43,7 +43,19 @@ def main(cfg: DictConfig):
                 test_size=0.3,
             )
 
-        pipeline = Preprocess()
+        data_types = {
+            "query_animal_category_id": "str",
+            "query_animal_subcategory_id": "str",
+            "likes": "int64",
+            "animal_category_id": "str",
+            "animal_subcategory_id": "str",
+        }
+        for k in raw_data.keys:
+            if k.startswith("name_vector_") or k.startswith("description_vector_"):
+                data_types[k] = "float64"
+        logger.info(f"data types: {data_types}")
+
+        pipeline = Preprocess(data_types=data_types)
 
         _model = MODELS.get_model(name=cfg.jobs.model.name)
         model = _model.model(
