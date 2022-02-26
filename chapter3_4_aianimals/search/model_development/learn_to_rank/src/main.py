@@ -44,6 +44,7 @@ def main(cfg: DictConfig):
             )
 
         data_types = {
+            "query_phrases": "str",
             "query_animal_category_id": "str",
             "query_animal_subcategory_id": "str",
             "likes": "int64",

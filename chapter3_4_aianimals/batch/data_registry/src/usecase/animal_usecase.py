@@ -5,7 +5,6 @@ from typing import Dict, List, Optional
 
 import cloudpickle
 from src.configurations import Configurations
-from src.service.text_processing import DescriptionTokenizer, DescriptionVectorizer, NameTokenizer, NameVectorizer
 from src.entities.animal import AnimalCreate, AnimalQuery
 from src.entities.animal_feature import AnimalFeatureCreate, AnimalFeatureQuery, AnimalFeatureUpdate
 from src.entities.animal_search import ANIMAL_MAPPING, ANIMAL_MAPPING_NAME, AnimalDocument
@@ -17,6 +16,7 @@ from src.repository.animal_repository import AbstractAnimalRepository
 from src.repository.like_repository import AbstractLikeRepository
 from src.request_object.animal import AnimalCreateRequest, AnimalRequest
 from src.response_object.animal import AnimalResponse, AnimalResponseWithLike
+from src.service.text_processing import DescriptionTokenizer, DescriptionVectorizer, NameTokenizer, NameVectorizer
 
 logger = configure_logger(__name__)
 

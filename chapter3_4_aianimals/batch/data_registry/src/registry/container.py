@@ -1,5 +1,4 @@
 from src.configurations import Configurations
-from src.service.text_processing import DescriptionTokenizer, DescriptionVectorizer, NameTokenizer, NameVectorizer
 from src.infrastructure.client.elastic_search import Elasticsearch
 from src.infrastructure.client.postgresql_database import PostgreSQLDatabase
 from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging
@@ -22,6 +21,7 @@ from src.repository.table_repository import AbstractTableRepository, TableReposi
 from src.repository.user_repository import AbstractUserRepository, UserRepository
 from src.repository.violation_repository import AbstractViolationRepository, ViolationRepository
 from src.repository.violation_type_repository import AbstractViolationTypeRepository, ViolationTypeRepository
+from src.service.text_processing import DescriptionTokenizer, DescriptionVectorizer, NameTokenizer, NameVectorizer
 from src.usecase.access_log_usecase import AbstractAccessLogUsecase, AccessLogUsecase
 from src.usecase.animal_category_usecase import AbstractAnimalCategoryUsecase, AnimalCategoryUsecase
 from src.usecase.animal_subcategory_usecase import AbstractAnimalSubcategoryUsecase, AnimalSubcategoryUsecase

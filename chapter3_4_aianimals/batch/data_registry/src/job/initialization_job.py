@@ -18,11 +18,11 @@ from src.request_object.violation_type import ViolationTypeCreateRequest
 from src.schema.access_log import AccessLog
 from src.schema.animal import Animal
 from src.schema.animal_category import AnimalCategory
+from src.schema.animal_feature import AnimalFeature
 from src.schema.animal_subcategory import AnimalSubcategory
 from src.schema.base import Base
 from src.schema.like import Like
 from src.schema.user import User
-from src.schema.animal_feature import AnimalFeature
 from src.schema.violation import Violation
 from src.schema.violation_type import ViolationType
 from src.usecase.access_log_usecase import AbstractAccessLogUsecase
