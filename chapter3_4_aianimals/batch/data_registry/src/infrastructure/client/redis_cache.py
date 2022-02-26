@@ -1,14 +1,14 @@
 import os
-from logging import getLogger
-from typing import Optional, Tuple, Union
+from typing import Optional, Union
 
 import redis
-from src.infrastructure.queue import AbstractQueue
+from src.infrastructure.cache import AbstractCache
+from src.middleware.logger import configure_logger
 
-logger = getLogger(__name__)
+logger = configure_logger(__name__)
 
 
-class RedisQueue(AbstractQueue):
+class RedisCache(AbstractCache):
     def __init__(self):
         super().__init__()
         self.__redis_host = os.environ["REDIS_HOST"]
@@ -21,25 +21,6 @@ class RedisQueue(AbstractQueue):
             db=self.__redis_db,
             decode_responses=True,
         )
-
-    def enqueue(
-        self,
-        queue_name: str,
-        key: str,
-    ):
-        try:
-            self.redis_client.lpush(queue_name, key)
-        except Exception as e:
-            logger.error(e)
-
-    def dequeue(
-        self,
-        queue_name: str,
-    ) -> Optional[Tuple[int, str, float, bool]]:
-        if self.redis_client.llen(queue_name) > 0:
-            return self.redis_client.rpop(queue_name)
-        else:
-            return None
 
     def set(
         self,

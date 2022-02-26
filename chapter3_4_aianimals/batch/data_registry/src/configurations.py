@@ -14,13 +14,13 @@ class Configurations:
     access_log_file = os.path.join(data_directory, "access_logs.json")
 
     save_directory = os.getenv("SAVE_DIRECTORY", "/tmp")
-    description_tokenizer_file = os.getenv(
-        "DESCRIPTION_TOKENIZER",
-        os.path.join(save_directory, "description_tokenizer.pkl"),
+    animal_category_vectorizer_file = os.getenv(
+        "ANIMAL_CATEGORY_VECTORIZER",
+        os.path.join(save_directory, "animal_category_vectorizer.pkl"),
     )
-    name_tokenizer_file = os.getenv(
-        "NAME_TOKENIZER",
-        os.path.join(save_directory, "name_tokenizer.pkl"),
+    animal_subcategory_vectorizer_file = os.getenv(
+        "ANIMAL_SUBCATEGORY_VECTORIZER",
+        os.path.join(save_directory, "animal_subcategory_vectorizer.pkl"),
     )
     description_vectorizer_file = os.getenv(
         "DESCRIPTION_VECTORIZER",

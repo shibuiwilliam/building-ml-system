@@ -15,6 +15,16 @@ class AnimalFeature(Base):
         ForeignKey(f"{TABLES.ANIMAL.value}.id"),
         primary_key=True,
     )
+    animal_category_vector = Column(
+        JSON,
+        nullable=True,
+        unique=False,
+    )
+    animal_subcategory_vector = Column(
+        JSON,
+        nullable=True,
+        unique=False,
+    )
     name_words = Column(
         JSON,
         nullable=True,

@@ -13,6 +13,8 @@ class AnimalFeatureQuery(BaseModel):
 
 class AnimalFeatureCreate(BaseModel):
     id: str
+    animal_category_vector: Union[Dict, List]
+    animal_subcategory_vector: Union[Dict, List]
     name_words: Union[Dict, List]
     name_vector: Union[Dict, List]
     description_words: Union[Dict, List]
@@ -26,6 +28,8 @@ class AnimalFeatureCreate(BaseModel):
 
 class AnimalFeatureUpdate(BaseModel):
     id: str
+    animal_category_vector: Union[Dict, List]
+    animal_subcategory_vector: Union[Dict, List]
     name_words: Optional[Union[Dict, List]]
     name_vector: Optional[Union[Dict, List]]
     description_words: Optional[Union[Dict, List]]
@@ -37,6 +41,8 @@ class AnimalFeatureUpdate(BaseModel):
 
 class AnimalFeatureModel(BaseModel):
     id: str
+    animal_category_vector: Union[Dict, List]
+    animal_subcategory_vector: Union[Dict, List]
     name_words: Union[Dict, List]
     name_vector: Union[Dict, List]
     description_words: Union[Dict, List]

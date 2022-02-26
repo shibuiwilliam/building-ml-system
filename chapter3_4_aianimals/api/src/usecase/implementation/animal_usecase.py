@@ -7,8 +7,8 @@ from sqlalchemy.orm import Session
 from src.configurations import Configurations
 from src.constants import CONSTANTS
 from src.entities.animal import ANIMAL_INDEX, AnimalCreate, AnimalQuery, AnimalSearchQuery, AnimalSearchSortKey
+from src.infrastructure.cache import AbstractCache
 from src.infrastructure.messaging import AbstractMessaging
-from src.infrastructure.queue import AbstractQueue
 from src.infrastructure.search import AbstractSearch
 from src.infrastructure.storage import AbstractStorage
 from src.middleware.json import json_serial
@@ -29,7 +29,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
         animal_repository: AbstractAnimalRepository,
         like_repository: AbstractLikeRepository,
         storage_client: AbstractStorage,
-        queue: AbstractQueue,
+        cache: AbstractCache,
         search_client: AbstractSearch,
         messaging: AbstractMessaging,
     ):
@@ -37,7 +37,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
             animal_repository=animal_repository,
             like_repository=like_repository,
             storage_client=storage_client,
-            queue=queue,
+            cache=cache,
             search_client=search_client,
             messaging=messaging,
         )
@@ -116,7 +116,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
         )
         if data is not None:
             response = AnimalResponse(**data.dict())
-            for q in Configurations.animal_violation_queues:
+            for q in Configurations.animal_violation_caches:
                 background_tasks.add_task(
                     self.messaging.publish,
                     q,
@@ -149,7 +149,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
         result: AnimalSearchResponses,
     ):
         logger.info(f"save cache: {key}")
-        self.queue.set(
+        self.cache.set(
             key=key,
             value=json.dumps(result.dict(), default=json_serial),
         )
@@ -177,7 +177,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
             limit=limit,
             offset=offset,
         )
-        cached = self.queue.get(key=key)
+        cached = self.cache.get(key=key)
         if cached is not None and isinstance(cached, str):
             cache = json.loads(cached)
             logger.info(f"hit cache: {key}")

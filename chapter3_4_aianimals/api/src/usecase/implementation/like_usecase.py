@@ -5,7 +5,7 @@ from fastapi import BackgroundTasks
 from sqlalchemy.orm import Session
 from src.configurations import Configurations
 from src.entities.like import LikeCreate, LikeDelete, LikeQuery
-from src.infrastructure.queue import AbstractQueue
+from src.infrastructure.cache import AbstractCache
 from src.middleware.strings import get_uuid
 from src.repository.like_repository import AbstractLikeRepository
 from src.request_object.like import LikeCreateRequest, LikeDeleteRequest, LikeRequest
@@ -19,11 +19,11 @@ class LikeUsecase(AbstractLikeUsecase):
     def __init__(
         self,
         like_repository: AbstractLikeRepository,
-        queue: AbstractQueue,
+        cache: AbstractCache,
     ):
         super().__init__(
             like_repository=like_repository,
-            queue=queue,
+            cache=cache,
         )
 
     def retrieve(
@@ -82,8 +82,8 @@ class LikeUsecase(AbstractLikeUsecase):
         if data is not None:
             response = LikeResponse(**data.dict())
             background_tasks.add_task(
-                self.queue.enqueue,
-                Configurations.animal_registry_queue,
+                self.cache.encache,
+                Configurations.animal_registry_cache,
                 data.animal_id,
             )
             return response

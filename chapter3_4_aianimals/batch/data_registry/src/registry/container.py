@@ -21,7 +21,13 @@ from src.repository.table_repository import AbstractTableRepository, TableReposi
 from src.repository.user_repository import AbstractUserRepository, UserRepository
 from src.repository.violation_repository import AbstractViolationRepository, ViolationRepository
 from src.repository.violation_type_repository import AbstractViolationTypeRepository, ViolationTypeRepository
-from src.service.text_processing import DescriptionTokenizer, DescriptionVectorizer, NameTokenizer, NameVectorizer
+from src.service.feature_processing import (
+    DescriptionTokenizer,
+    DescriptionVectorizer,
+    NameTokenizer,
+    NameVectorizer,
+    CategoricalVectorizer,
+)
 from src.usecase.access_log_usecase import AbstractAccessLogUsecase, AccessLogUsecase
 from src.usecase.animal_category_usecase import AbstractAnimalCategoryUsecase, AnimalCategoryUsecase
 from src.usecase.animal_subcategory_usecase import AbstractAnimalSubcategoryUsecase, AnimalSubcategoryUsecase
@@ -31,6 +37,8 @@ from src.usecase.table_usecase import AbstractTableUsecase, TableUsecase
 from src.usecase.user_usecase import AbstractUserUsecase, UserUsecase
 from src.usecase.violation_type_usecase import AbstractViolationTypeUsecase, ViolationTypeUsecase
 from src.usecase.violation_usecase import AbstractViolationUsecase, ViolationUsecase
+from src.infrastructure.cache import AbstractCache
+from src.infrastructure.client.redis_cache import RedisCache
 
 logger = configure_logger(__name__)
 
@@ -40,7 +48,10 @@ class Container(object):
         self,
         database: AbstractDatabase,
         messaging: RabbitmqMessaging,
+        cache: AbstractCache,
         search: AbstractSearch,
+        animal_category_vectorizer: CategoricalVectorizer,
+        animal_subcategory_vectorizer: CategoricalVectorizer,
         description_tokenizer: DescriptionTokenizer,
         name_tokenizer: NameTokenizer,
         description_vectorizer: DescriptionVectorizer,
@@ -48,6 +59,7 @@ class Container(object):
     ):
         self.database = database
         self.search = search
+        self.cache = cache
         self.messaging = messaging
         self.messaging.init_channel()
         for q in Configurations.animal_violation_queues:
@@ -55,6 +67,8 @@ class Container(object):
         self.messaging.create_queue(queue_name=Configurations.animal_registry_queue)
         self.messaging.create_queue(queue_name=Configurations.animal_feature_registry_queue)
 
+        self.animal_category_vectorizer = animal_category_vectorizer
+        self.animal_subcategory_vectorizer = animal_subcategory_vectorizer
         self.description_tokenizer = description_tokenizer
         self.name_tokenizer = name_tokenizer
         self.description_vectorizer = description_vectorizer
@@ -94,7 +108,10 @@ class Container(object):
             like_repository=self.like_repository,
             animal_feature_repository=self.animal_feature_repository,
             messaging=self.messaging,
+            cache=self.cache,
             search=self.search,
+            animal_category_vectorizer=self.animal_category_vectorizer,
+            animal_subcategory_vectorizer=self.animal_subcategory_vectorizer,
             description_tokenizer=self.description_tokenizer,
             name_tokenizer=self.name_tokenizer,
             description_vectorizer=self.description_vectorizer,
@@ -140,6 +157,9 @@ container = Container(
     database=PostgreSQLDatabase(),
     search=Elasticsearch(),
     messaging=RabbitmqMessaging(),
+    cache=RedisCache(),
+    animal_category_vectorizer=CategoricalVectorizer(),
+    animal_subcategory_vectorizer=CategoricalVectorizer(),
     description_tokenizer=DescriptionTokenizer(),
     name_tokenizer=NameTokenizer(),
     description_vectorizer=DescriptionVectorizer(),

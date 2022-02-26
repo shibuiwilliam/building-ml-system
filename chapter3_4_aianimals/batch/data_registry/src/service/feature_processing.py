@@ -6,13 +6,64 @@ import MeCab
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder
 from src.constants import STOP_WORDS
 from src.middleware.logger import configure_logger
 
 logger = configure_logger(__name__)
 
 cloudpickle.register_pickle_by_value(sys.modules[__name__])
+
+
+class CategoricalVectorizer(BaseEstimator, TransformerMixin):
+    def __init__(self):
+        self.define_pipeline()
+
+    def define_pipeline(self):
+        logger.info("init pipeline")
+        self.pipeline = Pipeline(
+            [
+                (
+                    "simple_imputer",
+                    SimpleImputer(
+                        missing_values=np.nan,
+                        strategy="constant",
+                        fill_value=None,
+                    ),
+                ),
+                (
+                    "one_hot_encoder",
+                    OneHotEncoder(
+                        sparse=True,
+                        handle_unknown="ignore",
+                    ),
+                ),
+            ]
+        )
+
+        logger.info(f"pipeline: {self.pipeline}")
+
+    def transform(
+        self,
+        x: List[int],
+    ):
+        return self.pipeline.transform(x)
+
+    def fit(
+        self,
+        x: List[int],
+        y=None,
+    ):
+        return self.pipeline.fit(x)
+
+    def fit_transform(
+        self,
+        x: List[int],
+        y=None,
+    ):
+        return self.pipeline.fit_transform(x)
 
 
 class DescriptionTokenizer(BaseEstimator, TransformerMixin):

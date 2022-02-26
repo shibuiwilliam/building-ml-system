@@ -14,9 +14,9 @@ class AbstractMessaging(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def create_queue(
+    def create_cache(
         self,
-        queue_name: str,
+        cache_name: str,
     ):
         raise NotImplementedError
 
@@ -27,7 +27,7 @@ class AbstractMessaging(ABC):
     @abstractmethod
     def publish(
         self,
-        queue_name: str,
+        cache_name: str,
         body: Dict,
     ):
         raise NotImplementedError

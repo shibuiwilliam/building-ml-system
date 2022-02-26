@@ -4,7 +4,7 @@ from typing import List, Optional
 
 from fastapi import BackgroundTasks
 from sqlalchemy.orm import Session
-from src.infrastructure.queue import AbstractQueue
+from src.infrastructure.cache import AbstractCache
 from src.repository.like_repository import AbstractLikeRepository
 from src.request_object.like import LikeCreateRequest, LikeDeleteRequest, LikeRequest
 from src.response_object.like import LikeResponse
@@ -16,10 +16,10 @@ class AbstractLikeUsecase(ABC):
     def __init__(
         self,
         like_repository: AbstractLikeRepository,
-        queue: AbstractQueue,
+        cache: AbstractCache,
     ):
         self.like_repository = like_repository
-        self.queue = queue
+        self.cache = cache
 
     @abstractmethod
     def retrieve(

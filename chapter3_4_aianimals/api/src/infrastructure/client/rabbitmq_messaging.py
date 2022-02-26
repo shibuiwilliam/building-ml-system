@@ -30,12 +30,12 @@ class RabbitmqMessaging(AbstractMessaging):
         self.connection = pika.BlockingConnection(self.__params)
         self.channel = self.connection.channel()
 
-    def create_queue(
+    def create_cache(
         self,
-        queue_name: str,
+        cache_name: str,
     ):
-        self.channel.queue_declare(
-            queue=queue_name,
+        self.channel.cache_declare(
+            cache=cache_name,
             durable=True,
         )
 
@@ -45,12 +45,12 @@ class RabbitmqMessaging(AbstractMessaging):
 
     def publish(
         self,
-        queue_name: str,
+        cache_name: str,
         body: Dict,
     ):
         self.channel.basic_publish(
             exchange="",
-            routing_key=queue_name,
+            routing_key=cache_name,
             body=json.dumps(body),
             properties=self.properties,
         )

@@ -81,6 +81,8 @@ class AnimalFeatureRepository(AbstractAnimalFeatureRepository):
             data = [
                 AnimalFeatureModel(
                     id=d.id,
+                    animal_category_vector=d.animal_category_vector,
+                    animal_subcategory_vector=d.animal_subcategory_vector,
                     name_words=d.name_words,
                     name_vector=d.name_vector,
                     description_words=d.description_words,
@@ -104,6 +106,8 @@ class AnimalFeatureRepository(AbstractAnimalFeatureRepository):
         session = self.database.get_session().__next__()
         try:
             data = record.dict()
+            data["animal_category_vector"] = data["animal_category_vector"]
+            data["animal_subcategory_vector"] = data["animal_subcategory_vector"]
             data["name_words"] = data["name_words"]
             data["name_vector"] = data["name_vector"]
             data["description_words"] = data["description_words"]
@@ -124,6 +128,10 @@ class AnimalFeatureRepository(AbstractAnimalFeatureRepository):
         session = self.database.get_session().__next__()
         try:
             updates = {}
+            if record.animal_category_vector is not None:
+                updates["animal_category_vector"] = record.animal_category_vector
+            if record.animal_subcategory_vector is not None:
+                updates["animal_subcategory_vector"] = record.animal_subcategory_vector
             if record.name_words is not None:
                 updates["name_words"] = record.name_words
             if record.name_vector is not None:
