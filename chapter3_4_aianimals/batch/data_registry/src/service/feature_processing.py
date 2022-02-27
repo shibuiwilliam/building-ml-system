@@ -30,7 +30,7 @@ class CategoricalVectorizer(BaseEstimator, TransformerMixin):
                     SimpleImputer(
                         missing_values=np.nan,
                         strategy="constant",
-                        fill_value=None,
+                        fill_value=-1,
                     ),
                 ),
                 (

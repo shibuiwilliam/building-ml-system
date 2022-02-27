@@ -335,28 +335,51 @@ class AnimalUsecase(AbstractAnimalUsecase):
         if len(animals) == 0:
             logger.info("no data to fit and register")
             return
+
         ids = [a.id for a in animals]
-        animal_categories = [a.animal_category_id for a in animals]
-        animal_subcategories = [a.animal_subcategory_id for a in animals]
-        descriptions = [a.description for a in animals]
-        names = [a.name for a in animals]
 
         logger.info("vectorize animal_category")
-        vectorized_animal_category = self.animal_category_vectorizer.fit_transform(x=animal_categories).tolist()
+        vectorized_animal_category = (
+            self.animal_category_vectorizer.fit_transform(
+                x=[[a.animal_category_id] for a in animals],
+            )
+            .toarray()
+            .tolist()
+        )
         logger.info("vectorize animal_subcategory")
-        vectorized_animal_subcategory = self.animal_subcategory_vectorizer.fit_transform(
-            x=animal_subcategories
-        ).tolist()
+        vectorized_animal_subcategory = (
+            self.animal_subcategory_vectorizer.fit_transform(
+                x=[[a.animal_subcategory_id] for a in animals],
+            )
+            .toarray()
+            .tolist()
+        )
 
         logger.info("tokenize description")
-        tokenized_description = self.description_tokenizer.fit_transform(X=descriptions).tolist()
+        tokenized_description = self.description_tokenizer.fit_transform(
+            X=[a.description for a in animals],
+        ).tolist()
         logger.info("tokenize name")
-        tokenized_name = self.name_tokenizer.fit_transform(X=names).tolist()
+        tokenized_name = self.name_tokenizer.fit_transform(
+            X=[a.name for a in animals],
+        ).tolist()
 
         logger.info("vectorize description")
-        vectorized_description = self.description_vectorizer.fit_transform(X=tokenized_description).toarray().tolist()
+        vectorized_description = (
+            self.description_vectorizer.fit_transform(
+                X=tokenized_description,
+            )
+            .toarray()
+            .tolist()
+        )
         logger.info("vectorize name")
-        vectorized_name = self.name_vectorizer.fit_transform(X=tokenized_name).toarray().tolist()
+        vectorized_name = (
+            self.name_vectorizer.fit_transform(
+                X=tokenized_name,
+            )
+            .toarray()
+            .tolist()
+        )
 
         with open(Configurations.animal_category_vectorizer_file, "wb") as f:
             cloudpickle.dump(self.animal_category_vectorizer, f)
@@ -402,17 +425,28 @@ class AnimalUsecase(AbstractAnimalUsecase):
             if len(animals) == 0:
                 return
             ids = [a.id for a in animals]
-            animal_categories = [a.animal_category_id for a in animals]
-            animal_subcategories = [a.animal_subcategory_id for a in animals]
-            descriptions = [a.description for a in animals]
-            names = [a.name for a in animals]
 
-            vectorized_animal_category = self.animal_category_vectorizer.transform(x=animal_categories).tolist()
-            vectorized_animal_subcategory = self.animal_subcategory_vectorizer.transform(
-                x=animal_subcategories
+            vectorized_animal_category = (
+                self.animal_category_vectorizer.transform(
+                    x=[[a.animal_category_id] for a in animals],
+                )
+                .toarray()
+                .tolist()
+            )
+            vectorized_animal_subcategory = (
+                self.animal_subcategory_vectorizer.transform(
+                    x=[[a.animal_subcategory_id] for a in animals],
+                )
+                .toarray()
+                .tolist()
+            )
+
+            tokenized_description = self.description_tokenizer.transform(
+                X=[a.description for a in animals],
             ).tolist()
-            tokenized_description = self.description_tokenizer.transform(X=descriptions).tolist()
-            tokenized_name = self.name_tokenizer.transform(X=names).tolist()
+            tokenized_name = self.name_tokenizer.transform(
+                X=[a.name for a in animals],
+            ).tolist()
 
             vectorized_description = self.description_vectorizer.transform(X=tokenized_description).toarray().tolist()
             vectorized_name = self.name_vectorizer.transform(X=tokenized_name).toarray().tolist()
@@ -480,4 +514,14 @@ class AnimalUsecase(AbstractAnimalUsecase):
                         self.animal_feature_repository.update(record=AnimalFeatureUpdate(**d))
                 else:
                     self.animal_feature_repository.insert(record=AnimalFeatureCreate(**d))
+                integrated = []
+                integrated.extend(d["animal_category_vector"])
+                integrated.extend(d["animal_subcategory_vector"])
+                integrated.extend(d["description_vector"])
+                integrated.extend(d["name_vector"])
+                self.cache.set(
+                    key=f"{d['id']}_feature",
+                    value=json.dumps(integrated),
+                    expire_second=60 * 60 * 24 * 30,
+                )
             logger.info(f"registered: {i} animal features")
