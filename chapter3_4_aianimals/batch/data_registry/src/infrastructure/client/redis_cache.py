@@ -1,5 +1,5 @@
 import os
-from typing import Optional, Union, List
+from typing import Optional, Union
 
 import redis
 from src.infrastructure.cache import AbstractCache

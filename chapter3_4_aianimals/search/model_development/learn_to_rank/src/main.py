@@ -2,14 +2,16 @@ import os
 from datetime import datetime
 
 import hydra
+import pickle
 import mlflow
 from omegaconf import DictConfig
-from src.dataset.data_manager import DBClient
+from src.dataset.data_manager import DBClient, RedisCache
 from src.jobs.retrieve import retrieve_access_logs
 from src.jobs.train import Trainer
 from src.middleware.logger import configure_logger
 from src.models.models import MODELS
-from src.models.preprocess import Preprocess, random_split, split_by_qid
+from src.jobs.preprocess import Preprocess
+from src.models.preprocess import NumericalMinMaxScaler, CategoricalVectorizer, random_split, split_by_qid
 
 logger = configure_logger(__name__)
 
@@ -31,7 +33,11 @@ def main(cfg: DictConfig):
     mlflow.set_experiment(os.getenv("MLFLOW_EXPERIMENT", "learn_to_rank"))
     with mlflow.start_run(run_name=run_name):
         db_client = DBClient()
-        raw_data = retrieve_access_logs(db_client=db_client)
+        cache = RedisCache()
+        raw_data = retrieve_access_logs(
+            db_client=db_client,
+            cache=cache,
+        )
         if cfg.jobs.data.split_by_qid:
             dataset = split_by_qid(
                 raw_data=raw_data,
@@ -43,21 +49,6 @@ def main(cfg: DictConfig):
                 test_size=0.3,
             )
 
-        data_types = {
-            "query_phrases": "str",
-            "query_animal_category_id": "str",
-            "query_animal_subcategory_id": "str",
-            "likes": "int64",
-            "animal_category_id": "str",
-            "animal_subcategory_id": "str",
-        }
-        for k in raw_data.keys:
-            if k.startswith("name_vector_") or k.startswith("description_vector_"):
-                data_types[k] = "float64"
-        logger.info(f"data types: {data_types}")
-
-        pipeline = Preprocess(data_types=data_types)
-
         _model = MODELS.get_model(name=cfg.jobs.model.name)
         model = _model.model(
             early_stopping_rounds=cfg.jobs.model.params.get("early_stopping_rounds", 5),
@@ -68,15 +59,33 @@ def main(cfg: DictConfig):
             model.reset_model(params=cfg.jobs.model.params)
 
         now = datetime.now().strftime("%Y%m%d_%H%M%S")
-        preprocess_save_file_path = os.path.join(cwd, f"{model.name}_preprocess_{now}")
+        likes_scaler_save_file_path = os.path.join(
+            cwd,
+            f"{model.name}_likes_scaler_{now}",
+        )
+        query_phrase_encoder_save_file_path = os.path.join(
+            cwd,
+            f"{model.name}_query_phrase_encoder_{now}",
+        )
+        query_animal_category_id_encoder_save_file_path = os.path.join(
+            cwd,
+            f"{model.name}_query_animal_category_id_encoder_{now}",
+        )
+        query_animal_subcategory_id_encoder_save_file_path = os.path.join(
+            cwd,
+            f"{model.name}_query_animal_subcategory_id_encoder_{now}",
+        )
         model_save_file_path = os.path.join(cwd, f"{model.name}_{now}")
 
-        trainer = Trainer()
-        artifact = trainer.train(
-            pipeline=pipeline,
-            model=model,
-            preprocess_save_file_path=preprocess_save_file_path,
-            model_save_file_path=model_save_file_path,
+        preprocessed_data, preprocess_artifact = Preprocess().run(
+            likes_scaler=NumericalMinMaxScaler(),
+            query_phrase_encoder=CategoricalVectorizer(),
+            query_animal_category_id_encoder=CategoricalVectorizer(),
+            query_animal_subcategory_id_encoder=CategoricalVectorizer(),
+            likes_scaler_save_file_path=likes_scaler_save_file_path,
+            query_phrase_encoder_save_file_path=query_phrase_encoder_save_file_path,
+            query_animal_category_id_encoder_save_file_path=query_animal_category_id_encoder_save_file_path,
+            query_animal_subcategory_id_encoder_save_file_path=query_animal_subcategory_id_encoder_save_file_path,
             x_train=dataset.x_train,
             y_train=dataset.y_train,
             x_test=dataset.x_test,
@@ -84,8 +93,38 @@ def main(cfg: DictConfig):
             q_train=dataset.q_train,
             q_test=dataset.q_test,
         )
+        mlflow.log_artifact(
+            preprocess_artifact.likes_scaler_save_file_path,
+            "likes_scaler_save_file_path",
+        )
+        mlflow.log_artifact(
+            preprocess_artifact.query_phrase_encoder_save_file_path,
+            "query_phrase_encoder_save_file_path",
+        )
+        mlflow.log_artifact(
+            preprocess_artifact.query_animal_category_id_encoder_save_file_path,
+            "query_animal_category_id_encoder_save_file_path",
+        )
+        mlflow.log_artifact(
+            preprocess_artifact.query_animal_subcategory_id_encoder_save_file_path,
+            "query_animal_subcategory_id_encoder_save_file_path",
+        )
+        preprocessed_data_file = os.path.join(cwd, f"preprocessed_data_{now}.pickle")
+        with open(preprocessed_data_file, "wb") as f:
+            pickle.dump(preprocessed_data, f)
 
-        mlflow.log_artifact(artifact.preprocess_file_path, "preprocess")
+        trainer = Trainer()
+        artifact = trainer.train(
+            model=model,
+            model_save_file_path=model_save_file_path,
+            x_train=preprocessed_data.x_train,
+            y_train=preprocessed_data.y_train,
+            x_test=preprocessed_data.x_test,
+            y_test=preprocessed_data.y_test,
+            q_train=preprocessed_data.q_train,
+            q_test=preprocessed_data.q_test,
+        )
+
         mlflow.log_artifact(artifact.model_file_path, "model")
         if cfg.jobs.model.get("save_onnx", False):
             mlflow.log_artifact(artifact.onnx_file_path, "onnx")

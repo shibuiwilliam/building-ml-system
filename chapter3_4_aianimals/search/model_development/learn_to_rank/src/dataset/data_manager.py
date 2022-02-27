@@ -1,7 +1,9 @@
 import os
 from abc import ABC, abstractmethod
 from datetime import date
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
+import redis
+import json
 
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -20,6 +22,18 @@ class AbstractDBClient(ABC):
         raise NotImplementedError
 
 
+class AbstractCache(ABC):
+    def __init__(self):
+        pass
+
+    @abstractmethod
+    def get(
+        self,
+        key: str,
+    ) -> Optional[Union[str, int, float, bool, bytes]]:
+        raise NotImplementedError
+
+
 class DBClient(AbstractDBClient):
     def __init__(self):
         self.__postgres_user = os.environ["POSTGRES_USER"]
@@ -31,6 +45,53 @@ class DBClient(AbstractDBClient):
 
     def get_connection(self):
         return psycopg2.connect(self.__connection_string)
+
+
+class RedisCache(AbstractCache):
+    def __init__(self):
+        super().__init__()
+        self.__redis_host = os.environ["REDIS_HOST"]
+        self.__redis_port = os.getenv("REDIS_PORT", 6379)
+        self.__redis_db = int(os.getenv("REDIS_DB", 0))
+
+        self.redis_client = redis.Redis(
+            host=self.__redis_host,
+            port=self.__redis_port,
+            db=self.__redis_db,
+            decode_responses=True,
+        )
+
+    def get(
+        self,
+        key: str,
+    ) -> Optional[Union[str, int, float, bool, bytes]]:
+        value = self.redis_client.get(key)
+        return value
+
+
+class FeatureCacheRepository(object):
+    def __init__(
+        self,
+        cache: AbstractCache,
+    ):
+        self.cache = cache
+
+    def get_features_by_keys(
+        self,
+        keys: List[str],
+    ) -> Dict[str, List[float]]:
+        logger.info(f"keys to get from cache: {len(keys)}")
+        features = {}
+        i = 1000
+        for key in keys:
+            feature = self.cache.get(key=key)
+            if feature is not None:
+                features[key] = json.loads(str(feature))
+                i -= 1
+                if i == 0:
+                    logger.info(f"retrieved {len(features)} from cache")
+                    i = 1000
+        return features
 
 
 class BaseRepository(object):
@@ -61,7 +122,6 @@ class AccessLogRepository(BaseRepository):
         super().__init__(db_client=db_client)
         self.access_log_table = TABLES.ACCESS_LOG.value
         self.animal_table = TABLES.ANIMAL.value
-        self.animal_feature_table = TABLES.ANIMAL_FEATURE.value
 
     def select(
         self,
@@ -76,24 +136,15 @@ SELECT
     {self.access_log_table}.phrases AS query_phrases,
     {self.access_log_table}.animal_category_id AS query_animal_category_id,
     {self.access_log_table}.animal_subcategory_id AS query_animal_subcategory_id,
-    {self.access_log_table}.user_id AS user_id,
     {self.access_log_table}.likes AS likes,
     {self.access_log_table}.action AS action,
-    {self.access_log_table}.animal_id AS animal_id,
-    {self.animal_table}.animal_category_id AS animal_category_id,
-    {self.animal_table}.animal_subcategory_id AS animal_subcategory_id,
-    {self.animal_feature_table}.name_vector AS name_vector,
-    {self.animal_feature_table}.description_vector AS description_vector
+    {self.access_log_table}.animal_id AS animal_id
 FROM 
     {self.access_log_table}
 LEFT JOIN
     {self.animal_table}
 ON
     {self.access_log_table}.animal_id = {self.animal_table}.id
-LEFT JOIN
-    {self.animal_feature_table}
-ON
-    {self.access_log_table}.animal_id = {self.animal_feature_table}.id
 WHERE
     {self.animal_table}.deactivated = false
         """

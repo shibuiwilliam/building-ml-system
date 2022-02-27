@@ -1,10 +1,7 @@
-from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from typing import Dict, List, Optional, Union
 
-import numpy as np
-import pandas as pd
 from pydantic import BaseModel, Extra
 
 
@@ -71,38 +68,37 @@ class AnimalFeature(BaseModel):
     updated_at: datetime
 
 
-class AccessLogBase(BaseModel):
+class AccessLog(BaseModel):
     id: str
     query_phrases: List[str]
     query_animal_category_id: Optional[int] = None
     query_animal_subcategory_id: Optional[int] = None
-    user_id: str
     likes: int
     action: str
     animal_id: str
-
-
-class AccessLog(AccessLogBase):
-    animal_category_id: int
-    animal_subcategory_id: int
-    name_vector: Union[Dict, List]
-    description_vector: Union[Dict, List]
 
     class Config:
         extra = Extra.forbid
 
 
+class Data(BaseModel):
+    animal_id: str
+    query_phrases: str
+    query_animal_category_id: Optional[int] = None
+    query_animal_subcategory_id: Optional[int] = None
+    likes: int
+    feature_vector: List[float]
+
+
 class RawData(BaseModel):
-    data: List[Dict]
-    target: List[List[int]]
-    keys: List[str]
+    data: List[Data]
+    target: List[int]
 
 
-@dataclass
-class SplitData(object):
-    x_train: pd.DataFrame
-    x_test: pd.DataFrame
-    y_train: np.ndarray
-    y_test: np.ndarray
+class SplitData(BaseModel):
+    x_train: List[Data]
+    x_test: List[Data]
+    y_train: List[int]
+    y_test: List[int]
     q_train: Optional[List[int]]
     q_test: Optional[List[int]]
