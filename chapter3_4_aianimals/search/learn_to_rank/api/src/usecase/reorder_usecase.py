@@ -94,7 +94,8 @@ class ReorderUsecase(AbstractReorderUsecase):
         if cached_data is not None:
             return AnimalResponse(ids=cached_data.split(","))
         _likes = self.like_repository.select_all(like_query=LikeQuery(animal_ids=request.ids))
-        likes = [[l.likes] for l in _likes]
+        logger.info(f"likes: {_likes}")
+        likes = [[_likes.get(id, 0)] for id in request.ids]
 
         feature_cache_keys = [f"{id}_feature" for id in request.ids]
         features = self.feature_cache_repository.get_features_by_keys(keys=feature_cache_keys)
@@ -116,14 +117,14 @@ class ReorderUsecase(AbstractReorderUsecase):
         inputs = [
             [
                 *l,
-                transformed_query_phrase[0][0],
-                transformed_query_animal_category_id[0][0],
-                transformed_query_animal_subcategory_id[0][0],
+                *transformed_query_phrase[0],
+                *transformed_query_animal_category_id[0],
+                *transformed_query_animal_subcategory_id[0],
                 *f,
             ]
             for l, f in zip(
                 transformed_likes,
-                features,
+                features.values(),
             )
         ]
         prediction = self.learn_to_rank_predict_service.predict(

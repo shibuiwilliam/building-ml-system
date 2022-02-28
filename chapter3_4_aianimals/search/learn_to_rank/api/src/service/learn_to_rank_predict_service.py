@@ -145,19 +145,23 @@ class LearnToRankPredictService(AbstractLearnToRankPredictService):
         self,
         query_animal_category_id: List[List[Optional[int]]],
     ) -> List[List[float]]:
-        return self.preprocess_query_animal_category_id_encoder.transform(query_animal_category_id).tolist()
+        return self.preprocess_query_animal_category_id_encoder.transform(query_animal_category_id).toarray().tolist()
 
     def transform_query_animal_subcategory_id_encoder(
         self,
         query_animal_subcategory_id: List[List[Optional[int]]],
     ) -> List[List[float]]:
-        return self.preprocess_query_animal_subcategory_id_encoder.transform(query_animal_subcategory_id).tolist()
+        return (
+            self.preprocess_query_animal_subcategory_id_encoder.transform(query_animal_subcategory_id)
+            .toarray()
+            .tolist()
+        )
 
     def transform_query_phrase_encoder(
         self,
         query_phrase: List[List[str]],
     ) -> List[List[float]]:
-        return self.preprocess_query_phrase_encoder.transform(query_phrase).tolist()
+        return self.preprocess_query_phrase_encoder.transform(query_phrase).toarray().tolist()
 
     def _predict_sklearn(
         self,

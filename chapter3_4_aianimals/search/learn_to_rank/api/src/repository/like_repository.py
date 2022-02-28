@@ -1,5 +1,5 @@
 from logging import getLogger
-from typing import List
+from typing import List, Dict
 
 from pydantic import BaseModel, Extra
 from src.infrastructure.db_client import AbstractDBClient
@@ -10,14 +10,6 @@ logger = getLogger(__name__)
 
 class LikeQuery(BaseModel):
     animal_ids: List[str]
-
-    class Config:
-        extra = Extra.forbid
-
-
-class Like(BaseModel):
-    animal_id: str
-    likes: int = 0
 
     class Config:
         extra = Extra.forbid
@@ -36,7 +28,9 @@ class LikeRepository(BaseRepository):
         like_query: LikeQuery,
         limit: int = 200,
         offset: int = 0,
-    ) -> List[Like]:
+    ) -> Dict[str, int]:
+        parameters = like_query.animal_ids
+        ids = ",".join(["%s" for _ in like_query.animal_ids])
         query = f"""
             SELECT
                 {self.like_table}.animal_id as animal_id,
@@ -44,7 +38,7 @@ class LikeRepository(BaseRepository):
             FROM
                 {self.like_table}
             WHERE
-                {self.like_table}.animal_id IN ({like_query.animal_ids})
+                {self.like_table}.animal_id IN ({ids})
             GROUP BY
                 {self.like_table}.animal_id
             LIMIT
@@ -54,28 +48,33 @@ class LikeRepository(BaseRepository):
             ;
         """
 
-        records = self.execute_select_query(query=query)
-        data = [Like(**r) for r in records]
+        records = self.execute_select_query(
+            query=query,
+            parameters=tuple(parameters),
+        )
+        data = {r["animal_id"]: int(r["likes"]) for r in records}
         return data
 
     def select_all(
         self,
         like_query: LikeQuery,
-    ) -> List[Like]:
+    ) -> Dict[str, int]:
         limit = 200
         offset = 0
-        records = []
+        records = {}
         while True:
-            r = self.select(
+            data = self.select(
                 like_query=like_query,
                 limit=limit,
                 offset=offset,
             )
-            if len(r) == len(like_query.ids):
-                records.extend(r)
+            if len(data) == len(like_query.animal_ids):
+                for k, v in data.items():
+                    records[k] = v
                 break
-            if len(r) > 0:
-                records.extend(r)
+            if len(data) > 0:
+                for k, v in data.items():
+                    records[k] = v
             else:
                 break
             offset += limit
