@@ -107,10 +107,10 @@ q_test: {sum(q_test) if q_test is not None else None}
         logger.info(
             f"""
 data after preprocess
-x_train: {_x_train.shape}
-y_train: {y_train.shape}
-x_test: {_x_test.shape}
-y_test: {y_test.shape}
+x_train: {len(_x_train)}
+y_train: {len(y_train)}
+x_test: {len(_x_test)}
+y_test: {len(y_test)}
 q_train: {sum(q_train) if q_train is not None else None}
 q_test: {sum(q_test) if q_test is not None else None}
         """
