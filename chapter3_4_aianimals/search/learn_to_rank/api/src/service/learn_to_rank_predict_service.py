@@ -5,7 +5,6 @@ from typing import List, Optional, Tuple
 import cloudpickle
 import numpy as np
 import onnxruntime
-import pandas as pd
 
 logger = getLogger(__name__)
 
@@ -15,23 +14,45 @@ class AbstractLearnToRankPredictService(ABC):
         pass
 
     @abstractmethod
-    def _preprocess(
-        self,
-        input: pd.DataFrame,
-    ) -> np.ndarray:
+    def _load_preprocess(self):
         raise NotImplementedError
 
     @abstractmethod
-    def _predict(
+    def _load_predictor(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def transform_likes_scaler(
         self,
-        input: pd.DataFrame,
-    ) -> List[float]:
+        likes: List[List[int]],
+    ) -> List[List[float]]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def transform_query_animal_category_id_encoder(
+        self,
+        query_animal_category_id: List[List[Optional[int]]],
+    ) -> List[List[float]]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def transform_query_animal_subcategory_id_encoder(
+        self,
+        query_animal_subcategory_id: List[List[Optional[int]]],
+    ) -> List[List[float]]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def transform_query_phrase_encoder(
+        self,
+        query_phrase: List[List[str]],
+    ) -> List[List[float]]:
         raise NotImplementedError
 
     @abstractmethod
     def _postprocess(
         self,
-        input: pd.DataFrame,
+        ids: List[str],
         prediction: List[float],
     ) -> List[Tuple[str, float]]:
         raise NotImplementedError
@@ -39,7 +60,8 @@ class AbstractLearnToRankPredictService(ABC):
     @abstractmethod
     def predict(
         self,
-        input: pd.DataFrame,
+        ids: List[str],
+        input: np.ndarray,
     ) -> List[Tuple[str, float]]:
         raise NotImplementedError
 
@@ -47,32 +69,58 @@ class AbstractLearnToRankPredictService(ABC):
 class LearnToRankPredictService(AbstractLearnToRankPredictService):
     def __init__(
         self,
-        preprocess_file_path: str,
+        preprocess_likes_scaler_file_path: str,
+        preprocess_query_animal_category_id_encoder_file_path: str,
+        preprocess_query_animal_subcategory_id_encoder_file_path: str,
+        preprocess_query_phrase_encoder_file_path: str,
         predictor_file_path: str,
         predictor_batch_size: Optional[int] = None,
         predictor_input_name: Optional[str] = None,
         predictor_output_name: Optional[str] = None,
     ):
         super().__init__()
-        self.preprocess_file_path = preprocess_file_path
+        self.preprocess_likes_scaler_file_path = preprocess_likes_scaler_file_path
+        self.preprocess_query_animal_category_id_encoder_file_path = (
+            preprocess_query_animal_category_id_encoder_file_path
+        )
+        self.preprocess_query_animal_subcategory_id_encoder_file_path = (
+            preprocess_query_animal_subcategory_id_encoder_file_path
+        )
+        self.preprocess_query_phrase_encoder_file_path = preprocess_query_phrase_encoder_file_path
         self.predictor_file_path = predictor_file_path
+
         self.is_onnx_predictor = False
         self.predictor_batch_size = predictor_batch_size
         self.predictor_input_name = predictor_input_name
         self.predictor_output_name = predictor_output_name
 
-        self.__load_preprocess()
-        self.__load_predictor()
+        self._load_preprocess()
+        self._load_predictor()
 
-    def __load_preprocess(self):
-        with open(self.preprocess_file_path, "rb") as f:
-            self.preprocess = cloudpickle.load(f)
-        logger.info(f"loaded: {self.preprocess_file_path}")
+    def __load_cloud_pickle(
+        self,
+        file_path: str,
+    ):
+        with open(file_path, "rb") as f:
+            p = cloudpickle.load(f)
+        logger.info(f"loaded: {file_path}")
+        return p
 
-    def __load_predictor(self):
+    def _load_preprocess(self):
+        self.preprocess_likes_scaler = self.__load_cloud_pickle(file_path=self.preprocess_likes_scaler_file_path)
+        self.preprocess_query_animal_category_id_encoder = self.__load_cloud_pickle(
+            file_path=self.preprocess_query_animal_category_id_encoder_file_path
+        )
+        self.preprocess_query_animal_subcategory_id_encoder = self.__load_cloud_pickle(
+            file_path=self.preprocess_query_animal_subcategory_id_encoder_file_path
+        )
+        self.preprocess_query_phrase_encoder = self.__load_cloud_pickle(
+            file_path=self.preprocess_query_phrase_encoder_file_path
+        )
+
+    def _load_predictor(self):
         if self.predictor_file_path.endswith(".pkl"):
-            with open(self.predictor_file_path, "rb") as f:
-                self.predictor = cloudpickle.load(f)
+            self.predictor = self.__load_cloud_pickle(file_path=self.predictor_file_path)
             self.is_onnx_predictor = False
         elif self.predictor_file_path.endswith(".onnx"):
             self.predictor = onnxruntime.InferenceSession(self.predictor_file_path)
@@ -87,11 +135,29 @@ class LearnToRankPredictService(AbstractLearnToRankPredictService):
             raise ValueError
         logger.info(f"loaded: {self.predictor_file_path}")
 
-    def _preprocess(
+    def transform_likes_scaler(
         self,
-        input: pd.DataFrame,
-    ) -> np.ndarray:
-        return self.preprocess.transform(input)
+        likes: List[List[int]],
+    ) -> List[List[float]]:
+        return self.preprocess_likes_scaler.transform(likes).tolist()
+
+    def transform_query_animal_category_id_encoder(
+        self,
+        query_animal_category_id: List[List[Optional[int]]],
+    ) -> List[List[float]]:
+        return self.preprocess_query_animal_category_id_encoder.transform(query_animal_category_id).tolist()
+
+    def transform_query_animal_subcategory_id_encoder(
+        self,
+        query_animal_subcategory_id: List[List[Optional[int]]],
+    ) -> List[List[float]]:
+        return self.preprocess_query_animal_subcategory_id_encoder.transform(query_animal_subcategory_id).tolist()
+
+    def transform_query_phrase_encoder(
+        self,
+        query_phrase: List[List[str]],
+    ) -> List[List[float]]:
+        return self.preprocess_query_phrase_encoder.transform(query_phrase).tolist()
 
     def _predict_sklearn(
         self,
@@ -129,19 +195,22 @@ class LearnToRankPredictService(AbstractLearnToRankPredictService):
 
     def _postprocess(
         self,
-        input: pd.DataFrame,
+        ids: List[str],
         prediction: List[float],
     ) -> List[Tuple[str, float]]:
-        id_prediction = {id: prob for id, prob in zip(input.animal_id, prediction)}
+        id_prediction = {id: prob for id, prob in zip(ids, prediction)}
         sort_orders = sorted(id_prediction.items(), key=lambda x: x[1], reverse=True)
         return sort_orders
 
     def predict(
         self,
-        input: pd.DataFrame,
+        ids: List[str],
+        input: np.ndarray,
     ) -> List[Tuple[str, float]]:
-        preprocessed_input = self._preprocess(input=input)
-        prediction = self._predict(input=preprocessed_input)
-        id_prediction = self._postprocess(input=input, prediction=prediction)
+        prediction = self._predict(input=input)
+        id_prediction = self._postprocess(
+            ids=ids,
+            prediction=prediction,
+        )
         logger.info(f"sorted prediction: {id_prediction}")
         return id_prediction

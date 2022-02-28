@@ -8,6 +8,7 @@ from src.configurations import Configurations
 from src.entities.animal import AnimalCreate, AnimalQuery
 from src.entities.animal_feature import AnimalFeatureCreate, AnimalFeatureQuery, AnimalFeatureUpdate
 from src.entities.animal_search import ANIMAL_MAPPING, ANIMAL_MAPPING_NAME, AnimalDocument
+from src.infrastructure.cache import AbstractCache
 from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging
 from src.infrastructure.search import AbstractSearch
 from src.middleware.logger import configure_logger
@@ -16,7 +17,6 @@ from src.repository.animal_repository import AbstractAnimalRepository
 from src.repository.like_repository import AbstractLikeRepository
 from src.request_object.animal import AnimalCreateRequest, AnimalRequest
 from src.response_object.animal import AnimalResponse, AnimalResponseWithLike
-from src.infrastructure.cache import AbstractCache
 from src.service.feature_processing import (
     CategoricalVectorizer,
     DescriptionTokenizer,

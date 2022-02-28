@@ -1,7 +1,9 @@
 from src.configurations import Configurations
+from src.infrastructure.cache import AbstractCache
 from src.infrastructure.client.elastic_search import Elasticsearch
 from src.infrastructure.client.postgresql_database import PostgreSQLDatabase
 from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging
+from src.infrastructure.client.redis_cache import RedisCache
 from src.infrastructure.database import AbstractDatabase
 from src.infrastructure.search import AbstractSearch
 from src.job.animal_feature_registration_job import AnimalFeatureRegistrationJob
@@ -22,11 +24,11 @@ from src.repository.user_repository import AbstractUserRepository, UserRepositor
 from src.repository.violation_repository import AbstractViolationRepository, ViolationRepository
 from src.repository.violation_type_repository import AbstractViolationTypeRepository, ViolationTypeRepository
 from src.service.feature_processing import (
+    CategoricalVectorizer,
     DescriptionTokenizer,
     DescriptionVectorizer,
     NameTokenizer,
     NameVectorizer,
-    CategoricalVectorizer,
 )
 from src.usecase.access_log_usecase import AbstractAccessLogUsecase, AccessLogUsecase
 from src.usecase.animal_category_usecase import AbstractAnimalCategoryUsecase, AnimalCategoryUsecase
@@ -37,8 +39,6 @@ from src.usecase.table_usecase import AbstractTableUsecase, TableUsecase
 from src.usecase.user_usecase import AbstractUserUsecase, UserUsecase
 from src.usecase.violation_type_usecase import AbstractViolationTypeUsecase, ViolationTypeUsecase
 from src.usecase.violation_usecase import AbstractViolationUsecase, ViolationUsecase
-from src.infrastructure.cache import AbstractCache
-from src.infrastructure.client.redis_cache import RedisCache
 
 logger = configure_logger(__name__)
 

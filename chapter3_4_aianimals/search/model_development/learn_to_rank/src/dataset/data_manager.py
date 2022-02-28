@@ -1,11 +1,11 @@
+import json
 import os
 from abc import ABC, abstractmethod
 from datetime import date
 from typing import Any, Dict, List, Optional, Tuple, Union
-import redis
-import json
 
 import psycopg2
+import redis
 from psycopg2.extras import DictCursor
 from src.dataset.schema import TABLES, AccessLog
 from src.middleware.logger import configure_logger

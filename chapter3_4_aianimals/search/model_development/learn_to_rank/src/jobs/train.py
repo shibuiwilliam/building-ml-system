@@ -1,4 +1,5 @@
 from typing import List, Optional
+
 import numpy as np
 from pydantic import BaseModel
 from src.middleware.logger import configure_logger

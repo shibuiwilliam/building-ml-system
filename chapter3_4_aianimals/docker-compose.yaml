@@ -210,7 +210,7 @@ services:
       - DATA_DIRECTORY=/opt/dataset
       - SAVE_DIRECTORY=/opt/model
     command: >
-      /bin/sh -c "sleep 10s && python -m src.main --job animal_feature_registration_job"
+      /bin/sh -c "sleep 120s && python -m src.main --job animal_feature_registration_job"
     depends_on:
       - postgres
       - api

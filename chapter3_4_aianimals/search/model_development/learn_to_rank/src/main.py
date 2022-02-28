@@ -1,17 +1,17 @@
 import os
+import pickle
 from datetime import datetime
 
 import hydra
-import pickle
 import mlflow
 from omegaconf import DictConfig
 from src.dataset.data_manager import DBClient, RedisCache
+from src.jobs.preprocess import Preprocess
 from src.jobs.retrieve import retrieve_access_logs
 from src.jobs.train import Trainer
 from src.middleware.logger import configure_logger
 from src.models.models import MODELS
-from src.jobs.preprocess import Preprocess
-from src.models.preprocess import NumericalMinMaxScaler, CategoricalVectorizer, random_split, split_by_qid
+from src.models.preprocess import CategoricalVectorizer, NumericalMinMaxScaler, random_split, split_by_qid
 
 logger = configure_logger(__name__)
 
@@ -109,9 +109,13 @@ def main(cfg: DictConfig):
             preprocess_artifact.query_animal_subcategory_id_encoder_save_file_path,
             "query_animal_subcategory_id_encoder_save_file_path",
         )
-        preprocessed_data_file = os.path.join(cwd, f"preprocessed_data_{now}.pickle")
+        preprocessed_data_file = os.path.join(cwd, f"{model.name}_preprocessed_data_{now}.pickle")
         with open(preprocessed_data_file, "wb") as f:
             pickle.dump(preprocessed_data, f)
+        mlflow.log_artifact(
+            preprocessed_data_file,
+            f"{model.name}_preprocessed_data_file",
+        )
 
         trainer = Trainer()
         artifact = trainer.train(

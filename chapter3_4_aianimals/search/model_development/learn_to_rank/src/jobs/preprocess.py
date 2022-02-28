@@ -1,8 +1,9 @@
 from typing import List, Optional, Tuple
+
 from pydantic import BaseModel
-from src.middleware.logger import configure_logger
 from src.dataset.schema import Data
-from src.models.preprocess import NumericalMinMaxScaler, CategoricalVectorizer
+from src.middleware.logger import configure_logger
+from src.models.preprocess import CategoricalVectorizer, NumericalMinMaxScaler
 
 logger = configure_logger(name=__name__)
 

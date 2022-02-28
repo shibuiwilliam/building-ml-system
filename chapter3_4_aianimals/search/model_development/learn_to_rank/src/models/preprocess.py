@@ -1,6 +1,6 @@
+import os
 import random
 import sys
-import os
 from typing import Dict, List, Optional, Tuple, Union
 
 import cloudpickle
