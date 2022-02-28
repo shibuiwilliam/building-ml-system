@@ -216,34 +216,37 @@ services:
       - api
       - es
 
-  # search_learn_to_rank_lgbm_ranker_api:
-  #   container_name: search_learn_to_rank_lgbm_ranker_api
-  #   image: shibui/building-ml-system:ai_animals_search_learn_to_rank_lgbm_api_0.0.0
-  #   restart: always
-  #   networks:
-  #     - default
-  #   ports:
-  #     - 9000:9000
-  #   environment:
-  #     - POSTGRES_HOST=postgres
-  #     - POSTGRES_PORT=5432
-  #     - POSTGRES_USER=postgres
-  #     - POSTGRES_PASSWORD=password
-  #     - POSTGRES_DB=aianimals
-  #     - REDIS_HOST=redis
-  #     - REDIS_PORT=6379
-  #     - REDIS_DB=0
-  #     - LOG_LEVEL=INFO
-  #     - RUN_ENVIRONMENT=local
-  #     - WORKERS=1
-  #     - PORT=9000
-  #     - PREPROCESS_FILE_PATH=/opt/model/learn_to_rank_ranker_preprocess.pkl
-  #     - PREDICTOR_FILE_PATH=/opt/model/learn_to_rank_ranker.pkl
-  #   command: ./run.sh
-  #   hostname: api
-  #   depends_on:
-  #     - postgres
-  #     - redis
+  search_learn_to_rank_lgbm_ranker_api:
+    container_name: search_learn_to_rank_lgbm_ranker_api
+    image: shibui/building-ml-system:ai_animals_search_learn_to_rank_lgbm_api_0.0.0
+    restart: always
+    networks:
+      - default
+    ports:
+      - 9000:9000
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=aianimals
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - LOG_LEVEL=INFO
+      - RUN_ENVIRONMENT=local
+      - WORKERS=1
+      - PORT=9000
+      - PREPROCESS_LIKES_SCALER_FILE_PATH=/opt/model/learn_to_rank_ranker_likes_scaler.pkl
+      - PREPROCESS_QUERY_ANIMAL_CATEGORY_ID_ENCODER_FILE_PATH=/opt/model/learn_to_rank_ranker_query_animal_category_id_encoder.pkl
+      - PREPROCESS_QUERY_ANIMAL_SUBCATEGORY_ID_ENCODER_FILE_PATH=/opt/model/learn_to_rank_ranker_query_animal_subcategory_id_encoder.pkl
+      - PREPROCESS_QUERY_PHRASE_ENCODER_FILE_PATH=/opt/model/learn_to_rank_ranker_query_phrase_encoder.pkl
+      - PREDICTOR_FILE_PATH=/opt/model/learn_to_rank_ranker.pkl
+    command: ./run.sh
+    hostname: api
+    depends_on:
+      - postgres
+      - redis
 
   # no_animal_violation:
   #   container_name: no_animal_violation
