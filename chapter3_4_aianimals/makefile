@@ -9,6 +9,23 @@ DIR := $(ABSOLUTE_PATH)
 K8S_DIR := $(ABSOLUTE_PATH)/infrastructure
 K8S_SECRET_DIR := $(K8S_DIR)/secrets
 
+############ Data COMMANDS ############
+DATA_MANIFEST_DIR := $(K8S_DIR)/manifests/data
+
+.PHONY: deploy_data_ns
+deploy_data_ns:
+	kubectl apply -f $(DATA_MANIFEST_DIR)/namespace.yaml 
+
+.PHONY: registry_data
+registry_data: deploy_data_ns
+	@cd $(K8S_SECRET_DIR) && \
+		NAMESPACE=data ./private_registry_secret.sh
+
+.PHONY: deploy_data
+deploy_data: deploy_data_ns
+	kubectl apply -f $(DATA_MANIFEST_DIR)/postgres.yaml && \
+	kubectl apply -f $(DATA_MANIFEST_DIR)/redis.yaml && \
+	kubectl apply -f $(DATA_MANIFEST_DIR)/rabbitmq.yaml
 
 ############ MLflow COMMANDS ############
 MLFLOW_DIR := $(DIR)/mlflow
@@ -126,7 +143,6 @@ registry_api: deploy_api_ns
 
 .PHONY: deploy_api
 deploy_api: deploy_api_ns
-	kubectl apply -f $(API_MANIFEST_DIR)/postgres.yaml && \
 	kubectl apply -f $(API_MANIFEST_DIR)/api.yaml
 
 
@@ -204,6 +220,7 @@ DOCKER_ES_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_ES_TAG)_$(ES_VERSION)
 .PHONY: build_es
 build_es: 
 	docker build \
+		--platform x86_64 \
 		-t $(DOCKER_ES_IMAGE_NAME) \
 		-f $(DOCKERFILE_ES) \
 		.

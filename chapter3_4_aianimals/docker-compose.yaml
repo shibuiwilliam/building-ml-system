@@ -248,52 +248,52 @@ services:
       - postgres
       - redis
 
-  # no_animal_violation:
-  #   container_name: no_animal_violation
-  #   image: shibui/building-ml-system:ai_animals_violation_detection_no_animal_violation_proxy_0.0.0
-  #   restart: always
-  #   networks:
-  #     - default
-  #   environment:
-  #     - POSTGRES_HOST=postgres
-  #     - POSTGRES_PORT=5432
-  #     - POSTGRES_USER=postgres
-  #     - POSTGRES_PASSWORD=password
-  #     - POSTGRES_DB=aianimals
-  #     - RABBITMQ_HOST=rabbitmq
-  #     - RABBITMQ_USER=user
-  #     - RABBITMQ_PASSWORD=password
-  #     - CONSUMING_QUEUE=no_animal_violation
-  #     - REGISTRATION_QUEUE=violation
-  #   command: >
-  #     /bin/sh -c "sleep 60s && python -m src.main"
-  #   depends_on:
-  #     - postgres
-  #     - rabbitmq
-  #     - initial_data_registry
+  no_animal_violation:
+    container_name: no_animal_violation
+    image: shibui/building-ml-system:ai_animals_violation_detection_no_animal_violation_proxy_0.0.0
+    restart: always
+    networks:
+      - default
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=aianimals
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=user
+      - RABBITMQ_PASSWORD=password
+      - CONSUMING_QUEUE=no_animal_violation
+      - REGISTRATION_QUEUE=violation
+    command: >
+      /bin/sh -c "sleep 60s && python -m src.main"
+    depends_on:
+      - postgres
+      - rabbitmq
+      - initial_data_registry
 
-  # violation_registry:
-  #   container_name: violation_registry
-  #   image: shibui/building-ml-system:ai_animals_violation_detection_registry_0.0.0
-  #   restart: always
-  #   networks:
-  #     - default
-  #   environment:
-  #     - POSTGRES_HOST=postgres
-  #     - POSTGRES_PORT=5432
-  #     - POSTGRES_USER=postgres
-  #     - POSTGRES_PASSWORD=password
-  #     - POSTGRES_DB=aianimals
-  #     - RABBITMQ_HOST=rabbitmq
-  #     - RABBITMQ_USER=user
-  #     - RABBITMQ_PASSWORD=password
-  #     - VIOLATION_QUEUE=violation
-  #   command: >
-  #     /bin/sh -c "sleep 20s && python -m src.main"
-  #   depends_on:
-  #     - postgres
-  #     - rabbitmq
-  #     - initial_data_registry
+  violation_registry:
+    container_name: violation_registry
+    image: shibui/building-ml-system:ai_animals_violation_detection_registry_0.0.0
+    restart: always
+    networks:
+      - default
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=aianimals
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=user
+      - RABBITMQ_PASSWORD=password
+      - VIOLATION_QUEUE=violation
+    command: >
+      /bin/sh -c "sleep 20s && python -m src.main"
+    depends_on:
+      - postgres
+      - rabbitmq
+      - initial_data_registry
 
   mlflow:
     container_name: mlflow

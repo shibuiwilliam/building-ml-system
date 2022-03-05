@@ -9,12 +9,27 @@ metadata:
   name: elastic-search
   namespace: elastic-search
 spec:
-  version: 7.16.0
+  version: 8.0.1
   nodeSets:
     - name: default
       count: 1
       config:
         node.store.allow_mmap: false
+      podTemplate:
+        spec:
+          containers:
+          - name: elasticsearch
+            image: shibui/building-ml-system:ai_animals_elasticsearch_0.0.0
+            imagePullPolicy: Always
+            resources:
+              requests:
+                cpu: 2000m
+                memory: 4000Mi
+            env:
+            - name: ES_JAVA_OPTS
+              value: "-Xms2g -Xmx2g"
+          imagePullSecrets:
+          - name: regcred
 ---
 apiVersion: kibana.k8s.elastic.co/v1
 kind: Kibana
@@ -22,7 +37,7 @@ metadata:
   name: kibana
   namespace: elastic-search
 spec:
-  version: 7.16.0
+  version: 8.0.1
   count: 1
   elasticsearchRef:
     name: elastic-search

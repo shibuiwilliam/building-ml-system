@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres
-  namespace: aianimals
+  namespace: data
   labels:
     app: postgres
 spec:
@@ -13,7 +13,7 @@ spec:
   template:
     metadata:
       name: postgres
-      namespace: aianimals
+      namespace: data
       labels:
         app: postgres
     spec:
@@ -34,15 +34,15 @@ spec:
               value: --encoding=UTF-8
           resources:
             requests:
-              cpu: 500m
-              memory: "1000Mi"
+              cpu: "2000m"
+              memory: "4000Mi"
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: postgres
-  namespace: aianimals
+  namespace: data
   labels:
     app: postgres
 spec:

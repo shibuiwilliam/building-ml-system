@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mlflow
+  namespace: data
+  labels:
+    app: mlflow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mlflow
+  template:
+    metadata:
+      name: mlflow
+      namespace: data
+      labels:
+        app: mlflow
+    spec:
+      containers:
+        - name: mlflow
+          image: shibui/building-ml-system:ai_animals_mlflow_0.0.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+          env:
+            - name: mlflow_USER
+              value: mlflow
+            - name: mlflow_PASSWORD
+              value: password
+            - name: mlflow_DB
+              value: aianimals
+            - name: mlflow_INITDB_ARGS
+              value: --encoding=UTF-8
+          resources:
+            requests:
+              cpu: "2000m"
+              memory: "4000Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mlflow
+  namespace: data
+  labels:
+    app: mlflow
+spec:
+  ports:
+    - port: 5000
+  selector:
+    app: mlflow
