@@ -21,21 +21,23 @@ spec:
         - name: mlflow
           image: shibui/building-ml-system:ai_animals_mlflow_0.0.0
           imagePullPolicy: Always
+          command:
+            - "mlflow"
+            - "server"
+            - "--backend-store-uri"
+            - "/opt/outputs"
+            - "--default-artifact-root"
+            - "/opt/outputs"
+            - "--host"
+            - "0.0.0.0"
           ports:
             - containerPort: 5000
-          env:
-            - name: mlflow_USER
-              value: mlflow
-            - name: mlflow_PASSWORD
-              value: password
-            - name: mlflow_DB
-              value: aianimals
-            - name: mlflow_INITDB_ARGS
-              value: --encoding=UTF-8
           resources:
             requests:
-              cpu: "2000m"
-              memory: "4000Mi"
+              cpu: "500m"
+              memory: "500Mi"
+      imagePullSecrets:
+        - name: regcred
 
 ---
 apiVersion: v1

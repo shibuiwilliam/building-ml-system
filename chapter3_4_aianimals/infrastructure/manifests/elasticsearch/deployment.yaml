@@ -27,7 +27,7 @@ spec:
                 memory: 4000Mi
             env:
             - name: ES_JAVA_OPTS
-              value: "-Xms2g -Xmx2g"
+              value: "-Xms3g -Xmx3g"
           imagePullSecrets:
           - name: regcred
 ---

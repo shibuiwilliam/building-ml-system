@@ -27,9 +27,11 @@ deploy_data: deploy_data_ns
 	kubectl apply -f $(DATA_MANIFEST_DIR)/redis.yaml && \
 	kubectl apply -f $(DATA_MANIFEST_DIR)/rabbitmq.yaml
 
+
 ############ MLflow COMMANDS ############
 MLFLOW_DIR := $(DIR)/mlflow
 MLFLOW_VERSION := 0.0.0
+MLFLOW_MANIFEST_DIR := $(K8S_DIR)/manifests/mlflow
 DOCKERFILE_MLFLOW = $(MLFLOW_DIR)/$(DOCKERFILE)
 DOCKER_MLFLOW_TAG = $(TAG)_mlflow
 DOCKER_MLFLOW_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_MLFLOW_TAG)_$(MLFLOW_VERSION)
@@ -45,6 +47,19 @@ build_mlflow:
 .PHONY: push_mlflow
 push_mlflow: 
 	docker push $(DOCKER_MLFLOW_IMAGE_NAME)
+
+.PHONY: deploy_mlflow_ns
+deploy_mlflow_ns:
+	kubectl apply -f $(MLFLOW_MANIFEST_DIR)/namespace.yaml 
+
+.PHONY: registry_mlflow
+registry_mlflow: deploy_mlflow_ns
+	@cd $(K8S_SECRET_DIR) && \
+		NAMESPACE=mlflow ./private_registry_secret.sh
+
+.PHONY: deploy_mlflow
+deploy_mlflow: registry_mlflow
+	kubectl apply -f $(MLFLOW_MANIFEST_DIR)/mlflow.yaml
 
 
 ############ BASE_TEXT_PROCESSING COMMANDS ############
@@ -211,7 +226,7 @@ port_forward_argo:
 
 ############ ELASTICSEARCH COMMANDS ############
 ES_DIR := $(DIR)/elasticsearch
-ES_VERSION := 0.0.0
+ES_VERSION := 8.0.1
 ES_MANIFEST_DIR := $(K8S_DIR)/manifests/elasticsearch
 DOCKERFILE_ES = $(ES_DIR)/$(DOCKERFILE)
 DOCKER_ES_TAG = $(TAG)_elasticsearch
