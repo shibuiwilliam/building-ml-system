@@ -226,7 +226,7 @@ port_forward_argo:
 
 ############ ELASTICSEARCH COMMANDS ############
 ES_DIR := $(DIR)/elasticsearch
-ES_VERSION := 8.0.1
+ES_VERSION := 0.0.0
 ES_MANIFEST_DIR := $(K8S_DIR)/manifests/elasticsearch
 DOCKERFILE_ES = $(ES_DIR)/$(DOCKERFILE)
 DOCKER_ES_TAG = $(TAG)_elasticsearch

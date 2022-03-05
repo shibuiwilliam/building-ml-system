@@ -25,9 +25,6 @@ spec:
               requests:
                 cpu: 2000m
                 memory: 4000Mi
-            env:
-            - name: ES_JAVA_OPTS
-              value: "-Xms3g -Xmx3g"
           imagePullSecrets:
           - name: regcred
 ---
