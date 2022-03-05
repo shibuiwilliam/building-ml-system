@@ -132,7 +132,7 @@ push_data_registry:
 ############ API COMMANDS ############
 API_DIR := $(DIR)/api
 API_VERSION := $(shell cd ${API_DIR} && poetry version -s)
-API_MANIFEST_DIR := $(K8S_DIR)/manifests/api
+API_MANIFEST_DIR := $(K8S_DIR)/manifests/aianimals
 DOCKERFILE_API = $(API_DIR)/$(DOCKERFILE)
 DOCKER_API_TAG = $(TAG)_api
 DOCKER_API_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_API_TAG)_$(API_VERSION)
@@ -166,15 +166,24 @@ registry_api: deploy_api_ns
 	@cd $(K8S_SECRET_DIR) && \
 		NAMESPACE=aianimals ./private_registry_secret.sh
 
+.PHONY: secret_api
+secret_api:
+	kubectl -n aianimals \
+		create secret generic auth-secret \
+		--from-file=infrastructure/secrets/secret.key
+
 .PHONY: deploy_api
 deploy_api: registry_api
 	kubectl apply -f $(API_MANIFEST_DIR)/api.yaml
 
 
+############ BATCH COMMANDS ############
+BATCH_MANIFEST_DIR := $(K8S_DIR)/manifests/aianimals
+
+
 ############ AB_TEST_PROXY COMMANDS ############
 AB_TEST_PROXY_DIR := $(DIR)/ab_test_proxy
 AB_TEST_PROXY_VERSION := $(shell cd ${AB_TEST_PROXY_DIR} && poetry version -s)
-AB_TEST_PROXY_MANIFEST_DIR := $(K8S_DIR)/manifests/ab_test_proxy
 DOCKERFILE_AB_TEST_PROXY = $(AB_TEST_PROXY_DIR)/$(DOCKERFILE)
 DOCKER_AB_TEST_PROXY_TAG = $(TAG)_ab_test_proxy
 DOCKER_AB_TEST_PROXY_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_AB_TEST_PROXY_TAG)_$(AB_TEST_PROXY_VERSION)
@@ -198,19 +207,6 @@ build_ab_test_proxy:
 .PHONY: push_ab_test_proxy
 push_ab_test_proxy: 
 	docker push $(DOCKER_AB_TEST_PROXY_IMAGE_NAME)
-
-.PHONY: deploy_ab_test_proxy_ns
-deploy_ab_test_proxy_ns:
-	kubectl apply -f $(AB_TEST_PROXY_MANIFEST_DIR)/namespace.yaml 
-
-.PHONY: registry_ab_test_proxy
-registry_ab_test_proxy: deploy_ab_test_proxy_ns
-	@cd $(K8S_SECRET_DIR) && \
-		NAMESPACE=aianimals ./private_registry_secret.sh
-
-.PHONY: deploy_ab_test_proxy
-deploy_ab_test_proxy: registry_ab_test_proxy
-	kubectl apply -f $(AB_TEST_PROXY_MANIFEST_DIR)/ab_test_proxy.yaml
 
 
 ############ ARGO COMMANDS ############

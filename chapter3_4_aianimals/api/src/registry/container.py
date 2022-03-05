@@ -68,8 +68,8 @@ class Container(object):
         self.search_client = search_client
         self.messaging = messaging
         self.messaging.init_channel()
-        for q in Configurations.animal_violation_caches:
-            self.messaging.create_cache(cache_name=q)
+        for q in Configurations.animal_violation_queues:
+            self.messaging.create_queue(queue_name=q)
         self.crypt = crypt
 
         self.animal_category_repository: AbstractAnimalCategoryRepository = AnimalCategoryRepository()

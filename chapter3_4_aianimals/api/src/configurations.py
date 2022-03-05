@@ -13,9 +13,9 @@ class Configurations:
 
     work_directory = os.getenv("WORK_DIRECTORY", "/tmp")
 
-    animal_registry_cache = os.getenv("ANIMAL_REGISTRY_QUEUE", "animal")
+    animal_registry_queue = os.getenv("ANIMAL_REGISTRY_QUEUE", "animal")
 
-    animal_violation_caches = []
+    animal_violation_queues = []
     for k, v in os.environ.items():
         if k.startswith("ANIMAL_VIOLATION_QUEUE_"):
-            animal_violation_caches.append(v)
+            animal_violation_queues.append(v)

@@ -81,7 +81,6 @@ services:
     image: shibui/building-ml-system:ai_animals_api_0.0.0
     volumes:
       - ./api/secrets/secret.key:/opt/secrets/secret.key
-      - ./dataset/:/opt/dataset/
     restart: always
     networks:
       - default
@@ -99,11 +98,13 @@ services:
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_USER=user
       - RABBITMQ_PASSWORD=password
+      - ES_HOST=es
+      - ES_SCHEMA=http
+      - ES_PORT=9200
       - ANIMAL_REGISTRY_QUEUE=animal
       - ANIMAL_VIOLATION_QUEUE_NO_ANIMAL_VIOLATION=no_animal_violation
       - LOG_LEVEL=INFO
       - RUN_ENVIRONMENT=local
-      - DATA_DIRECTORY=/opt/dataset
       - KEY_FILE_PATH=/opt/secrets/secret.key
       - WORKERS=1
       - PORT=8000

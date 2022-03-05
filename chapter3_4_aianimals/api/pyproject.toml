@@ -15,11 +15,11 @@ SQLAlchemy = "^1.4.27"
 python-multipart = "^0.0.5"
 aiofiles = "^0.8.0"
 psycopg2-binary = "^2.9.2"
-google-cloud-storage = "^1.43.0"
 redis = "^4.0.2"
 elasticsearch = "^7.16.1"
 cryptography = "^36.0.1"
 pika = "^1.2.0"
+google-cloud-storage = "^2.1.0"
 
 [tool.poetry.dev-dependencies]
 
