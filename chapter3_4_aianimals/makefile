@@ -22,10 +22,20 @@ registry_data: deploy_data_ns
 		NAMESPACE=data ./private_registry_secret.sh
 
 .PHONY: deploy_data
-deploy_data: deploy_data_ns
+deploy_data: registry_data
 	kubectl apply -f $(DATA_MANIFEST_DIR)/postgres.yaml && \
 	kubectl apply -f $(DATA_MANIFEST_DIR)/redis.yaml && \
 	kubectl apply -f $(DATA_MANIFEST_DIR)/rabbitmq.yaml
+
+.PHONY: connect_postgres
+connect_postgres:
+	kubectl -n default \
+		run postgresql-client \
+		--rm --tty -i \
+		--restart="Never" \
+		--image bitnami/postgresql \
+		--env="PGPASSWORD=password" \
+		--command -- psql --host postgres.data.svc.cluster.local -U postgres
 
 
 ############ MLFLOW COMMANDS ############
@@ -157,7 +167,7 @@ registry_api: deploy_api_ns
 		NAMESPACE=aianimals ./private_registry_secret.sh
 
 .PHONY: deploy_api
-deploy_api: deploy_api_ns
+deploy_api: registry_api
 	kubectl apply -f $(API_MANIFEST_DIR)/api.yaml
 
 
@@ -199,7 +209,7 @@ registry_ab_test_proxy: deploy_ab_test_proxy_ns
 		NAMESPACE=aianimals ./private_registry_secret.sh
 
 .PHONY: deploy_ab_test_proxy
-deploy_ab_test_proxy: deploy_ab_test_proxy_ns
+deploy_ab_test_proxy: registry_ab_test_proxy
 	kubectl apply -f $(AB_TEST_PROXY_MANIFEST_DIR)/ab_test_proxy.yaml
 
 
@@ -216,7 +226,8 @@ registry_argo: deploy_argo_ns
 		NAMESPACE=argo ./private_registry_secret.sh
 
 .PHONY: deploy_argo
-deploy_argo: deploy_argo_ns
+deploy_argo: registry_argo
+	kubectl apply -f $(ARGO_MANIFEST_DIR)/argo_clusterrolebinding.yaml
 	kubectl apply -f $(ARGO_MANIFEST_DIR)/quick_argo.yaml
 
 .PHONY: port_forward_argo
@@ -254,7 +265,7 @@ registry_es: deploy_es_ns
 		NAMESPACE=elastic-search ./private_registry_secret.sh
 
 .PHONY: deploy_es
-deploy_es: deploy_es_ns
+deploy_es: registry_es
 	kubectl apply -f $(ES_MANIFEST_DIR)/crds.yaml && \
 	kubectl apply -f $(ES_MANIFEST_DIR)/operator.yaml && \
 	kubectl apply -f $(ES_MANIFEST_DIR)/deployment.yaml
@@ -495,16 +506,12 @@ registry_default:
 	@cd $(K8S_SECRET_DIR) && \
 		NAMESPACE=default ./private_registry_secret.sh
 
-.PHONY: admin_clusterrole
-admin_clusterrole:
-	@cd $(K8S_SECRET_DIR) && \
-		./admin_clusterrole.sh
-
 .PHONY: deploy_all
-deploy_all: registry_default admin_clusterrole \
-	registry_api deploy_api \
-	registry_argo deploy_argo \
-	registry_es deploy_es
+deploy_all: registry_default \
+	deploy_data \
+	deploy_mlflow \
+	deploy_es \
+	deploy_api
 
 
 ############ ALL COMMANDS ############

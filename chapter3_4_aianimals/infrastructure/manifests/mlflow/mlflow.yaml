@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mlflow
-  namespace: data
+  namespace: mlflow
   labels:
     app: mlflow
 spec:
@@ -13,7 +13,7 @@ spec:
   template:
     metadata:
       name: mlflow
-      namespace: data
+      namespace: mlflow
       labels:
         app: mlflow
     spec:
@@ -22,12 +22,10 @@ spec:
           image: shibui/building-ml-system:ai_animals_mlflow_0.0.0
           imagePullPolicy: Always
           command:
-            - "pip install google-cloud-storage"
-            - "&&"
             - "mlflow"
             - "server"
             - "--backend-store-uri"
-            - "/opt/outputs"
+            - "postgresql://postgres:password@postgres.data.svc.cluster.local:5432"
             - "--default-artifact-root"
             - "gs://aianimals/models"
             - "--host"
@@ -46,7 +44,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mlflow
-  namespace: data
+  namespace: mlflow
   labels:
     app: mlflow
 spec:
