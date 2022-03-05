@@ -9,7 +9,7 @@ DIR := $(ABSOLUTE_PATH)
 K8S_DIR := $(ABSOLUTE_PATH)/infrastructure
 K8S_SECRET_DIR := $(K8S_DIR)/secrets
 
-############ Data COMMANDS ############
+############ DATA COMMANDS ############
 DATA_MANIFEST_DIR := $(K8S_DIR)/manifests/data
 
 .PHONY: deploy_data_ns
@@ -28,7 +28,7 @@ deploy_data: deploy_data_ns
 	kubectl apply -f $(DATA_MANIFEST_DIR)/rabbitmq.yaml
 
 
-############ MLflow COMMANDS ############
+############ MLFLOW COMMANDS ############
 MLFLOW_DIR := $(DIR)/mlflow
 MLFLOW_VERSION := 0.0.0
 MLFLOW_MANIFEST_DIR := $(K8S_DIR)/manifests/mlflow

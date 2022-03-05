@@ -22,12 +22,14 @@ spec:
           image: shibui/building-ml-system:ai_animals_mlflow_0.0.0
           imagePullPolicy: Always
           command:
+            - "pip install google-cloud-storage"
+            - "&&"
             - "mlflow"
             - "server"
             - "--backend-store-uri"
             - "/opt/outputs"
             - "--default-artifact-root"
-            - "/opt/outputs"
+            - "gs://aianimals/models"
             - "--host"
             - "0.0.0.0"
           ports:

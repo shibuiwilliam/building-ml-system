@@ -17,16 +17,16 @@ spec:
         node.store.allow_mmap: false
       podTemplate:
         spec:
-          containers:
-          - name: elasticsearch
-            image: shibui/building-ml-system:ai_animals_elasticsearch_0.0.0
-            imagePullPolicy: Always
-            resources:
-              requests:
-                cpu: 2000m
-                memory: 4000Mi
-          imagePullSecrets:
-          - name: regcred
+          initContainers:
+          - name: install-plugins
+            command:
+            - /usr/bin/env
+            - bash
+            - -c
+            - |
+              bin/elasticsearch-plugin install analysis-kuromoji
+              bin/elasticsearch-plugin install analysis-icu
+
 ---
 apiVersion: kibana.k8s.elastic.co/v1
 kind: Kibana
