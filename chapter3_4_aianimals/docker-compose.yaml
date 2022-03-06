@@ -47,7 +47,7 @@ services:
     container_name: initial_data_registry
     image: shibui/building-ml-system:ai_animals_data_registry_0.0.0
     volumes:
-      - ./dataset/:/opt/dataset/
+      - ./dataset/data/:/opt/dataset/data/
     restart: "no"
     networks:
       - default
@@ -69,7 +69,7 @@ services:
       - ES_PORT=9200
       - LOG_LEVEL=INFO
       - RUN_ENVIRONMENT=local
-      - DATA_DIRECTORY=/opt/dataset
+      - DATA_DIRECTORY=/opt/dataset/data/
     command: >
       /bin/sh -c "sleep 20s && python -m src.main --job initialization_job"
     depends_on:
@@ -151,7 +151,7 @@ services:
     container_name: search_registry
     image: shibui/building-ml-system:ai_animals_data_registry_0.0.0
     volumes:
-      - ./dataset/:/opt/dataset/
+      - ./dataset/data/:/opt/dataset/data/
     restart: always
     networks:
       - default
@@ -172,7 +172,7 @@ services:
       - ES_PORT=9200
       - LOG_LEVEL=INFO
       - RUN_ENVIRONMENT=local
-      - DATA_DIRECTORY=/opt/dataset
+      - DATA_DIRECTORY=/opt/dataset/data/
     command: >
       /bin/sh -c "sleep 20s && python -m src.main --job animal_to_search_job"
     depends_on:
@@ -185,7 +185,7 @@ services:
     container_name: animal_feature_registration
     image: shibui/building-ml-system:ai_animals_data_registry_0.0.0
     volumes:
-      - ./dataset/:/opt/dataset/
+      - ./dataset/data/:/opt/dataset/data/
       - ./batch/data_registry/model/:/opt/model/
       - ./batch/data_registry/outputs/:/opt/outputs/
     restart: always
@@ -208,7 +208,7 @@ services:
       - ES_PORT=9200
       - LOG_LEVEL=INFO
       - RUN_ENVIRONMENT=local
-      - DATA_DIRECTORY=/opt/dataset
+      - DATA_DIRECTORY=/opt/dataset/data/
       - SAVE_DIRECTORY=/opt/model
     command: >
       /bin/sh -c "sleep 120s && python -m src.main --job animal_feature_registration_job"

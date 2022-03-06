@@ -1,39 +1,30 @@
-apiVersion: batch/v1
-kind: Job
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: initial-data-registry
+  name: search-registry
   namespace: aianimals
   labels:
-    app: initial-data-registry
+    app: search-registry
 spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: search-registry
   template:
+    metadata:
+      labels:
+        app: search-registry
     spec:
-      restartPolicy: Never
-      initContainers:
-      - name: init
-        image: shibui/building-ml-system:ai_animals_data_registry_0.0.0
-        command:
-        - bash
-        - -c
-        - |
-          mkdir -p /opt/dataset/data/
-          wget ${access_logs} -P /opt/dataset/data/
-          wget ${animal} -P /opt/dataset/data/
-          wget ${animal_category} -P /opt/dataset/data/
-          wget ${animal_subcategory} -P /opt/dataset/data/
-          wget ${no_animal_violation} -P /opt/dataset/data/
-          wget ${user} -P /opt/dataset/data/
-          wget ${violation} -P /opt/dataset/data/
-          wget ${violation_type} -P /opt/dataset/data/
-        envFrom:
-        - configMapRef:
-            name: data-paths
-        volumeMounts:
-        - mountPath: /opt/dataset/data/
-          name: data
       containers:
-      - name: initial-data-registry
+      - name: search-registry
         image: shibui/building-ml-system:ai_animals_data_registry_0.0.0
+        imagePullPolicy: Always
+        command:
+        - "python"
+        - "-m"
+        - "src.main"
+        - "--job"
+        - "animal_to_search_job"
         resources:
           limits:
             cpu: 500m
@@ -41,12 +32,6 @@ spec:
           requests:
             cpu: 500m
             memory: "500Mi"
-        command:
-        - "python"
-        - "-m"
-        - "src.main"
-        - "--job"
-        - "initialization_job"
         env:
         - name: POSTGRES_HOST
           value: postgres.data.svc.cluster.local
@@ -76,17 +61,15 @@ spec:
           value: http
         - name: ES_PORT
           value: "9200"
+        - name: ES_USER
+          value: elastic_user
+        - name: ES_PASSWORD
+          value: password
         - name: RUN_ENVIRONMENT
           value: cloud
         - name: LOG_LEVEL
           value: INFO
         - name: DATA_DIRECTORY
           value: /opt/dataset/data/
-        volumeMounts:
-        - mountPath: /opt/dataset/data/
-          name: data
-      volumes:
-      - name: data
-        emptyDir: {}
       imagePullSecrets:
         - name: regcred

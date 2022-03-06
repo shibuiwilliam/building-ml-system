@@ -10,7 +10,9 @@ COPY ${LOCAL_DIR}/requirements.txt /${PROJECT_DIR}/
 RUN apt-get -y update && \
     apt-get -y install \
     apt-utils \
-    gcc && \
+    gcc \
+    curl \
+    wget && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     pip install --no-cache-dir -r requirements.txt

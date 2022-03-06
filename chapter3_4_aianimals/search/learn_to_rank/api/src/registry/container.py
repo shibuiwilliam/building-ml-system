@@ -3,8 +3,8 @@ from calendar import c
 from src.configurations import Configurations
 from src.infrastructure.cache_client import AbstractCacheClient, RedisClient
 from src.infrastructure.db_client import AbstractDBClient, DBClient
-from src.repository.like_repository import LikeRepository
 from src.repository.feature_cache_repository import AbstractFeatureCacheRepository, FeatureCacheRepository
+from src.repository.like_repository import LikeRepository
 from src.service.learn_to_rank_predict_service import AbstractLearnToRankPredictService, LearnToRankPredictService
 from src.usecase.reorder_usecase import AbstractReorderUsecase, ReorderUsecase
 

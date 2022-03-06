@@ -24,6 +24,7 @@ spec:
             - bash
             - -c
             - |
+              bin/elasticsearch-users useradd elastic_user -p password -r superuser
               bin/elasticsearch-plugin install analysis-kuromoji
               bin/elasticsearch-plugin install analysis-icu
 

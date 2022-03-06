@@ -1,6 +1,6 @@
 from src.configurations import Configurations
 from src.infrastructure.cache import AbstractCache
-from src.infrastructure.client.elastic_search import Elasticsearch
+from src.infrastructure.client.elastic_search import ElasticsearchClient
 from src.infrastructure.client.postgresql_database import PostgreSQLDatabase
 from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging
 from src.infrastructure.client.redis_cache import RedisCache
@@ -155,7 +155,7 @@ class Container(object):
 
 container = Container(
     database=PostgreSQLDatabase(),
-    search=Elasticsearch(),
+    search=ElasticsearchClient(),
     messaging=RabbitmqMessaging(),
     cache=RedisCache(),
     animal_category_vectorizer=CategoricalVectorizer(),

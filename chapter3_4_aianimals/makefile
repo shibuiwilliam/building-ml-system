@@ -180,6 +180,16 @@ deploy_api: registry_api
 ############ BATCH COMMANDS ############
 BATCH_MANIFEST_DIR := $(K8S_DIR)/manifests/aianimals
 
+.PHONY: deploy_batch_config
+deploy_batch_config: registry_api
+	kubectl apply \
+		-f $(BATCH_MANIFEST_DIR)/data_configmap.yaml
+
+.PHONY: deploy_initial_data_registry
+deploy_initial_data_registry: deploy_batch_config
+	kubectl apply \
+		-f $(BATCH_MANIFEST_DIR)/initial_data_registry.yaml
+
 
 ############ AB_TEST_PROXY COMMANDS ############
 AB_TEST_PROXY_DIR := $(DIR)/ab_test_proxy
@@ -502,11 +512,21 @@ registry_default:
 	@cd $(K8S_SECRET_DIR) && \
 		NAMESPACE=default ./private_registry_secret.sh
 
+.PHONY: initialize_deployment
+initialize_deployment: registry_default \
+	registry_api \
+	registry_data \
+	registry_es \
+	registry_mlflow \
+	registry_argo \
+	secret_api
+
 .PHONY: deploy_all
 deploy_all: registry_default \
 	deploy_data \
 	deploy_mlflow \
 	deploy_es \
+	deploy_initial_data_registry \
 	deploy_api
 
 
