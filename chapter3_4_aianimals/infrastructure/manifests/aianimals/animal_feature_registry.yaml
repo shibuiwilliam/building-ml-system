@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: search-registry
+  name: animal-feature-registry
   namespace: aianimals
   labels:
-    app: search-registry
+    app: animal-feature-registry
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: search-registry
+      app: animal-feature-registry
   template:
     metadata:
       labels:
-        app: search-registry
+        app: animal-feature-registry
     spec:
       containers:
-        - name: search-registry
+        - name: animal-feature-registry
           image: shibui/building-ml-system:ai_animals_data_registry_0.0.0
           imagePullPolicy: Always
           command:
@@ -24,11 +24,11 @@ spec:
             - "-m"
             - "src.main"
             - "--job"
-            - "animal_to_search_job"
+            - "animal_feature_registration_job"
           resources:
             limits:
-              cpu: 500m
-              memory: "500Mi"
+              cpu: 2000m
+              memory: "2000Mi"
             requests:
               cpu: 500m
               memory: "500Mi"
@@ -56,7 +56,7 @@ spec:
             - name: RABBITMQ_PASSWORD
               value: password
             - name: ES_HOST
-              value: https://elastic-search-es-http.elastic-search.svc.cluster.local:9200
+              value: https://elastic-animal-feature-es-http.elastic-animal-feature.svc.cluster.local:9200
             - name: ES_SCHEMA
               value: https
             - name: ES_VERIFY_CERTS
@@ -71,5 +71,7 @@ spec:
               value: INFO
             - name: DATA_DIRECTORY
               value: /opt/dataset/data/
+            - name: SAVE_DIRECTORY
+              value: /tmp/
       imagePullSecrets:
         - name: regcred

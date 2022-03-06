@@ -190,6 +190,16 @@ deploy_initial_data_registry: deploy_batch_config
 	kubectl apply \
 		-f $(BATCH_MANIFEST_DIR)/initial_data_registry.yaml
 
+.PHONY: deploy_search_registry
+deploy_search_registry:
+	kubectl apply \
+		-f $(BATCH_MANIFEST_DIR)/search_registry.yaml
+
+
+.PHONY: deploy_animal_feature_registry
+deploy_animal_feature_registry:
+	kubectl apply \
+		-f $(BATCH_MANIFEST_DIR)/animal_feature_registry.yaml
 
 ############ AB_TEST_PROXY COMMANDS ############
 AB_TEST_PROXY_DIR := $(DIR)/ab_test_proxy
@@ -527,7 +537,9 @@ deploy_all: registry_default \
 	deploy_mlflow \
 	deploy_es \
 	deploy_initial_data_registry \
-	deploy_api
+	deploy_api \
+	deploy_search_registry \
+	deploy_animal_feature_registry
 
 
 ############ ALL COMMANDS ############

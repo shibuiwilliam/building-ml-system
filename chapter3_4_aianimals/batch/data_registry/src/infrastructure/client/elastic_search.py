@@ -11,9 +11,8 @@ logger = configure_logger(__name__)
 class ElasticsearchClient(AbstractSearch):
     def __init__(self):
         super().__init__()
-        self.__es_host = os.getenv("ES_HOST", "es")
-        self.__es_schema = os.getenv("ES_SCHEMA", "http")
-        self.__es_port = int(os.getenv("ES_PORT", 9200))
+        self.__es_host = os.getenv("ES_HOST", "http://es:9200")
+        self.__es_verify_certs = bool(int(os.getenv("ES_VERIFY_CERTS", 0)))
         self.__es_user = os.getenv("ES_USER", None)
         self.__es_password = os.getenv("ES_PASSWORD", None)
         self.__basic_auth = (
@@ -22,9 +21,8 @@ class ElasticsearchClient(AbstractSearch):
             else None
         )
         self.es_client = Elasticsearch(
-            [self.__es_host],
-            scheme=self.__es_schema,
-            port=self.__es_port,
+            hosts=[self.__es_host],
+            verify_certs=self.__es_verify_certs,
             basic_auth=self.__basic_auth,
         )
 

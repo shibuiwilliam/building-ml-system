@@ -172,22 +172,34 @@ ssh = ["bcrypt (>=3.1.5)"]
 test = ["pytest (>=6.2.0)", "pytest-cov", "pytest-subtests", "pytest-xdist", "pretend", "iso8601", "pytz", "hypothesis (>=1.11.4,!=3.79.2)"]
 
 [[package]]
+name = "elastic-transport"
+version = "8.0.1"
+description = "Transport classes and utilities shared among Python Elastic client libraries"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+certifi = "*"
+urllib3 = ">=1.26.2,<2"
+
+[package.extras]
+develop = ["pytest", "pytest-cov", "pytest-mock", "pytest-asyncio", "mock", "requests", "aiohttp"]
+
+[[package]]
 name = "elasticsearch"
-version = "7.17.1"
+version = "8.0.1"
 description = "Python client for Elasticsearch"
 category = "main"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, <4"
+python-versions = ">=3.6, <4"
 
 [package.dependencies]
 aiohttp = {version = ">=3,<4", optional = true, markers = "extra == \"async\""}
-certifi = "*"
-urllib3 = ">=1.21.1,<2"
+elastic-transport = ">=8,<9"
 
 [package.extras]
 async = ["aiohttp (>=3,<4)"]
-develop = ["requests (>=2.0.0,<3.0.0)", "coverage", "mock", "pyyaml", "pytest", "pytest-cov", "sphinx (<1.7)", "sphinx-rtd-theme", "black", "jinja2"]
-docs = ["sphinx (<1.7)", "sphinx-rtd-theme"]
 requests = ["requests (>=2.4.0,<3.0.0)"]
 
 [[package]]
@@ -691,7 +703,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "3.9.7"
-content-hash = "cd0ffd06b2a9b689e14f72febc7547a79d6498d1291f61eedd4e85f271302983"
+content-hash = "ae085262acb4775e220a5e8af004dc381b221a79125aabc79fb9cd79de187d0b"
 
 [metadata.files]
 aiohttp = [
@@ -892,9 +904,13 @@ cryptography = [
     {file = "cryptography-36.0.1-pp38-pypy38_pp73-win_amd64.whl", hash = "sha256:39bdf8e70eee6b1c7b289ec6e5d84d49a6bfa11f8b8646b5b3dfe41219153316"},
     {file = "cryptography-36.0.1.tar.gz", hash = "sha256:53e5c1dc3d7a953de055d77bef2ff607ceef7a2aac0353b5d630ab67f7423638"},
 ]
+elastic-transport = [
+    {file = "elastic-transport-8.0.1.tar.gz", hash = "sha256:8e07b52fd71e3f209ec2053c2b3953b22dcd085143669cfe6e28bb4ed4af94c3"},
+    {file = "elastic_transport-8.0.1-py3-none-any.whl", hash = "sha256:ae2800ac5abd03f91fe951b8b20e6c315d69cec10aeac9898bb5229e3dbeb3b0"},
+]
 elasticsearch = [
-    {file = "elasticsearch-7.17.1-py2.py3-none-any.whl", hash = "sha256:8c79fe145f23826df144d1adc406a131e5cf3f41f302869fb5a1263b381e5ee2"},
-    {file = "elasticsearch-7.17.1.tar.gz", hash = "sha256:0061c49c3d4202802c09fba6734e48699a47cfeb737747acecc932ea73b7d318"},
+    {file = "elasticsearch-8.0.1-py3-none-any.whl", hash = "sha256:68598bd9cb297199523bf28c4a71c63d559ebca42107110f39ef2a748b58c6d7"},
+    {file = "elasticsearch-8.0.1.tar.gz", hash = "sha256:b9facb8d7db71ad0d3c0ccc87dc224985abfe00bea888acd1d187cb0972c61f2"},
 ]
 fasteners = [
     {file = "fasteners-0.17.3-py3-none-any.whl", hash = "sha256:cae0772df265923e71435cc5057840138f4e8b6302f888a567d06ed8e1cbca03"},

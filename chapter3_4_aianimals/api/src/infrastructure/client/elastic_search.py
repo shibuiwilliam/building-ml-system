@@ -2,7 +2,7 @@ import os
 from logging import getLogger
 from typing import Dict, List, Optional, Union
 
-from elasticsearch import Elasticsearch as ES
+from elasticsearch import Elasticsearch
 from src.entities.animal import AnimalSearchQuery, AnimalSearchResult, AnimalSearchResults, AnimalSearchSortKey
 from src.infrastructure.search import AbstractSearch
 from src.middleware.strings import hiragana_to_katakana, katakana_to_hiragana
@@ -10,16 +10,22 @@ from src.middleware.strings import hiragana_to_katakana, katakana_to_hiragana
 logger = getLogger(__name__)
 
 
-class Elasticsearch(AbstractSearch):
+class ElasticsearchClient(AbstractSearch):
     def __init__(self):
         super().__init__()
-        self.__es_host = os.getenv("ES_HOST", "es")
-        self.__es_schema = os.getenv("ES_SCHEMA", "http")
-        self.__es_port = int(os.getenv("ES_PORT", 9200))
-        self.es_client = ES(
-            [self.__es_host],
-            scheme=self.__es_schema,
-            port=self.__es_port,
+        self.__es_host = os.getenv("ES_HOST", "http://es:9200")
+        self.__es_verify_certs = bool(int(os.getenv("ES_VERIFY_CERTS", 0)))
+        self.__es_user = os.getenv("ES_USER", None)
+        self.__es_password = os.getenv("ES_PASSWORD", None)
+        self.__basic_auth = (
+            (self.__es_user, self.__es_password)
+            if self.__es_user is not None and self.__es_password is not None
+            else None
+        )
+        self.es_client = Elasticsearch(
+            hosts=[self.__es_host],
+            verify_certs=self.__es_verify_certs,
+            basic_auth=self.__basic_auth,
         )
 
     def __add_must(

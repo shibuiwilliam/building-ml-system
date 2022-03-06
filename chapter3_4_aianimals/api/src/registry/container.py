@@ -3,7 +3,7 @@ from logging import getLogger
 from src.configurations import Configurations
 from src.constants import RUN_ENVIRONMENT
 from src.infrastructure.cache import AbstractCache
-from src.infrastructure.client.elastic_search import Elasticsearch
+from src.infrastructure.client.elastic_search import ElasticsearchClient
 from src.infrastructure.client.google_cloud_storage import GoogleCloudStorage
 from src.infrastructure.client.local_storage import LocalStorage
 from src.infrastructure.client.postgresql_database import PostgreSQLDatabase
@@ -129,7 +129,7 @@ container = Container(
     storage_client=storage_client,
     database=PostgreSQLDatabase(),
     cache=RedisCache(),
-    search_client=Elasticsearch(),
+    search_client=ElasticsearchClient(),
     messaging=RabbitmqMessaging(),
     crypt=Crypt(key_file_path=Configurations.key_file_path),
 )

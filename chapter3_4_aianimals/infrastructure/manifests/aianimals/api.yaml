@@ -54,11 +54,15 @@ spec:
             - name: RABBITMQ_PASSWORD
               value: password
             - name: ES_HOST
-              value: elastic-search-es-http.elastic-search.svc.cluster.local
+              value: https://elastic-search-es-http.elastic-search.svc.cluster.local:9200
             - name: ES_SCHEMA
-              value: http
-            - name: ES_PORT
-              value: "9200"
+              value: https
+            - name: ES_VERIFY_CERTS
+              value: "0"
+            - name: ES_USER
+              value: elastic_user
+            - name: ES_PASSWORD
+              value: password
             - name: ANIMAL_REGISTRY_QUEUE
               value: animal
             - name: ANIMAL_VIOLATION_QUEUE_NO_ANIMAL_VIOLATION
@@ -78,13 +82,13 @@ spec:
             - name: KEY_FILE_PATH
               value: /opt/secrets/secret.key
           volumeMounts:
-          - name: auth-secret
-            mountPath: /opt/secrets
-            readOnly: true
+            - name: auth-secret
+              mountPath: /opt/secrets
+              readOnly: true
       volumes:
-      - name: auth-secret
-        secret:
-          secretName: auth-secret
+        - name: auth-secret
+          secret:
+            secretName: auth-secret
       imagePullSecrets:
         - name: regcred
 

@@ -64,9 +64,7 @@ services:
       - RABBITMQ_USER=user
       - RABBITMQ_PASSWORD=password
       - ANIMAL_VIOLATION_QUEUE_NO_ANIMAL_VIOLATION=no_animal_violation
-      - ES_HOST=es
-      - ES_SCHEMA=http
-      - ES_PORT=9200
+      - ES_HOST=http://es:9200
       - LOG_LEVEL=INFO
       - RUN_ENVIRONMENT=local
       - DATA_DIRECTORY=/opt/dataset/data/
@@ -98,9 +96,7 @@ services:
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_USER=user
       - RABBITMQ_PASSWORD=password
-      - ES_HOST=es
-      - ES_SCHEMA=http
-      - ES_PORT=9200
+      - ES_HOST=http://es:9200
       - ANIMAL_REGISTRY_QUEUE=animal
       - ANIMAL_VIOLATION_QUEUE_NO_ANIMAL_VIOLATION=no_animal_violation
       - LOG_LEVEL=INFO
@@ -167,9 +163,7 @@ services:
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_USER=user
       - RABBITMQ_PASSWORD=password
-      - ES_HOST=es
-      - ES_SCHEMA=http
-      - ES_PORT=9200
+      - ES_HOST=http://es:9200
       - LOG_LEVEL=INFO
       - RUN_ENVIRONMENT=local
       - DATA_DIRECTORY=/opt/dataset/data/
@@ -203,9 +197,7 @@ services:
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_USER=user
       - RABBITMQ_PASSWORD=password
-      - ES_HOST=es
-      - ES_SCHEMA=http
-      - ES_PORT=9200
+      - ES_HOST=http://es:9200
       - LOG_LEVEL=INFO
       - RUN_ENVIRONMENT=local
       - DATA_DIRECTORY=/opt/dataset/data/
