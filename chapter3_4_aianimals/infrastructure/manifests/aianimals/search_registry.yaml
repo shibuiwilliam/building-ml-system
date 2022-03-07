@@ -71,5 +71,7 @@ spec:
               value: INFO
             - name: DATA_DIRECTORY
               value: /opt/dataset/data/
+            - name: ANIMAL_REGISTRY_QUEUE
+              value: animal
       imagePullSecrets:
         - name: regcred

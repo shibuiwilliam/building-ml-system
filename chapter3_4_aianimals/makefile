@@ -362,7 +362,8 @@ push_search_learn_to_rank_lgbm_api:
 
 .PHONY: deploy_search_learn_to_rank_lgbm_api
 deploy_search_learn_to_rank_lgbm_api: 
-	kubectl apply -f $(SEARCH_LEARN_TO_RANK_LGBM_API_MANIFEST_DIR)/search_learn_to_rank_lgbm_api.yaml
+	kubectl apply \
+		-f $(SEARCH_LEARN_TO_RANK_LGBM_API_MANIFEST_DIR)/search_learn_to_rank_lgbm_api.yaml
 
 
 ############ SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN COMMANDS ############
@@ -394,10 +395,23 @@ push_search_similar_image_search_train:
 	docker push $(DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_IMAGE_NAME)
 
 
+############ VIOLATION_DETECTION COMMANDS ############
+VIOLATION_DETECTION_MANIFEST_DIR := $(K8S_DIR)/manifests/violation_detection
+
+.PHONY: deploy_violation_detection_ns
+deploy_violation_detection_ns:
+	kubectl apply \
+		-f $(VIOLATION_DETECTION_MANIFEST_DIR)/namespace.yaml
+
+.PHONY: registry_violation_detection
+registry_violation_detection: deploy_violation_detection_ns
+	@cd $(K8S_SECRET_DIR) && \
+		NAMESPACE=violation-detection ./private_registry_secret.sh
+
+
 ############ VIOLATION_DETECTION_REGISTRY COMMANDS ############
 VIOLATION_DETECTION_REGISTRY_DIR := $(DIR)/violation_detection/registry
 VIOLATION_DETECTION_REGISTRY_VERSION := $(shell cd ${VIOLATION_DETECTION_REGISTRY_DIR} && poetry version -s)
-VIOLATION_DETECTION_REGISTRY_MANIFEST_DIR := $(K8S_DIR)/manifests/violation_detection/registry
 DOCKERFILE_VIOLATION_DETECTION_REGISTRY = $(VIOLATION_DETECTION_REGISTRY_DIR)/$(DOCKERFILE)
 DOCKER_VIOLATION_DETECTION_REGISTRY_TAG = $(TAG)_violation_detection_registry
 DOCKER_VIOLATION_DETECTION_REGISTRY_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_VIOLATION_DETECTION_REGISTRY_TAG)_$(VIOLATION_DETECTION_REGISTRY_VERSION)
@@ -421,6 +435,11 @@ build_violation_detection_registry:
 .PHONY: push_violation_detection_registry
 push_violation_detection_registry: 
 	docker push $(DOCKER_VIOLATION_DETECTION_REGISTRY_IMAGE_NAME)
+
+.PHONY: deploy_violation_detection_registry
+deploy_violation_detection_registry: registry_violation_detection
+	kubectl apply \
+		-f $(VIOLATION_DETECTION_MANIFEST_DIR)/registry.yaml
 
 
 ############ NO_ANIMAL_VIOLATION_TRAIN COMMANDS ############
@@ -455,7 +474,6 @@ push_violation_detection_no_animal_violation_train:
 ############ NO_ANIMAL_VIOLATION_PROXY COMMANDS ############
 NO_ANIMAL_VIOLATION_PROXY_DIR := $(DIR)/violation_detection/no_animal_violation/proxy
 NO_ANIMAL_VIOLATION_PROXY_VERSION := $(shell cd ${NO_ANIMAL_VIOLATION_PROXY_DIR} && poetry version -s)
-NO_ANIMAL_VIOLATION_PROXY_MANIFEST_DIR := $(K8S_DIR)/manifests/violation_detection/no_animal_violation_proxy
 DOCKERFILE_NO_ANIMAL_VIOLATION_PROXY = $(NO_ANIMAL_VIOLATION_PROXY_DIR)/$(DOCKERFILE)
 DOCKER_NO_ANIMAL_VIOLATION_PROXY_TAG = $(TAG)_violation_detection_no_animal_violation_proxy
 DOCKER_NO_ANIMAL_VIOLATION_PROXY_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_NO_ANIMAL_VIOLATION_PROXY_TAG)_$(NO_ANIMAL_VIOLATION_PROXY_VERSION)
@@ -480,11 +498,15 @@ build_violation_detection_no_animal_violation_proxy:
 push_violation_detection_no_animal_violation_proxy: 
 	docker push $(DOCKER_NO_ANIMAL_VIOLATION_PROXY_IMAGE_NAME)
 
+.PHONY: deploy_no_animal_violation_proxy
+deploy_no_animal_violation_proxy: registry_violation_detection
+	kubectl apply \
+		-f $(VIOLATION_DETECTION_MANIFEST_DIR)/no_animal_violation_proxy.yaml
+
 
 ############ NO_ANIMAL_VIOLATION_SERVING COMMANDS ############
 NO_ANIMAL_VIOLATION_SERVING_DIR := $(DIR)/violation_detection/no_animal_violation/serving
 NO_ANIMAL_VIOLATION_SERVING_VERSION := 0.0.0
-NO_ANIMAL_VIOLATION_SERVING_MANIFEST_DIR := $(K8S_DIR)/manifests/violation_detection/no_animal_violation_serving
 DOCKERFILE_NO_ANIMAL_VIOLATION_SERVING = $(NO_ANIMAL_VIOLATION_SERVING_DIR)/$(DOCKERFILE)
 DOCKER_NO_ANIMAL_VIOLATION_SERVING_TAG = $(TAG)_violation_detection_no_animal_violation_serving
 DOCKER_NO_ANIMAL_VIOLATION_SERVING_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_NO_ANIMAL_VIOLATION_SERVING_TAG)_$(NO_ANIMAL_VIOLATION_SERVING_VERSION)
@@ -500,6 +522,11 @@ build_violation_detection_no_animal_violation_serving:
 .PHONY: push_violation_detection_no_animal_violation_serving
 push_violation_detection_no_animal_violation_serving: 
 	docker push $(DOCKER_NO_ANIMAL_VIOLATION_SERVING_IMAGE_NAME)
+
+.PHONY: deploy_no_animal_violation_serving
+deploy_no_animal_violation_serving: registry_violation_detection
+	kubectl apply \
+		-f $(VIOLATION_DETECTION_MANIFEST_DIR)/no_animal_violation_serving.yaml
 
 
 ############ DOCKER COMPOSE COMMANDS ############
@@ -524,23 +551,35 @@ registry_default:
 
 .PHONY: initialize_deployment
 initialize_deployment: registry_default \
-	registry_api \
 	registry_data \
+	registry_api \
+	registry_violation_detection \
 	registry_es \
 	registry_mlflow \
 	registry_argo \
 	secret_api
 
 .PHONY: deploy_all
-deploy_all: registry_default \
-	deploy_data \
+deploy_all: deploy_data \
 	deploy_mlflow \
 	deploy_es \
 	deploy_initial_data_registry \
 	deploy_api \
+	deploy_violation_detection_registry \
+	deploy_no_animal_violation_serving \
+	deploy_no_animal_violation_proxy \
 	deploy_search_registry \
 	deploy_animal_feature_registry
 
+.PHONY: delete_namespaces
+delete_namespaces:
+	kubectl delete ns aianimals && \
+	kubectl delete ns argo && \
+	kubectl delete ns data && \
+	kubectl delete ns elastic-search && \
+	kubectl delete ns elastic-system && \
+	kubectl delete ns mlflow && \
+	kubectl delete ns violation-detection
 
 ############ ALL COMMANDS ############
 .PHONY: req_all

@@ -86,6 +86,10 @@ spec:
               value: INFO
             - name: DATA_DIRECTORY
               value: /opt/dataset/data/
+            - name: ANIMAL_VIOLATION_QUEUE_NO_ANIMAL_VIOLATION
+              value: no_animal_violation
+            - name: ANIMAL_REGISTRY_QUEUE
+              value: animal
           volumeMounts:
             - mountPath: /opt/dataset/data/
               name: data
