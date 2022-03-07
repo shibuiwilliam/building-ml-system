@@ -1,15 +1,17 @@
 import json
-from typing import Dict, Optional
-import httpx
 from io import BytesIO
+from typing import Dict, Optional
+
+import httpx
 from PIL import Image
-from src.entities.animal import AnimalQuery, AnimalModel
+from src.configurations import Configurations
+from src.entities.animal import AnimalModel, AnimalQuery
 from src.entities.violation_type import ViolationTypeQuery
 from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging
 from src.middleware.logger import configure_logger
 from src.repository.animal_repository import AbstractAnimalRepository
 from src.repository.violation_type_repository import AbstractViolationTypeRepository
-from src.configurations import Configurations
+from src.service.predictor import AbstractPredictor, Prediction
 
 logger = configure_logger(__name__)
 
@@ -20,12 +22,14 @@ class ViolationDetectionJob(object):
         messaging: RabbitmqMessaging,
         animal_repository: AbstractAnimalRepository,
         violation_type_repository: AbstractViolationTypeRepository,
+        predictor: AbstractPredictor,
         timeout: float = 10.0,
         retries: int = 3,
     ):
         self.messaging = messaging
         self.animal_repository = animal_repository
         self.violation_type_repository = violation_type_repository
+        self.predictor = predictor
 
         _v = self.violation_type_repository.select(query=ViolationTypeQuery(name="no_animal_violation"))
         self.violation_type_id = _v[0].id
@@ -51,6 +55,11 @@ class ViolationDetectionJob(object):
             img_rgb = Image.new("RGB", (img.height, img.width), (255, 255, 255))
             img_rgb.paste(img, mask=img.split()[3])
             img = img_rgb
+        prediction = self.predictor.predict(img=img)
+        if prediction is None:
+            logger.error(f"failed to predict {animal.id}")
+            return None
+        return prediction.dict()
 
     def pseudo_detect_violation(
         self,
