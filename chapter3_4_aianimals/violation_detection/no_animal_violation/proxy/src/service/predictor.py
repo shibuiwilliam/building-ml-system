@@ -11,7 +11,6 @@ logger = configure_logger(__name__)
 
 
 class Prediction(BaseModel):
-    violation: bool
     violation_probability: float
 
 
@@ -94,7 +93,4 @@ class NoViolationDetectionPredictor(AbstractPredictor):
         prediction = self._predict(img_array=img_array)
         if prediction is None:
             return None
-        return Prediction(
-            violation=prediction[0] < prediction[1],
-            violation_probability=prediction[1],
-        )
+        return Prediction(violation_probability=prediction[1])

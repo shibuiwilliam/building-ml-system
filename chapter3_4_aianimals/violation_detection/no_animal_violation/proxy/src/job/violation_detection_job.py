@@ -59,7 +59,13 @@ class ViolationDetectionJob(object):
         if prediction is None:
             logger.error(f"failed to predict {animal.id}")
             return None
-        return prediction.dict()
+        return {
+            "animal_id": animal.id,
+            "violation_type_id": self.violation_type_id,
+            "probability": prediction.violation_probability,
+            "judge": "administrator",
+            "is_effective": True,
+        }
 
     def pseudo_detect_violation(
         self,

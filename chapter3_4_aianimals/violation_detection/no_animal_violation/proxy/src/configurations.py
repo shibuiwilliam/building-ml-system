@@ -8,3 +8,7 @@ class Configurations:
     registration_queue = os.getenv("REGISTRATION_QUEUE", "violation")
 
     pseudo_prediction = bool(int(os.getenv("PSEUDO_PREDICTION", "0")))
+
+    predictor_url = os.getenv("PREDICTION_URL", "http://localhost:8501/v1/models/no_animal_violation:predict")
+    predictor_height = int(os.getenv("PREDICTOR_HEIGHT", "224"))
+    predictor_width = int(os.getenv("PREDICTOR_WIDTH", "224"))
