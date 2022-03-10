@@ -544,6 +544,12 @@ down:
 
 
 ############ DEPLOYMENT COMMANDS ############
+KUBE_SYSTEM_MANIFEST_DIR := $(K8S_DIR)/manifests/kube_system
+
+.PHONY: deploy_kube_system
+deploy_kube_system:
+	kubectl apply -f $(KUBE_SYSTEM_MANIFEST_DIR)/pdb.yaml
+
 .PHONY: registry_default
 registry_default:
 	@cd $(K8S_SECRET_DIR) && \

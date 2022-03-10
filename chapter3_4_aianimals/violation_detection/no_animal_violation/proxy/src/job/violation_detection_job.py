@@ -94,7 +94,7 @@ class ViolationDetectionJob(object):
             )
 
             if len(animals) != 1:
-                logger.info(f"cannot ack {method.delivery_tag}")
+                logger.error(f"invalid animal select; cannot ack {method.delivery_tag}")
 
             animal = animals[0]
             if Configurations.pseudo_prediction:
@@ -103,13 +103,13 @@ class ViolationDetectionJob(object):
                 violation = self.detect_violation(animal=animal)
 
             if violation is None:
-                logger.info(f"cannot ack {method.delivery_tag}")
-
-            self.messaging.publish(
-                queue_name=registration_queue,
-                body=violation,
-            )
-            ch.basic_ack(delivery_tag=method.delivery_tag)
+                logger.error(f"no prediction; cannot ack {method.delivery_tag}")
+            else:
+                self.messaging.publish(
+                    queue_name=registration_queue,
+                    body=violation,
+                )
+                ch.basic_ack(delivery_tag=method.delivery_tag)
 
         try:
             self.messaging.init_channel()

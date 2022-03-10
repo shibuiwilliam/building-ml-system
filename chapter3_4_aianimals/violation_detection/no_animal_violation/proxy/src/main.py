@@ -7,6 +7,7 @@ logger = configure_logger(__name__)
 
 def main():
     logger.info("START...")
+
     container.violation_detection_job.run(
         consuming_queue=Configurations.consuming_queue,
         registration_queue=Configurations.registration_queue,

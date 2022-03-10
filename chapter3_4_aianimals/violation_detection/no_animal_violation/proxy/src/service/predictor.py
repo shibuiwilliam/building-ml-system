@@ -1,3 +1,4 @@
+import json
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
@@ -60,7 +61,7 @@ class NoViolationDetectionPredictor(AbstractPredictor):
         img: Image,
     ) -> np.ndarray:
         img = img.resize((self.height, self.width))
-        array = np.array(img).astype(np.float32) / 255.0
+        array = np.array(img).reshape((1, self.height, self.width, 3)).astype(np.float32) / 255.0
         return array
 
     def _predict(
@@ -68,14 +69,14 @@ class NoViolationDetectionPredictor(AbstractPredictor):
         img_array: np.ndarray,
     ) -> Optional[List]:
         img_list = img_array.tolist()
-        request_dict = {"inputs": {"keras_layer_input": [img_list]}}
+        request_dict = {"inputs": {"keras_layer_input": img_list}}
         with httpx.Client(
             timeout=self.timeout,
             transport=self.transport,
         ) as client:
             res = client.post(
                 self.url,
-                data=request_dict,
+                data=json.dumps(request_dict),
                 headers=self.headers,
             )
         if res.status_code != 200:
@@ -83,7 +84,7 @@ class NoViolationDetectionPredictor(AbstractPredictor):
             return None
         response = res.json()
         logger.info(f"prediction: {response}")
-        return response["outputs"]
+        return response["outputs"][0]
 
     def predict(
         self,

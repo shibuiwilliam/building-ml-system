@@ -1,14 +1,14 @@
+from src.configurations import Configurations
 from src.infrastructure.client.postgresql_database import PostgreSQLDatabase
 from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging
 from src.infrastructure.database import AbstractDatabase
 from src.job.violation_detection_job import ViolationDetectionJob
 from src.middleware.logger import configure_logger
-from src.service.predictor import AbstractPredictor, NoViolationDetectionPredictor
 from src.repository.animal_repository import AbstractAnimalRepository
 from src.repository.implementation.animal_repository import AnimalRepository
 from src.repository.implementation.violation_type_repository import ViolationTypeRepository
 from src.repository.violation_type_repository import AbstractViolationTypeRepository
-from src.configurations import Configurations
+from src.service.predictor import AbstractPredictor, NoViolationDetectionPredictor
 
 logger = configure_logger(__name__)
 

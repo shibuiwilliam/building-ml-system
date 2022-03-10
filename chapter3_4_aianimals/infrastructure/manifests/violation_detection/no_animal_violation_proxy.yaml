@@ -52,6 +52,12 @@ spec:
             - name: REGISTRATION_QUEUE
               value: violation
             - name: PSEUDO_PREDICTION
-              value: "1"
+              value: "0"
+            - name: PREDICTOR_URL
+              value: http://no-animal-violation-serving.violation-detection.svc.cluster.local:8501/v1/models/no_animal_violation:predict
+            - name: PREDICTOR_HEIGHT
+              value: "224"
+            - name: PREDICTOR_WIDTH
+              value: "224"
       imagePullSecrets:
         - name: regcred

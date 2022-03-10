@@ -258,7 +258,7 @@ services:
       - RABBITMQ_PASSWORD=password
       - CONSUMING_QUEUE=no_animal_violation
       - REGISTRATION_QUEUE=violation
-      - PSEUDO_PREDICTION=0
+      - PSEUDO_PREDICTION=1
     command: >
       /bin/sh -c "sleep 60s && python -m src.main"
     depends_on:
