@@ -30,8 +30,8 @@ spec:
               cpu: 500m
               memory: "500Mi"
             requests:
-              cpu: 500m
-              memory: "500Mi"
+              cpu: 200m
+              memory: "300Mi"
           env:
             - name: POSTGRES_HOST
               value: postgres.data.svc.cluster.local

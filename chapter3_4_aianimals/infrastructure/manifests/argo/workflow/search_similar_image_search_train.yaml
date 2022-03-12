@@ -20,9 +20,19 @@ spec:
             value: http://mlflow.mlflow.svc.cluster.local:5000
           - name: MLFLOW_EXPERIMENT
             value: search_similar_image_search
+          - name: POSTGRES_HOST
+            value: postgres.data.svc.cluster.local
+          - name: POSTGRES_PORT
+            value: "5432"
+          - name: POSTGRES_USER
+            value: postgres
+          - name: POSTGRES_PASSWORD
+            value: password
+          - name: POSTGRES_DB
+            value: aianimals
         resources:
           requests:
-            memory: 8000Mi
+            memory: 16000Mi
             cpu: 2000m
   imagePullSecrets:
     - name: regcred

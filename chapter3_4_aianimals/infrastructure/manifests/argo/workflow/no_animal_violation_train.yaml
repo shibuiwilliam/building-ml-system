@@ -22,7 +22,7 @@ spec:
             value: violation_detection_no_animal_violation_detection
         resources:
           requests:
-            memory: 8000Mi
+            memory: 12000Mi
             cpu: 2000m
   imagePullSecrets:
     - name: regcred
