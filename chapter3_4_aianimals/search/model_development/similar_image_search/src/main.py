@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 import hydra
 import mlflow
@@ -20,12 +21,16 @@ def main(cfg: DictConfig):
     logger.info(f"config: {cfg}")
     cwd = os.getcwd()
     run_name = cfg.task_name
+    experiment_name = os.getenv("MLFLOW_EXPERIMENT", "similar_image_search")
+    now = datetime.now().strftime("%Y%m%d_%H%M%S")
+    run_name = f"{cfg.task_name}_{now}"
 
     logger.info(f"current working directory: {cwd}")
+    logger.info(f"experiment_name: {experiment_name}")
     logger.info(f"run_name: {run_name}")
 
     mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000"))
-    mlflow.set_experiment(os.getenv("MLFLOW_EXPERIMENT", "similar_image_search"))
+    mlflow.set_experiment(experiment_name=experiment_name)
     with mlflow.start_run(run_name=run_name):
         db_client = DBClient()
         animals = retrieve_animals(db_client=db_client)

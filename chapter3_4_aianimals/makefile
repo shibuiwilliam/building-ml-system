@@ -557,7 +557,8 @@ registry_default:
 		NAMESPACE=default ./private_registry_secret.sh
 
 .PHONY: initialize_deployment
-initialize_deployment: registry_default \
+initialize_deployment: deploy_kube_system \
+	registry_default \
 	registry_data \
 	registry_api \
 	registry_violation_detection \
@@ -568,8 +569,9 @@ initialize_deployment: registry_default \
 
 .PHONY: deploy_all
 deploy_all: deploy_data \
-	deploy_mlflow \
 	deploy_es \
+	deploy_argo \
+	deploy_mlflow \
 	deploy_initial_data_registry \
 	deploy_api \
 	deploy_violation_detection_registry \
