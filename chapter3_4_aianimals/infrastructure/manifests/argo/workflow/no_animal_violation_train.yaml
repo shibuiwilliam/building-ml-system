@@ -7,7 +7,7 @@ spec:
   templates:
     - name: no-animal-violation-train
       container:
-        image: shibui/building-ml-system:ai_animals_search_similar_image_search_train_0.0.0
+        image: shibui/building-ml-system:ai_animals_violation_detection_no_animal_violation_train_0.0.0
         command:
           - "python"
           - "-m"
@@ -19,3 +19,9 @@ spec:
             value: https://mlflow.mlflow.svc.cluster.local:5000
           - name: MLFLOW_EXPERIMENT
             value: no_animal_violation_detection
+        resources:
+          requests:
+            memory: 8000Mi
+            cpu: 2000m
+  imagePullSecrets:
+    - name: regcred
