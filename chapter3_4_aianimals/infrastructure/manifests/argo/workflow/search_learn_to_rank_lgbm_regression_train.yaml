@@ -1,11 +1,11 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
-  generateName: search-learn-to-rank-train-
+  generateName: search-learn-to-rank-lightgbm-regression-train-
 spec:
-  entrypoint: search-learn-to-rank-train
+  entrypoint: search-learn-to-rank-lightgbm-regression-train
   templates:
-    - name: search-learn-to-rank-train
+    - name: search-learn-to-rank-lightgbm-regression-train
       container:
         image: shibui/building-ml-system:ai_animals_search_learn_to_rank_train_0.0.0
         imagePullPolicy: Always
@@ -19,7 +19,7 @@ spec:
           - name: MLFLOW_TRACKING_URI
             value: http://mlflow.mlflow.svc.cluster.local:5000
           - name: MLFLOW_EXPERIMENT
-            value: learn_to_rank
+            value: search_learn_to_rank
           - name: POSTGRES_HOST
             value: postgres.data.svc.cluster.local
           - name: POSTGRES_PORT
@@ -38,7 +38,7 @@ spec:
             value: "0"
         resources:
           requests:
-            memory: 3000Mi
-            cpu: 1000m
+            memory: 2000Mi
+            cpu: 2000m
   imagePullSecrets:
     - name: regcred
