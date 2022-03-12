@@ -10,9 +10,9 @@ from src.job.abstract_job import AbstractJob
 from src.middleware.logger import configure_logger
 from src.request_object.access_log import AccessLogCreateRequest
 from src.request_object.animal import AnimalCreateRequest
-from src.request_object.like import LikeCreateRequest
 from src.request_object.animal_category import AnimalCategoryCreateRequest
 from src.request_object.animal_subcategory import AnimalSubcategoryCreateRequest
+from src.request_object.like import LikeCreateRequest
 from src.request_object.user import UserCreateRequest
 from src.request_object.violation import ViolationCreateRequest
 from src.request_object.violation_type import ViolationTypeCreateRequest
@@ -27,10 +27,10 @@ from src.schema.user import User
 from src.schema.violation import Violation
 from src.schema.violation_type import ViolationType
 from src.usecase.access_log_usecase import AbstractAccessLogUsecase
-from src.usecase.like_usecase import AbstractLikeUsecase
 from src.usecase.animal_category_usecase import AbstractAnimalCategoryUsecase
 from src.usecase.animal_subcategory_usecase import AbstractAnimalSubcategoryUsecase
 from src.usecase.animal_usecase import AbstractAnimalUsecase
+from src.usecase.like_usecase import AbstractLikeUsecase
 from src.usecase.table_usecase import AbstractTableUsecase
 from src.usecase.user_usecase import AbstractUserUsecase
 from src.usecase.violation_type_usecase import AbstractViolationTypeUsecase
