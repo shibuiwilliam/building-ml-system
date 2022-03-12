@@ -8,6 +8,7 @@ spec:
     - name: search-learn-to-rank-train
       container:
         image: shibui/building-ml-system:ai_animals_search_learn_to_rank_train_0.0.0
+        imagePullPolicy: Always
         command:
           - "python"
           - "-m"
