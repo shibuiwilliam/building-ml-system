@@ -243,12 +243,13 @@ registry_argo: deploy_argo_ns
 
 .PHONY: deploy_argo
 deploy_argo: registry_argo
-	kubectl apply -f $(ARGO_MANIFEST_DIR)/argo_clusterrolebinding.yaml
-	kubectl apply -f $(ARGO_MANIFEST_DIR)/quick_argo.yaml
+	kubectl -n argo apply -f $(ARGO_MANIFEST_DIR)/argo_clusterrolebinding.yaml
+	kubectl -n argo apply -f $(ARGO_MANIFEST_DIR)/quick_argo.yaml
 
 .PHONY: port_forward_argo
 port_forward_argo:
 	kubectl -n argo port-forward service/argo-server 2746:2746 &
+	echo "Open https://127.0.0.1:2746"
 
 
 ############ ELASTICSEARCH COMMANDS ############

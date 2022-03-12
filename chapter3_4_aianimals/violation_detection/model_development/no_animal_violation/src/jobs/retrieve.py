@@ -61,7 +61,6 @@ async def download_files(
 
 
 def download_dataset(
-    bucket: str,
     filepaths: List[str],
     destination_directory: str,
 ) -> List[str]:

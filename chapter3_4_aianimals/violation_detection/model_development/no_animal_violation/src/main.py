@@ -16,7 +16,7 @@ logger = configure_logger(__name__)
 
 @hydra.main(
     config_path="../hydra",
-    config_name="mobilenet_v3",
+    config_name=os.getenv("MODEL_CONFIG", "mobilenet_v3"),
 )
 def main(cfg: DictConfig):
     logger.info(f"config: {cfg}")

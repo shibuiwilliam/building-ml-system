@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: no-animal-violation-train-
+spec:
+  entrypoint: no-animal-violation-train
+  templates:
+    - name: no-animal-violation-train
+      container:
+        image: shibui/building-ml-system:ai_animals_search_similar_image_search_train_0.0.0
+        command:
+          - "python"
+          - "-m"
+          - "src.main"
+        env:
+          - name: MODEL_CONFIG
+            value: mobilenet_v3
+          - name: MLFLOW_TRACKING_URI
+            value: https://mlflow.mlflow.svc.cluster.local:5000
+          - name: MLFLOW_EXPERIMENT
+            value: no_animal_violation_detection
