@@ -34,6 +34,13 @@ class AbstractLikeUsecase(ABC):
     ) -> Optional[LikeResponse]:
         raise NotImplementedError
 
+    @abstractmethod
+    def bulk_register(
+        self,
+        requests: List[LikeCreateRequest],
+    ):
+        raise NotImplementedError
+
 
 class LikeUsecase(AbstractLikeUsecase):
     def __init__(
@@ -91,3 +98,24 @@ class LikeUsecase(AbstractLikeUsecase):
             logger.info(f"done register: {response}")
             return response
         return None
+
+    def bulk_register(
+        self,
+        requests: List[LikeCreateRequest],
+    ):
+        records = [
+            LikeCreate(
+                id=request.id,
+                animal_id=request.animal_id,
+                user_id=request.user_id,
+                created_at=request.created_at,
+            )
+            for request in requests
+        ]
+        for i in range(0, len(records), 200):
+            _records = records[i : i + 200]
+            self.like_repository.bulk_insert(
+                records=_records,
+                commit=True,
+            )
+            logger.info(f"bulk register like: {i} to {i+200}")

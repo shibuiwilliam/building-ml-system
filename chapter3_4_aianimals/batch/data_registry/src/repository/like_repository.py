@@ -43,6 +43,14 @@ class AbstractLikeRepository(ABC):
     ) -> Optional[LikeModel]:
         raise NotImplementedError
 
+    @abstractmethod
+    def bulk_insert(
+        self,
+        records: List[LikeCreate],
+        commit: bool = True,
+    ):
+        raise NotImplementedError
+
 
 class LikeRepository(AbstractLikeRepository):
     def __init__(
@@ -129,6 +137,22 @@ class LikeRepository(AbstractLikeRepository):
                 )
                 return result[0]
             return None
+        except Exception as e:
+            raise e
+        finally:
+            session.close()
+
+    def bulk_insert(
+        self,
+        records: List[LikeCreate],
+        commit: bool = True,
+    ):
+        session = self.database.get_session().__next__()
+        try:
+            data = [d.dict() for d in records]
+            session.execute(Like.__table__.insert(), data)
+            if commit:
+                session.commit()
         except Exception as e:
             raise e
         finally:

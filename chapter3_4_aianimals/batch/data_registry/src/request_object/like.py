@@ -1,4 +1,5 @@
 from typing import Optional
+from datetime import datetime
 
 from pydantic import BaseModel, Extra
 
@@ -13,8 +14,10 @@ class LikeRequest(BaseModel):
 
 
 class LikeCreateRequest(BaseModel):
+    id: Optional[str]
     animal_id: str
     user_id: str
+    created_at: Optional[datetime]
 
     class Config:
         extra = Extra.forbid

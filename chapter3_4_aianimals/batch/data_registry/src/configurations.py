@@ -11,6 +11,7 @@ class Configurations:
     animal_file = os.path.join(data_directory, "animal.json")
     violation_type_file = os.path.join(data_directory, "violation_type.json")
     violation_file = os.path.join(data_directory, "violation.json")
+    like_file = os.path.join(data_directory, "likes.json")
     access_log_file = os.path.join(data_directory, "access_logs.json")
 
     save_directory = os.getenv("SAVE_DIRECTORY", "/tmp")

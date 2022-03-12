@@ -139,6 +139,7 @@ class Container(object):
             animal_usecase=self.animal_usecase,
             violation_type_usecase=self.violation_type_usecase,
             violation_usecase=self.violation_usecase,
+            like_usecase=self.like_usecase,
             access_log_usecase=self.access_log_usecase,
             messaging=self.messaging,
             engine=self.database.engine,

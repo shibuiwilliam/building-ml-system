@@ -17,6 +17,7 @@ class LikeCreate(BaseModel):
     id: str
     animal_id: str
     user_id: str
+    created_at: Optional[datetime]
 
     class Config:
         extra = Extra.forbid

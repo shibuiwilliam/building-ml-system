@@ -10,6 +10,7 @@ from src.job.abstract_job import AbstractJob
 from src.middleware.logger import configure_logger
 from src.request_object.access_log import AccessLogCreateRequest
 from src.request_object.animal import AnimalCreateRequest
+from src.request_object.like import LikeCreateRequest
 from src.request_object.animal_category import AnimalCategoryCreateRequest
 from src.request_object.animal_subcategory import AnimalSubcategoryCreateRequest
 from src.request_object.user import UserCreateRequest
@@ -26,6 +27,7 @@ from src.schema.user import User
 from src.schema.violation import Violation
 from src.schema.violation_type import ViolationType
 from src.usecase.access_log_usecase import AbstractAccessLogUsecase
+from src.usecase.like_usecase import AbstractLikeUsecase
 from src.usecase.animal_category_usecase import AbstractAnimalCategoryUsecase
 from src.usecase.animal_subcategory_usecase import AbstractAnimalSubcategoryUsecase
 from src.usecase.animal_usecase import AbstractAnimalUsecase
@@ -47,6 +49,7 @@ class InitializationJob(AbstractJob):
         animal_usecase: AbstractAnimalUsecase,
         violation_type_usecase: AbstractViolationTypeUsecase,
         violation_usecase: AbstractViolationUsecase,
+        like_usecase: AbstractLikeUsecase,
         access_log_usecase: AbstractAccessLogUsecase,
         messaging: RabbitmqMessaging,
         engine: Engine,
@@ -59,6 +62,7 @@ class InitializationJob(AbstractJob):
         self.animal_usecase = animal_usecase
         self.violation_type_usecase = violation_type_usecase
         self.violation_usecase = violation_usecase
+        self.like_usecase = like_usecase
         self.access_log_usecase = access_log_usecase
         self.messaging = messaging
         self.engine = engine
@@ -290,6 +294,26 @@ class InitializationJob(AbstractJob):
             self.violation_usecase.register(request=request)
         logger.info(f"done register violation: {file_path}")
 
+    def __register_like(
+        self,
+        file_path: str,
+    ):
+        logger.info(f"register like: {file_path}")
+        with open(file_path, "r") as f:
+            data = json.load(f)
+        requests = []
+        for v in data["likes"]:
+            requests.append(
+                LikeCreateRequest(
+                    id=v["id"],
+                    animal_id=v["animal_id"],
+                    user_id=v["user_id"],
+                    created_at=datetime.strptime(v["created_at"], "%Y-%m-%d %H:%M:%S.%f"),
+                )
+            )
+        self.like_usecase.bulk_register(requests=requests)
+        logger.info(f"done register like: {file_path}")
+
     def __register_access_log(
         self,
         file_path: str,
@@ -325,4 +349,5 @@ class InitializationJob(AbstractJob):
         self.__register_user(file_path=Configurations.user_file)
         self.__register_animal(file_path=Configurations.animal_file)
         self.__register_violation(file_path=Configurations.violation_file)
+        self.__register_like(file_path=Configurations.like_file)
         self.__register_access_log(file_path=Configurations.access_log_file)
