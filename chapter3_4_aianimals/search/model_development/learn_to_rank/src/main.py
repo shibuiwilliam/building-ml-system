@@ -24,15 +24,15 @@ def main(cfg: DictConfig):
     logger.info("start ml...")
     logger.info(f"config: {cfg}")
     cwd = os.getcwd()
-    run_name = cfg.task_name
     experiment_name = os.getenv("MLFLOW_EXPERIMENT", "learn_to_rank")
+    now = datetime.now().strftime("%Y%m%d_%H%M%S")
+    run_name = f"{cfg.task_name}_{now}"
 
     logger.info(f"current working directory: {cwd}")
-    logger.info(f"run_name: {run_name}")
     logger.info(f"experiment_name: {experiment_name}")
+    logger.info(f"run_name: {run_name}")
 
     mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000"))
-    mlflow.create_experiment(name=experiment_name)
     mlflow.set_experiment(experiment_name=experiment_name)
     with mlflow.start_run(run_name=run_name):
         db_client = DBClient()
@@ -61,7 +61,6 @@ def main(cfg: DictConfig):
         if "params" in cfg.jobs.model.keys():
             model.reset_model(params=cfg.jobs.model.params)
 
-        now = datetime.now().strftime("%Y%m%d_%H%M%S")
         likes_scaler_save_file_path = os.path.join(
             cwd,
             f"{model.name}_likes_scaler_{now}",

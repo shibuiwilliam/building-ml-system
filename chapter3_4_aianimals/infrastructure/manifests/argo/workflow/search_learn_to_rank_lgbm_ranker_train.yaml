@@ -15,9 +15,9 @@ spec:
           - "src.main"
         env:
           - name: MODEL_CONFIG
-            value: learn_to_rank_lightgbm_regression
+            value: learn_to_rank_lightgbm_ranker
           - name: MLFLOW_TRACKING_URI
-            value: https://mlflow.mlflow.svc.cluster.local:5000
+            value: http://mlflow.mlflow.svc.cluster.local:5000
           - name: MLFLOW_EXPERIMENT
             value: learn_to_rank
           - name: POSTGRES_HOST
@@ -38,7 +38,7 @@ spec:
             value: "0"
         resources:
           requests:
-            memory: 2000Mi
-            cpu: 500m
+            memory: 3000Mi
+            cpu: 1000m
   imagePullSecrets:
     - name: regcred
