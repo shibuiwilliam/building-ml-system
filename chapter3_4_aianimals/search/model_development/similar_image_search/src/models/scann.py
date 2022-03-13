@@ -44,7 +44,7 @@ class Scann(keras.Model):
 
     def save(
         self,
-        export_path: str = "/opt/outputs/saved_model/scann/0",
+        export_path: str = "/opt/outputs/saved_model/similar_image_search/0",
     ):
         signatures = {"serving_default": self.serving_fn}
         keras.backend.set_learning_phase(0)
@@ -121,7 +121,7 @@ class ScannModel(object):
 
     def save_as_saved_model(
         self,
-        saved_model: str = "/opt/outputs/saved_model/scann/0",
+        saved_model: str = "/opt/outputs/saved_model/similar_image_search/0",
     ) -> str:
         self.scann.save(export_path=saved_model)
         logger.info(f"saved model: {saved_model}")

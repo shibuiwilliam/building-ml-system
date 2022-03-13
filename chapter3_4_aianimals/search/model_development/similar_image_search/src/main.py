@@ -58,7 +58,7 @@ def main(cfg: DictConfig):
             num_leaves_to_search=cfg.model.num_leaves_to_search,
             num_reordering_candidates=cfg.model.num_reordering_candidates,
         )
-        scann_model.save_as_saved_model(saved_model="/opt/outputs/saved_model/scann/0")
+        scann_model.save_as_saved_model(saved_model="/opt/outputs/saved_model/similar_image_search/0")
         shutil.make_archive(
             "saved_model",
             format="zip",
