@@ -1,12 +1,12 @@
 import json
 from abc import ABC, abstractmethod
-from typing import List, Optional, Dict
+from logging import getLogger
+from typing import Dict, List, Optional
 
 import httpx
 import numpy as np
 from PIL import Image
 from pydantic import BaseModel
-from logging import getLogger
 
 logger = getLogger(__name__)
 

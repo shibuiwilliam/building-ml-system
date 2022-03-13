@@ -1,15 +1,15 @@
 from abc import ABC, abstractmethod
+from io import BytesIO
 from logging import getLogger
 from typing import List
 
-from io import BytesIO
-from PIL import Image
 import httpx
 from fastapi import BackgroundTasks
-from src.service.predictor import AbstractPredictor
+from PIL import Image
 from src.infrastructure.cache_client import AbstractCacheClient
 from src.repository.animal_repository import AnimalQuery, AnimalRepository
 from src.schema.animal import AnimalRequest, AnimalResponse
+from src.service.predictor import AbstractPredictor
 
 logger = getLogger(__name__)
 

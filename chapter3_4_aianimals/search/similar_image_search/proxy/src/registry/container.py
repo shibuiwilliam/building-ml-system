@@ -1,8 +1,8 @@
 from src.configurations import Configurations
-from src.service.predictor import AbstractPredictor, SimilarImageSearchPredictor
 from src.infrastructure.cache_client import AbstractCacheClient, RedisClient
 from src.infrastructure.db_client import AbstractDBClient, DBClient
 from src.repository.animal_repository import AnimalRepository
+from src.service.predictor import AbstractPredictor, SimilarImageSearchPredictor
 from src.usecase.search_similar_image_usecase import AbstractSearchSimilarImageUsecase, SearchSimilarImageUsecase
 
 
