@@ -1,4 +1,5 @@
 import os
+import shutil
 from datetime import datetime
 
 import hydra
@@ -114,17 +115,25 @@ def main(cfg: DictConfig):
             tensorboard=cfg.jobs.train.callback.tensorboard,
         )
 
-        saved_model = save_as_saved_model(
+        save_as_saved_model(
             model=model,
             save_dir=os.path.join(cwd, cfg.task_name),
             version=0,
         )
+        shutil.make_archive(
+            "saved_model",
+            format="zip",
+            root_dir=cwd,
+            base_dir=cfg.task_name,
+        )
+        saved_model_zip = shutil.move("./saved_model.zip", "/opt/outputs/saved_model.zip")
+
         tflite = save_as_tflite(
             model=model,
             save_path=os.path.join(cwd, cfg.task_name, f"{cfg.jobs.train.model_name}.tflite"),
         )
 
-        mlflow.log_artifact(saved_model, "saved_model")
+        mlflow.log_artifact(saved_model_zip, "saved_model")
         mlflow.log_artifact(tflite, "tflite")
         mlflow.log_artifact(os.path.join(cwd, ".hydra/config.yaml"))
         mlflow.log_artifact(os.path.join(cwd, ".hydra/hydra.yaml"))
