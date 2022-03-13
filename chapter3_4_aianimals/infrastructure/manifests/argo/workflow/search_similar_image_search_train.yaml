@@ -17,8 +17,8 @@ spec:
               template: print-message
               arguments:
                 parameters:
-                  - name: experiment_run
-                    value: "{{steps.search-similar-image-search-train.outputs.parameters.experiment_run}}"
+                  - name: experiment-run
+                    value: "{{steps.search-similar-image-search-train.outputs.parameters.experiment-run}}"
 
       - name: search-similar-image-search-train
         container:
@@ -51,18 +51,18 @@ spec:
               cpu: 2000m
         outputs:
           parameters:
-            - name: experiment_run
+            - name: experiment-run
               valueFrom:
                 path: /tmp/output.json
 
       - name: print-message
         inputs:
           parameters:
-            - name: experiment_run
+            - name: experiment-run
         container:
           image: docker/whalesay:latest
           command: [cowsay]
-          args: ["{{inputs.parameters.experiment_run}}"]
+          args: ["{{inputs.parameters.experiment-run}}"]
 
     imagePullSecrets:
       - name: regcred
