@@ -1,4 +1,4 @@
-ARG FROM_IMAGE=google/tf-serving-scann:latest
+ARG FROM_IMAGE=google/tf-serving-scann:2.7.0
 
 FROM ${FROM_IMAGE}
 

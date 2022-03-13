@@ -317,6 +317,20 @@ port_forward_kibana:
 	kubectl -n elastic-search port-forward service/kibana-kb-http 5601:5601 &
 
 
+############ SEARCH COMMANDS ############
+SEARCH_MANIFEST_DIR := $(K8S_DIR)/manifests/search
+
+.PHONY: deploy_search_ns
+deploy_search_ns:
+	kubectl apply \
+		-f $(SEARCH_MANIFEST_DIR)/namespace.yaml
+
+.PHONY: registry_search
+registry_search: deploy_search_ns
+	@cd $(K8S_SECRET_DIR) && \
+		NAMESPACE=search ./private_registry_secret.sh
+
+
 ############ SEARCH_LEARN_TO_RANK_TRAIN COMMANDS ############
 SEARCH_LEARN_TO_RANK_TRAIN_DIR := $(DIR)/search/model_development/learn_to_rank
 SEARCH_LEARN_TO_RANK_TRAIN_VERSION := $(shell cd ${SEARCH_LEARN_TO_RANK_TRAIN_DIR} && poetry version -s)
@@ -379,7 +393,7 @@ push_search_learn_to_rank_lgbm_api:
 .PHONY: deploy_search_learn_to_rank_lgbm_api
 deploy_search_learn_to_rank_lgbm_api: 
 	kubectl apply \
-		-f $(SEARCH_LEARN_TO_RANK_LGBM_API_MANIFEST_DIR)/search_learn_to_rank_lgbm_api.yaml
+		-f $(SEARCH_MANIFEST_DIR)/search_learn_to_rank_lgbm_api.yaml
 
 
 ############ SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN COMMANDS ############
@@ -409,6 +423,31 @@ build_search_similar_image_search_train:
 .PHONY: push_search_similar_image_search_train
 push_search_similar_image_search_train: 
 	docker push $(DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_IMAGE_NAME)
+
+
+############ SEARCH_SIMILAR_IMAGE_SEARCH_SERVING COMMANDS ############
+SEARCH_SIMILAR_IMAGE_SEARCH_SERVING_DIR := $(DIR)/search/similar_image_search/serving
+SEARCH_SIMILAR_IMAGE_SEARCH_SERVING_VERSION := 0.0.0
+DOCKERFILE_SEARCH_SIMILAR_IMAGE_SEARCH_SERVING = $(SEARCH_SIMILAR_IMAGE_SEARCH_SERVING_DIR)/$(DOCKERFILE)
+DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_SERVING_TAG = $(TAG)_search_similar_image_search_serving
+DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_SERVING_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_SERVING_TAG)_$(SEARCH_SIMILAR_IMAGE_SEARCH_SERVING_VERSION)
+
+.PHONY: build_search_similar_image_search_serving
+build_search_similar_image_search_serving: 
+	docker build \
+		--platform x86_64 \
+		-t $(DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_SERVING_IMAGE_NAME) \
+		-f $(DOCKERFILE_SEARCH_SIMILAR_IMAGE_SEARCH_SERVING) \
+		.
+
+.PHONY: push_search_similar_image_search_serving
+push_search_similar_image_search_serving: 
+	docker push $(DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_SERVING_IMAGE_NAME)
+
+.PHONY: deploy_similar_image_search_serving
+deploy_similar_image_search_serving: registry_search
+	kubectl apply \
+		-f $(SEARCH_MANIFEST_DIR)/similar_image_search_serving.yaml
 
 
 ############ VIOLATION_DETECTION COMMANDS ############
@@ -580,6 +619,7 @@ initialize_deployment: deploy_kube_system \
 	registry_es \
 	registry_mlflow \
 	registry_argo \
+	registry_search \
 	secret_api
 
 .PHONY: deploy_all
@@ -593,7 +633,8 @@ deploy_all: deploy_data \
 	deploy_no_animal_violation_serving \
 	deploy_no_animal_violation_proxy \
 	deploy_search_registry \
-	deploy_animal_feature_registry
+	deploy_animal_feature_registry \
+	deploy_similar_image_search_serving
 
 .PHONY: delete_namespaces
 delete_namespaces:

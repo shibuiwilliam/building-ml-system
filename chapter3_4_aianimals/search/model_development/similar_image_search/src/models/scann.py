@@ -54,7 +54,7 @@ class Scann(keras.Model):
 class ScannModel(object):
     def __init__(
         self,
-        tfhub_url: str = "https://tfhub.dev/google/imagenet/mobilenet_v3_large_100_224/classification/5",
+        tfhub_url: str = "https://tfhub.dev/google/imagenet/mobilenet_v3_large_100_224/feature_vector/5",
         height: int = 224,
         width: int = 224,
     ):

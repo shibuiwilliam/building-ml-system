@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: similar-image-search-serving
+  namespace: search
+  labels:
+    app: similar-image-search-serving
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: similar-image-search-serving
+  template:
+    metadata:
+      labels:
+        app: similar-image-search-serving
+    spec:
+      containers:
+        - name: similar-image-search-serving
+          image: shibui/building-ml-system:ai_animals_search_similar_image_search_serving_0.0.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8500
+            - containerPort: 8501
+          resources:
+            limits:
+              cpu: 2000m
+              memory: "8000Mi"
+            requests:
+              cpu: 1000m
+              memory: "4000Mi"
+          env:
+            - name: REST_API_PORT
+              value: "8501"
+            - name: PORT
+              value: "8500"
+      imagePullSecrets:
+        - name: regcred
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: similar-image-search-serving
+  namespace: search
+  labels:
+    app: similar-image-search-serving
+spec:
+  ports:
+    - name: grpc
+      port: 8500
+      protocol: TCP
+    - name: rest
+      port: 8501
+      protocol: TCP
+  selector:
+    app: similar-image-search-serving
