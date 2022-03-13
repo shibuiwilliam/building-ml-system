@@ -3,7 +3,6 @@ ARG FROM_IMAGE=tensorflow/serving:2.7.0
 FROM ${FROM_IMAGE}
 
 ARG LOCAL_DIR=violation_detection/no_animal_violation/serving
-ARG SERVER_DIR=no_animal_violation
 ENV PROJECT_DIR no_animal_violation
 ENV MODEL_NAME no_animal_violation
 ENV MODEL_BASE_PATH /${PROJECT_DIR}/saved_model/
