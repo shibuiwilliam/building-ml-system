@@ -425,6 +425,39 @@ push_search_similar_image_search_train:
 	docker push $(DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_IMAGE_NAME)
 
 
+############ SIMILAR_IMAGE_SEARCH_PROXY COMMANDS ############
+SIMILAR_IMAGE_SEARCH_PROXY_DIR := $(DIR)/search/similar_image_search/proxy
+SIMILAR_IMAGE_SEARCH_PROXY_VERSION := $(shell cd ${SIMILAR_IMAGE_SEARCH_PROXY_DIR} && poetry version -s)
+DOCKERFILE_SIMILAR_IMAGE_SEARCH_PROXY = $(SIMILAR_IMAGE_SEARCH_PROXY_DIR)/$(DOCKERFILE)
+DOCKER_SIMILAR_IMAGE_SEARCH_PROXY_TAG = $(TAG)_search_similar_image_search_proxy
+DOCKER_SIMILAR_IMAGE_SEARCH_PROXY_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_SIMILAR_IMAGE_SEARCH_PROXY_TAG)_$(SIMILAR_IMAGE_SEARCH_PROXY_VERSION)
+
+.PHONY: req_search_similar_image_search_proxy
+req_search_similar_image_search_proxy:
+	cd $(SIMILAR_IMAGE_SEARCH_PROXY_DIR) && \
+	poetry export \
+		--without-hashes \
+		-f requirements.txt \
+		--output requirements.txt
+
+.PHONY: build_search_similar_image_search_proxy
+build_search_similar_image_search_proxy: 
+	docker build \
+		--platform x86_64 \
+		-t $(DOCKER_SIMILAR_IMAGE_SEARCH_PROXY_IMAGE_NAME) \
+		-f $(DOCKERFILE_SIMILAR_IMAGE_SEARCH_PROXY) \
+		.
+
+.PHONY: push_search_similar_image_search_proxy
+push_search_similar_image_search_proxy: 
+	docker push $(DOCKER_SIMILAR_IMAGE_SEARCH_PROXY_IMAGE_NAME)
+
+.PHONY: deploy_similar_image_search_proxy
+deploy_similar_image_search_proxy: registry_search
+	kubectl apply \
+		-f $(SEARCH_MANIFEST_DIR)/similar_image_search_proxy.yaml
+
+
 ############ SEARCH_SIMILAR_IMAGE_SEARCH_SERVING COMMANDS ############
 SEARCH_SIMILAR_IMAGE_SEARCH_SERVING_DIR := $(DIR)/search/similar_image_search/serving
 SEARCH_SIMILAR_IMAGE_SEARCH_SERVING_VERSION := 0.0.0
@@ -658,8 +691,9 @@ req_all: \
 	req_violation_detection_no_animal_violation_train \
 	req_search_learn_to_rank_train \
 	req_search_similar_image_search_train \
+	req_search_similar_image_search_proxy \
 	req_search_learn_to_rank_lgbm_api
-	
+
 .PHONY: build_all
 build_all: \
 	build_mlflow \
@@ -674,6 +708,7 @@ build_all: \
 	build_violation_detection_no_animal_violation_train \
 	build_search_learn_to_rank_train \
 	build_search_similar_image_search_train \
+	build_search_similar_image_search_proxy \
 	build_search_learn_to_rank_lgbm_api
 	
 .PHONY: push_all
@@ -690,5 +725,6 @@ push_all: \
 	push_violation_detection_no_animal_violation_train \
 	push_search_learn_to_rank_train \
 	push_search_similar_image_search_train \
+	push_search_similar_image_search_proxy \
 	push_search_learn_to_rank_lgbm_api
 	

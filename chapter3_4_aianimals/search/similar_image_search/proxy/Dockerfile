@@ -2,7 +2,7 @@ ARG FROM_IMAGE=python:3.9.7-slim
 
 FROM ${FROM_IMAGE}
 
-ARG LOCAL_DIR=search/similar_image_search
+ARG LOCAL_DIR=search/similar_image_search/proxy
 
 ENV PROJECT_DIR opt
 WORKDIR /${PROJECT_DIR}
@@ -16,3 +16,7 @@ RUN apt-get -y update && \
     pip install --no-cache-dir -r requirements.txt
 
 COPY ${LOCAL_DIR}/src/ /${PROJECT_DIR}/src/
+
+COPY ${LOCAL_DIR}/run.sh /${PROJECT_DIR}/run.sh
+RUN chmod +x /${PROJECT_DIR}/run.sh
+CMD [ "./run.sh" ]

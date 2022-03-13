@@ -7,7 +7,13 @@ ARG LOCAL_DIR=search/learn_to_rank/api
 ENV PROJECT_DIR opt
 WORKDIR /${PROJECT_DIR}
 COPY ${LOCAL_DIR}/requirements.txt /${PROJECT_DIR}/
-RUN pip install --no-cache-dir -r requirements.txt
+RUN apt-get -y update && \
+    apt-get -y install \
+    apt-utils \
+    gcc && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    pip install --no-cache-dir -r requirements.txt
 
 COPY ${LOCAL_DIR}/src/ /${PROJECT_DIR}/src/
 COPY ${LOCAL_DIR}/model/ /${PROJECT_DIR}/model/

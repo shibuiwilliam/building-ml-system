@@ -29,11 +29,6 @@ spec:
             requests:
               cpu: 1000m
               memory: "4000Mi"
-          env:
-            - name: REST_API_PORT
-              value: "8501"
-            - name: PORT
-              value: "8500"
       imagePullSecrets:
         - name: regcred
 
