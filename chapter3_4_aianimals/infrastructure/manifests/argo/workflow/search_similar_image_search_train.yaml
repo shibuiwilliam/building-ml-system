@@ -1,14 +1,25 @@
 apiVersion: argoproj.io/v1alpha1
 kind: CronWorkflow
 metadata:
-  generateName: search-similar-image-search-train-
+  generateName: search-similar-image-search-pipeline-
 spec:
   schedule: "0 * * * *"
   concurrencyPolicy: "Allow"
   startingDeadlineSeconds: 0
   workflowSpec:
-    entrypoint: search-similar-image-search-train
+    entrypoint: pipeline
     templates:
+      - name: pipeline
+        steps:
+          - - name: search-similar-image-search-train
+              template: search-similar-image-search-train
+          - - name: print-message
+              template: print-message
+              arguments:
+                parameters:
+                  - name: experiment_run
+                    value: "{{steps.search-similar-image-search-train.outputs.parameters.experiment_run}}"
+
       - name: search-similar-image-search-train
         container:
           image: shibui/building-ml-system:ai_animals_search_similar_image_search_train_0.0.0
@@ -38,5 +49,20 @@ spec:
             requests:
               memory: 16000Mi
               cpu: 2000m
+        outputs:
+          parameters:
+            - name: experiment_run
+              valueFrom:
+                path: /tmp/output.json
+
+      - name: print-message
+        inputs:
+          parameters:
+            - name: experiment_run
+        container:
+          image: docker/whalesay:latest
+          command: [cowsay]
+          args: ["{{inputs.parameters.experiment_run}}"]
+
     imagePullSecrets:
       - name: regcred

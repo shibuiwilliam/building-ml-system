@@ -1,6 +1,7 @@
+import json
 import os
-from datetime import datetime
 import shutil
+from datetime import datetime
 
 import hydra
 import mlflow
@@ -74,6 +75,15 @@ def main(cfg: DictConfig):
 
         mlflow.log_params(cfg.model)
         mlflow.log_params(cfg.input)
+
+    with open("/tmp/output.json", "w") as f:
+        json.dump(
+            dict(
+                experiment_name=experiment_name,
+                run_name=run_name,
+            ),
+            f,
+        )
 
 
 if __name__ == "__main__":
