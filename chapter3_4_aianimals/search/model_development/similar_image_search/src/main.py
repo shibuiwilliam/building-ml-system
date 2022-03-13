@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+import shutil
 
 import hydra
 import mlflow
@@ -56,9 +57,16 @@ def main(cfg: DictConfig):
             num_leaves_to_search=cfg.model.num_leaves_to_search,
             num_reordering_candidates=cfg.model.num_reordering_candidates,
         )
-        saved_model = scann_model.save_as_saved_model()
+        scann_model.save_as_saved_model(saved_model="/opt/outputs/saved_model/scann/0")
+        shutil.make_archive(
+            "saved_model",
+            format="zip",
+            root_dir="/opt/outputs",
+            base_dir="saved_model",
+        )
+        saved_model_zip = shutil.move("./saved_model.zip", "/opt/outputs/saved_model.zip")
 
-        mlflow.log_artifact(saved_model, "saved_model")
+        mlflow.log_artifact(saved_model_zip, "saved_model")
         mlflow.log_artifact(os.path.join(cwd, ".hydra/config.yaml"), "hydra_config.yaml")
         mlflow.log_artifact(os.path.join(cwd, ".hydra/hydra.yaml"), "hydra_hydra.yaml")
         mlflow.log_artifact(os.path.join(cwd, ".hydra/overrides.yaml"), "hydra_overrides.yaml")

@@ -23,6 +23,7 @@ spec:
               wget ${animal_subcategory} -P /opt/dataset/data/
               wget ${no_animal_violation} -P /opt/dataset/data/
               wget ${user} -P /opt/dataset/data/
+              wget ${like} -P /opt/dataset/data/
               wget ${violation} -P /opt/dataset/data/
               wget ${violation_type} -P /opt/dataset/data/
           envFrom:

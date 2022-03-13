@@ -183,7 +183,7 @@ deploy_api: registry_api
 .PHONY: port_forward_api
 port_forward_api:
 	kubectl -n aianimals port-forward service/api 8000:8000 &
-	
+
 
 ############ BATCH COMMANDS ############
 BATCH_MANIFEST_DIR := $(K8S_DIR)/manifests/aianimals
@@ -597,12 +597,12 @@ deploy_all: deploy_data \
 
 .PHONY: delete_namespaces
 delete_namespaces:
-	kubectl delete ns aianimals && \
-	kubectl delete ns argo && \
-	kubectl delete ns data && \
-	kubectl delete ns elastic-search && \
-	kubectl delete ns elastic-system && \
-	kubectl delete ns mlflow && \
+	kubectl delete ns aianimals & \
+	kubectl delete ns argo & \
+	kubectl delete ns data & \
+	kubectl delete ns elastic-search & \
+	kubectl delete ns elastic-system & \
+	kubectl delete ns mlflow & \
 	kubectl delete ns violation-detection
 
 ############ ALL COMMANDS ############
