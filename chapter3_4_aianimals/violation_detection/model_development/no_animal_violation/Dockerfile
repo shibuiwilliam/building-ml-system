@@ -17,4 +17,3 @@ RUN apt-get -y update && \
 
 COPY ${LOCAL_DIR}/src/ /${PROJECT_DIR}/src/
 COPY ${LOCAL_DIR}/hydra/ /${PROJECT_DIR}/hydra/
-COPY ${LOCAL_DIR}/data/ /${PROJECT_DIR}/data/
