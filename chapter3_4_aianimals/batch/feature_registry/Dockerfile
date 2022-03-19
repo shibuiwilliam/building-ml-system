@@ -18,5 +18,4 @@ RUN apt-get -y update && \
     pip install --no-cache-dir -r requirements.txt
 
 COPY ${LOCAL_DIR}/src/ /${PROJECT_DIR}/src/
-
-CMD [ "python", "-m", "src.main" ]
+COPY ${LOCAL_DIR}/hydra/ /${PROJECT_DIR}/hydra/

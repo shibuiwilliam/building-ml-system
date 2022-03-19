@@ -1,9 +1,8 @@
 from src.configurations import Configurations
 from src.infrastructure.cache import AbstractCache
-from src.infrastructure.client.postgresql_database import PostgreSQLDatabase
 from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging
-from src.infrastructure.client.redis_cache import RedisCache
 from src.infrastructure.database import AbstractDatabase
+from src.job.animal_feature_initialization_job import AnimalFeatureInitializationJob
 from src.job.animal_feature_registration_job import AnimalFeatureRegistrationJob
 from src.middleware.logger import configure_logger
 from src.repository.animal_feature_repository import AbstractAnimalFeatureRepository, AnimalFeatureRepository
@@ -37,9 +36,6 @@ class Container(object):
         self.cache = cache
         self.messaging = messaging
         self.messaging.init_channel()
-        for q in Configurations.animal_violation_queues:
-            self.messaging.create_queue(queue_name=q)
-        self.messaging.create_queue(queue_name=Configurations.animal_registry_queue)
         self.messaging.create_queue(queue_name=Configurations.animal_feature_registry_queue)
 
         self.animal_category_vectorizer = animal_category_vectorizer
@@ -67,20 +63,10 @@ class Container(object):
             name_vectorizer=self.name_vectorizer,
         )
 
+        self.animal_feature_initialization_job: AnimalFeatureInitializationJob = AnimalFeatureInitializationJob(
+            animal_feature_usecase=self.animal_feature_usecase,
+        )
         self.animal_feature_registration_job: AnimalFeatureRegistrationJob = AnimalFeatureRegistrationJob(
-            animal_usecase=self.animal_feature_usecase,
+            animal_feature_usecase=self.animal_feature_usecase,
             messaging=self.messaging,
         )
-
-
-container = Container(
-    database=PostgreSQLDatabase(),
-    messaging=RabbitmqMessaging(),
-    cache=RedisCache(),
-    animal_category_vectorizer=CategoricalVectorizer(),
-    animal_subcategory_vectorizer=CategoricalVectorizer(),
-    description_tokenizer=DescriptionTokenizer(),
-    name_tokenizer=NameTokenizer(),
-    description_vectorizer=DescriptionVectorizer(),
-    name_vectorizer=NameVectorizer(),
-)

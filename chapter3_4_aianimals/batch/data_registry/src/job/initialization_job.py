@@ -127,6 +127,11 @@ class InitializationJob(AbstractJob):
             {"column": Animal.animal_category_id, "unique": False},
             {"column": Animal.animal_subcategory_id, "unique": False},
         ]
+        animal_feature_indices = [
+            {"column": AnimalFeature.animal_id, "unique": False},
+            {"column": Animal.mlflow_experiment_id, "unique": False},
+            {"column": Animal.mlflow_run_id, "unique": False},
+        ]
         like_indices = [
             {"column": Like.user_id, "unique": False},
             {"column": Like.animal_id, "unique": False},
@@ -156,6 +161,10 @@ class InitializationJob(AbstractJob):
         )
         self.__create_index(
             indices=animal_indices,
+            table=Animal,
+        )
+        self.__create_index(
+            indices=animal_feature_indices,
             table=Animal,
         )
         self.__create_index(

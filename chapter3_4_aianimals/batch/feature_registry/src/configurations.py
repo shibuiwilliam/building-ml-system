@@ -4,17 +4,9 @@ import os
 class Configurations:
     run_environment = os.getenv("RUN_ENVIRONMENT", "local")
 
-    data_directory = os.environ["DATA_DIRECTORY"]
-    animal_category_file = os.path.join(data_directory, "animal_category.json")
-    animal_subcategory_file = os.path.join(data_directory, "animal_subcategory.json")
-    user_file = os.path.join(data_directory, "user.json")
-    animal_file = os.path.join(data_directory, "animal.json")
-    violation_type_file = os.path.join(data_directory, "violation_type.json")
-    violation_file = os.path.join(data_directory, "violation.json")
-    like_file = os.path.join(data_directory, "likes.json")
-    access_log_file = os.path.join(data_directory, "access_logs.json")
+    job = os.environ["JOB"]
 
-    save_directory = os.getenv("SAVE_DIRECTORY", "/tmp")
+    save_directory = os.getenv("SAVE_DIRECTORY", "/opt/outputs")
     animal_category_vectorizer_file = os.getenv(
         "ANIMAL_CATEGORY_VECTORIZER",
         os.path.join(save_directory, "animal_category_vectorizer.pkl"),
@@ -32,10 +24,7 @@ class Configurations:
         os.path.join(save_directory, "name_vectorizer.pkl"),
     )
 
-    animal_registry_queue = os.getenv("ANIMAL_REGISTRY_QUEUE", "animal")
-    animal_feature_registry_queue = os.getenv("ANIMAL_FEATURE_REGISTRY_QUEUE", "animal_feature")
+    mlflow_experiment_name = os.getenv("MLFLOW_EXPERIMENT_NAME", "animal_feature_extraction")
+    mlflow_run_id = os.getenv("MLFLOW_RUN_ID", "")
 
-    animal_violation_queues = []
-    for k, v in os.environ.items():
-        if k.startswith("ANIMAL_VIOLATION_QUEUE_"):
-            animal_violation_queues.append(v)
+    animal_feature_registry_queue = os.getenv("ANIMAL_FEATURE_REGISTRY_QUEUE", "animal_feature")

@@ -4,7 +4,7 @@ metadata:
   generateName: search-similar-image-search-pipeline-
 spec:
   schedule: "0 * * * *"
-  concurrencyPolicy: "Allow"
+  concurrencyPolicy: "Forbid"
   startingDeadlineSeconds: 0
   workflowSpec:
     entrypoint: pipeline

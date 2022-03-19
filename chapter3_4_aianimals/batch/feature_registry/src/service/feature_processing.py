@@ -18,7 +18,13 @@ cloudpickle.register_pickle_by_value(sys.modules[__name__])
 
 
 class CategoricalVectorizer(BaseEstimator, TransformerMixin):
-    def __init__(self):
+    def __init__(
+        self,
+        sparse: bool = True,
+        handle_unknown: str = "ignore",
+    ):
+        self.sparse = sparse
+        self.handle_unknown = handle_unknown
         self.define_pipeline()
 
     def define_pipeline(self):
@@ -36,8 +42,8 @@ class CategoricalVectorizer(BaseEstimator, TransformerMixin):
                 (
                     "one_hot_encoder",
                     OneHotEncoder(
-                        sparse=True,
-                        handle_unknown="ignore",
+                        sparse=self.sparse,
+                        handle_unknown=self.handle_unknown,
                     ),
                 ),
             ]
@@ -47,20 +53,20 @@ class CategoricalVectorizer(BaseEstimator, TransformerMixin):
 
     def transform(
         self,
-        x: List[int],
+        x: List[List[int]],
     ):
         return self.pipeline.transform(x)
 
     def fit(
         self,
-        x: List[int],
+        x: List[List[int]],
         y=None,
     ):
         return self.pipeline.fit(x)
 
     def fit_transform(
         self,
-        x: List[int],
+        x: List[List[int]],
         y=None,
     ):
         return self.pipeline.fit_transform(x)
@@ -99,7 +105,10 @@ class DescriptionTokenizer(BaseEstimator, TransformerMixin):
             tokens.append(w)
         return tokens
 
-    def transform(self, X) -> np.ndarray:
+    def transform(
+        self,
+        X: List[str],
+    ) -> np.ndarray:
         y = []
         for x in X:
             ts = self.tokenize_description(
@@ -110,10 +119,18 @@ class DescriptionTokenizer(BaseEstimator, TransformerMixin):
             y.append(ts)
         return np.array(y)
 
-    def fit(self, X, y=None):
+    def fit(
+        self,
+        X: List[str],
+        y=None,
+    ):
         return self
 
-    def fit_transform(self, X, y=None) -> np.ndarray:
+    def fit_transform(
+        self,
+        X: List[str],
+        y=None,
+    ) -> np.ndarray:
         self.fit(X=X, y=y)
         return self.transform(X=X)
 
@@ -149,7 +166,10 @@ class NameTokenizer(BaseEstimator, TransformerMixin):
             tokens.append(w)
         return tokens
 
-    def transform(self, X) -> np.ndarray:
+    def transform(
+        self,
+        X: List[str],
+    ) -> np.ndarray:
         y = []
         for x in X:
             ts = self.tokenize_name(
@@ -160,10 +180,18 @@ class NameTokenizer(BaseEstimator, TransformerMixin):
             y.append(ts)
         return np.array(y)
 
-    def fit(self, X, y=None):
+    def fit(
+        self,
+        X: List[str],
+        y=None,
+    ):
         return self
 
-    def fit_transform(self, X, y=None) -> np.ndarray:
+    def fit_transform(
+        self,
+        X: List[str],
+        y=None,
+    ) -> np.ndarray:
         self.fit(X=X, y=y)
         return self.transform(X=X)
 
@@ -175,7 +203,6 @@ class DescriptionVectorizer(BaseEstimator, TransformerMixin):
     ):
         self.max_features = max_features
         self.define_pipeline()
-        self.is_fitted = False
 
     def define_pipeline(self):
         self.pipeline = Pipeline(
@@ -187,14 +214,24 @@ class DescriptionVectorizer(BaseEstimator, TransformerMixin):
             ]
         )
 
-    def transform(self, X):
+    def transform(
+        self,
+        X: List[List[str]],
+    ):
         return self.pipeline.transform(X)
 
-    def fit(self, X, y=None):
-        self.is_fitted = True
+    def fit(
+        self,
+        X: List[List[str]],
+        y=None,
+    ):
         return self.pipeline.fit(X=X, y=y)
 
-    def fit_transform(self, X, y=None):
+    def fit_transform(
+        self,
+        X: List[List[str]],
+        y=None,
+    ):
         return self.pipeline.fit_transform(X=X, y=y)
 
 
@@ -205,7 +242,6 @@ class NameVectorizer(BaseEstimator, TransformerMixin):
     ):
         self.max_features = max_features
         self.define_pipeline()
-        self.is_fitted = False
 
     def define_pipeline(self):
         self.pipeline = Pipeline(
@@ -217,12 +253,22 @@ class NameVectorizer(BaseEstimator, TransformerMixin):
             ]
         )
 
-    def transform(self, X):
+    def transform(
+        self,
+        X: List[List[str]],
+    ):
         return self.pipeline.transform(X)
 
-    def fit(self, X, y=None):
-        self.is_fitted = True
+    def fit(
+        self,
+        X: List[List[str]],
+        y=None,
+    ):
         return self.pipeline.fit(X=X, y=y)
 
-    def fit_transform(self, X, y=None):
+    def fit_transform(
+        self,
+        X: List[List[str]],
+        y=None,
+    ):
         return self.pipeline.fit_transform(X=X, y=y)

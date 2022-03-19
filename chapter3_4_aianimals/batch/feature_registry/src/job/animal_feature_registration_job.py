@@ -19,7 +19,6 @@ class AnimalFeatureRegistrationJob(AbstractJob):
 
     def run(self):
         logger.info("run animal feature registration job")
-        self.animal_feature_usecase.fit_register_animal_feature()
         try:
             self.messaging.init_channel()
             self.messaging.create_queue(queue_name=Configurations.animal_feature_registry_queue)

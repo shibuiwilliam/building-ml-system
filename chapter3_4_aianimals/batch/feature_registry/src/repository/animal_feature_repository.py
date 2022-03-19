@@ -1,4 +1,3 @@
-import json
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
@@ -69,8 +68,15 @@ class AnimalFeatureRepository(AbstractAnimalFeatureRepository):
         session = self.database.get_session().__next__()
         try:
             filters = []
-            if query is not None and len(query.ids) > 0:
-                filters.append(AnimalFeature.id.in_(query.ids))
+            if query is not None:
+                if query.id is not None:
+                    filters.append(AnimalFeature.id == query.id)
+                if query.animal_id is not None:
+                    filters.append(AnimalFeature.animal_id == query.animal_id)
+                if query.mlflow_experiment_id is not None:
+                    filters.append(AnimalFeature.mlflow_experiment_id == query.mlflow_experiment_id)
+                if query.mlflow_run_id is not None:
+                    filters.append(AnimalFeature.mlflow_run_id == query.mlflow_run_id)
             results = (
                 session.query(AnimalFeature)
                 .filter(and_(*filters))
@@ -81,6 +87,9 @@ class AnimalFeatureRepository(AbstractAnimalFeatureRepository):
             data = [
                 AnimalFeatureModel(
                     id=d.id,
+                    animal_id=d.animal_id,
+                    mlflow_experiment_id=d.mlflow_experiment_id,
+                    mlflow_run_id=d.mlflow_run_id,
                     animal_category_vector=d.animal_category_vector,
                     animal_subcategory_vector=d.animal_subcategory_vector,
                     name_words=d.name_words,
@@ -106,12 +115,6 @@ class AnimalFeatureRepository(AbstractAnimalFeatureRepository):
         session = self.database.get_session().__next__()
         try:
             data = record.dict()
-            data["animal_category_vector"] = data["animal_category_vector"]
-            data["animal_subcategory_vector"] = data["animal_subcategory_vector"]
-            data["name_words"] = data["name_words"]
-            data["name_vector"] = data["name_vector"]
-            data["description_words"] = data["description_words"]
-            data["description_vector"] = data["description_vector"]
             data = AnimalFeature(**data)
             session.add(data)
             if commit:

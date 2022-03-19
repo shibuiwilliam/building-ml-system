@@ -1,6 +1,6 @@
 import json
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 
 import cloudpickle
 from src.configurations import Configurations
@@ -9,8 +9,11 @@ from src.entities.animal_feature import AnimalFeatureCreate, AnimalFeatureQuery,
 from src.infrastructure.cache import AbstractCache
 from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging
 from src.middleware.logger import configure_logger
+from src.middleware.strings import get_uuid
 from src.repository.animal_feature_repository import AbstractAnimalFeatureRepository
 from src.repository.animal_repository import AbstractAnimalRepository
+from src.request_object.animal_feature import AnimalFeatureInitializeRequest, AnimalFeatureRegistrationRequest
+from src.response_object.animal_feature import AnimalFeatureInitializeResponse
 from src.service.feature_processing import (
     CategoricalVectorizer,
     DescriptionTokenizer,
@@ -23,6 +26,8 @@ logger = configure_logger(__name__)
 
 
 class AbstractAnimalFeatureUsecase(ABC):
+    PREFIX = "animal_feature"
+
     def __init__(
         self,
         animal_repository: AbstractAnimalRepository,
@@ -49,11 +54,17 @@ class AbstractAnimalFeatureUsecase(ABC):
         self.name_vectorizer = name_vectorizer
 
     @abstractmethod
-    def fit_register_animal_feature(self):
+    def fit_register_animal_feature(
+        self,
+        request: AnimalFeatureInitializeRequest,
+    ) -> Optional[AnimalFeatureInitializeResponse]:
         raise NotImplementedError
 
     @abstractmethod
-    def register_animal_feature(self):
+    def register_animal_feature(
+        self,
+        request: AnimalFeatureRegistrationRequest,
+    ):
         raise NotImplementedError
 
 
@@ -84,7 +95,10 @@ class AnimalFeatureUsecase(AbstractAnimalFeatureUsecase):
             name_vectorizer=name_vectorizer,
         )
 
-    def fit_register_animal_feature(self):
+    def fit_register_animal_feature(
+        self,
+        request: AnimalFeatureInitializeRequest,
+    ) -> Optional[AnimalFeatureInitializeResponse]:
         limit = 1000
         offset = 0
         animals = []
@@ -102,9 +116,9 @@ class AnimalFeatureUsecase(AbstractAnimalFeatureUsecase):
         logger.info(f"data size: {len(animals)}")
         if len(animals) == 0:
             logger.info("no data to fit and register")
-            return
+            return None
 
-        ids = [a.id for a in animals]
+        animal_ids = [a.id for a in animals]
 
         logger.info("vectorize animal_category")
         vectorized_animal_category = (
@@ -124,11 +138,11 @@ class AnimalFeatureUsecase(AbstractAnimalFeatureUsecase):
         )
 
         logger.info("tokenize description")
-        tokenized_description = self.description_tokenizer.fit_transform(
+        tokenized_description = self.description_tokenizer.transform(
             X=[a.description for a in animals],
         ).tolist()
         logger.info("tokenize name")
-        tokenized_name = self.name_tokenizer.fit_transform(
+        tokenized_name = self.name_tokenizer.transform(
             X=[a.name for a in animals],
         ).tolist()
 
@@ -159,26 +173,29 @@ class AnimalFeatureUsecase(AbstractAnimalFeatureUsecase):
             cloudpickle.dump(self.name_vectorizer, f)
 
         self.__register_animal_features(
-            ids=ids,
-            vectorized_animal_category=vectorized_animal_category,
-            vectorized_animal_subcategory=vectorized_animal_subcategory,
-            tokenized_description=tokenized_description,
-            tokenized_name=tokenized_name,
-            vectorized_description=vectorized_description,
-            vectorized_name=vectorized_name,
+            animal_ids=animal_ids,
+            mlflow_experiment_id=request.mlflow_experiment_id,
+            mlflow_run_id=request.mlflow_run_id,
+            vectorized_animal_categories=vectorized_animal_category,
+            vectorized_animal_subcategories=vectorized_animal_subcategory,
+            tokenized_descriptions=tokenized_description,
+            tokenized_names=tokenized_name,
+            vectorized_descriptions=vectorized_description,
+            vectorized_names=vectorized_name,
             update=True,
         )
+        return AnimalFeatureInitializeResponse(
+            animal_category_vectorizer_file=Configurations.animal_category_vectorizer_file,
+            animal_subcategory_vectorizer_file=Configurations.animal_subcategory_vectorizer_file,
+            description_vectorizer_file=Configurations.description_vectorizer_file,
+            name_vectorizer_file=Configurations.name_vectorizer_file,
+            animal_ids=animal_ids,
+        )
 
-    def register_animal_feature(self):
-        with open(Configurations.animal_category_vectorizer_file, "rb") as f:
-            self.animal_category_vectorizer = cloudpickle.load(f)
-        with open(Configurations.animal_subcategory_vectorizer_file, "rb") as f:
-            self.animal_subcategory_vectorizer = cloudpickle.load(f)
-        with open(Configurations.description_vectorizer_file, "rb") as f:
-            self.description_vectorizer = cloudpickle.load(f)
-        with open(Configurations.name_vectorizer_file, "rb") as f:
-            self.name_vectorizer = cloudpickle.load(f)
-
+    def register_animal_feature(
+        self,
+        request: AnimalFeatureRegistrationRequest,
+    ):
         def callback(ch, method, properties, body):
             data = json.loads(body)
             logger.info(f"consumed data: {data}")
@@ -192,7 +209,7 @@ class AnimalFeatureUsecase(AbstractAnimalFeatureUsecase):
             )
             if len(animals) == 0:
                 return
-            ids = [a.id for a in animals]
+            animal_ids = [a.id for a in animals]
 
             vectorized_animal_category = (
                 self.animal_category_vectorizer.transform(
@@ -220,13 +237,15 @@ class AnimalFeatureUsecase(AbstractAnimalFeatureUsecase):
             vectorized_name = self.name_vectorizer.transform(X=tokenized_name).toarray().tolist()
 
             self.__register_animal_features(
-                ids=ids,
-                vectorized_animal_category=vectorized_animal_category,
-                vectorized_animal_subcategory=vectorized_animal_subcategory,
-                tokenized_description=tokenized_description,
-                tokenized_name=tokenized_name,
-                vectorized_description=vectorized_description,
-                vectorized_name=vectorized_name,
+                animal_ids=animal_ids,
+                mlflow_experiment_id=request.mlflow_experiment_id,
+                mlflow_run_id=request.mlflow_run_id,
+                vectorized_animal_categories=vectorized_animal_category,
+                vectorized_animal_subcategories=vectorized_animal_subcategory,
+                tokenized_descriptions=tokenized_description,
+                tokenized_names=tokenized_name,
+                vectorized_descriptions=vectorized_description,
+                vectorized_names=vectorized_name,
                 update=False,
             )
             ch.basic_ack(delivery_tag=method.delivery_tag)
@@ -240,56 +259,80 @@ class AnimalFeatureUsecase(AbstractAnimalFeatureUsecase):
 
     def __register_animal_features(
         self,
-        ids: List[str],
-        vectorized_animal_category: List[List[int]],
-        vectorized_animal_subcategory: List[List[int]],
-        tokenized_description: List[str],
-        tokenized_name: List[str],
-        vectorized_description: List[List[float]],
-        vectorized_name: List[List[float]],
+        animal_ids: List[str],
+        mlflow_experiment_id: int,
+        mlflow_run_id: str,
+        vectorized_animal_categories: List[List[int]],
+        vectorized_animal_subcategories: List[List[int]],
+        tokenized_descriptions: List[str],
+        tokenized_names: List[str],
+        vectorized_descriptions: List[List[float]],
+        vectorized_names: List[List[float]],
         update: bool = True,
     ):
-        data = [
-            dict(
-                id=id,
-                animal_category_vector=vac,
-                animal_subcategory_vector=vas,
-                description_words=td.split(" "),
-                name_words=tn.split(" "),
-                description_vector=vd,
-                name_vector=vn,
+        for i, (
+            animal_id,
+            animal_category_vector,
+            animal_subcategory_vector,
+            description_words,
+            name_words,
+            description_vector,
+            name_vector,
+        ) in enumerate(
+            zip(
+                animal_ids,
+                vectorized_animal_categories,
+                vectorized_animal_subcategories,
+                tokenized_descriptions,
+                tokenized_names,
+                vectorized_descriptions,
+                vectorized_names,
             )
-            for id, vac, vas, td, tn, vd, vn in zip(
-                ids,
-                vectorized_animal_category,
-                vectorized_animal_subcategory,
-                tokenized_description,
-                tokenized_name,
-                vectorized_description,
-                vectorized_name,
-            )
-        ]
-
-        for i in range(0, len(data), 1000):
-            target_data = data[i : i + 1000]
-            existing_features = self.animal_feature_repository.select(
-                query=AnimalFeatureQuery(ids=[d["id"] for d in target_data])
-            )
-            existing_ids = [f.id for f in existing_features]
-            for d in target_data:
-                if d["id"] in existing_ids:
-                    if update:
-                        self.animal_feature_repository.update(record=AnimalFeatureUpdate(**d))
-                else:
-                    self.animal_feature_repository.insert(record=AnimalFeatureCreate(**d))
-                integrated = []
-                integrated.extend(d["animal_category_vector"])
-                integrated.extend(d["animal_subcategory_vector"])
-                integrated.extend(d["description_vector"])
-                integrated.extend(d["name_vector"])
-                self.cache.set(
-                    key=f"{d['id']}_feature",
-                    value=json.dumps(integrated),
-                    expire_second=60 * 60 * 24 * 30,
+        ):
+            _cache = update
+            existing_feature = self.animal_feature_repository.select(
+                query=AnimalFeatureQuery(
+                    animal_id=animal_id,
+                    mlflow_experiment_id=mlflow_experiment_id,
+                    mlflow_run_id=mlflow_run_id,
                 )
-            logger.info(f"registered: {i} animal features")
+            )
+            data = dict(
+                animal_category_vector=animal_category_vector,
+                animal_subcategory_vector=animal_subcategory_vector,
+                description_words=description_words.split(" "),
+                name_words=name_words.split(" "),
+                name_vector=name_vector,
+                description_vector=description_vector,
+            )
+            if len(existing_feature) > 0:
+                if update:
+                    self.animal_feature_repository.update(
+                        record=AnimalFeatureUpdate(
+                            id=existing_feature[0].id,
+                            **data,
+                        )
+                    )
+                    _cache = True
+                else:
+                    _cache = False
+            else:
+                create_record = AnimalFeatureCreate(
+                    id=get_uuid(),
+                    animal_id=animal_id,
+                    mlflow_experiment_id=mlflow_experiment_id,
+                    mlflow_run_id=mlflow_run_id,
+                    **data,
+                )
+                self.animal_feature_repository.insert(record=create_record)
+                _cache = True
+
+            if _cache:
+                self.cache.set(
+                    key=f"{self.PREFIX}_{animal_id}_{mlflow_experiment_id}_{mlflow_run_id}",
+                    value=json.dumps(data),
+                    expire_second=60 * 60 * 24 * 60,
+                    # cache for 60 days
+                )
+            if i % 1000 == 0:
+                logger.info(f"registered: {i} animal features")
