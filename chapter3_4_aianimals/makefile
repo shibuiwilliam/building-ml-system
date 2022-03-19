@@ -726,6 +726,22 @@ down:
 
 ############ DEPLOYMENT COMMANDS ############
 KUBE_SYSTEM_MANIFEST_DIR := $(K8S_DIR)/manifests/kube_system
+K8S_CLIENT_VERSION := 0.0.0
+DOCKERFILE_K8S_CLIENT = $(K8S_DIR)/k8s_client/$(DOCKERFILE)
+DOCKER_K8S_CLIENT_TAG = $(TAG)_k8s_client
+DOCKER_K8S_CLIENT_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_K8S_CLIENT_TAG)_$(K8S_CLIENT_VERSION)
+
+.PHONY: build_k8s_client
+build_k8s_client:
+	docker build \
+		--platform x86_64 \
+		-t $(DOCKER_K8S_CLIENT_IMAGE_NAME) \
+		-f $(DOCKERFILE_K8S_CLIENT) \
+		.
+
+.PHONY: push_k8s_client
+push_k8s_client:
+	docker push $(DOCKER_K8S_CLIENT_IMAGE_NAME)
 
 .PHONY: deploy_kube_system
 deploy_kube_system:
@@ -791,6 +807,7 @@ req_all: \
 
 .PHONY: build_all
 build_all: \
+	build_k8s_client \
 	build_model_loader \
 	build_mlflow \
 	build_base_text_processing \
@@ -811,6 +828,7 @@ build_all: \
 	
 .PHONY: push_all
 push_all: \
+	push_k8s_client \
 	push_model_loader \
 	push_mlflow \
 	push_base_text_processing \
