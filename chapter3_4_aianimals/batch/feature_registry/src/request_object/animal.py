@@ -40,3 +40,10 @@ class AnimalCreateRequest(BaseModel):
         if isinstance(value, str):
             return cls(**json.loads(value))
         return value
+
+
+class AnimalFeatureCreateRequest(BaseModel):
+    ids: List[str]
+
+    class Config:
+        extra = Extra.forbid
