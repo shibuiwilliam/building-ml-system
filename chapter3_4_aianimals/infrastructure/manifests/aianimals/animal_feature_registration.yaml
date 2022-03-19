@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: animal-feature-registry-initialize
+  name: animal-feature-registry-registration
   namespace: aianimals
   labels:
-    app: animal-feature-registry-initialize
+    app: animal-feature-registry-registration
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: animal-feature-registry-initialize
+      app: animal-feature-registry-registration
   template:
     metadata:
       labels:
-        app: animal-feature-registry-initialize
+        app: animal-feature-registry-registration
     spec:
       containers:
-        - name: animal-feature-registry-initialize
+        - name: animal-feature-registry-registration
           image: shibui/building-ml-system:ai_animals_feature_registry_0.0.0
           imagePullPolicy: Always
           command:
@@ -68,7 +68,7 @@ spec:
             - name: MLFLOW_EXPERIMENT_NAME
               value: animal_feature_extraction
             - name: MLFLOW_RUN_ID
-              value: ""
+              value: 9cb72b123a284c1ebb980714ab185667
             - name: EMPTY_RUN
               value: "1"
       imagePullSecrets:

@@ -33,7 +33,7 @@ def main(cfg: DictConfig):
 
     mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000"))
     mlflow.set_experiment(experiment_name=experiment_name)
-    with mlflow.start_run(run_name=run_name):
+    with mlflow.start_run(run_name=run_name) as run:
         db_client = DBClient()
         animals = retrieve_animals(db_client=db_client)
         downloaded_images = download_dataset(
@@ -76,14 +76,14 @@ def main(cfg: DictConfig):
         mlflow.log_params(cfg.model)
         mlflow.log_params(cfg.input)
 
-    with open("/tmp/output.json", "w") as f:
-        json.dump(
-            dict(
-                experiment_name=experiment_name,
-                run_name=run_name,
-            ),
-            f,
-        )
+        with open("/tmp/output.json", "w") as f:
+            json.dump(
+                dict(
+                    mlflow_experiment_id=run.info.experiment_id,
+                    mlflow_run_id=run.info.run_id,
+                ),
+                f,
+            )
 
 
 if __name__ == "__main__":

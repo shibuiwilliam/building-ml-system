@@ -28,6 +28,9 @@ def main(cfg: DictConfig):
     now = datetime.now().strftime("%Y%m%d_%H%M%S")
     run_name = f"{cfg.task_name}_{now}"
 
+    feature_mlflow_experiment_id = int(os.getenv("FEATURE_MLFLOW_EXPERIMENT_ID", "1"))
+    feature_mlflow_run_id = os.getenv("FEATURE_MLFLOW_RUN_ID", "")
+
     logger.info(f"current working directory: {cwd}")
     logger.info(f"experiment_name: {experiment_name}")
     logger.info(f"run_name: {run_name}")
@@ -38,6 +41,8 @@ def main(cfg: DictConfig):
         db_client = DBClient()
         cache = RedisCache()
         raw_data = retrieve_access_logs(
+            feature_mlflow_experiment_id=feature_mlflow_experiment_id,
+            feature_mlflow_run_id=feature_mlflow_run_id,
             db_client=db_client,
             cache=cache,
         )

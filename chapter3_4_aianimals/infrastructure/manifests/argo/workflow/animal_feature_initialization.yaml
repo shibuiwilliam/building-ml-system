@@ -7,8 +7,19 @@ spec:
   concurrencyPolicy: "Forbid"
   startingDeadlineSeconds: 0
   workflowSpec:
-    entrypoint: animal-feature-registry-initialization
+    entrypoint: pipeline
     templates:
+      - name: pipeline
+        steps:
+          - - name: animal-feature-registry-initialization
+              template: animal-feature-registry-initialization
+          - - name: print-message
+              template: print-message
+              arguments:
+                parameters:
+                  - name: experiment-run
+                    value: "{{steps.animal-feature-registry-initialization.outputs.parameters.experiment-run}}"
+
       - name: animal-feature-registry-initialization
         container:
           image: shibui/building-ml-system:ai_animals_feature_registry_0.0.0
@@ -61,5 +72,20 @@ spec:
             requests:
               cpu: 500m
               memory: "500Mi"
+        outputs:
+          parameters:
+            - name: experiment-run
+              valueFrom:
+                path: /tmp/output.json
+
+      - name: print-message
+        inputs:
+          parameters:
+            - name: experiment-run
+        container:
+          image: docker/whalesay:latest
+          command: [cowsay]
+          args: ["{{inputs.parameters.experiment-run}}"]
+
     imagePullSecrets:
       - name: regcred

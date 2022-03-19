@@ -263,7 +263,7 @@ deploy_search_registry:
 .PHONY: deploy_animal_feature_registry
 deploy_animal_feature_registry:
 	kubectl apply \
-		-f $(BATCH_MANIFEST_DIR)/animal_feature_registry.yaml
+		-f $(BATCH_MANIFEST_DIR)/animal_feature_registration.yaml
 
 
 ############ AB_TEST_PROXY COMMANDS ############

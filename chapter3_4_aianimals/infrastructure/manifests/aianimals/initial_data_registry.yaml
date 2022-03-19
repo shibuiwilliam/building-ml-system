@@ -12,6 +12,7 @@ spec:
       initContainers:
         - name: init
           image: shibui/building-ml-system:ai_animals_data_registry_0.0.0
+          imagePullPolicy: Always
           command:
             - bash
             - -c
@@ -35,6 +36,7 @@ spec:
       containers:
         - name: initial-data-registry
           image: shibui/building-ml-system:ai_animals_data_registry_0.0.0
+          imagePullPolicy: Always
           resources:
             limits:
               cpu: 500m

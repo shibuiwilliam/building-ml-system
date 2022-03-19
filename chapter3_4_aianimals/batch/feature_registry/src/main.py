@@ -3,6 +3,7 @@ from datetime import datetime
 from time import sleep
 import cloudpickle
 import hydra
+import json
 import mlflow
 from mlflow.tracking import MlflowClient
 from omegaconf import DictConfig
@@ -75,6 +76,15 @@ def main(cfg: DictConfig):
             mlflow.log_artifact(os.path.join(cwd, ".hydra/hydra.yaml"))
             mlflow.log_artifact(os.path.join(cwd, ".hydra/overrides.yaml"))
 
+            with open("/tmp/output.json", "w") as f:
+                json.dump(
+                    dict(
+                        mlflow_experiment_id=run.info.experiment_id,
+                        mlflow_run_id=run.info.run_id,
+                    ),
+                    f,
+                )
+
     elif Configurations.job == JOBS.ANIMAL_FEATURE_REGISTRATION_JOB.value.name:
         if Configurations.empty_run:
             while True:
@@ -138,6 +148,8 @@ def main(cfg: DictConfig):
 
     else:
         raise ValueError
+
+    logger.info("Done...")
 
 
 if __name__ == "__main__":

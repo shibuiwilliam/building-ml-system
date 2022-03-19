@@ -6,12 +6,16 @@ logger = configure_logger(__name__)
 
 
 def retrieve_access_logs(
+    feature_mlflow_experiment_id: int,
+    feature_mlflow_run_id: str,
     db_client: AbstractDBClient,
     cache: AbstractCache,
 ) -> RawData:
     access_log_repository = AccessLogRepository(db_client=db_client)
     records = access_log_repository.select_all()
-    ids = list(set([f"{r.animal_id}_feature" for r in records]))
+    ids = list(
+        set([f"animal_feature_{r.animal_id}_{feature_mlflow_experiment_id}_{feature_mlflow_run_id}" for r in records])
+    )
     logger.info(f"retrieved: {len(records)} like {records[0]}")
     feature_cache_repository = FeatureCacheRepository(cache=cache)
     features = feature_cache_repository.get_features_by_keys(keys=ids)
