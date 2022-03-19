@@ -331,8 +331,8 @@ class AnimalFeatureUsecase(AbstractAnimalFeatureUsecase):
                 self.cache.set(
                     key=f"{self.PREFIX}_{animal_id}_{mlflow_experiment_id}_{mlflow_run_id}",
                     value=json.dumps(data),
-                    expire_second=60 * 60 * 24 * 60,
-                    # cache for 60 days
+                    expire_second=60 * 60 * 24 * 30,
+                    # cache for 30 days
                 )
             if i % 1000 == 0:
                 logger.info(f"registered: {i} animal features")

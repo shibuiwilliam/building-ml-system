@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: animal-feature-registry-initialize
+  namespace: aianimals
+  labels:
+    app: animal-feature-registry-initialize
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: animal-feature-registry-initialize
+  template:
+    metadata:
+      labels:
+        app: animal-feature-registry-initialize
+    spec:
+      containers:
+        - name: animal-feature-registry-initialize
+          image: shibui/building-ml-system:ai_animals_feature_registry_0.0.0
+          imagePullPolicy: Always
+          command:
+            - "python"
+            - "-m"
+            - "src.main"
+          resources:
+            limits:
+              cpu: 2000m
+              memory: "2000Mi"
+            requests:
+              cpu: 500m
+              memory: "500Mi"
+          env:
+            - name: POSTGRES_HOST
+              value: postgres.data.svc.cluster.local
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: password
+            - name: POSTGRES_DB
+              value: aianimals
+            - name: REDIS_HOST
+              value: redis.data.svc.cluster.local
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_DB
+              value: "0"
+            - name: RABBITMQ_HOST
+              value: rabbitmq-amqp.data.svc.cluster.local
+            - name: RABBITMQ_USER
+              value: user
+            - name: RABBITMQ_PASSWORD
+              value: password
+            - name: RUN_ENVIRONMENT
+              value: cloud
+            - name: LOG_LEVEL
+              value: INFO
+            - name: SAVE_DIRECTORY
+              value: /tmp/
+            - name: JOB
+              value: animal_feature_initialization_job
+            - name: MODEL_CONFIG
+              value: animal_feature
+            - name: MLFLOW_TRACKING_URI
+              value: http://mlflow.mlflow.svc.cluster.local:5000
+            - name: MLFLOW_EXPERIMENT_NAME
+              value: animal_feature_extraction
+      imagePullSecrets:
+        - name: regcred

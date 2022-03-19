@@ -1,37 +1,22 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
 metadata:
-  name: animal-feature-registry
-  namespace: aianimals
-  labels:
-    app: animal-feature-registry
+  generateName: animal-feature-registry-initialization-
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: animal-feature-registry
-  template:
-    metadata:
-      labels:
-        app: animal-feature-registry
-    spec:
-      containers:
-        - name: animal-feature-registry
+  schedule: "0 0 1 * *"
+  concurrencyPolicy: "Forbid"
+  startingDeadlineSeconds: 0
+  workflowSpec:
+    entrypoint: animal-feature-registry-initialization
+    templates:
+      - name: animal-feature-registry-initialization
+        container:
           image: shibui/building-ml-system:ai_animals_feature_registry_0.0.0
           imagePullPolicy: Always
           command:
             - "python"
             - "-m"
             - "src.main"
-            - "--job"
-            - "animal_feature_registration_job"
-          resources:
-            limits:
-              cpu: 2000m
-              memory: "2000Mi"
-            requests:
-              cpu: 500m
-              memory: "500Mi"
           env:
             - name: POSTGRES_HOST
               value: postgres.data.svc.cluster.local
@@ -59,9 +44,22 @@ spec:
               value: cloud
             - name: LOG_LEVEL
               value: INFO
-            - name: DATA_DIRECTORY
-              value: /opt/dataset/data/
             - name: SAVE_DIRECTORY
               value: /tmp/
-      imagePullSecrets:
-        - name: regcred
+            - name: JOB
+              value: animal_feature_initialization_job
+            - name: MODEL_CONFIG
+              value: animal_feature
+            - name: MLFLOW_TRACKING_URI
+              value: http://mlflow.mlflow.svc.cluster.local:5000
+            - name: MLFLOW_EXPERIMENT_NAME
+              value: animal_feature_extraction
+          resources:
+            limits:
+              cpu: 2000m
+              memory: "2000Mi"
+            requests:
+              cpu: 500m
+              memory: "500Mi"
+    imagePullSecrets:
+      - name: regcred

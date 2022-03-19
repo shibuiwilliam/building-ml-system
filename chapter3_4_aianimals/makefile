@@ -320,6 +320,10 @@ port_forward_argo:
 create_argo_similar_image_search_train_cron:
 	argo cron create infrastructure/manifests/argo/workflow/search_similar_image_search_train.yaml
 
+.PHONY: create_argo_animal_feature_initialization_cron
+create_argo_animal_feature_initialization_cron:
+	argo cron create infrastructure/manifests/argo/workflow/animal_feature_initialization.yaml
+
 .PHONY: submit_argo_learn_to_rank_lgbm_ranker_train
 submit_argo_learn_to_rank_lgbm_ranker_train:
 	argo submit infrastructure/manifests/argo/workflow/search_learn_to_rank_lgbm_ranker_train.yaml
@@ -755,7 +759,6 @@ deploy_all: deploy_data \
 	deploy_no_animal_violation_serving \
 	deploy_no_animal_violation_proxy \
 	deploy_search_registry \
-	deploy_animal_feature_registry \
 	deploy_similar_image_search_serving
 
 .PHONY: delete_namespaces

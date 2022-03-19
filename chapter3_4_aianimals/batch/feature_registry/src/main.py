@@ -58,7 +58,7 @@ def main(cfg: DictConfig):
         )
 
         now = datetime.now().strftime("%Y%m%d_%H%M%S")
-        experiment_name = cfg.task_name
+        experiment_name = Configurations.mlflow_experiment_name
         run_name = f"{cfg.task_name}_{now}"
         logger.info(f"experiment_name: {experiment_name}")
         logger.info(f"run_name: {run_name}")
