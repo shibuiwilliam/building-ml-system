@@ -82,10 +82,12 @@ spec:
         inputs:
           parameters:
             - name: experiment-run
+        serviceAccountName: user-admin
         container:
-          image: docker/whalesay:latest
-          command: [cowsay]
-          args: ["{{inputs.parameters.experiment-run}}"]
+          image: shibui/building-ml-system:ai_animals_k8s_client_0.0.0
+          imagePullPolicy: Always
+          command: [kubectl]
+          args: ["get", "ns"]
 
     imagePullSecrets:
       - name: regcred
