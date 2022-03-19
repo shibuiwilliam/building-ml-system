@@ -129,8 +129,8 @@ class InitializationJob(AbstractJob):
         ]
         animal_feature_indices = [
             {"column": AnimalFeature.animal_id, "unique": False},
-            {"column": Animal.mlflow_experiment_id, "unique": False},
-            {"column": Animal.mlflow_run_id, "unique": False},
+            {"column": AnimalFeature.mlflow_experiment_id, "unique": False},
+            {"column": AnimalFeature.mlflow_run_id, "unique": False},
         ]
         like_indices = [
             {"column": Like.user_id, "unique": False},
