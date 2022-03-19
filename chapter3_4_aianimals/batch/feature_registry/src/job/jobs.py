@@ -9,8 +9,6 @@ class Job(BaseModel):
 
 
 class JOBS(Enum):
-    INITIALIZATION_JOG = Job(name="initialization_job")
-    ANIMAL_TO_SEARCH_JOB = Job(name="animal_to_search_job")
     ANIMAL_FEATURE_REGISTRATION_JOB = Job(name="animal_feature_registration_job")
 
     @staticmethod

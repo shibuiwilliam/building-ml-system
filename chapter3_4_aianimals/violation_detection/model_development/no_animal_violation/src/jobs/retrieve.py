@@ -21,10 +21,10 @@ async def download_file(
     try:
         res = await client.get(source_path)
     except httpx.PoolTimeout as e:
-        logger.error(f"failed to download data: {source_path}")
+        logger.error(f"timeout {e}: failed to download data: {source_path}")
         return None
     if res.status_code != 200:
-        logger.error(f"failed to download data: {source_path}")
+        logger.error(f"status code {res.status_code}: failed to download data: {source_path}")
         return None
     img = Image.open(BytesIO(res.content))
     if img.mode == "RGB":
@@ -66,13 +66,24 @@ def download_dataset(
 ) -> List[str]:
     logger.info("start downloading image")
     os.makedirs(destination_directory, exist_ok=True)
-    loop = asyncio.get_event_loop()
-    destination_paths = loop.run_until_complete(
-        download_files(
-            filepaths=filepaths,
-            destination_directory=destination_directory,
+    _filepaths = []
+    _f = []
+    for i, f in enumerate(filepaths):
+        _f.append(f)
+        if i != 0 and i % 500 == 0:
+            _filepaths.append(_f)
+            _f = []
+    _filepaths.append(_f)
+    destination_paths = []
+    for fs in _filepaths:
+        loop = asyncio.get_event_loop()
+        _destination_paths = loop.run_until_complete(
+            download_files(
+                filepaths=fs,
+                destination_directory=destination_directory,
+            )
         )
-    )
+        destination_paths.extend(_destination_paths)
     logger.info("done downloading image")
     destination_paths = [f for f in destination_paths if f is not None]
     return destination_paths

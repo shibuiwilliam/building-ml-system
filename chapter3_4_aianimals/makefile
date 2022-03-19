@@ -320,8 +320,8 @@ port_forward_argo:
 create_argo_similar_image_search_train_cron:
 	argo cron create infrastructure/manifests/argo/workflow/search_similar_image_search_train.yaml
 
-.PHONY: submit_learn_to_rank_lgbm_ranker_train
-submit_learn_to_rank_lgbm_ranker_train:
+.PHONY: submit_argo_learn_to_rank_lgbm_ranker_train
+submit_argo_learn_to_rank_lgbm_ranker_train:
 	argo submit infrastructure/manifests/argo/workflow/search_learn_to_rank_lgbm_ranker_train.yaml
 
 .PHONY: submit_argo_no_animal_violation_train

@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: animal-feature-registry
-          image: shibui/building-ml-system:ai_animals_data_registry_0.0.0
+          image: shibui/building-ml-system:ai_animals_feature_registry_0.0.0
           imagePullPolicy: Always
           command:
             - "python"
@@ -54,16 +54,6 @@ spec:
             - name: RABBITMQ_USER
               value: user
             - name: RABBITMQ_PASSWORD
-              value: password
-            - name: ES_HOST
-              value: https://elastic-animal-feature-es-http.elastic-animal-feature.svc.cluster.local:9200
-            - name: ES_SCHEMA
-              value: https
-            - name: ES_VERIFY_CERTS
-              value: "0"
-            - name: ES_USER
-              value: elastic_user
-            - name: ES_PASSWORD
               value: password
             - name: RUN_ENVIRONMENT
               value: cloud

@@ -177,7 +177,7 @@ services:
 
   # animal_feature_registration:
   #   container_name: animal_feature_registration
-  #   image: shibui/building-ml-system:ai_animals_data_registry_0.0.0
+  #   image: shibui/building-ml-system:ai_animals_feature_registry_0.0.0
   #   volumes:
   #     - ./dataset/data/:/opt/dataset/data/
   #     - ./batch/data_registry/model/:/opt/model/
@@ -197,7 +197,6 @@ services:
   #     - RABBITMQ_HOST=rabbitmq
   #     - RABBITMQ_USER=user
   #     - RABBITMQ_PASSWORD=password
-  #     - ES_HOST=http://es:9200
   #     - LOG_LEVEL=INFO
   #     - RUN_ENVIRONMENT=local
   #     - DATA_DIRECTORY=/opt/dataset/data/
