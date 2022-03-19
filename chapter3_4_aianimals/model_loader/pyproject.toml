@@ -10,6 +10,8 @@ python = "^3.9"
 click = "^8.0.4"
 SQLAlchemy = "^1.4.32"
 psycopg2-binary = "^2.9.3"
+mlflow = "^1.24.0"
+httpx = "^0.22.0"
 
 [tool.poetry.dev-dependencies]
 

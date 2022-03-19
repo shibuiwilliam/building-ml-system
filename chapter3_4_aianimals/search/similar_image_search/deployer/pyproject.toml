@@ -9,6 +9,8 @@ license = "MIT"
 python = "^3.9"
 kubernetes = "^23.3.0"
 click = "^8.0.4"
+mlflow = "^1.24.0"
+httpx = "^0.22.0"
 
 [tool.poetry.dev-dependencies]
 
