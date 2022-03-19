@@ -11,7 +11,6 @@ from src.job.initialization_job import InitializationJob
 from src.middleware.logger import configure_logger
 from src.repository.access_log_repository import AbstractAccessLogRepository, AccessLogRepository
 from src.repository.animal_category_repository import AbstractAnimalCategoryRepository, AnimalCategoryRepository
-from src.repository.animal_feature_repository import AbstractAnimalFeatureRepository, AnimalFeatureRepository
 from src.repository.animal_repository import AbstractAnimalRepository, AnimalRepository
 from src.repository.animal_subcategory_repository import (
     AbstractAnimalSubcategoryRepository,
@@ -68,9 +67,6 @@ class Container(object):
         )
         self.violation_repository: AbstractViolationRepository = ViolationRepository(database=self.database)
         self.access_log_repository: AbstractAccessLogRepository = AccessLogRepository(database=self.database)
-        self.animal_feature_repository: AbstractAnimalFeatureRepository = AnimalFeatureRepository(
-            database=self.database
-        )
 
         self.table_usecase: AbstractTableUsecase = TableUsecase(table_repository=self.table_repository)
         self.animal_category_usecase: AbstractAnimalCategoryUsecase = AnimalCategoryUsecase(
@@ -85,7 +81,6 @@ class Container(object):
         self.animal_usecase: AbstractAnimalUsecase = AnimalUsecase(
             animal_repository=self.animal_repository,
             like_repository=self.like_repository,
-            animal_feature_repository=self.animal_feature_repository,
             messaging=self.messaging,
             cache=self.cache,
             search=self.search,

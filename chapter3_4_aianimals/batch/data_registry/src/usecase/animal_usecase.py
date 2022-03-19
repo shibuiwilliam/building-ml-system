@@ -10,7 +10,6 @@ from src.infrastructure.cache import AbstractCache
 from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging
 from src.infrastructure.search import AbstractSearch
 from src.middleware.logger import configure_logger
-from src.repository.animal_feature_repository import AbstractAnimalFeatureRepository
 from src.repository.animal_repository import AbstractAnimalRepository
 from src.repository.like_repository import AbstractLikeRepository
 from src.request_object.animal import AnimalCreateRequest, AnimalRequest
@@ -24,14 +23,12 @@ class AbstractAnimalUsecase(ABC):
         self,
         animal_repository: AbstractAnimalRepository,
         like_repository: AbstractLikeRepository,
-        animal_feature_repository: AbstractAnimalFeatureRepository,
         search: AbstractSearch,
         messaging: RabbitmqMessaging,
         cache: AbstractCache,
     ):
         self.animal_repository = animal_repository
         self.like_repository = like_repository
-        self.animal_feature_repository = animal_feature_repository
         self.search = search
         self.messaging = messaging
         self.cache = cache
@@ -88,7 +85,6 @@ class AnimalUsecase(AbstractAnimalUsecase):
         self,
         animal_repository: AbstractAnimalRepository,
         like_repository: AbstractLikeRepository,
-        animal_feature_repository: AbstractAnimalFeatureRepository,
         search: AbstractSearch,
         messaging: RabbitmqMessaging,
         cache: AbstractCache,
@@ -96,7 +92,6 @@ class AnimalUsecase(AbstractAnimalUsecase):
         super().__init__(
             animal_repository=animal_repository,
             like_repository=like_repository,
-            animal_feature_repository=animal_feature_repository,
             search=search,
             messaging=messaging,
             cache=cache,

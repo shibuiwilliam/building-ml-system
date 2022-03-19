@@ -21,8 +21,6 @@ def main(job: str):
         container.animal_search_job.run()
     elif job == JOBS.INITIALIZATION_JOG.value.name:
         container.initialization_job.run()
-    elif job == JOBS.ANIMAL_FEATURE_REGISTRATION_JOB.value.name:
-        container.animal_feature_registration_job.run()
     else:
         raise ValueError
 
