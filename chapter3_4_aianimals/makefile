@@ -161,6 +161,35 @@ push_data_registry:
 	docker push $(DOCKER_DATA_REGISTRY_IMAGE_NAME)
 
 
+############ FEATURE REGISTRY COMMANDS ############
+FEATURE_REGISTRY_DIR := $(DIR)/batch/feature_registry
+FEATURE_REGISTRY_VERSION := $(shell cd ${FEATURE_REGISTRY_DIR} && poetry version -s)
+DOCKERFILE_FEATURE_REGISTRY = $(FEATURE_REGISTRY_DIR)/$(DOCKERFILE)
+DOCKER_FEATURE_REGISTRY_TAG = $(TAG)_feature_registry
+DOCKER_FEATURE_REGISTRY_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_FEATURE_REGISTRY_TAG)_$(FEATURE_REGISTRY_VERSION)
+
+.PHONY: req_feature_registry
+req_feature_registry:
+	cd $(FEATURE_REGISTRY_DIR) && \
+	poetry export \
+		--without-hashes \
+		-f requirements.txt \
+		--output requirements.txt
+
+.PHONY: build_feature_registry
+build_feature_registry: 
+	docker build \
+		--platform x86_64 \
+		--build-arg FROM_IMAGE=$(DOCKER_BASE_TEXT_PROCESSING_IMAGE_NAME) \
+		-t $(DOCKER_FEATURE_REGISTRY_IMAGE_NAME) \
+		-f $(DOCKERFILE_FEATURE_REGISTRY) \
+		.
+	 
+.PHONY: push_feature_registry
+push_feature_registry: 
+	docker push $(DOCKER_FEATURE_REGISTRY_IMAGE_NAME)
+
+
 ############ API COMMANDS ############
 API_DIR := $(DIR)/api
 API_VERSION := $(shell cd ${API_DIR} && poetry version -s)
@@ -231,11 +260,11 @@ deploy_search_registry:
 	kubectl apply \
 		-f $(BATCH_MANIFEST_DIR)/search_registry.yaml
 
-
 .PHONY: deploy_animal_feature_registry
 deploy_animal_feature_registry:
 	kubectl apply \
 		-f $(BATCH_MANIFEST_DIR)/animal_feature_registry.yaml
+
 
 ############ AB_TEST_PROXY COMMANDS ############
 AB_TEST_PROXY_DIR := $(DIR)/ab_test_proxy
@@ -745,6 +774,7 @@ req_all: \
 	req_model_loader \
 	req_base_text_processing \
 	req_data_registry \
+	req_feature_registry \
 	req_api \
 	req_ab_test_proxy \
 	req_violation_detection_no_animal_violation_proxy \
@@ -762,6 +792,7 @@ build_all: \
 	build_mlflow \
 	build_base_text_processing \
 	build_data_registry \
+	build_feature_registry \
 	build_api \
 	build_ab_test_proxy \
 	build_es \
@@ -783,6 +814,7 @@ push_all: \
 	push_api \
 	push_ab_test_proxy \
 	push_data_registry \
+	push_feature_registry \
 	push_es \
 	push_violation_detection_no_animal_violation_proxy \
 	push_violation_detection_no_animal_violation_serving \
