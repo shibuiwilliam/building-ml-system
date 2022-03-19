@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-
+from time import sleep
 import cloudpickle
 import hydra
 import mlflow
@@ -66,13 +66,20 @@ def main(cfg: DictConfig):
 
         mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000"))
         mlflow.set_experiment(experiment_name=experiment_name)
-        with mlflow.start_run(run_name=run_name):
-            container.animal_feature_initialization_job.run()
+        with mlflow.start_run(run_name=run_name) as run:
+            container.animal_feature_initialization_job.run(
+                mlflow_experiment_id=run.info.experiment_id,
+                mlflow_run_id=run.info.run_id,
+            )
             mlflow.log_artifact(os.path.join(cwd, ".hydra/config.yaml"))
             mlflow.log_artifact(os.path.join(cwd, ".hydra/hydra.yaml"))
             mlflow.log_artifact(os.path.join(cwd, ".hydra/overrides.yaml"))
 
     elif Configurations.job == JOBS.ANIMAL_FEATURE_REGISTRATION_JOB.value.name:
+        if Configurations.empty_run:
+            while True:
+                sleep(10)
+                logger.info("empty run...")
         mlflow_client = MlflowClient()
         mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000"))
         experiment = mlflow_client.get_experiment_by_name(name=Configurations.mlflow_experiment_name)
@@ -124,7 +131,10 @@ def main(cfg: DictConfig):
             description_vectorizer=description_vectorizer,
             name_vectorizer=name_vectorizer,
         )
-        container.animal_feature_registration_job.run()
+        container.animal_feature_registration_job.run(
+            mlflow_experiment_id=run.info.experiment_id,
+            mlflow_run_id=run.info.run_id,
+        )
 
     else:
         raise ValueError

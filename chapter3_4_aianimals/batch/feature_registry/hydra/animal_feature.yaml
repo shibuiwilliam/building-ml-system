@@ -13,8 +13,8 @@ jobs:
   description:
     type: text
     vectorizer:
-      max_feature: 500
+      max_features: 500
   name:
     type: text
     vectorizer:
-      max_feature: 300
+      max_features: 300

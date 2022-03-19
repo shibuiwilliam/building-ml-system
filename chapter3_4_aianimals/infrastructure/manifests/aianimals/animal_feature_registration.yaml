@@ -60,12 +60,16 @@ spec:
             - name: SAVE_DIRECTORY
               value: /tmp/
             - name: JOB
-              value: animal_feature_initialization_job
+              value: animal_feature_registration_job
             - name: MODEL_CONFIG
               value: animal_feature
             - name: MLFLOW_TRACKING_URI
               value: http://mlflow.mlflow.svc.cluster.local:5000
             - name: MLFLOW_EXPERIMENT_NAME
               value: animal_feature_extraction
+            - name: MLFLOW_RUN_ID
+              value: ""
+            - name: EMPTY_RUN
+              value: "1"
       imagePullSecrets:
         - name: regcred
