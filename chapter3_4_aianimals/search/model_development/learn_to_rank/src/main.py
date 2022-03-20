@@ -87,29 +87,20 @@ def main(cfg: DictConfig):
             q_train=dataset.q_train,
             q_test=dataset.q_test,
         )
+        mlflow.log_artifact(preprocess_artifact.likes_scaler_save_file_path, "likes_scaler")
+        mlflow.log_artifact(preprocess_artifact.query_phrase_encoder_save_file_path, "query_phrase_encoder")
         mlflow.log_artifact(
-            preprocess_artifact.likes_scaler_save_file_path,
-            "likes_scaler",
-        )
-        mlflow.log_artifact(
-            preprocess_artifact.query_phrase_encoder_save_file_path,
-            "query_phrase_encoder",
-        )
-        mlflow.log_artifact(
-            preprocess_artifact.query_animal_category_id_encoder_save_file_path,
-            "query_animal_category_id_encoder",
+            preprocess_artifact.query_animal_category_id_encoder_save_file_path, "query_animal_category_id_encoder"
         )
         mlflow.log_artifact(
             preprocess_artifact.query_animal_subcategory_id_encoder_save_file_path,
             "query_animal_subcategory_id_encoder",
         )
+
         preprocessed_data_file = os.path.join(cwd, f"preprocessed_data.pickle")
         with open(preprocessed_data_file, "wb") as f:
             pickle.dump(preprocessed_data, f)
-        mlflow.log_artifact(
-            preprocessed_data_file,
-            f"preprocessed_data_file",
-        )
+        mlflow.log_artifact(preprocessed_data_file, "preprocessed_data_file")
 
         artifact = Trainer().train(
             model=model,

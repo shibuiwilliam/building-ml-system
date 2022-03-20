@@ -19,6 +19,24 @@ spec:
                 parameters:
                   - name: mlflow-params
                     value: "{{steps.animal-feature-registry-initialization.outputs.parameters.mlflow-params}}"
+            - name: search-learn-to-rank-lightgbm-ranker-train
+              template: search-learn-to-rank-lightgbm-ranker-train
+              arguments:
+                parameters:
+                  - name: mlflow-params
+                    value: "{{steps.animal-feature-registry-initialization.outputs.parameters.mlflow-params}}"
+          - - name: print-message-regression
+              template: print-message
+              arguments:
+                parameters:
+                  - name: mlflow-params
+                    value: "{{steps.search-learn-to-rank-lightgbm-regression-train.outputs.parameters.mlflow-params}}"
+            - name: print-message-ranker
+              template: print-message
+              arguments:
+                parameters:
+                  - name: mlflow-params
+                    value: "{{steps.search-learn-to-rank-lightgbm-ranker-train.outputs.parameters.mlflow-params}}"
 
       - name: animal-feature-registry-initialization
         container:
@@ -70,10 +88,10 @@ spec:
           resources:
             limits:
               cpu: 2000m
-              memory: "2000Mi"
+              memory: "4000Mi"
             requests:
               cpu: 500m
-              memory: "500Mi"
+              memory: "2000Mi"
         outputs:
           parameters:
             - name: mlflow-params
@@ -117,9 +135,75 @@ spec:
             - name: FEATURE_MLFLOW_PARAM_JSON
               value: "{{inputs.parameters.mlflow-params}}"
           resources:
-            requests:
-              memory: 2000Mi
+            limits:
               cpu: 2000m
+              memory: "4000Mi"
+            requests:
+              cpu: 500m
+              memory: "2000Mi"
+        outputs:
+          parameters:
+            - name: mlflow-params
+              valueFrom:
+                path: /tmp/output.json
+
+      - name: search-learn-to-rank-lightgbm-ranker-train
+        inputs:
+          parameters:
+            - name: mlflow-params
+        container:
+          image: shibui/building-ml-system:ai_animals_search_learn_to_rank_train_0.0.0
+          imagePullPolicy: Always
+          command:
+            - "python"
+            - "-m"
+            - "src.main"
+          env:
+            - name: MODEL_CONFIG
+              value: learn_to_rank_lightgbm_ranker
+            - name: MLFLOW_TRACKING_URI
+              value: http://mlflow.mlflow.svc.cluster.local:5000
+            - name: MLFLOW_EXPERIMENT
+              value: search_learn_to_rank
+            - name: POSTGRES_HOST
+              value: postgres.data.svc.cluster.local
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: password
+            - name: POSTGRES_DB
+              value: aianimals
+            - name: REDIS_HOST
+              value: redis.data.svc.cluster.local
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_DB
+              value: "0"
+            - name: FEATURE_MLFLOW_PARAM_JSON
+              value: "{{inputs.parameters.mlflow-params}}"
+          resources:
+            limits:
+              cpu: 2000m
+              memory: "4000Mi"
+            requests:
+              cpu: 500m
+              memory: "2000Mi"
+        outputs:
+          parameters:
+            - name: mlflow-params
+              valueFrom:
+                path: /tmp/output.json
+
+      - name: print-message
+        inputs:
+          parameters:
+            - name: mlflow-params
+        container:
+          image: docker/whalesay:latest
+          command: [cowsay]
+          args: ["{{inputs.parameters.mlflow-params}}"]
 
     imagePullSecrets:
       - name: regcred
