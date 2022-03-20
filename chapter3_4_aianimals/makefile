@@ -783,7 +783,7 @@ deploy_all: deploy_data \
 	deploy_similar_image_search_serving \
 	deploy_search_learn_to_rank_lgbm_ranker_api \
 	deploy_search_learn_to_rank_lgbm_regression_api \
-	create_argo_animal_feature_initialization_cron \
+	create_argo_animal_feature_train_cron \
 	create_argo_similar_image_search_train_cron 
 
 .PHONY: delete_namespaces
