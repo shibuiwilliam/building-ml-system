@@ -30,3 +30,5 @@ class Configurations:
     animal_feature_registry_queue = os.getenv("ANIMAL_FEATURE_REGISTRY_QUEUE", "animal_feature")
 
     empty_run = bool(int(os.getenv("EMPTY_RUN", "0")))
+
+    feature_cache_ttl = int(os.getenv("FEATURE_CACHE_TTL", 60 * 60 * 24 * 7))

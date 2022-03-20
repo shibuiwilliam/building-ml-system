@@ -65,6 +65,8 @@ spec:
               value: http://mlflow.mlflow.svc.cluster.local:5000
             - name: MLFLOW_EXPERIMENT_NAME
               value: animal_feature_extraction
+            - name: FEATURE_CACHE_TTL
+              value: "604800"
           resources:
             limits:
               cpu: 2000m
@@ -79,6 +81,9 @@ spec:
                 path: /tmp/output.json
 
       - name: search-learn-to-rank-lightgbm-regression-train
+        inputs:
+          parameters:
+            - name: mlflow-params
         container:
           image: shibui/building-ml-system:ai_animals_search_learn_to_rank_train_0.0.0
           imagePullPolicy: Always
