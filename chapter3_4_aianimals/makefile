@@ -787,7 +787,8 @@ delete_namespaces:
 	kubectl delete ns elastic-search & \
 	kubectl delete ns elastic-system & \
 	kubectl delete ns mlflow & \
-	kubectl delete ns violation-detection
+	kubectl delete ns violation-detection & \
+	kubectl delete ns search
 
 ############ ALL COMMANDS ############
 .PHONY: req_all

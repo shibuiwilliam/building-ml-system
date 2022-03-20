@@ -1,5 +1,5 @@
 from src.dataset.data_manager import AbstractCache, AbstractDBClient, AccessLogRepository, FeatureCacheRepository
-from src.dataset.schema import Action, Data, RawData
+from src.dataset.schema import Action, Data, RawData, FeatureVector
 from src.middleware.logger import configure_logger
 
 logger = configure_logger(__name__)
@@ -45,13 +45,22 @@ def retrieve_access_logs(
             feature_mlflow_experiment_id=feature_mlflow_experiment_id,
             feature_mlflow_run_id=feature_mlflow_run_id,
         )
+        feature_vector = features.get(cache_key, None)
+        if feature_vector is None:
+            logger.info(f"skip {record.id} for lack of cache: {cache_key}")
+            continue
         d = Data(
             animal_id=record.animal_id,
             query_phrases=".".join(sorted(record.query_phrases)),
             query_animal_category_id=record.query_animal_category_id,
             query_animal_subcategory_id=record.query_animal_subcategory_id,
             likes=record.likes,
-            feature_vector=features[cache_key],
+            feature_vector=FeatureVector(
+                animal_category_vector=feature_vector["animal_category_vector"],
+                animal_subcategory_vector=feature_vector["animal_subcategory_vector"],
+                name_vector=feature_vector["name_vector"],
+                description_vector=feature_vector["description_vector"],
+            ),
         )
 
         data.append(d)

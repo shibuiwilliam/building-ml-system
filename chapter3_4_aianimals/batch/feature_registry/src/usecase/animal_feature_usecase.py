@@ -308,8 +308,8 @@ class AnimalFeatureUsecase(AbstractAnimalFeatureUsecase):
             data = dict(
                 animal_category_vector=animal_category_vector,
                 animal_subcategory_vector=animal_subcategory_vector,
-                description_words=description_words.split(" "),
                 name_words=name_words.split(" "),
+                description_words=description_words.split(" "),
                 name_vector=name_vector,
                 description_vector=description_vector,
             )

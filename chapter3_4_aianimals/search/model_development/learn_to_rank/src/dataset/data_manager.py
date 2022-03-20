@@ -79,7 +79,7 @@ class FeatureCacheRepository(object):
     def get_features_by_keys(
         self,
         keys: List[str],
-    ) -> Dict[str, List[float]]:
+    ) -> Dict[str, Dict[str, List[float]]]:
         logger.info(f"keys to get from cache: {len(keys)}")
         features = {}
         i = 1000

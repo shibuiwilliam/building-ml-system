@@ -81,13 +81,20 @@ class AccessLog(BaseModel):
         extra = Extra.forbid
 
 
+class FeatureVector(BaseModel):
+    animal_category_vector: List[float]
+    animal_subcategory_vector: List[float]
+    name_vector: List[float]
+    description_vector: List[float]
+
+
 class Data(BaseModel):
     animal_id: str
     query_phrases: str
     query_animal_category_id: Optional[int] = None
     query_animal_subcategory_id: Optional[int] = None
     likes: int
-    feature_vector: List[float]
+    feature_vector: FeatureVector
 
 
 class RawData(BaseModel):
