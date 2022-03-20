@@ -1,7 +1,8 @@
 from logging import getLogger
 
 from fastapi import APIRouter, BackgroundTasks
-from src.registry.container import container
+from src.registry.container import Container, EmptyContainer
+from src.registry.registry import container
 from src.schema.animal import AnimalRequest, AnimalRequestResponse, AnimalResponse
 
 logger = getLogger(__name__)
@@ -19,8 +20,11 @@ async def post_reorder(
     background_tasks: BackgroundTasks,
     request: AnimalRequest,
 ):
-    data = container.reorder_usecase.reorder(
-        request=request,
-        background_tasks=background_tasks,
-    )
-    return data
+    if isinstance(container, EmptyContainer):
+        return AnimalResponse(ids=request.ids)
+    else:
+        data = container.reorder_usecase.reorder(
+            request=request,
+            background_tasks=background_tasks,
+        )
+        return data

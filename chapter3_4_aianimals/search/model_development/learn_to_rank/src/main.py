@@ -1,11 +1,12 @@
+import json
 import os
 import pickle
 from datetime import datetime
-import json
 
 import hydra
 import mlflow
 from omegaconf import DictConfig
+from src.configurations import Configurations
 from src.dataset.data_manager import DBClient, RedisCache
 from src.jobs.preprocess import Preprocess, random_split, split_by_qid
 from src.jobs.retrieve import retrieve_access_logs
@@ -13,7 +14,6 @@ from src.jobs.train import Trainer
 from src.middleware.logger import configure_logger
 from src.models.models import MODELS
 from src.models.preprocess import CategoricalVectorizer, NumericalMinMaxScaler
-from src.configurations import Configurations
 
 logger = configure_logger(__name__)
 

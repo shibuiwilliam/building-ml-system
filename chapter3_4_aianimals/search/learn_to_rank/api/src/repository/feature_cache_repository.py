@@ -19,7 +19,7 @@ class AbstractFeatureCacheRepository(ABC):
     def get_features_by_keys(
         self,
         keys: List[str],
-    ) -> Dict[str, List[float]]:
+    ) -> Dict[str, Dict[str, List[float]]]:
         raise NotImplementedError
 
 
@@ -33,7 +33,7 @@ class FeatureCacheRepository(AbstractFeatureCacheRepository):
     def get_features_by_keys(
         self,
         keys: List[str],
-    ) -> Dict[str, List[float]]:
+    ) -> Dict[str, Dict[str, List[float]]]:
         features = {}
         for key in keys:
             feature = self.cache.get(key=key)

@@ -12,7 +12,7 @@ class Configurations:
             feature_mlflow_param = json.load(f)
     if feature_mlflow_param_json is not None:
         feature_mlflow_param = json.loads(feature_mlflow_param_json)
-    _feature_mlflow_experiment_id = feature_mlflow_param.get("mlflow_experiment_id")
+    _feature_mlflow_experiment_id = feature_mlflow_param.get("mlflow_experiment_id", -1)
     _feature_mlflow_run_id = feature_mlflow_param.get("mlflow_run_id")
 
     feature_mlflow_experiment_id = int(os.getenv("FEATURE_MLFLOW_EXPERIMENT_ID", _feature_mlflow_experiment_id))

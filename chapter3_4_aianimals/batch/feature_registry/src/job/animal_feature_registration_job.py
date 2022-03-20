@@ -2,8 +2,8 @@ from src.configurations import Configurations
 from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging
 from src.job.abstract_job import AbstractJob
 from src.middleware.logger import configure_logger
-from src.usecase.animal_feature_usecase import AbstractAnimalFeatureUsecase
 from src.request_object.animal_feature import AnimalFeatureRegistrationRequest
+from src.usecase.animal_feature_usecase import AbstractAnimalFeatureUsecase
 
 logger = configure_logger(__name__)
 

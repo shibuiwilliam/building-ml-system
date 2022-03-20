@@ -1,8 +1,8 @@
 import mlflow
 from src.job.abstract_job import AbstractJob
 from src.middleware.logger import configure_logger
-from src.usecase.animal_feature_usecase import AbstractAnimalFeatureUsecase
 from src.request_object.animal_feature import AnimalFeatureInitializeRequest
+from src.usecase.animal_feature_usecase import AbstractAnimalFeatureUsecase
 
 logger = configure_logger(__name__)
 

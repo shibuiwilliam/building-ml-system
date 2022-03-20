@@ -1,5 +1,5 @@
 from src.dataset.data_manager import AbstractCache, AbstractDBClient, AccessLogRepository, FeatureCacheRepository
-from src.dataset.schema import Action, Data, RawData, FeatureVector
+from src.dataset.schema import Action, Data, FeatureVector, RawData
 from src.middleware.logger import configure_logger
 
 logger = configure_logger(__name__)

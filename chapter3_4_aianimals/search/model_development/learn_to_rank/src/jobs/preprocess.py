@@ -2,11 +2,10 @@ import random
 from typing import Dict, List, Optional, Tuple
 
 from pydantic import BaseModel
-from src.dataset.schema import Data
+from sklearn.model_selection import train_test_split
+from src.dataset.schema import Data, RawData, SplitData
 from src.middleware.logger import configure_logger
 from src.models.preprocess import CategoricalVectorizer, NumericalMinMaxScaler
-from src.dataset.schema import RawData, SplitData
-from sklearn.model_selection import train_test_split
 
 logger = configure_logger(name=__name__)
 
@@ -169,47 +168,57 @@ q_test: {sum(q_test) if q_test is not None else None}
             .tolist()
         )
 
-        _x_train = []
-        for l, qp, qac, qas, v in zip(
-            likes_train,
-            query_phrases_train,
-            query_animal_category_ids_train,
-            query_animal_subcategory_ids_train,
-            x_train,
-        ):
-            _x_train.append(
-                [
-                    *l,
-                    *qp,
-                    *qac,
-                    *qas,
-                    *v.feature_vector.animal_category_vector,
-                    *v.feature_vector.animal_subcategory_vector,
-                    *v.feature_vector.name_vector,
-                    *v.feature_vector.description_vector,
-                ]
+        _x_train = [
+            [
+                *_likes_train,
+                *_query_phrases_train,
+                *_query_animal_category_ids_train,
+                *_query_animal_subcategory_ids_train,
+                *v.feature_vector.animal_category_vector,
+                *v.feature_vector.animal_subcategory_vector,
+                *v.feature_vector.name_vector,
+                *v.feature_vector.description_vector,
+            ]
+            for (
+                _likes_train,
+                _query_phrases_train,
+                _query_animal_category_ids_train,
+                _query_animal_subcategory_ids_train,
+                v,
+            ) in zip(
+                likes_train,
+                query_phrases_train,
+                query_animal_category_ids_train,
+                query_animal_subcategory_ids_train,
+                x_train,
             )
+        ]
 
-        _x_test = []
-        for l, qp, qac, qas, v in zip(
-            likes_test,
-            query_phrases_test,
-            query_animal_category_ids_test,
-            query_animal_subcategory_ids_test,
-            x_test,
-        ):
-            _x_test.append(
-                [
-                    *l,
-                    *qp,
-                    *qac,
-                    *qas,
-                    *v.feature_vector.animal_category_vector,
-                    *v.feature_vector.animal_subcategory_vector,
-                    *v.feature_vector.name_vector,
-                    *v.feature_vector.description_vector,
-                ]
+        _x_test = [
+            [
+                *_likes_test,
+                *_query_phrases_test,
+                *_query_animal_category_ids_test,
+                *_query_animal_subcategory_ids_test,
+                *v.feature_vector.animal_category_vector,
+                *v.feature_vector.animal_subcategory_vector,
+                *v.feature_vector.name_vector,
+                *v.feature_vector.description_vector,
+            ]
+            for (
+                _likes_test,
+                _query_phrases_test,
+                _query_animal_category_ids_test,
+                _query_animal_subcategory_ids_test,
+                v,
+            ) in zip(
+                likes_test,
+                query_phrases_test,
+                query_animal_category_ids_test,
+                query_animal_subcategory_ids_test,
+                x_test,
             )
+        ]
 
         logger.info(
             f"""

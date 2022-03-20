@@ -1,5 +1,5 @@
 from logging import getLogger
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Union
 
 from pydantic import BaseModel, Extra
 from src.infrastructure.db_client import AbstractDBClient
