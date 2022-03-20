@@ -32,6 +32,8 @@ def main(cfg: DictConfig):
     logger.info(f"current working directory: {cwd}")
     logger.info(f"experiment_name: {experiment_name}")
     logger.info(f"run_name: {run_name}")
+    logger.info(f"feature mlflow experiment_id: {Configurations.feature_mlflow_experiment_id}")
+    logger.info(f"feature mlflow run_id: {Configurations.feature_mlflow_run_id}")
 
     mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000"))
     mlflow.set_experiment(experiment_name=experiment_name)

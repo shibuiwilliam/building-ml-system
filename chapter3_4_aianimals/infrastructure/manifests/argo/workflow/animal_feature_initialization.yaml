@@ -3,7 +3,7 @@ kind: CronWorkflow
 metadata:
   generateName: animal-feature-registry-initialization-
 spec:
-  schedule: "0 0 1 * *"
+  schedule: "0 0 * * 2"
   concurrencyPolicy: "Forbid"
   startingDeadlineSeconds: 0
   workflowSpec:
