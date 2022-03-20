@@ -5,6 +5,14 @@ from src.middleware.logger import configure_logger
 logger = configure_logger(__name__)
 
 
+def make_cache_key(
+    animal_id: str,
+    feature_mlflow_experiment_id: int,
+    feature_mlflow_run_id: str,
+) -> str:
+    return f"animal_feature_{animal_id}_{feature_mlflow_experiment_id}_{feature_mlflow_run_id}"
+
+
 def retrieve_access_logs(
     feature_mlflow_experiment_id: int,
     feature_mlflow_run_id: str,
@@ -14,7 +22,16 @@ def retrieve_access_logs(
     access_log_repository = AccessLogRepository(db_client=db_client)
     records = access_log_repository.select_all()
     ids = list(
-        set([f"animal_feature_{r.animal_id}_{feature_mlflow_experiment_id}_{feature_mlflow_run_id}" for r in records])
+        set(
+            [
+                make_cache_key(
+                    animal_id=r.animal_id,
+                    feature_mlflow_experiment_id=feature_mlflow_experiment_id,
+                    feature_mlflow_run_id=feature_mlflow_run_id,
+                )
+                for r in records
+            ]
+        )
     )
     logger.info(f"retrieved: {len(records)} like {records[0]}")
     feature_cache_repository = FeatureCacheRepository(cache=cache)
@@ -23,13 +40,18 @@ def retrieve_access_logs(
     target = []
     i = 1000
     for record in records:
+        cache_key = make_cache_key(
+            animal_id=record.animal_id,
+            feature_mlflow_experiment_id=feature_mlflow_experiment_id,
+            feature_mlflow_run_id=feature_mlflow_run_id,
+        )
         d = Data(
             animal_id=record.animal_id,
             query_phrases=".".join(sorted(record.query_phrases)),
             query_animal_category_id=record.query_animal_category_id,
             query_animal_subcategory_id=record.query_animal_subcategory_id,
             likes=record.likes,
-            feature_vector=features[f"{record.animal_id}_feature"],
+            feature_vector=features[cache_key],
         )
 
         data.append(d)

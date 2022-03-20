@@ -95,6 +95,14 @@ class AnimalFeatureUsecase(AbstractAnimalFeatureUsecase):
             name_vectorizer=name_vectorizer,
         )
 
+    def make_cache_key(
+        self,
+        animal_id: str,
+        mlflow_experiment_id: int,
+        mlflow_run_id: str,
+    ) -> str:
+        return f"{self.PREFIX}_{animal_id}_{mlflow_experiment_id}_{mlflow_run_id}"
+
     def fit_register_animal_feature(
         self,
         request: AnimalFeatureInitializeRequest,
@@ -328,8 +336,13 @@ class AnimalFeatureUsecase(AbstractAnimalFeatureUsecase):
                 _cache = True
 
             if _cache:
+                key = self.make_cache_key(
+                    animal_id=animal_id,
+                    mlflow_experiment_id=mlflow_experiment_id,
+                    mlflow_run_id=mlflow_run_id,
+                )
                 self.cache.set(
-                    key=f"{self.PREFIX}_{animal_id}_{mlflow_experiment_id}_{mlflow_run_id}",
+                    key=key,
                     value=json.dumps(data),
                     expire_second=Configurations.feature_cache_ttl,
                 )
