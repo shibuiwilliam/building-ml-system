@@ -775,7 +775,9 @@ deploy_all: deploy_data \
 	deploy_no_animal_violation_serving \
 	deploy_no_animal_violation_proxy \
 	deploy_search_registry \
-	deploy_similar_image_search_serving
+	deploy_similar_image_search_serving \
+	create_argo_animal_feature_initialization_cron \
+	create_argo_similar_image_search_train_cron 
 
 .PHONY: delete_namespaces
 delete_namespaces:
