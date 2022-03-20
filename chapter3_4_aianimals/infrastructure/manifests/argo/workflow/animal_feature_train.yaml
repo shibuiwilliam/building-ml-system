@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: CronWorkflow
 metadata:
-  generateName: animal-feature-registry-initialization-
+  generateName: animal-feature-registry-train-
 spec:
   schedule: "0 0 * * 2"
   concurrencyPolicy: "Forbid"

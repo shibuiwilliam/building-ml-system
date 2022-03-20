@@ -9,7 +9,7 @@ class Configurations(object):
 
     model_name = os.getenv("MODEL_VERSION", "learn_to_rank_lightgbm_ranker_0.0.0")
 
-    mlflow_param_json = os.getenv("FEATURE_MLFLOW_PARAM_JSON", None)
+    mlflow_param_json = os.getenv("MLFLOW_PARAM_JSON", None)
     mlflow_param = {}
     if mlflow_param_json is not None:
         mlflow_param = json.loads(mlflow_param_json)

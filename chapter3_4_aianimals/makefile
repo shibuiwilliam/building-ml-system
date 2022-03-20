@@ -320,9 +320,9 @@ port_forward_argo:
 create_argo_similar_image_search_train_cron:
 	argo cron create infrastructure/manifests/argo/workflow/search_similar_image_search_train.yaml
 
-.PHONY: create_argo_animal_feature_initialization_cron
-create_argo_animal_feature_initialization_cron:
-	argo cron create infrastructure/manifests/argo/workflow/animal_feature_initialization.yaml
+.PHONY: create_argo_animal_feature_train_cron
+create_argo_animal_feature_train_cron:
+	argo cron create infrastructure/manifests/argo/workflow/animal_feature_train.yaml
 
 .PHONY: submit_argo_learn_to_rank_lgbm_ranker_train
 submit_argo_learn_to_rank_lgbm_ranker_train:
@@ -429,7 +429,7 @@ push_search_learn_to_rank_train:
 ############ SEARCH_LEARN_TO_RANK_LGBM_API COMMANDS ############
 SEARCH_LEARN_TO_RANK_LGBM_API_DIR := $(DIR)/search/learn_to_rank/api
 SEARCH_LEARN_TO_RANK_LGBM_API_VERSION := $(shell cd ${SEARCH_LEARN_TO_RANK_LGBM_API_DIR} && poetry version -s)
-SEARCH_LEARN_TO_RANK_LGBM_API_MANIFEST_DIR := $(K8S_DIR)/manifests/search_learn_to_rank_lgbm_api
+SEARCH_LEARN_TO_RANK_LGBM_API_MANIFEST_DIR := $(K8S_DIR)/manifests/search
 DOCKERFILE_SEARCH_LEARN_TO_RANK_LGBM_API = $(SEARCH_LEARN_TO_RANK_LGBM_API_DIR)/$(DOCKERFILE)
 DOCKER_SEARCH_LEARN_TO_RANK_LGBM_API_TAG = $(TAG)_search_learn_to_rank_lgbm_api
 DOCKER_SEARCH_LEARN_TO_RANK_LGBM_API_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_API_TAG)_$(SEARCH_LEARN_TO_RANK_LGBM_API_VERSION)
@@ -455,10 +455,15 @@ build_search_learn_to_rank_lgbm_api:
 push_search_learn_to_rank_lgbm_api: 
 	docker push $(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_API_IMAGE_NAME)
 
-.PHONY: deploy_search_learn_to_rank_lgbm_api
-deploy_search_learn_to_rank_lgbm_api: 
+.PHONY: deploy_search_learn_to_rank_lgbm_ranker_api
+deploy_search_learn_to_rank_lgbm_ranker_api: 
 	kubectl apply \
-		-f $(SEARCH_MANIFEST_DIR)/search_learn_to_rank_lgbm_api.yaml
+		-f $(SEARCH_MANIFEST_DIR)/learn_to_rank_lgbm_ranker.yaml
+
+.PHONY: deploy_search_learn_to_rank_lgbm_regression_api
+deploy_search_learn_to_rank_lgbm_regression_api: 
+	kubectl apply \
+		-f $(SEARCH_MANIFEST_DIR)/learn_to_rank_lgbm_regression.yaml
 
 
 ############ SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN COMMANDS ############
@@ -776,6 +781,8 @@ deploy_all: deploy_data \
 	deploy_no_animal_violation_proxy \
 	deploy_search_registry \
 	deploy_similar_image_search_serving \
+	deploy_search_learn_to_rank_lgbm_ranker_api \
+	deploy_search_learn_to_rank_lgbm_regression_api \
 	create_argo_animal_feature_initialization_cron \
 	create_argo_similar_image_search_train_cron 
 
