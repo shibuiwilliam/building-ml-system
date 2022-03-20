@@ -36,9 +36,16 @@ spec:
             value: "6379"
           - name: REDIS_DB
             value: "0"
+          - name: FEATURE_MLFLOW_EXPERIMENT_ID
+            value: "2"
+          - name: FEATURE_MLFLOW_RUN_ID
+            value: ""
         resources:
-          requests:
-            memory: 2000Mi
+          limits:
             cpu: 2000m
+            memory: "8000Mi"
+          requests:
+            cpu: 2000m
+            memory: "4000Mi"
   imagePullSecrets:
     - name: regcred

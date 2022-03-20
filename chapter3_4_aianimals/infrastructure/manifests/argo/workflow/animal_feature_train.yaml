@@ -161,6 +161,7 @@ spec:
                 path: /tmp/output.json
 
       - name: learn-to-rank-lgbm-update
+        serviceAccountName: user-admin
         inputs:
           parameters:
             - name: deployment

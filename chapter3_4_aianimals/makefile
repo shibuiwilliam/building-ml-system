@@ -9,6 +9,10 @@ DIR := $(ABSOLUTE_PATH)
 K8S_DIR := $(ABSOLUTE_PATH)/infrastructure
 K8S_SECRET_DIR := $(K8S_DIR)/secrets
 
+.PHONY: source
+source:
+	source $(K8S_DIR)/env
+
 ############ DATA COMMANDS ############
 DATA_MANIFEST_DIR := $(K8S_DIR)/manifests/data
 

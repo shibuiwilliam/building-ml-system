@@ -34,6 +34,8 @@ def load_cloud_pickle(file_path: str):
 
 
 def build_container() -> Container:
+    logger.info("build container...")
+
     mlflow_client = MlflowClient()
     mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000"))
     mlflow.set_experiment(experiment_id=Configurations.mlflow_experiment_id)
@@ -97,4 +99,6 @@ def build_container() -> Container:
 
 
 def build_empty_container() -> EmptyContainer:
+    logger.info("build empty container...")
+
     return EmptyContainer()
