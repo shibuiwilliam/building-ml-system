@@ -63,7 +63,6 @@ def main(cfg: DictConfig):
             "saved_model",
             format="zip",
             root_dir="/opt/outputs",
-            base_dir="saved_model",
         )
         saved_model_zip = shutil.move("./saved_model.zip", "/opt/outputs/saved_model.zip")
 

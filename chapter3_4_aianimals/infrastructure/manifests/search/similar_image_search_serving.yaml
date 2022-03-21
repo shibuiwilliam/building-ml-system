@@ -33,9 +33,9 @@ spec:
             - name: TARGET_URLS
               value: "https://storage.googleapis.com/aianimals/models/search/similar_image_search/saved_model.zip"
             - name: TARGET_DIRECTORY
-              value: "/models/similar_image_search/0/"
+              value: "/models/similar_image_search/"
           volumeMounts:
-            - mountPath: /models/similar_image_search/0/
+            - mountPath: /models/similar_image_search/
               name: data
       containers:
         - name: similar-image-search-serving
@@ -52,7 +52,7 @@ spec:
               cpu: 1000m
               memory: "4000Mi"
           volumeMounts:
-            - mountPath: /models/similar_image_search/0/
+            - mountPath: /models/similar_image_search/
               name: data
       volumes:
         - name: data
