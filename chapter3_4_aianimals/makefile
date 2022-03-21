@@ -532,34 +532,6 @@ deploy_similar_image_search_proxy: registry_search
 		-f $(SEARCH_MANIFEST_DIR)/similar_image_search_proxy.yaml
 
 
-############ SIMILAR_IMAGE_SEARCH_DEPLOYER COMMANDS ############
-SIMILAR_IMAGE_SEARCH_DEPLOYER_DIR := $(DIR)/search/similar_image_search/deployer
-SIMILAR_IMAGE_SEARCH_DEPLOYER_VERSION := $(shell cd ${SIMILAR_IMAGE_SEARCH_DEPLOYER_DIR} && poetry version -s)
-DOCKERFILE_SIMILAR_IMAGE_SEARCH_DEPLOYER = $(SIMILAR_IMAGE_SEARCH_DEPLOYER_DIR)/$(DOCKERFILE)
-DOCKER_SIMILAR_IMAGE_SEARCH_DEPLOYER_TAG = $(TAG)_search_similar_image_search_deployer
-DOCKER_SIMILAR_IMAGE_SEARCH_DEPLOYER_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_SIMILAR_IMAGE_SEARCH_DEPLOYER_TAG)_$(SIMILAR_IMAGE_SEARCH_DEPLOYER_VERSION)
-
-.PHONY: req_search_similar_image_search_deployer
-req_search_similar_image_search_deployer:
-	cd $(SIMILAR_IMAGE_SEARCH_DEPLOYER_DIR) && \
-	poetry export \
-		--without-hashes \
-		-f requirements.txt \
-		--output requirements.txt
-
-.PHONY: build_search_similar_image_search_deployer
-build_search_similar_image_search_deployer: 
-	docker build \
-		--platform x86_64 \
-		-t $(DOCKER_SIMILAR_IMAGE_SEARCH_DEPLOYER_IMAGE_NAME) \
-		-f $(DOCKERFILE_SIMILAR_IMAGE_SEARCH_DEPLOYER) \
-		.
-
-.PHONY: push_search_similar_image_search_deployer
-push_search_similar_image_search_deployer: 
-	docker push $(DOCKER_SIMILAR_IMAGE_SEARCH_DEPLOYER_IMAGE_NAME)
-
-
 ############ SEARCH_SIMILAR_IMAGE_SEARCH_SERVING COMMANDS ############
 SEARCH_SIMILAR_IMAGE_SEARCH_SERVING_DIR := $(DIR)/search/similar_image_search/serving
 SEARCH_SIMILAR_IMAGE_SEARCH_SERVING_VERSION := 0.0.0
@@ -817,7 +789,6 @@ req_all: \
 	req_search_learn_to_rank_train \
 	req_search_similar_image_search_train \
 	req_search_similar_image_search_proxy \
-	req_search_similar_image_search_deployer \
 	req_search_learn_to_rank_lgbm_api
 
 .PHONY: build_all
@@ -838,7 +809,6 @@ build_all: \
 	build_search_learn_to_rank_train \
 	build_search_similar_image_search_train \
 	build_search_similar_image_search_proxy \
-	build_search_similar_image_search_deployer \
 	build_search_learn_to_rank_lgbm_api
 	
 .PHONY: push_all
@@ -859,6 +829,5 @@ push_all: \
 	push_search_learn_to_rank_train \
 	push_search_similar_image_search_train \
 	push_search_similar_image_search_proxy \
-	push_search_similar_image_search_deployer \
 	push_search_learn_to_rank_lgbm_api
 	
