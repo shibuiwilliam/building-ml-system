@@ -13,12 +13,16 @@ spec:
         steps:
           - - name: search-similar-image-search-train
               template: search-similar-image-search-train
-          - - name: print-message
-              template: print-message
+          - - name: search-similar-image-search-update
+              template: search-similar-image-search-update
               arguments:
                 parameters:
-                  - name: experiment-run
-                    value: "{{steps.search-similar-image-search-train.outputs.parameters.experiment-run}}"
+                  - name: deployment
+                    value: similar-image-search-serving
+                  - name: containers
+                    value: model-loader
+                  - name: mlflow-params
+                    value: "{{steps.search-similar-image-search-train.outputs.parameters.mlflow-params}}"
 
       - name: search-similar-image-search-train
         container:
@@ -51,18 +55,31 @@ spec:
               cpu: 2000m
         outputs:
           parameters:
-            - name: experiment-run
+            - name: mlflow-params
               valueFrom:
                 path: /tmp/output.json
 
-      - name: print-message
+      - name: search-similar-image-search-update
+        serviceAccountName: user-admin
         inputs:
           parameters:
-            - name: experiment-run
+            - name: deployment
+            - name: containers
+            - name: mlflow-params
         container:
-          image: docker/whalesay:latest
-          command: [cowsay]
-          args: ["{{inputs.parameters.experiment-run}}"]
+          image: shibui/building-ml-system:ai_animals_k8s_client_0.0.0
+          command: [kubectl]
+          args:
+            - -n
+            - search
+            - set
+            - env
+            - deployment
+            - "{{inputs.parameters.deployment}}"
+            - "--containers={{inputs.parameters.containers}}"
+            - "MLFLOW_PARAM_JSON={{inputs.parameters.mlflow-params}}"
+            - "TARGET_ARTIFACTS=saved_model"
+            - "TARGET_URLS=''"
 
     imagePullSecrets:
       - name: regcred
