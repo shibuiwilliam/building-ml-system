@@ -31,10 +31,12 @@ def download_model_from_url(url: str) -> Optional[str]:
         logger.info(f"saved as {filename}")
         if filename.endswith(".zip"):
             directory = os.path.dirname(filename)
+            extract_dir = os.path.join(directory, filename)
             shutil.unpack_archive(
                 filename=filename,
-                extract_dir=directory,
+                extract_dir=extract_dir,
             )
+            path = extract_dir
         logger.info(f"downloaded {filename}")
         return filename
     except Exception as e:
@@ -67,15 +69,12 @@ def download_model_from_mlflow(
         path = os.path.join(model_path, os.listdir(model_path)[0])
         if path.endswith(".zip"):
             directory = os.path.dirname(path)
-            basename = os.path.basename(path)
-            _filename, _ = os.path.splitext(basename)
-            _path = os.path.join(directory, _filename)
-            os.makedirs(_path, exist_ok=True)
+            extract_dir = os.path.join(directory, os.path.basename(path))
             shutil.unpack_archive(
                 filename=path,
-                extract_dir=_path,
+                extract_dir=extract_dir,
             )
-            path = _path
+            path = extract_dir
         logger.info(f"downloaded {path}")
         return path
     except Exception as e:

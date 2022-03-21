@@ -28,8 +28,8 @@ async def download_file(
 ) -> Tuple[Optional[str], Optional[str]]:
     logger.info(f"download: {source_path} to {destination_path}")
     if os.path.exists(destination_path):
-        logger.error(f"failed to download data: {source_path}")
-        return None, None
+        logger.error(f"data already exists: {id} {source_path} {destination_path}")
+        return id, destination_path
     res = await client.get(source_path)
     if res.status_code != 200:
         raise Exception(f"failed to download {source_path}")

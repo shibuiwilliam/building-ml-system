@@ -35,10 +35,11 @@ def main(cfg: DictConfig):
     mlflow.set_experiment(experiment_name=experiment_name)
     with mlflow.start_run(run_name=run_name) as run:
         db_client = DBClient()
+        image_dir = os.path.join(cwd, "images")
         animals = retrieve_animals(db_client=db_client)
         downloaded_images = download_dataset(
             animals=animals,
-            destination_directory="/opt/outputs/images",
+            destination_directory=image_dir,
         )
         dataset = load_images(
             images=downloaded_images,
