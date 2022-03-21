@@ -28,14 +28,15 @@ def download_model_from_url(url: str) -> Optional[str]:
             raise Exception(f"failed to download {url}")
         with open(filename, "wb") as f:
             f.write(res.content)
+        logger.info(f"saved as {filename}")
         if filename.endswith(".zip"):
             directory = os.path.dirname(filename)
             basename = os.path.basename(filename)
-            filename, _ = os.path.splitext(basename)
-            _path = os.path.join(directory, filename)
+            _filename, _ = os.path.splitext(basename)
+            _path = os.path.join(directory, _filename)
             os.makedirs(_path, exist_ok=True)
             shutil.unpack_archive(
-                filename=filename,
+                filename=_filename,
                 extract_dir=_path,
             )
             filename = _path
@@ -72,8 +73,8 @@ def download_model_from_mlflow(
         if path.endswith(".zip"):
             directory = os.path.dirname(path)
             basename = os.path.basename(path)
-            filename, _ = os.path.splitext(basename)
-            _path = os.path.join(directory, filename)
+            _filename, _ = os.path.splitext(basename)
+            _path = os.path.join(directory, _filename)
             os.makedirs(_path, exist_ok=True)
             shutil.unpack_archive(
                 filename=path,
