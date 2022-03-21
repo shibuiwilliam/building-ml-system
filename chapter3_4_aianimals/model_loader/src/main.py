@@ -31,15 +31,10 @@ def download_model_from_url(url: str) -> Optional[str]:
         logger.info(f"saved as {filename}")
         if filename.endswith(".zip"):
             directory = os.path.dirname(filename)
-            basename = os.path.basename(filename)
-            _filename, _ = os.path.splitext(basename)
-            _path = os.path.join(directory, _filename)
-            os.makedirs(_path, exist_ok=True)
             shutil.unpack_archive(
                 filename=filename,
-                extract_dir=_path,
+                extract_dir=directory,
             )
-            filename = _path
         logger.info(f"downloaded {filename}")
         return filename
     except Exception as e:
