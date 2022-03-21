@@ -117,10 +117,9 @@ def main(cfg: DictConfig):
         if cfg.jobs.model.get("save_onnx", False):
             mlflow.log_artifact(artifact.onnx_file_path, "onnx")
 
-        mlflow.log_artifact(os.path.join(cwd, ".hydra/config.yaml"), "hydra_config.yaml")
-        mlflow.log_artifact(os.path.join(cwd, ".hydra/hydra.yaml"), "hydra_hydra.yaml")
-        mlflow.log_artifact(os.path.join(cwd, ".hydra/overrides.yaml"), "hydra_overrides.yaml")
-        mlflow.log_artifact(os.path.join(cwd, "main.log"))
+        mlflow.log_artifacts(os.path.join(cwd, ".hydra/"), "hydra")
+        mlflow.log_artifact(os.path.join(cwd, "main.log"), "log")
+        mlflow.log_params(cfg)
 
         mlflow.log_param("model", model.name)
         mlflow.log_params(model.params)

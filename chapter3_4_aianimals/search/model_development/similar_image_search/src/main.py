@@ -68,13 +68,9 @@ def main(cfg: DictConfig):
         saved_model_zip = shutil.move("./saved_model.zip", "/opt/outputs/saved_model.zip")
 
         mlflow.log_artifact(saved_model_zip, "saved_model")
-        mlflow.log_artifact(os.path.join(cwd, ".hydra/config.yaml"), "hydra_config.yaml")
-        mlflow.log_artifact(os.path.join(cwd, ".hydra/hydra.yaml"), "hydra_hydra.yaml")
-        mlflow.log_artifact(os.path.join(cwd, ".hydra/overrides.yaml"), "hydra_overrides.yaml")
-        mlflow.log_artifact(os.path.join(cwd, "main.log"))
-
-        mlflow.log_params(cfg.model)
-        mlflow.log_params(cfg.input)
+        mlflow.log_artifacts(os.path.join(cwd, ".hydra/"), "hydra")
+        mlflow.log_artifact(os.path.join(cwd, "main.log"), "log")
+        mlflow.log_params(cfg)
 
         with open("/tmp/output.json", "w") as f:
             json.dump(

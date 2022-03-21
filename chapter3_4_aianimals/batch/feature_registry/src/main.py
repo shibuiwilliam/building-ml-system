@@ -73,9 +73,8 @@ def main(cfg: DictConfig):
                 mlflow_experiment_id=run.info.experiment_id,
                 mlflow_run_id=run.info.run_id,
             )
-            mlflow.log_artifact(os.path.join(cwd, ".hydra/config.yaml"))
-            mlflow.log_artifact(os.path.join(cwd, ".hydra/hydra.yaml"))
-            mlflow.log_artifact(os.path.join(cwd, ".hydra/overrides.yaml"))
+            mlflow.log_artifacts(os.path.join(cwd, ".hydra/"), "hydra")
+            mlflow.log_params(cfg)
 
             with open("/tmp/output.json", "w") as f:
                 json.dump(
