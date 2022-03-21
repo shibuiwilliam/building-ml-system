@@ -11,7 +11,7 @@ from src.middleware.logger import configure_logger
 logger = configure_logger(__name__)
 
 
-def download_model_from_url(url: str) -> Optional[str]:
+def download_model_from_url(url: str) -> Optional[List[str]]:
     logger.info(f"target url download: {url}")
     filename = os.path.basename(url)
     timeout = 20.0
@@ -32,13 +32,16 @@ def download_model_from_url(url: str) -> Optional[str]:
         if filename.endswith(".zip"):
             extract_dir = os.path.join("/tmp/", filename)
             os.makedirs(extract_dir, exist_ok=True)
+            logger.info(f"extract to {extract_dir}")
             shutil.unpack_archive(
                 filename=filename,
                 extract_dir=extract_dir,
             )
-            filename = extract_dir
-        logger.info(f"downloaded {filename}")
-        return filename
+            filenames = [os.path.join(extract_dir, f) for f in os.listdir(extract_dir)]
+        else:
+            filenames = [filename]
+        logger.info(f"downloaded {filenames}")
+        return filenames
     except Exception as e:
         logger.error(f"failed downloading {url}: {e}")
         return None
@@ -50,7 +53,7 @@ def download_model_from_urls(urls: List[str]) -> List[str]:
     for url in urls:
         file = download_model_from_url(url=url)
         if file is not None:
-            files.append(file)
+            files.extend(file)
     logger.info(f"downloaded {len(files)} models")
     return files
 
@@ -59,7 +62,7 @@ def download_model_from_mlflow(
     mlflow_client: MlflowClient,
     run_id: str,
     save_as: str,
-) -> Optional[str]:
+) -> Optional[List[str]]:
     logger.info(f"target download: {run_id} {save_as}")
     try:
         model_path = mlflow_client.download_artifacts(
@@ -70,13 +73,16 @@ def download_model_from_mlflow(
         if path.endswith(".zip"):
             extract_dir = os.path.join("/tmp/", os.path.basename(path))
             os.makedirs(extract_dir, exist_ok=True)
+            logger.info(f"extract to {extract_dir}")
             shutil.unpack_archive(
                 filename=path,
                 extract_dir=extract_dir,
             )
-            path = extract_dir
-        logger.info(f"downloaded {path}")
-        return path
+            paths = [os.path.join(extract_dir, f) for f in os.listdir(extract_dir)]
+        else:
+            paths = [path]
+        logger.info(f"downloaded {paths}")
+        return paths
     except Exception as e:
         logger.error(f"failed downloading {run_id} {save_as}: {e}")
         return None
@@ -96,7 +102,7 @@ def download_models_from_mlflow(
             save_as=save_as,
         )
         if model_path is not None:
-            model_paths.append(model_path)
+            model_paths.extend(model_path)
     logger.info(f"downloaded {len(model_paths)} models")
     return model_paths
 
@@ -138,7 +144,7 @@ def main():
             basename = os.path.basename(model_path)
             target_path = os.path.join(Configurations.target_directory, basename)
             moved_to = shutil.move(model_path, target_path)
-            logger.info(f"moved to {moved_to}")
+            logger.info(f"moved {model_path} to {moved_to}")
             logger.info(
                 f"files {[os.path.join(Configurations.target_directory, f) for f in os.listdir(Configurations.target_directory)]}"
             )
