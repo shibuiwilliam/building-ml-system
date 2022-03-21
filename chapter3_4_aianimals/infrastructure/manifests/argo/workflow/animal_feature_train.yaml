@@ -185,10 +185,10 @@ spec:
           resources:
             limits:
               cpu: 2000m
-              memory: "8000Mi"
+              memory: "10000Mi"
             requests:
               cpu: 2000m
-              memory: "4000Mi"
+              memory: "5000Mi"
         outputs:
           parameters:
             - name: mlflow-params

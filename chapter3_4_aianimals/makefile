@@ -768,11 +768,11 @@ delete_namespaces:
 	kubectl delete ns aianimals & \
 	kubectl delete ns argo & \
 	kubectl delete ns data & \
-	kubectl delete ns elastic-search & \
-	kubectl delete ns elastic-system & \
-	kubectl delete ns mlflow & \
 	kubectl delete ns violation-detection & \
-	kubectl delete ns search
+	kubectl delete ns mlflow & \
+	kubectl delete ns search & \
+	kubectl delete ns elastic-search & \
+	kubectl delete ns elastic-system
 
 ############ ALL COMMANDS ############
 .PHONY: req_all
