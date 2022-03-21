@@ -28,6 +28,8 @@ spec:
               value: "{}"
             - name: TARGET_ARTIFACTS
               value: "saved_model"
+            - name: TARGET_URLS
+              value: "https://storage.googleapis.com/aianimals/models/search/similar_image_search/saved_model.zip"
             - name: TARGET_DIRECTORY
               value: "/models/similar_image_search/0/"
           volumeMounts:

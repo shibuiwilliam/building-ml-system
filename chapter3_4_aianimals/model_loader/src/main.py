@@ -1,6 +1,6 @@
 import os
 import shutil
-from typing import List
+from typing import List, Optional
 
 import httpx
 import mlflow
@@ -11,24 +11,38 @@ from src.middleware.logger import configure_logger
 logger = configure_logger(__name__)
 
 
-def download_model_from_url(url: str) -> str:
+def download_model_from_url(url: str) -> Optional[str]:
     logger.info(f"target url download: {url}")
     filename = os.path.basename(url)
     timeout = 20.0
     transport = httpx.AsyncHTTPTransport(
         retries=3,
     )
-    with httpx.AsyncClient(
-        timeout=timeout,
-        transport=transport,
-    ) as client:
-        res = client.get(url)
-    if res.status_code != 200:
-        raise Exception(f"failed to download {url}")
-    with open(filename, "wb") as f:
-        f.write(res.content)
-    logger.info(f"downloaded {filename}")
-    return filename
+    try:
+        with httpx.AsyncClient(
+            timeout=timeout,
+            transport=transport,
+        ) as client:
+            res = client.get(url)
+        if res.status_code != 200:
+            raise Exception(f"failed to download {url}")
+        with open(filename, "wb") as f:
+            f.write(res.content)
+        if filename.endswith(".zip"):
+            directory = os.path.dirname(filename)
+            basename = os.path.basename(filename)
+            filename, _ = os.path.splitext(basename)
+            _path = os.path.join(directory, filename)
+            shutil.unpack_archive(
+                filename=filename,
+                extract_dir=_path,
+            )
+            filename = _path
+        logger.info(f"downloaded {filename}")
+        return filename
+    except Exception as e:
+        logger.error(f"failed downloading {url}: {e}")
+        return None
 
 
 def download_model_from_urls(urls: List[str]) -> List[str]:
@@ -36,7 +50,8 @@ def download_model_from_urls(urls: List[str]) -> List[str]:
     files = []
     for url in urls:
         file = download_model_from_url(url=url)
-        files.append(file)
+        if file is not None:
+            files.append(file)
     logger.info(f"downloaded {len(files)} models")
     return files
 
@@ -45,25 +60,29 @@ def download_model_from_mlflow(
     mlflow_client: MlflowClient,
     run_id: str,
     save_as: str,
-) -> str:
-    logger.info(f"target download: {save_as}")
-    model_path = mlflow_client.download_artifacts(
-        run_id=run_id,
-        path=save_as,
-    )
-    path = os.path.join(model_path, os.listdir(model_path)[0])
-    if path.endswith(".zip"):
-        directory = os.path.dirname(path)
-        basename = os.path.basename(path)
-        filename, _ = os.path.splitext(basename)
-        _path = os.path.join(directory, filename)
-        shutil.unpack_archive(
-            filename=path,
-            extract_dir=_path,
+) -> Optional[str]:
+    logger.info(f"target download: {run_id} {save_as}")
+    try:
+        model_path = mlflow_client.download_artifacts(
+            run_id=run_id,
+            path=save_as,
         )
-        path = _path
-    logger.info(f"downloaded {path}")
-    return path
+        path = os.path.join(model_path, os.listdir(model_path)[0])
+        if path.endswith(".zip"):
+            directory = os.path.dirname(path)
+            basename = os.path.basename(path)
+            filename, _ = os.path.splitext(basename)
+            _path = os.path.join(directory, filename)
+            shutil.unpack_archive(
+                filename=path,
+                extract_dir=_path,
+            )
+            path = _path
+        logger.info(f"downloaded {path}")
+        return path
+    except Exception as e:
+        logger.error(f"failed downloading {run_id} {save_as}: {e}")
+        return None
 
 
 def download_models_from_mlflow(
@@ -79,25 +98,30 @@ def download_models_from_mlflow(
             run_id=run_id,
             save_as=save_as,
         )
-        model_paths.append(model_path)
+        if model_path is not None:
+            model_paths.append(model_path)
     logger.info(f"downloaded {len(model_paths)} models")
     return model_paths
 
 
 def download_from_mlflow(save_as_list: List[str]) -> List[str]:
-    mlflow_client = MlflowClient()
-    mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000"))
-    mlflow.set_experiment(experiment_id=Configurations.mlflow_experiment_id)
-    run = mlflow_client.get_run(run_id=Configurations.mlflow_run_id)
+    try:
+        mlflow_client = MlflowClient()
+        mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000"))
+        mlflow.set_experiment(experiment_id=Configurations.mlflow_experiment_id)
+        run = mlflow_client.get_run(run_id=Configurations.mlflow_run_id)
 
-    logger.info(f"target mlflow run: {run}")
+        logger.info(f"target mlflow run: {run}")
 
-    model_paths = download_models_from_mlflow(
-        mlflow_client=mlflow_client,
-        run_id=run.info.run_id,
-        save_as_list=save_as_list,
-    )
-    return model_paths
+        model_paths = download_models_from_mlflow(
+            mlflow_client=mlflow_client,
+            run_id=run.info.run_id,
+            save_as_list=save_as_list,
+        )
+        return model_paths
+    except Exception as e:
+        logger.error(f"mlflow error: {e}")
+        return []
 
 
 def main():
