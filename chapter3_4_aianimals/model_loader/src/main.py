@@ -15,11 +15,11 @@ def download_model_from_url(url: str) -> Optional[str]:
     logger.info(f"target url download: {url}")
     filename = os.path.basename(url)
     timeout = 20.0
-    transport = httpx.AsyncHTTPTransport(
+    transport = httpx.HTTPTransport(
         retries=3,
     )
     try:
-        with httpx.AsyncClient(
+        with httpx.Client(
             timeout=timeout,
             transport=transport,
         ) as client:
