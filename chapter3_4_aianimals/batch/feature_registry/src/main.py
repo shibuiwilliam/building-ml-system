@@ -60,14 +60,13 @@ def main(cfg: DictConfig):
         )
 
         now = datetime.now().strftime("%Y%m%d_%H%M%S")
-        experiment_name = Configurations.mlflow_experiment_name
         run_name = f"{cfg.task_name}_{now}"
-        logger.info(f"experiment_name: {experiment_name}")
+        logger.info(f"experiment_name: {Configurations.mlflow_experiment_name}")
         logger.info(f"run_name: {run_name}")
         logger.info("START...")
 
         mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000"))
-        mlflow.set_experiment(experiment_name=experiment_name)
+        mlflow.set_experiment(experiment_name=Configurations.mlflow_experiment_name)
         with mlflow.start_run(run_name=run_name) as run:
             container.animal_feature_initialization_job.run(
                 mlflow_experiment_id=run.info.experiment_id,
@@ -92,9 +91,8 @@ def main(cfg: DictConfig):
                 logger.info("empty run...")
         mlflow_client = MlflowClient()
         mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000"))
-        experiment = mlflow_client.get_experiment_by_name(name=Configurations.mlflow_experiment_name)
-        mlflow.set_experiment(experiment_id=experiment.experiment_id)
-        run = mlflow_client.get_run(run_id=Configurations.mlflow_run_id)
+        mlflow.set_experiment(experiment_id=Configurations.registry_mlflow_experiment_id)
+        run = mlflow_client.get_run(run_id=Configurations.registry_mlflow_run_id)
 
         def download_model(
             run_id: str,

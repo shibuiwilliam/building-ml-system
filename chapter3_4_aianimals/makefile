@@ -784,6 +784,7 @@ deploy_all: deploy_data \
 	deploy_no_animal_violation_serving \
 	deploy_no_animal_violation_proxy \
 	deploy_search_registry \
+	deploy_animal_feature_registry \
 	deploy_similar_image_search_serving \
 	deploy_search_learn_to_rank_lgbm_ranker_api \
 	deploy_search_learn_to_rank_lgbm_regression_api \

@@ -67,8 +67,8 @@ spec:
               value: http://mlflow.mlflow.svc.cluster.local:5000
             - name: MLFLOW_EXPERIMENT_NAME
               value: animal_feature_extraction
-            - name: MLFLOW_RUN_ID
-              value: 9cb72b123a284c1ebb980714ab185667
+            - name: REGISTRY_MLFLOW_PARAM_JSON
+              value: "{}"
             - name: EMPTY_RUN
               value: "1"
       imagePullSecrets:

@@ -1,3 +1,4 @@
+import json
 import os
 
 
@@ -25,7 +26,15 @@ class Configurations:
     )
 
     mlflow_experiment_name = os.getenv("MLFLOW_EXPERIMENT_NAME", "animal_feature_extraction")
-    mlflow_run_id = os.getenv("MLFLOW_RUN_ID", "")
+
+    registry_mlflow_param_json = os.getenv("REGISTRY_MLFLOW_PARAM_JSON", None)
+    registry_mlflow_param = {}
+    if registry_mlflow_param_json is not None:
+        registry_mlflow_param = json.loads(registry_mlflow_param_json)
+    _registry_mlflow_experiment_id = registry_mlflow_param.get("mlflow_experiment_id", -1)
+    _registry_mlflow_run_id = registry_mlflow_param.get("mlflow_run_id")
+    registry_mlflow_experiment_id = int(os.getenv("REGISTRY_MLFLOW_EXPERIMENT_ID", _registry_mlflow_experiment_id))
+    registry_mlflow_run_id = os.getenv("REGISTRY_MLFLOW_RUN_ID", _registry_mlflow_run_id)
 
     animal_feature_registry_queue = os.getenv("ANIMAL_FEATURE_REGISTRY_QUEUE", "animal_feature")
 
