@@ -62,7 +62,7 @@ def main(cfg: DictConfig):
         shutil.make_archive(
             "saved_model",
             format="zip",
-            root_dir="/opt/outputs",
+            root_dir="/opt/outputs/saved_model/similar_image_search/",
         )
         saved_model_zip = shutil.move("./saved_model.zip", "/opt/outputs/saved_model.zip")
 

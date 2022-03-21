@@ -123,7 +123,7 @@ def main(cfg: DictConfig):
         shutil.make_archive(
             "saved_model",
             format="zip",
-            root_dir=cwd,
+            root_dir=os.path.join(cwd, cfg.task_name),
         )
         saved_model_zip = shutil.move("./saved_model.zip", "/opt/outputs/saved_model.zip")
 
