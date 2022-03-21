@@ -24,6 +24,8 @@ spec:
             - "-m"
             - "src.main"
           env:
+            - name: MLFLOW_TRACKING_URI
+              value: http://mlflow.mlflow.svc.cluster.local:5000
             - name: MLFLOW_PARAM_JSON
               value: "{}"
             - name: TARGET_ARTIFACTS

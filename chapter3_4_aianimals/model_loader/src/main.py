@@ -36,7 +36,7 @@ def download_model_from_url(url: str) -> Optional[str]:
             _path = os.path.join(directory, _filename)
             os.makedirs(_path, exist_ok=True)
             shutil.unpack_archive(
-                filename=_filename,
+                filename=filename,
                 extract_dir=_path,
             )
             filename = _path
