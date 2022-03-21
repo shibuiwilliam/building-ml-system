@@ -33,6 +33,7 @@ def download_model_from_url(url: str) -> Optional[str]:
             basename = os.path.basename(filename)
             filename, _ = os.path.splitext(basename)
             _path = os.path.join(directory, filename)
+            os.makedirs(_path, exist_ok=True)
             shutil.unpack_archive(
                 filename=filename,
                 extract_dir=_path,
@@ -73,6 +74,7 @@ def download_model_from_mlflow(
             basename = os.path.basename(path)
             filename, _ = os.path.splitext(basename)
             _path = os.path.join(directory, filename)
+            os.makedirs(_path, exist_ok=True)
             shutil.unpack_archive(
                 filename=path,
                 extract_dir=_path,
