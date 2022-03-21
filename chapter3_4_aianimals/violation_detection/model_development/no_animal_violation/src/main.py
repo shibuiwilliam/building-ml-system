@@ -137,7 +137,8 @@ def main(cfg: DictConfig):
         mlflow.log_artifact(tflite, "tflite")
         mlflow.log_artifacts(os.path.join(cwd, ".hydra/"), "hydra")
         mlflow.log_artifact(os.path.join(cwd, "main.log"), "log")
-        mlflow.log_params(cfg)
+        mlflow.log_params(cfg.jobs.train)
+        mlflow.log_params(cfg.dataset.image)
 
         mlflow.log_metric("accuracy", evaluation.accuracy)
         mlflow.log_metric("positive_precision", evaluation.positive_precision)

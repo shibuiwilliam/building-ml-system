@@ -13,6 +13,14 @@ spec:
         steps:
           - - name: animal-feature-registry-initialization
               template: animal-feature-registry-initialization
+          - - name: animal-feature-registry-update
+              template: animal-feature-registry-update
+              arguments:
+                parameters:
+                  - name: deployment
+                    value: animal-feature-registry-registration
+                  - name: feature-mlflow-params
+                    value: "{{steps.animal-feature-registry-initialization.outputs.parameters.feature-mlflow-params}}"
           - - name: search-learn-to-rank-lgbm-regression-train
               template: search-learn-to-rank-lgbm-train
               arguments:
@@ -179,6 +187,25 @@ spec:
             - "{{inputs.parameters.deployment}}"
             - "FEATURE_MLFLOW_PARAM_JSON={{inputs.parameters.feature-mlflow-params}}"
             - "MLFLOW_PARAM_JSON={{inputs.parameters.mlflow-params}}"
+
+      - name: animal-feature-registry-update
+        serviceAccountName: user-admin
+        inputs:
+          parameters:
+            - name: deployment
+            - name: feature-mlflow-params
+        container:
+          image: shibui/building-ml-system:ai_animals_k8s_client_0.0.0
+          command: [kubectl]
+          args:
+            - -n
+            - aianimals
+            - set
+            - env
+            - deployment
+            - "{{inputs.parameters.deployment}}"
+            - "REGISTRY_MLFLOW_PARAM_JSON={{inputs.parameters.feature-mlflow-params}}"
+            - "EMPTY_RUN=0"
 
     imagePullSecrets:
       - name: regcred

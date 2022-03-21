@@ -15,6 +15,20 @@ spec:
       labels:
         app: similar-image-search-serving
     spec:
+      initContainers:
+        - name: init
+          image: shibui/building-ml-system:ai_animals_model_loader_0.0.0
+          imagePullPolicy: Always
+          command:
+            - "python"
+            - "-m"
+            - "src.main"
+          envFrom:
+            - configMapRef:
+                name: data-paths
+          volumeMounts:
+            - mountPath: /opt/dataset/data/
+              name: data
       containers:
         - name: similar-image-search-serving
           image: shibui/building-ml-system:ai_animals_search_similar_image_search_serving_0.0.0

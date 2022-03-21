@@ -69,8 +69,9 @@ def main(cfg: DictConfig):
 
         mlflow.log_artifact(saved_model_zip, "saved_model")
         mlflow.log_artifacts(os.path.join(cwd, ".hydra/"), "hydra")
-        mlflow.log_artifact(os.path.join(cwd, "main.log"), "log")
-        mlflow.log_params(cfg)
+        mlflow.log_artifact(os.path.join(cwd, "main.log"))
+        mlflow.log_params(cfg.model)
+        mlflow.log_params(cfg.input)
 
         with open("/tmp/output.json", "w") as f:
             json.dump(

@@ -73,7 +73,6 @@ def main(cfg: DictConfig):
                 mlflow_run_id=run.info.run_id,
             )
             mlflow.log_artifacts(os.path.join(cwd, ".hydra/"), "hydra")
-            mlflow.log_params(cfg)
 
             with open("/tmp/output.json", "w") as f:
                 json.dump(

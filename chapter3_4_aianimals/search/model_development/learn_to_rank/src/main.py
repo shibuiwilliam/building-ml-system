@@ -119,7 +119,6 @@ def main(cfg: DictConfig):
 
         mlflow.log_artifacts(os.path.join(cwd, ".hydra/"), "hydra")
         mlflow.log_artifact(os.path.join(cwd, "main.log"), "log")
-        mlflow.log_params(cfg)
 
         mlflow.log_param("model", model.name)
         mlflow.log_params(model.params)
