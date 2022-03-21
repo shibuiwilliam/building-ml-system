@@ -23,11 +23,8 @@ spec:
             - "python"
             - "-m"
             - "src.main"
-          envFrom:
-            - configMapRef:
-                name: data-paths
           volumeMounts:
-            - mountPath: /opt/dataset/data/
+            - mountPath: /models/similar_image_search/
               name: data
       containers:
         - name: similar-image-search-serving
@@ -43,6 +40,12 @@ spec:
             requests:
               cpu: 1000m
               memory: "4000Mi"
+          volumeMounts:
+            - mountPath: /models/similar_image_search/
+              name: data
+      volumes:
+        - name: data
+          emptyDir: {}
       imagePullSecrets:
         - name: regcred
 

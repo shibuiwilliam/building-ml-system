@@ -72,7 +72,11 @@ def main():
         for model_path in model_paths:
             basename = os.path.basename(model_path)
             target_path = os.path.join(Configurations.target_directory, basename)
-            shutil.move(model_path, target_path)
+            moved_to = shutil.move(model_path, target_path)
+            logger.info(f"moved to {moved_to}")
+            logger.info(
+                f"files {[os.path.join(Configurations.target_directory, f) for f in os.listdir(Configurations.target_directory)]}"
+            )
 
         logger.info("done downloading model...")
 
