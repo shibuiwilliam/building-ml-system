@@ -15,4 +15,7 @@ class Configurations(object):
     _target_artifacts = os.getenv("TARGET_ARTIFACTS", "saved_model")
     target_artifacts = _target_artifacts.split(",")
 
+    _target_urls = os.getenv("TARGET_URLS", "")
+    target_urls = _target_urls.split(",")
+
     target_directory = os.getenv("TARGET_DIRECTORY", "/tmp/")

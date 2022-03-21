@@ -19,6 +19,8 @@ spec:
                 parameters:
                   - name: deployment
                     value: animal-feature-registry-registration
+                  - name: containers
+                    value: animal-feature-registry-registration
                   - name: feature-mlflow-params
                     value: "{{steps.animal-feature-registry-initialization.outputs.parameters.feature-mlflow-params}}"
           - - name: search-learn-to-rank-lgbm-regression-train
@@ -43,6 +45,8 @@ spec:
                 parameters:
                   - name: deployment
                     value: learn-to-rank-lgbm-ranker
+                  - name: containers
+                    value: learn-to-rank-lgbm-ranker
                   - name: feature-mlflow-params
                     value: "{{steps.animal-feature-registry-initialization.outputs.parameters.feature-mlflow-params}}"
                   - name: mlflow-params
@@ -52,6 +56,8 @@ spec:
               arguments:
                 parameters:
                   - name: deployment
+                    value: learn-to-rank-lgbm-regression
+                  - name: containers
                     value: learn-to-rank-lgbm-regression
                   - name: feature-mlflow-params
                     value: "{{steps.animal-feature-registry-initialization.outputs.parameters.feature-mlflow-params}}"
@@ -118,6 +124,27 @@ spec:
               valueFrom:
                 path: /tmp/output.json
 
+      - name: animal-feature-registry-update
+        serviceAccountName: user-admin
+        inputs:
+          parameters:
+            - name: deployment
+            - name: containers
+            - name: feature-mlflow-params
+        container:
+          image: shibui/building-ml-system:ai_animals_k8s_client_0.0.0
+          command: [kubectl]
+          args:
+            - -n
+            - aianimals
+            - set
+            - env
+            - deployment
+            - "{{inputs.parameters.deployment}}"
+            - "--containers={{inputs.parameters.containers}}"
+            - "REGISTRY_MLFLOW_PARAM_JSON={{inputs.parameters.feature-mlflow-params}}"
+            - "EMPTY_RUN=0"
+
       - name: search-learn-to-rank-lgbm-train
         inputs:
           parameters:
@@ -173,6 +200,7 @@ spec:
         inputs:
           parameters:
             - name: deployment
+            - name: containers
             - name: feature-mlflow-params
             - name: mlflow-params
         container:
@@ -185,27 +213,9 @@ spec:
             - env
             - deployment
             - "{{inputs.parameters.deployment}}"
+            - "--containers={{inputs.parameters.containers}}"
             - "FEATURE_MLFLOW_PARAM_JSON={{inputs.parameters.feature-mlflow-params}}"
             - "MLFLOW_PARAM_JSON={{inputs.parameters.mlflow-params}}"
-
-      - name: animal-feature-registry-update
-        serviceAccountName: user-admin
-        inputs:
-          parameters:
-            - name: deployment
-            - name: feature-mlflow-params
-        container:
-          image: shibui/building-ml-system:ai_animals_k8s_client_0.0.0
-          command: [kubectl]
-          args:
-            - -n
-            - aianimals
-            - set
-            - env
-            - deployment
-            - "{{inputs.parameters.deployment}}"
-            - "REGISTRY_MLFLOW_PARAM_JSON={{inputs.parameters.feature-mlflow-params}}"
-            - "EMPTY_RUN=0"
 
     imagePullSecrets:
       - name: regcred
