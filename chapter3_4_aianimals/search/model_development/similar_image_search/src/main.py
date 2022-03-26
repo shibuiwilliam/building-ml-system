@@ -73,14 +73,13 @@ def main(cfg: DictConfig):
         mlflow.log_params(cfg.model)
         mlflow.log_params(cfg.input)
 
+        mlflow_params = dict(
+            mlflow_experiment_id=run.info.experiment_id,
+            mlflow_run_id=run.info.run_id,
+        )
+        logger.info(f"mlflow params: {mlflow_params}")
         with open("/tmp/output.json", "w") as f:
-            json.dump(
-                dict(
-                    mlflow_experiment_id=run.info.experiment_id,
-                    mlflow_run_id=run.info.run_id,
-                ),
-                f,
-            )
+            json.dump(mlflow_params, f)
 
 
 if __name__ == "__main__":

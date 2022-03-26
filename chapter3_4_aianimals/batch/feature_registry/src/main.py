@@ -74,14 +74,13 @@ def main(cfg: DictConfig):
             )
             mlflow.log_artifacts(os.path.join(cwd, ".hydra/"), "hydra")
 
+            mlflow_params = dict(
+                mlflow_experiment_id=run.info.experiment_id,
+                mlflow_run_id=run.info.run_id,
+            )
+            logger.info(f"mlflow params: {mlflow_params}")
             with open("/tmp/output.json", "w") as f:
-                json.dump(
-                    dict(
-                        mlflow_experiment_id=run.info.experiment_id,
-                        mlflow_run_id=run.info.run_id,
-                    ),
-                    f,
-                )
+                json.dump(mlflow_params, f)
 
     elif Configurations.job == JOBS.ANIMAL_FEATURE_REGISTRATION_JOB.value.name:
         if Configurations.empty_run:
