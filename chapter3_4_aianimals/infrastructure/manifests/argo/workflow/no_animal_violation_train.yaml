@@ -1,28 +1,74 @@
 apiVersion: argoproj.io/v1alpha1
-kind: Workflow
+kind: CronWorkflow
 metadata:
   generateName: violation-detection-no-animal-violation-train-
 spec:
-  entrypoint: violation-detection-no-animal-violation-train
-  templates:
-    - name: violation-detection-no-animal-violation-train
-      container:
-        image: shibui/building-ml-system:ai_animals_violation_detection_no_animal_violation_train_0.0.0
-        imagePullPolicy: Always
-        command:
-          - "python"
-          - "-m"
-          - "src.main"
-        env:
-          - name: MODEL_CONFIG
-            value: mobilenet_v3
-          - name: MLFLOW_TRACKING_URI
-            value: http://mlflow.mlflow.svc.cluster.local:5000
-          - name: MLFLOW_EXPERIMENT
-            value: violation_detection_no_animal_violation_detection
-        resources:
-          requests:
-            memory: 20000Mi
-            cpu: 2000m
-  imagePullSecrets:
-    - name: regcred
+  schedule: "* 0 * * *"
+  concurrencyPolicy: "Forbid"
+  startingDeadlineSeconds: 0
+  workflowSpec:
+    entrypoint: pipeline
+    templates:
+      - name: pipeline
+        steps:
+          - - name: violation-detection-no-animal-violation-train
+              template: violation-detection-no-animal-violation-train
+          - - name: violation-detection-no-animal-violation-update
+              template: violation-detection-no-animal-violation-update
+              arguments:
+                parameters:
+                  - name: deployment
+                    value: no-animal-violation-serving
+                  - name: containers
+                    value: model-loader
+                  - name: mlflow-params
+                    value: "{{steps.violation-detection-no-animal-violation-train.outputs.parameters.mlflow-params}}"
+
+      - name: violation-detection-no-animal-violation-train
+        container:
+          image: shibui/building-ml-system:ai_animals_violation_detection_no_animal_violation_train_0.0.0
+          imagePullPolicy: Always
+          command:
+            - "python"
+            - "-m"
+            - "src.main"
+          env:
+            - name: MODEL_CONFIG
+              value: mobilenet_v3
+            - name: MLFLOW_TRACKING_URI
+              value: http://mlflow.mlflow.svc.cluster.local:5000
+            - name: MLFLOW_EXPERIMENT
+              value: violation_detection_no_animal_violation_detection
+          resources:
+            requests:
+              memory: 20000Mi
+              cpu: 2000m
+        outputs:
+          parameters:
+            - name: mlflow-params
+              valueFrom:
+                path: /tmp/output.json
+
+      - name: violation-detection-no-animal-violation-update
+        serviceAccountName: user-admin
+        inputs:
+          parameters:
+            - name: deployment
+            - name: containers
+            - name: mlflow-params
+        container:
+          image: shibui/building-ml-system:ai_animals_k8s_client_0.0.0
+          command: [kubectl]
+          args:
+            - -n
+            - violation-detection
+            - set
+            - env
+            - deployment
+            - "{{inputs.parameters.deployment}}"
+            - "--containers={{inputs.parameters.containers}}"
+            - "MLFLOW_PARAM_JSON={{inputs.parameters.mlflow-params}}"
+            - "TARGET_ARTIFACTS=saved_model"
+            - "TARGET_URLS=''"
+    imagePullSecrets:
+      - name: regcred

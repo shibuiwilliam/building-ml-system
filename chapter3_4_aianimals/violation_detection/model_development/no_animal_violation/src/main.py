@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 from datetime import datetime
@@ -33,7 +34,7 @@ def main(cfg: DictConfig):
 
     mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000"))
     mlflow.set_experiment(experiment_name=experiment_name)
-    with mlflow.start_run(run_name=run_name):
+    with mlflow.start_run(run_name=run_name) as run:
         negative_train_files = read_text(filepath=cfg.dataset.train.negative_file)
         positive_train_files = read_text(filepath=cfg.dataset.train.positive_file)
         negative_test_files = read_text(filepath=cfg.dataset.test.negative_file)
@@ -144,6 +145,15 @@ def main(cfg: DictConfig):
         mlflow.log_metric("positive_recall", evaluation.positive_recall)
         mlflow.log_metric("negative_precision", evaluation.negative_precision)
         mlflow.log_metric("negative_recall", evaluation.negative_recall)
+
+        with open("/tmp/output.json", "w") as f:
+            json.dump(
+                dict(
+                    mlflow_experiment_id=run.info.experiment_id,
+                    mlflow_run_id=run.info.run_id,
+                ),
+                f,
+            )
 
 
 if __name__ == "__main__":
