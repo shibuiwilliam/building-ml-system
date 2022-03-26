@@ -89,6 +89,7 @@ class Container(object):
             cache=self.cache,
             search_client=self.search_client,
             messaging=self.messaging,
+            local_cache=self.local_cache,
         )
         self.like_usecase: AbstractLikeUsecase = LikeUsecase(
             like_repository=self.like_repository,
