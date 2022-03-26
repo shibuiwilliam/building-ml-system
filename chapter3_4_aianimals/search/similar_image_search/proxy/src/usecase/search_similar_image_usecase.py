@@ -6,11 +6,11 @@ from typing import List
 import httpx
 from fastapi import BackgroundTasks
 from PIL import Image
+from src.configurations import Configurations
 from src.infrastructure.cache_client import AbstractCacheClient
 from src.repository.animal_repository import AnimalQuery, AnimalRepository
 from src.schema.animal import AnimalRequest, AnimalResponse
 from src.service.predictor import AbstractPredictor
-from src.configurations import Configurations
 
 logger = getLogger(__name__)
 

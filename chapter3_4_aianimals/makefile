@@ -763,13 +763,15 @@ deploy_second: deploy_mlflow \
 .PHONY: deploy_third
 deploy_third: deploy_search_registry \
 	deploy_animal_feature_registry \
-	deploy_violation_detection_registry \
-	create_argo_animal_feature_train_cron \
-	create_argo_similar_image_search_train_cron \
-	create_argo_no_animal_violation_train
+	deploy_violation_detection_registry
 
 .PHONY: deploy_fourth
 deploy_fourth: deploy_no_animal_violation_proxy
+
+.PHONY: register_argo
+register_argo: create_argo_animal_feature_train_cron \
+	create_argo_similar_image_search_train_cron \
+	create_argo_no_animal_violation_train
 
 .PHONY: delete_namespaces
 delete_namespaces:
