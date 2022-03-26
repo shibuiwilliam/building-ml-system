@@ -5,7 +5,6 @@ from typing import Dict, List, Optional, Union
 
 from elasticsearch import Elasticsearch
 from src.entities.animal import AnimalSearchQuery, AnimalSearchResult, AnimalSearchResults, AnimalSearchSortKey
-from src.infrastructure.search import AbstractSearch
 from src.middleware.strings import hiragana_to_katakana, katakana_to_hiragana
 
 logger = getLogger(__name__)
