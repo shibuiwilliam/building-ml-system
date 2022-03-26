@@ -63,6 +63,7 @@ class AnimalSearchSortKey(Enum):
     LIKE = "like"
     CREATED_AT = "created_at"
     RANDOM = "random"
+    LEARN_TO_RANK = "learn_to_rank"
 
     @staticmethod
     def has_value(value: str) -> bool:

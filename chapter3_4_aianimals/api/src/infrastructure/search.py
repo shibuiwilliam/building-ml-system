@@ -72,7 +72,7 @@ class ElasticsearchClient(AbstractSearch):
         key: Optional[AnimalSearchSortKey],
     ) -> List[Union[str, Dict]]:
         sort: List[Union[str, Dict]] = []
-        if key is not None and key != AnimalSearchSortKey.SCORE:
+        if key is not None and key:
             if key == AnimalSearchSortKey.RANDOM:
                 sort.append(
                     {
@@ -83,6 +83,8 @@ class ElasticsearchClient(AbstractSearch):
                         }
                     }
                 )
+            elif key == AnimalSearchSortKey.SCORE and key == AnimalSearchSortKey.LEARN_TO_RANK:
+                sort.append("_score")
             else:
                 sort.append(
                     {
@@ -91,7 +93,6 @@ class ElasticsearchClient(AbstractSearch):
                         }
                     }
                 )
-        sort.append("_score")
         return sort
 
     def __augment_query(
