@@ -83,6 +83,7 @@ class LocalCache(AbstractLocalCache):
                     self.cache[key] = animal_category.id
                     key = self.make_animal_category_key(subkey=animal_category.id)
                     self.cache[key] = animal_category.dict()
+                logger.info(f"cached animal category: {animal_category.id}")
             animal_subcategories = self.animal_subcategory_repository.select(session=session)
             for animal_subcategory in animal_subcategories:
                 if not animal_subcategory.is_deleted:
@@ -92,6 +93,7 @@ class LocalCache(AbstractLocalCache):
                     self.cache[key] = animal_subcategory.id
                     key = self.make_animal_subcategory_key(subkey=animal_subcategory.id)
                     self.cache[key] = animal_subcategory.dict()
+                logger.info(f"cached animal subcategory: {animal_subcategory.id}")
         except Exception as e:
             raise e
         finally:
