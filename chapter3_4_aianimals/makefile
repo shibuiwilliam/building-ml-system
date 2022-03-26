@@ -328,13 +328,13 @@ create_argo_similar_image_search_train_cron:
 create_argo_animal_feature_train_cron:
 	argo cron create infrastructure/manifests/argo/workflow/animal_feature_train.yaml
 
+.PHONY: create_argo_no_animal_violation_train
+create_argo_no_animal_violation_train:
+	argo cron create infrastructure/manifests/argo/workflow/no_animal_violation_train.yaml
+
 .PHONY: submit_argo_learn_to_rank_lgbm_ranker_train
 submit_argo_learn_to_rank_lgbm_ranker_train:
 	argo submit infrastructure/manifests/argo/workflow/search_learn_to_rank_lgbm_ranker_train.yaml
-
-.PHONY: submit_argo_no_animal_violation_train
-submit_argo_no_animal_violation_train:
-	argo submit infrastructure/manifests/argo/workflow/no_animal_violation_train.yaml
 
 
 ############ ELASTICSEARCH COMMANDS ############
@@ -745,23 +745,31 @@ initialize_deployment: deploy_kube_system \
 	registry_search \
 	secret_api
 
-.PHONY: deploy_all
-deploy_all: deploy_data \
+.PHONY: deploy_first
+deploy_first: deploy_data \
 	deploy_es \
-	deploy_argo \
-	deploy_mlflow \
+	deploy_argo
+
+.PHONY: deploy_second
+deploy_second: deploy_mlflow \
 	deploy_api \
 	deploy_initial_data_registry \
-	deploy_violation_detection_registry \
 	deploy_no_animal_violation_serving \
-	deploy_no_animal_violation_proxy \
-	deploy_search_registry \
-	deploy_animal_feature_registry \
 	deploy_similar_image_search_serving \
 	deploy_search_learn_to_rank_lgbm_ranker_api \
 	deploy_search_learn_to_rank_lgbm_regression_api \
+	deploy_similar_image_search_proxy
+
+.PHONY: deploy_third
+deploy_third: deploy_search_registry \
+	deploy_animal_feature_registry \
+	deploy_violation_detection_registry \
 	create_argo_animal_feature_train_cron \
-	create_argo_similar_image_search_train_cron 
+	create_argo_similar_image_search_train_cron \
+	create_argo_no_animal_violation_train
+
+.PHONY: deploy_fourth
+deploy_fourth: deploy_no_animal_violation_proxy
 
 .PHONY: delete_namespaces
 delete_namespaces:

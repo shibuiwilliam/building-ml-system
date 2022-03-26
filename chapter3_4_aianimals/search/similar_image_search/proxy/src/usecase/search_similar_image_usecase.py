@@ -10,6 +10,7 @@ from src.infrastructure.cache_client import AbstractCacheClient
 from src.repository.animal_repository import AnimalQuery, AnimalRepository
 from src.schema.animal import AnimalRequest, AnimalResponse
 from src.service.predictor import AbstractPredictor
+from src.configurations import Configurations
 
 logger = getLogger(__name__)
 
@@ -77,6 +78,8 @@ class SearchSimilarImageUsecase(AbstractSearchSimilarImageUsecase):
         request: AnimalRequest,
         background_tasks: BackgroundTasks,
     ) -> AnimalResponse:
+        if Configurations.pseudo_prediction:
+            return AnimalResponse(ids=[])
         cache_key = f"similar_image_{request.id}"
         cached_data = self.cache_client.get(key=cache_key)
         if cached_data is not None:

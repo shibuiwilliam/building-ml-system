@@ -13,3 +13,5 @@ class Configurations(object):
     predictor_width = int(os.getenv("PREDICTOR_WIDTH", "224"))
 
     threshold = int(os.getenv("THRESHOLD", 100))
+
+    pseudo_prediction = bool(int(os.getenv("PSEUDO_PREDICTION", "0")))
