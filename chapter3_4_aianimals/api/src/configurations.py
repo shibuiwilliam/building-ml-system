@@ -19,3 +19,5 @@ class Configurations:
     for k, v in os.environ.items():
         if k.startswith("ANIMAL_VIOLATION_QUEUE_"):
             animal_violation_queues.append(v)
+
+    learn_to_rank_url = os.getenv("LEARN_TO_RANK_URL", None)

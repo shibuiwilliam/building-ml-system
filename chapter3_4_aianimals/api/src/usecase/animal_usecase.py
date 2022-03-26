@@ -19,6 +19,8 @@ from src.repository.like_repository import AbstractLikeRepository
 from src.request_object.animal import AnimalCreateRequest, AnimalRequest, AnimalSearchRequest
 from src.response_object.animal import AnimalResponse, AnimalSearchResponse, AnimalSearchResponses
 from src.response_object.user import UserResponse
+from src.service.learn_to_rank import AbstractLearnToRank, LearnToRankRequest
+from src.service.local_cache import AbstractLocalCache
 
 logger = getLogger(__name__)
 
@@ -28,17 +30,21 @@ class AbstractAnimalUsecase(ABC):
         self,
         animal_repository: AbstractAnimalRepository,
         like_repository: AbstractLikeRepository,
+        learn_to_rank: AbstractLearnToRank,
         storage_client: AbstractStorage,
         cache: AbstractCache,
         search_client: AbstractSearch,
         messaging: AbstractMessaging,
+        local_cache: AbstractLocalCache,
     ):
         self.animal_repository = animal_repository
         self.like_repository = like_repository
+        self.learn_to_rank = learn_to_rank
         self.storage_client = storage_client
         self.cache = cache
         self.search_client = search_client
         self.messaging = messaging
+        self.local_cache = local_cache
 
     @abstractmethod
     def retrieve(
@@ -86,18 +92,22 @@ class AnimalUsecase(AbstractAnimalUsecase):
         self,
         animal_repository: AbstractAnimalRepository,
         like_repository: AbstractLikeRepository,
+        learn_to_rank: AbstractLearnToRank,
         storage_client: AbstractStorage,
         cache: AbstractCache,
         search_client: AbstractSearch,
         messaging: AbstractMessaging,
+        local_cache: AbstractLocalCache,
     ):
         super().__init__(
             animal_repository=animal_repository,
             like_repository=like_repository,
+            learn_to_rank=learn_to_rank,
             storage_client=storage_client,
             cache=cache,
             search_client=search_client,
             messaging=messaging,
+            local_cache=local_cache,
         )
 
     def retrieve(
@@ -210,6 +220,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
         self.cache.set(
             key=key,
             value=json.dumps(result.dict(), default=json_serial),
+            expire_second=60 * 10,
         )
 
     def search(
@@ -247,15 +258,42 @@ class AnimalUsecase(AbstractAnimalUsecase):
             from_=offset,
             size=limit,
         )
+        if query.sort_by == AnimalSearchSortKey.LEARN_TO_RANK:
+            _ids = {r.id: r for r in results.results}
+            learn_to_rank_request = LearnToRankRequest(
+                ids=list(_ids.keys()),
+                query_phrases=query.phrases,
+            )
+            if query.animal_category_name_en is not None:
+                animal_category_id = self.local_cache.get_animal_category_id_by_name(name=query.animal_category_name_en)
+                learn_to_rank_request.query_animal_category_id = animal_category_id
+            if query.animal_category_name_ja is not None:
+                animal_category_id = self.local_cache.get_animal_category_id_by_name(name=query.animal_category_name_ja)
+                learn_to_rank_request.query_animal_category_id = animal_category_id
+            if query.animal_subcategory_name_en is not None:
+                animal_subcategory_id = self.local_cache.get_animal_subcategory_id_by_name(
+                    name=query.animal_subcategory_name_en
+                )
+                learn_to_rank_request.query_animal_subcategory_id = animal_subcategory_id
+            if query.animal_subcategory_name_ja is not None:
+                animal_subcategory_id = self.local_cache.get_animal_subcategory_id_by_name(
+                    name=query.animal_subcategory_name_ja
+                )
+                learn_to_rank_request.query_animal_subcategory_id = animal_subcategory_id
+            ranked_ids = self.learn_to_rank.reorder(request=learn_to_rank_request)
+            _results = [_ids[i] for i in ranked_ids.ids]
+            results.results = _results
+
         searched = AnimalSearchResponses(
             hits=results.hits,
             max_score=results.max_score,
             results=[AnimalSearchResponse(**r.dict()) for r in results.results],
             offset=results.offset,
         )
-        background_tasks.add_task(
-            self.__set_search_cache,
-            key,
-            searched,
-        )
+        if query.sort_by != AnimalSearchSortKey.LEARN_TO_RANK:
+            background_tasks.add_task(
+                self.__set_search_cache,
+                key,
+                searched,
+            )
         return searched
