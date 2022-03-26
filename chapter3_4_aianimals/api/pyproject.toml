@@ -20,6 +20,7 @@ cryptography = "^36.0.1"
 pika = "^1.2.0"
 google-cloud-storage = "^2.1.0"
 elasticsearch = {extras = ["async"], version = "^8.0.1"}
+httpx = "^0.22.0"
 
 [tool.poetry.dev-dependencies]
 
