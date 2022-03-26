@@ -19,7 +19,7 @@ class AbstractViolationRepository(ABC):
     def select(
         self,
         session: Session,
-        query: Optional[ViolationQuery],
+        query: Optional[ViolationQuery] = None,
         limit: Optional[int] = 100,
         offset: Optional[int] = 0,
     ) -> List[ViolationModel]:
@@ -43,7 +43,7 @@ class ViolationRepository(AbstractViolationRepository):
     def select(
         self,
         session: Session,
-        query: Optional[ViolationQuery],
+        query: Optional[ViolationQuery] = None,
         limit: Optional[int] = 100,
         offset: Optional[int] = 0,
     ) -> List[ViolationModel]:

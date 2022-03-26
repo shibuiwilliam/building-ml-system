@@ -24,7 +24,7 @@ class AbstractAnimalRepository(ABC):
     def select(
         self,
         session: Session,
-        query: Optional[AnimalQuery],
+        query: Optional[AnimalQuery] = None,
         limit: Optional[int] = 100,
         offset: Optional[int] = 0,
     ) -> List[AnimalModel]:
@@ -58,7 +58,7 @@ class AnimalRepository(AbstractAnimalRepository):
     def select(
         self,
         session: Session,
-        query: Optional[AnimalQuery],
+        query: Optional[AnimalQuery] = None,
         limit: Optional[int] = 100,
         offset: Optional[int] = 0,
     ) -> List[AnimalModel]:

@@ -20,7 +20,7 @@ class AbstractLikeRepository(ABC):
     def select(
         self,
         session: Session,
-        query: Optional[LikeQuery],
+        query: Optional[LikeQuery] = None,
         limit: int = 100,
         offset: int = 0,
     ) -> List[LikeModel]:
@@ -61,7 +61,7 @@ class LikeRepository(AbstractLikeRepository):
     def select(
         self,
         session: Session,
-        query: Optional[LikeQuery],
+        query: Optional[LikeQuery] = None,
         limit: int = 100,
         offset: int = 0,
     ) -> List[LikeModel]:

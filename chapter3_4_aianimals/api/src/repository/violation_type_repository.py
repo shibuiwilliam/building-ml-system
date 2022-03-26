@@ -19,7 +19,7 @@ class AbstractViolationTypeRepository(ABC):
     def select(
         self,
         session: Session,
-        query: Optional[ViolationTypeQuery],
+        query: Optional[ViolationTypeQuery] = None,
     ) -> List[ViolationTypeModel]:
         raise NotImplementedError
 
@@ -41,7 +41,7 @@ class ViolationTypeRepository(AbstractViolationTypeRepository):
     def select(
         self,
         session: Session,
-        query: Optional[ViolationTypeQuery],
+        query: Optional[ViolationTypeQuery] = None,
     ) -> List[ViolationTypeModel]:
         filters = []
         if query is not None:

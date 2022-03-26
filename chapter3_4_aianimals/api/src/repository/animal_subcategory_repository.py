@@ -20,7 +20,7 @@ class AbstractAnimalSubcategoryRepository(ABC):
     def select(
         self,
         session: Session,
-        query: Optional[AnimalSubcategoryQuery],
+        query: Optional[AnimalSubcategoryQuery] = None,
     ) -> List[AnimalSubcategoryModel]:
         raise NotImplementedError
 
@@ -42,7 +42,7 @@ class AnimalSubcategoryRepository(AbstractAnimalSubcategoryRepository):
     def select(
         self,
         session: Session,
-        query: Optional[AnimalSubcategoryQuery],
+        query: Optional[AnimalSubcategoryQuery] = None,
     ) -> List[AnimalSubcategoryModel]:
         filters = []
         if query is not None:

@@ -19,7 +19,7 @@ class AbstractUserRepository(ABC):
     def select(
         self,
         session: Session,
-        query: Optional[UserQuery],
+        query: Optional[UserQuery] = None,
         limit: Optional[int] = 100,
         offset: Optional[int] = 0,
     ) -> List[UserModel]:
@@ -61,7 +61,7 @@ class UserRepository(AbstractUserRepository):
     def select(
         self,
         session: Session,
-        query: Optional[UserQuery],
+        query: Optional[UserQuery] = None,
         limit: Optional[int] = 100,
         offset: Optional[int] = 0,
     ) -> List[UserModel]:
