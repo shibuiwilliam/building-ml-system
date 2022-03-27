@@ -183,6 +183,7 @@ class ElasticsearchClient(AbstractSearch):
             results=[],
             offset=from_ + min(size, searched["hits"]["total"]["value"]),
         )
+        logger.info(f"DDDDDDDDDDDDDDDDDDDDDDDDD: {results}")
         for r in searched["hits"]["hits"]:
             results.results.append(
                 AnimalSearchResult(
@@ -200,4 +201,5 @@ class ElasticsearchClient(AbstractSearch):
                     created_at=r["_source"]["created_at"],
                 ),
             )
+        logger.info(f"EEEEEEEEEEEEEEEEEEEEEEEE: {results}")
         return results
