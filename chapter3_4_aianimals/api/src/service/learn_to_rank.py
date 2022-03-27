@@ -68,13 +68,11 @@ class LearnToRankClient(AbstractLearnToRank):
             transport=self.transport,
         ) as client:
             req = request.dict()
-            logger.info(f"BBBBBBBBBBBBBBBBBBBB {req}")
             res = client.post(
                 url=self.url,
                 data=json.dumps(req),
                 headers=self.post_header,
             )
-        logger.info(f"AAAAAAAAAAAAAAAa {res}")
         if res.status_code != 200:
             logger.error(f"failed to request learn to rank: {res}")
             return LearnToRankResponse(ids=request.ids)
