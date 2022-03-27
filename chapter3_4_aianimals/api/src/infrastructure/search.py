@@ -169,7 +169,6 @@ class ElasticsearchClient(AbstractSearch):
             from_=from_,
             size=size,
         )
-        logger.info(f"CCCCCCCCCCCCCCCCCCCc: {searched}")
         if searched["hits"]["total"]["value"] == 0:
             return AnimalSearchResults(
                 hits=0,

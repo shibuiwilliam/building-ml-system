@@ -97,7 +97,7 @@ class AnimalSearchQuery(BaseModel):
 
 
 class AnimalSearchResult(BaseModel):
-    score: float
+    score: Optional[float]
     id: str
     name: str
     description: str
