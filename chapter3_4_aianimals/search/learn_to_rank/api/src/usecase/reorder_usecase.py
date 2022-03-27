@@ -87,6 +87,7 @@ class ReorderUsecase(AbstractReorderUsecase):
         request: AnimalRequest,
         background_tasks: BackgroundTasks,
     ) -> AnimalResponse:
+        logger.info(f"request: {request}")
         query_phrases = ".".join(request.query_phrases)
         query_id = make_query_id(
             animal_ids=request.ids,
@@ -142,4 +143,6 @@ class ReorderUsecase(AbstractReorderUsecase):
             query_id,
             ordered_animal_ids,
         )
-        return AnimalResponse(ids=ordered_animal_ids)
+        response = AnimalResponse(ids=ordered_animal_ids)
+        logger.info(f"response: {response}")
+        return response

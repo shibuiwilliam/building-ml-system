@@ -61,6 +61,7 @@ class LearnToRankClient(AbstractLearnToRank):
     ) -> LearnToRankResponse:
         logger.info(f"request for learn to rank: {request}")
         if self.url is None:
+            logger.info(f"skip request learn to rank")
             return LearnToRankResponse(ids=request.ids)
         with httpx.Client(
             timeout=self.timeout,
@@ -74,5 +75,5 @@ class LearnToRankClient(AbstractLearnToRank):
         if res.status_code != 200:
             return LearnToRankResponse(ids=request.ids)
         response = LearnToRankResponse(**res.json())
-        logger.info(f"response for learn to rank: {response}")
+        logger.info(f"response from learn to rank: {response}")
         return response

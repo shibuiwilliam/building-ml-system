@@ -258,7 +258,6 @@ class AnimalUsecase(AbstractAnimalUsecase):
             from_=offset,
             size=limit,
         )
-        logger.info(f"AAAAAAAAAAAAAAAAAAA: {results}")
         if query.sort_by == AnimalSearchSortKey.LEARN_TO_RANK:
             _ids = {r.id: r for r in results.results}
             learn_to_rank_request = LearnToRankRequest(
@@ -291,7 +290,6 @@ class AnimalUsecase(AbstractAnimalUsecase):
             results=[AnimalSearchResponse(**r.dict()) for r in results.results],
             offset=results.offset,
         )
-        logger.info(f"BBBBBBBBBBBBBBBBBBBBBBB: {searched}")
         if query.sort_by != AnimalSearchSortKey.LEARN_TO_RANK:
             background_tasks.add_task(
                 self.__set_search_cache,
