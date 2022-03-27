@@ -72,7 +72,9 @@ class LearnToRankClient(AbstractLearnToRank):
                 data=json.dumps(request),
                 headers=self.post_header,
             )
+        logger.info(f"AAAAAAAAAAAAAAAa {res}")
         if res.status_code != 200:
+            logger.error(f"failed to request learn to rank: {res}")
             return LearnToRankResponse(ids=request.ids)
         response = LearnToRankResponse(**res.json())
         logger.info(f"response from learn to rank: {response}")
