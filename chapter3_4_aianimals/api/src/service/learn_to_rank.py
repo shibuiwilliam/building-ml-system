@@ -69,7 +69,7 @@ class LearnToRankClient(AbstractLearnToRank):
         ) as client:
             res = client.post(
                 url=self.url,
-                data=json.dumps(request),
+                data=json.dumps(request.dict()),
                 headers=self.post_header,
             )
         logger.info(f"AAAAAAAAAAAAAAAa {res}")
