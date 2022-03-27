@@ -31,7 +31,7 @@ class AnimalResponse(AnimalResponseBase):
 
 
 class AnimalSearchResponse(BaseModel):
-    score: float
+    score: Optional[float]
     id: str
     name: str
     description: str
