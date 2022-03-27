@@ -83,7 +83,7 @@ class ElasticsearchClient(AbstractSearch):
                         }
                     }
                 )
-            elif key == AnimalSearchSortKey.SCORE and key == AnimalSearchSortKey.LEARN_TO_RANK:
+            elif key == AnimalSearchSortKey.SCORE or key == AnimalSearchSortKey.LEARN_TO_RANK:
                 sort.append("_score")
             else:
                 sort.append(
