@@ -84,6 +84,8 @@ class LearnToRankClient(AbstractLearnToRank):
             transport=self.transport,
         ) as client:
             req = request.dict()
+            logger.info(f"AAAAAAAAAAAAAAAAAAAAA: {req}")
+            logger.info(f"BBBBBBBBBBBBBBBBBBBBB: {request}")
             res = client.post(
                 url=self.url,
                 data=json.dumps(req),
