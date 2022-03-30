@@ -35,6 +35,7 @@ class LearnToRankResponse(BaseModel):
 
 
 class LearnToRankABTestResponse(BaseModel):
+    endpoint: str
     response: LearnToRankResponse
 
     class Config:
@@ -96,7 +97,7 @@ class LearnToRankClient(AbstractLearnToRank):
             return LearnToRankResponse(ids=request.ids)
         res_json = res.json()
         if Configurations.learn_to_rank_ab_test:
-            response = LearnToRankABTestResponse(**res_json).response
+            response = LearnToRankABTestResponse(**res_json["response"]).response
         else:
             response = LearnToRankResponse(**res_json)
         logger.info(f"response from learn to rank: {response}")
