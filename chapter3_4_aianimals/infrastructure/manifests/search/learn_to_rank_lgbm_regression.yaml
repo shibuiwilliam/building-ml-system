@@ -22,7 +22,7 @@ spec:
           command:
             - "./run.sh"
           ports:
-            - containerPort: 11000
+            - containerPort: 10100
           resources:
             limits:
               cpu: 2000m
@@ -50,7 +50,7 @@ spec:
             - name: RUN_ENVIRONMENT
               value: cloud
             - name: PORT
-              value: "11000"
+              value: "10100"
             - name: WORKERS
               value: "2"
             - name: TIMEOUT
@@ -89,7 +89,7 @@ metadata:
 spec:
   ports:
     - name: api
-      port: 11000
+      port: 10100
       protocol: TCP
   selector:
     app: learn-to-rank-lgbm-regression

@@ -469,6 +469,11 @@ deploy_search_learn_to_rank_lgbm_regression_api:
 	kubectl apply \
 		-f $(SEARCH_MANIFEST_DIR)/learn_to_rank_lgbm_regression.yaml
 
+.PHONY: deploy_search_learn_to_rank_ab_test_proxy
+deploy_search_learn_to_rank_ab_test_proxy: 
+	kubectl apply \
+		-f $(SEARCH_MANIFEST_DIR)/learn_to_rank_ab_test_proxy.yaml
+
 
 ############ SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN COMMANDS ############
 SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_DIR := $(DIR)/search/model_development/similar_image_search
@@ -756,6 +761,7 @@ deploy_second: deploy_mlflow \
 	deploy_initial_data_registry \
 	deploy_no_animal_violation_serving \
 	deploy_similar_image_search_serving \
+	deploy_search_learn_to_rank_ab_test_proxy \
 	deploy_search_learn_to_rank_lgbm_ranker_api \
 	deploy_search_learn_to_rank_lgbm_regression_api \
 	deploy_similar_image_search_proxy
