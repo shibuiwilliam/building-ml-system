@@ -74,7 +74,7 @@ class UserTestService(AbstractUserTestService):
     ) -> Response[BaseUserResponse]:
         endpoint = self.user_ids.user_ids.get(request.request.user_id, self.user_ids.default_endpoint)
         response = await self.__route(
-            request=request.request,
+            request=request,
             endpoint=endpoint,
         )
         return Response[BaseUserResponse](response=response)

@@ -74,7 +74,7 @@ class AnimalTestService(AbstractAnimalTestService):
     ) -> Response[BaseAnimalResponse]:
         endpoint = self.animal_ids.animal_ids.get(request.request.animal_id, self.animal_ids.default_endpoint)
         response = await self.__route(
-            request=request.request,
+            request=request,
             endpoint=endpoint,
         )
         return Response[BaseAnimalResponse](response=response)

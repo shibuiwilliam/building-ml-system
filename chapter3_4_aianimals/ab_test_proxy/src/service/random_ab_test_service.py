@@ -109,7 +109,7 @@ class RandomABTestService(AbstractRandomABTestService):
         request: Request[BaseRandomABTestRequest],
     ) -> Response[BaseRandomABTestResponse]:
         response = await self.__route(
-            request=request.request,
+            request=request,
             endpoint=self.random_distribution.endpoint_a.endpoint,
         )
         return Response[BaseRandomABTestResponse](response=response)
@@ -119,7 +119,7 @@ class RandomABTestService(AbstractRandomABTestService):
         request: Request[BaseRandomABTestRequest],
     ) -> Response[BaseRandomABTestResponse]:
         response = await self.__route(
-            request=request.request,
+            request=request,
             endpoint=self.random_distribution.endpoint_b.endpoint,
         )
         return Response[BaseRandomABTestResponse](response=response)
