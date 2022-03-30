@@ -75,18 +75,19 @@ class LearnToRankClient(AbstractLearnToRank):
         request: LearnToRankRequest,
     ) -> LearnToRankResponse:
         logger.info(f"request for learn to rank: {request}")
+        _ids = request.ids
         if self.url is None:
             logger.info(f"skip request learn to rank")
-            return LearnToRankResponse(ids=request.ids)
+            return LearnToRankResponse(ids=_ids)
         if Configurations.learn_to_rank_ab_test:
-            request = LearnToRankABTestRequest(request=request)
+            _request = LearnToRankABTestRequest(request=request)
+        else:
+            _request = request
         with httpx.Client(
             timeout=self.timeout,
             transport=self.transport,
         ) as client:
-            req = request.dict()
-            logger.info(f"AAAAAAAAAAAAAAAAAAAAA: {req}")
-            logger.info(f"BBBBBBBBBBBBBBBBBBBBB: {request}")
+            req = _request.dict()
             res = client.post(
                 url=self.url,
                 data=json.dumps(req),
@@ -94,7 +95,7 @@ class LearnToRankClient(AbstractLearnToRank):
             )
         if res.status_code != 200:
             logger.error(f"failed to request learn to rank: {res}")
-            return LearnToRankResponse(ids=request.ids)
+            return LearnToRankResponse(ids=_ids)
         res_json = res.json()
         if Configurations.learn_to_rank_ab_test:
             response = LearnToRankABTestResponse(**res_json["response"]).response
