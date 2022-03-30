@@ -7,12 +7,12 @@ T = TypeVar("T")
 
 
 class BaseRequest(BaseModel):
-    request: Union[Dict, List]
+    request: Union[Dict, List, str, int, float, bool]
 
 
 class BaseResponse(BaseModel):
     endpoint: str
-    response: Union[Dict, List]
+    response: Union[Dict, List, str, int, float, bool]
 
 
 class BaseRandomABTestRequest(BaseRequest):
