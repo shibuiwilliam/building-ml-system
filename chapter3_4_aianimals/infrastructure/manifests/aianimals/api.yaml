@@ -70,7 +70,7 @@ spec:
             - name: LEARN_TO_RANK_URL
               value: http://learn-to-rank-ab-test-proxy.search.svc.cluster.local:11000/v0/proxy
             - name: LEARN_TO_RANK_AB_TEST
-              value: "1"
+              value: true
             - name: GCS_BUCKET
               value: aianimals
             - name: RUN_ENVIRONMENT
