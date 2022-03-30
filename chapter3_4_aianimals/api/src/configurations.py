@@ -21,3 +21,4 @@ class Configurations:
             animal_violation_queues.append(v)
 
     learn_to_rank_url = os.getenv("LEARN_TO_RANK_URL", None)
+    learn_to_rank_ab_test = bool(int(os.getenv("LEARN_TO_RANK_AB_TEST", "0")))

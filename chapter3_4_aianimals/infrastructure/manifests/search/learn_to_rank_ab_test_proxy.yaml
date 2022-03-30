@@ -20,29 +20,6 @@ data:
     timeout: "10.0"
     retries: "2"
 ---
-apiVersion: v1
-kind: Pod
-metadata:
-  name: aaaaaaaaa
-  namespace: search
-spec:
-  containers:
-    - name: aaaaaaaaa
-      image: ubuntu:latest
-      command:
-        - tail
-        - -f
-        - /dev/null
-      volumeMounts:
-        - name: config-volume
-          mountPath: /opt/config.yaml
-          subPath: config.yaml
-  volumes:
-    - name: config-volume
-      configMap:
-        name: learn-to-rank-ab-test-proxy
-  restartPolicy: Never
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:

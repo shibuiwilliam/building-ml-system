@@ -20,8 +20,22 @@ class LearnToRankRequest(BaseModel):
         extra = Extra.forbid
 
 
+class LearnToRankABTestRequest(BaseModel):
+    request: LearnToRankRequest
+
+    class Config:
+        extra = Extra.forbid
+
+
 class LearnToRankResponse(BaseModel):
     ids: List[str]
+
+    class Config:
+        extra = Extra.forbid
+
+
+class LearnToRankABTestResponse(BaseModel):
+    response: LearnToRankResponse
 
     class Config:
         extra = Extra.forbid
@@ -63,6 +77,8 @@ class LearnToRankClient(AbstractLearnToRank):
         if self.url is None:
             logger.info(f"skip request learn to rank")
             return LearnToRankResponse(ids=request.ids)
+        if Configurations.learn_to_rank_ab_test:
+            request = LearnToRankABTestRequest(request=request)
         with httpx.Client(
             timeout=self.timeout,
             transport=self.transport,
@@ -76,6 +92,10 @@ class LearnToRankClient(AbstractLearnToRank):
         if res.status_code != 200:
             logger.error(f"failed to request learn to rank: {res}")
             return LearnToRankResponse(ids=request.ids)
-        response = LearnToRankResponse(**res.json())
+        res_json = res.json()
+        if Configurations.learn_to_rank_ab_test:
+            response = LearnToRankABTestResponse(**res_json).response
+        else:
+            response = LearnToRankResponse(**res_json)
         logger.info(f"response from learn to rank: {response}")
         return response

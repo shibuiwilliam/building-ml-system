@@ -68,7 +68,9 @@ spec:
             - name: ANIMAL_VIOLATION_QUEUE_NO_ANIMAL_VIOLATION
               value: no_animal_violation
             - name: LEARN_TO_RANK_URL
-              value: http://learn-to-rank-lgbm-regression.search.svc.cluster.local:11000/v0/reorder
+              value: http://learn-to-rank-ab-test-proxy.search.svc.cluster.local:11000/v0/proxy
+            - name: LEARN_TO_RANK_AB_TEST
+              value: "1"
             - name: GCS_BUCKET
               value: aianimals
             - name: RUN_ENVIRONMENT
