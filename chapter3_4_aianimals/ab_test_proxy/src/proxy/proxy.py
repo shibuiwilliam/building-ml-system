@@ -13,11 +13,17 @@ router = APIRouter()
 async def post_test(
     request: Request,
 ):
-    return await container.test_service.test(request=request)
+    logger.info(f"test request: {request}")
+    response = await container.test_service.test(request=request)
+    logger.info(f"test response: {response}")
+    return response
 
 
 @router.post("", response_model=Response)
 async def post(
     request: Request,
 ):
-    return await container.test_service.route(request=request)
+    logger.info(f"request: {request}")
+    response = await container.test_service.route(request=request)
+    logger.info(f"response: {response}")
+    return response
