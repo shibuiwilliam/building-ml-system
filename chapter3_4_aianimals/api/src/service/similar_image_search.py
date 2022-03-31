@@ -46,7 +46,7 @@ class SimilarImageSearch(AbstractSimilarImageSearch):
         self.transport = httpx.HTTPTransport(
             retries=retries,
         )
-        self.url = Configurations.learn_to_rank_url
+        self.url = Configurations.similar_image_search_url
         self.post_header: Dict[str, str] = {
             "accept": "application/json",
             "Content-Type": "application/json",

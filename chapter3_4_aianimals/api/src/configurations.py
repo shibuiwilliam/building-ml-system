@@ -22,3 +22,5 @@ class Configurations:
 
     learn_to_rank_url = os.getenv("LEARN_TO_RANK_URL", None)
     learn_to_rank_ab_test = bool(int(os.getenv("LEARN_TO_RANK_AB_TEST", "0")))
+
+    similar_image_search_url = os.getenv("SIMILAR_IMAGE_SEARCH_URL", None)

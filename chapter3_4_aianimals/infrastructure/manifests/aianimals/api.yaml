@@ -71,6 +71,8 @@ spec:
               value: http://learn-to-rank-ab-test-proxy.search.svc.cluster.local:11000/v0/proxy
             - name: LEARN_TO_RANK_AB_TEST
               value: "1"
+            - name: SIMILAR_IMAGE_SEARCH_URL
+              value: http://similar-image-search-proxy.search.svc.cluster.local:15000/v0/similar-image-search
             - name: GCS_BUCKET
               value: aianimals
             - name: RUN_ENVIRONMENT
