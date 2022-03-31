@@ -336,12 +336,10 @@ class AnimalUsecase(AbstractAnimalUsecase):
         search_request = SimilarImageSearchRequest(id=request.id)
         response = self.similar_image_search.search(request=search_request)
         query = AnimalIDs(ids=response.ids)
-        logger.info(f"AAAAAAAAAAAAAAAAAAaa {query}")
         animals = self.animal_repository.select_by_ids(
             session=session,
             query=query,
         )
-        logger.info(f"BBBBBBBBBBBBBBBBBBBBB {animals}")
         likes = self.like_repository.count(
             session=session,
             animal_ids=[a.id for a in animals],
@@ -362,5 +360,4 @@ class AnimalUsecase(AbstractAnimalUsecase):
             )
             for a in animals
         ]
-        logger.info(f"CCCCCCCCCCCCCCCCCCCCCCCCC {responses}")
         return SimilarAnimalSearchResponses(results=responses)
