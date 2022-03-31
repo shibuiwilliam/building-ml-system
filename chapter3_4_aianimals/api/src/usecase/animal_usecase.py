@@ -342,6 +342,10 @@ class AnimalUsecase(AbstractAnimalUsecase):
             query=query,
         )
         logger.info(f"BBBBBBBBBBBBBBBBBBBBB {animals}")
+        likes = self.like_repository.count(
+            session=session,
+            animal_ids=[a.id for a in animals],
+        )
         responses = [
             SimilarAnimalSearchResponse(
                 id=a.id,
@@ -353,7 +357,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
                 animal_subcategory_name_en=a.animal_subcategory_name_en,
                 animal_subcategory_name_ja=a.animal_subcategory_name_ja,
                 user_handle_name=a.user_handle_name,
-                like=a.like,
+                like=likes[a.id].count,
                 created_at=a.created_at,
             )
             for a in animals
