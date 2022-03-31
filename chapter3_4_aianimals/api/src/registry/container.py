@@ -21,6 +21,7 @@ from src.repository.violation_repository import AbstractViolationRepository, Vio
 from src.repository.violation_type_repository import AbstractViolationTypeRepository, ViolationTypeRepository
 from src.service.learn_to_rank import AbstractLearnToRank, LearnToRankClient
 from src.service.local_cache import AbstractLocalCache, LocalCache
+from src.service.similar_image_search import AbstractSimilarImageSearch, SimilarImageSearch
 from src.usecase.access_log_usecase import AbstractAccessLogUsecase, AccessLogUsecase
 from src.usecase.animal_category_usecase import AbstractAnimalCategoryUsecase, AnimalCategoryUsecase
 from src.usecase.animal_subcategory_usecase import AbstractAnimalSubcategoryUsecase, AnimalSubcategoryUsecase
@@ -64,6 +65,7 @@ class Container(object):
         self.access_log_repository: AbstractAccessLogRepository = AccessLogRepository()
 
         self.learn_to_rank: AbstractLearnToRank = LearnToRankClient()
+        self.similar_image_search: AbstractSimilarImageSearch = SimilarImageSearch()
         self.local_cache: AbstractLocalCache = LocalCache(
             animal_category_repository=self.animal_category_repository,
             animal_subcategory_repository=self.animal_subcategory_repository,
@@ -85,6 +87,7 @@ class Container(object):
             animal_repository=self.animal_repository,
             like_repository=self.like_repository,
             learn_to_rank=self.learn_to_rank,
+            similar_image_search=self.similar_image_search,
             storage_client=self.storage_client,
             cache=self.cache,
             search_client=self.search_client,

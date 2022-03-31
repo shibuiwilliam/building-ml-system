@@ -71,6 +71,8 @@ class SearchSimilarImageUsecase(AbstractSearchSimilarImageUsecase):
         self.cache_client.set(
             key=animal_id,
             value=",".join(similar_animal_ids),
+            expire_second=60 * 60 * 6,
+            # 6 hours
         )
 
     def search(

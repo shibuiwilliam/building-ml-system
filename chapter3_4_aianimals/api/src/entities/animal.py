@@ -19,6 +19,14 @@ class AnimalQuery(BaseModel):
         extra = Extra.forbid
 
 
+class AnimalIDs(BaseModel):
+    ids: List[str]
+    deactivated: Optional[bool] = False
+
+    class Config:
+        extra = Extra.forbid
+
+
 class AnimalCreate(BaseModel):
     id: str
     animal_category_id: int

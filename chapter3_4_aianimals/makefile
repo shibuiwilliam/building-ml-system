@@ -757,7 +757,6 @@ deploy_first: deploy_data \
 
 .PHONY: deploy_second
 deploy_second: deploy_mlflow \
-	deploy_api \
 	deploy_initial_data_registry \
 	deploy_no_animal_violation_serving \
 	deploy_similar_image_search_serving \
@@ -767,7 +766,8 @@ deploy_second: deploy_mlflow \
 	deploy_similar_image_search_proxy
 
 .PHONY: deploy_third
-deploy_third: deploy_search_registry \
+deploy_third: deploy_api \
+	deploy_search_registry \
 	deploy_animal_feature_registry \
 	deploy_violation_detection_registry
 

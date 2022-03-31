@@ -48,3 +48,10 @@ class AnimalSearchRequest(BaseModel):
 
     class Config:
         extra = Extra.forbid
+
+
+class SimilarAnimalSearchRequest(BaseModel):
+    id: str
+
+    class Config:
+        extra = Extra.forbid

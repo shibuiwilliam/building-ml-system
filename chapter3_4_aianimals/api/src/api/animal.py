@@ -8,8 +8,13 @@ from src.configurations import Configurations
 from src.middleware.assert_token import token_assertion
 from src.middleware.strings import random_str
 from src.registry.container import container
-from src.request_object.animal import AnimalCreateRequest, AnimalRequest, AnimalSearchRequest
-from src.response_object.animal import AnimalResponse, AnimalSearchResponses
+from src.request_object.animal import (
+    AnimalCreateRequest,
+    AnimalRequest,
+    AnimalSearchRequest,
+    SimilarAnimalSearchRequest,
+)
+from src.response_object.animal import AnimalResponse, AnimalSearchResponses, SimilarAnimalSearchResponses
 from src.response_object.user import UserResponse
 
 logger = getLogger(__name__)
@@ -120,5 +125,24 @@ async def search_animal(
         background_tasks=background_tasks,
         limit=limit,
         offset=offset,
+    )
+    return data
+
+
+@router.post("/search/similar", response_model=SimilarAnimalSearchResponses)
+async def search_similar_animal(
+    request: SimilarAnimalSearchRequest,
+    token: str = Header(...),
+    session: Session = Depends(container.database.get_session),
+):
+    _, user_id = await token_assertion(
+        token=token,
+        session=session,
+    )
+    request.user_id = user_id
+    logger.info(f"search similar animal: {request}")
+    data = container.animal_usecase.search_similar_image(
+        session=session,
+        request=request,
     )
     return data

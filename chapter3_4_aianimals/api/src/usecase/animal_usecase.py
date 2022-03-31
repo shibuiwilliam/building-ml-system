@@ -7,7 +7,14 @@ from fastapi import BackgroundTasks
 from sqlalchemy.orm import Session
 from src.configurations import Configurations
 from src.constants import CONSTANTS
-from src.entities.animal import ANIMAL_INDEX, AnimalCreate, AnimalQuery, AnimalSearchQuery, AnimalSearchSortKey
+from src.entities.animal import (
+    ANIMAL_INDEX,
+    AnimalCreate,
+    AnimalIDs,
+    AnimalQuery,
+    AnimalSearchQuery,
+    AnimalSearchSortKey,
+)
 from src.infrastructure.cache import AbstractCache
 from src.infrastructure.messaging import AbstractMessaging
 from src.infrastructure.search import AbstractSearch
@@ -16,11 +23,23 @@ from src.middleware.json import json_serial
 from src.middleware.strings import get_uuid
 from src.repository.animal_repository import AbstractAnimalRepository
 from src.repository.like_repository import AbstractLikeRepository
-from src.request_object.animal import AnimalCreateRequest, AnimalRequest, AnimalSearchRequest
-from src.response_object.animal import AnimalResponse, AnimalSearchResponse, AnimalSearchResponses
+from src.request_object.animal import (
+    AnimalCreateRequest,
+    AnimalRequest,
+    AnimalSearchRequest,
+    SimilarAnimalSearchRequest,
+)
+from src.response_object.animal import (
+    AnimalResponse,
+    AnimalSearchResponse,
+    AnimalSearchResponses,
+    SimilarAnimalSearchResponse,
+    SimilarAnimalSearchResponses,
+)
 from src.response_object.user import UserResponse
 from src.service.learn_to_rank import AbstractLearnToRank, LearnToRankRequest
 from src.service.local_cache import AbstractLocalCache
+from src.service.similar_image_search import AbstractSimilarImageSearch, SimilarImageSearchRequest
 
 logger = getLogger(__name__)
 
@@ -31,6 +50,7 @@ class AbstractAnimalUsecase(ABC):
         animal_repository: AbstractAnimalRepository,
         like_repository: AbstractLikeRepository,
         learn_to_rank: AbstractLearnToRank,
+        similar_image_search: AbstractSimilarImageSearch,
         storage_client: AbstractStorage,
         cache: AbstractCache,
         search_client: AbstractSearch,
@@ -40,6 +60,7 @@ class AbstractAnimalUsecase(ABC):
         self.animal_repository = animal_repository
         self.like_repository = like_repository
         self.learn_to_rank = learn_to_rank
+        self.similar_image_search = similar_image_search
         self.storage_client = storage_client
         self.cache = cache
         self.search_client = search_client
@@ -86,6 +107,14 @@ class AbstractAnimalUsecase(ABC):
     ) -> AnimalSearchResponses:
         raise NotImplementedError
 
+    @abstractmethod
+    def search_similar_image(
+        self,
+        session: Session,
+        request: SimilarAnimalSearchRequest,
+    ) -> SimilarAnimalSearchResponses:
+        raise NotImplementedError
+
 
 class AnimalUsecase(AbstractAnimalUsecase):
     def __init__(
@@ -93,6 +122,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
         animal_repository: AbstractAnimalRepository,
         like_repository: AbstractLikeRepository,
         learn_to_rank: AbstractLearnToRank,
+        similar_image_search: AbstractSimilarImageSearch,
         storage_client: AbstractStorage,
         cache: AbstractCache,
         search_client: AbstractSearch,
@@ -103,6 +133,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
             animal_repository=animal_repository,
             like_repository=like_repository,
             learn_to_rank=learn_to_rank,
+            similar_image_search=similar_image_search,
             storage_client=storage_client,
             cache=cache,
             search_client=search_client,
@@ -297,3 +328,33 @@ class AnimalUsecase(AbstractAnimalUsecase):
                 searched,
             )
         return searched
+
+    def search_similar_image(
+        self,
+        session: Session,
+        request: SimilarAnimalSearchRequest,
+    ) -> SimilarAnimalSearchResponses:
+        search_request = SimilarImageSearchRequest(id=request.id)
+        response = self.similar_image_search.search(request=search_request)
+        query = AnimalIDs(ids=response.ids)
+        animals = self.animal_repository.select_by_ids(
+            session=session,
+            query=query,
+        )
+        responses = [
+            SimilarAnimalSearchResponse(
+                id=a.id,
+                name=a.name,
+                description=a.description,
+                photo_url=a.photo_url,
+                animal_category_name_en=a.animal_category_name_en,
+                animal_category_name_ja=a.animal_category_name_ja,
+                animal_subcategory_name_en=a.animal_subcategory_name_en,
+                animal_subcategory_name_ja=a.animal_subcategory_name_ja,
+                user_handle_name=a.user_handle_name,
+                like=a.like,
+                created_at=a.created_at,
+            )
+            for a in animals
+        ]
+        return SimilarAnimalSearchResponses(results=responses)

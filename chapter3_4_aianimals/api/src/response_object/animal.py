@@ -56,3 +56,27 @@ class AnimalSearchResponses(BaseModel):
 
     class Config:
         extra = Extra.forbid
+
+
+class SimilarAnimalSearchResponse(BaseModel):
+    id: str
+    name: str
+    description: str
+    photo_url: str
+    animal_category_name_en: str
+    animal_category_name_ja: str
+    animal_subcategory_name_en: str
+    animal_subcategory_name_ja: str
+    user_handle_name: str
+    like: int
+    created_at: datetime
+
+    class Config:
+        extra = Extra.forbid
+
+
+class SimilarAnimalSearchResponses(BaseModel):
+    results: List[SimilarAnimalSearchResponse]
+
+    class Config:
+        extra = Extra.forbid

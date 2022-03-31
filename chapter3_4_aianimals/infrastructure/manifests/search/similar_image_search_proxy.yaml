@@ -6,7 +6,7 @@ metadata:
   labels:
     app: similar-image-search-proxy
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: similar-image-search-proxy
@@ -25,10 +25,10 @@ spec:
             - containerPort: 10000
           resources:
             limits:
-              cpu: 600m
+              cpu: 1000m
               memory: "1000Mi"
             requests:
-              cpu: 300m
+              cpu: 500m
               memory: "500Mi"
           env:
             - name: POSTGRES_HOST

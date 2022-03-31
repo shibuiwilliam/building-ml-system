@@ -4,7 +4,7 @@ from typing import List, Optional
 
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
-from src.entities.animal import AnimalCreate, AnimalModel, AnimalQuery
+from src.entities.animal import AnimalCreate, AnimalIDs, AnimalModel, AnimalQuery
 from src.entities.user import UserModel
 from src.schema.animal import Animal
 from src.schema.animal_category import AnimalCategory
@@ -27,6 +27,14 @@ class AbstractAnimalRepository(ABC):
         query: Optional[AnimalQuery] = None,
         limit: Optional[int] = 100,
         offset: Optional[int] = 0,
+    ) -> List[AnimalModel]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def select_by_ids(
+        self,
+        session: Session,
+        query: AnimalIDs,
     ) -> List[AnimalModel]:
         raise NotImplementedError
 
@@ -113,6 +121,69 @@ class AnimalRepository(AbstractAnimalRepository):
             .order_by(Animal.id)
             .limit(limit)
             .offset(offset)
+        )
+        data = [
+            AnimalModel(
+                id=d[0],
+                animal_category_id=d[1],
+                animal_category_name_en=d[2],
+                animal_category_name_ja=d[3],
+                animal_subcategory_id=d[4],
+                animal_subcategory_name_en=d[5],
+                animal_subcategory_name_ja=d[6],
+                user_id=d[7],
+                user_handle_name=d[8],
+                name=d[9],
+                description=d[10],
+                photo_url=d[11],
+                deactivated=d[12],
+                created_at=d[13],
+                updated_at=d[14],
+            )
+            for d in results
+        ]
+        return data
+
+    def select_by_ids(
+        self,
+        session: Session,
+        query: AnimalIDs,
+    ) -> List[AnimalModel]:
+        results = (
+            session.query(
+                Animal.id.label("id"),
+                AnimalCategory.id.label("animal_category_id"),
+                AnimalCategory.name_en.label("animal_category_name_en"),
+                AnimalCategory.name_ja.label("animal_category_name_ja"),
+                AnimalSubcategory.id.label("animal_subcategory_id"),
+                AnimalSubcategory.name_en.label("animal_subcategory_name_en"),
+                AnimalSubcategory.name_ja.label("animal_subcategory_name_ja"),
+                User.id.label("user_id"),
+                User.handle_name.label("user_handle_name"),
+                Animal.name.label("name"),
+                Animal.description.label("description"),
+                Animal.photo_url.label("photo_url"),
+                Animal.deactivated.label("deactivated"),
+                Animal.created_at.label("created_at"),
+                Animal.updated_at.label("updated_at"),
+            )
+            .join(
+                AnimalCategory,
+                AnimalCategory.id == Animal.animal_category_id,
+                isouter=True,
+            )
+            .join(
+                AnimalSubcategory,
+                AnimalSubcategory.id == Animal.animal_subcategory_id,
+                isouter=True,
+            )
+            .join(
+                User,
+                User.id == Animal.user_id,
+                isouter=True,
+            )
+            .filter(Animal.id.in_(query.ids))
+            .order_by(Animal.id)
         )
         data = [
             AnimalModel(
