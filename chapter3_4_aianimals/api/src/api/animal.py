@@ -112,13 +112,12 @@ async def search_animal(
     token: str = Header(...),
     session: Session = Depends(container.database.get_session),
 ):
-    _, user_id = await token_assertion(
+    await token_assertion(
         token=token,
         session=session,
     )
     if request is None:
         request = AnimalSearchRequest()
-    request.user_id = user_id
     logger.info(f"search animal: {request}")
     data = container.animal_usecase.search(
         request=request,
@@ -135,11 +134,10 @@ async def search_similar_animal(
     token: str = Header(...),
     session: Session = Depends(container.database.get_session),
 ):
-    _, user_id = await token_assertion(
+    await token_assertion(
         token=token,
         session=session,
     )
-    request.user_id = user_id
     logger.info(f"search similar animal: {request}")
     data = container.animal_usecase.search_similar_image(
         session=session,

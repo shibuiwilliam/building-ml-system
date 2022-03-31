@@ -263,7 +263,6 @@ class AnimalUsecase(AbstractAnimalUsecase):
     ) -> AnimalSearchResponses:
         sort_by = AnimalSearchSortKey.value_to_key(value=request.sort_by)
         query = AnimalSearchQuery(
-            user_id=request.user_id,
             animal_category_name_en=request.animal_category_name_en,
             animal_category_name_ja=request.animal_category_name_ja,
             animal_subcategory_name_en=request.animal_subcategory_name_en,
