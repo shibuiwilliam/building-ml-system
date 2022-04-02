@@ -8,6 +8,7 @@ import androidx.room.TypeConverters
 import com.example.aianimals.middleware.Converters
 import com.example.aianimals.repository.animal.Animal
 import com.example.aianimals.repository.animal.AnimalCategory
+import com.example.aianimals.repository.animal.AnimalSearchSortKey
 import com.example.aianimals.repository.animal.AnimalSubcategory
 import com.example.aianimals.repository.animal.source.local.AnimalDao
 import com.example.aianimals.repository.animal.source.local.AnimalMetadataDao
@@ -20,7 +21,8 @@ import com.example.aianimals.repository.login.source.local.LoginDao
         Login::class,
         Animal::class,
         AnimalCategory::class,
-        AnimalSubcategory::class
+        AnimalSubcategory::class,
+        AnimalSearchSortKey::class
     ],
     version = 1,
     exportSchema = false

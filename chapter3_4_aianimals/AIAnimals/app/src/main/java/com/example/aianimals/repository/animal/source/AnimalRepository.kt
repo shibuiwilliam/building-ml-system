@@ -59,17 +59,17 @@ class AnimalRepository(
 
     override suspend fun getAnimal(animalID: String): Animal? {
         if (BuildConfig.USE_LOCAL_DATA) {
-            val localAnimal = animalLocalDataSource.getAnimal(animalID)
-            return localAnimal
+            return animalLocalDataSource.getAnimal(animalID)
         }
-
-        val animal = animalRemoteDataSource.getAnimal(animalID)
-        return animal
+        return animalRemoteDataSource.getAnimal(animalID)
     }
 
     override suspend fun saveAnimal(animal: Animal) {
         Log.i("AnimalRepository", "register ${animal}")
-        animalLocalDataSource.saveAnimal(animal)
+        if (BuildConfig.USE_LOCAL_DATA) {
+            animalLocalDataSource.saveAnimal(animal)
+        }
+        animalRemoteDataSource.saveAnimal(animal)
     }
 
     override suspend fun loadAnimalMetadata(refresh: Boolean) {
@@ -92,7 +92,7 @@ class AnimalRepository(
                     )
                 }
                 val animalSearchSortKeys = animalMetadata.animalSearchSortKey.map {
-                    AnimalSearchSortKey(name=it)
+                    AnimalSearchSortKey(name = it)
                 }
                 animalLocalDataSource.saveAnimalMetadata(
                     animalCategories,
@@ -104,17 +104,39 @@ class AnimalRepository(
     }
 
     override suspend fun listAnimalCategory(): List<AnimalCategory> {
-        return animalLocalDataSource.listAnimalCategory()
+        var data = animalLocalDataSource.listAnimalCategory()
+        if (data.isEmpty()) {
+            loadAnimalMetadata(true)
+            data = animalLocalDataSource.listAnimalCategory()
+        }
+        return data
     }
 
     override suspend fun listAnimalSubcategory(
         animalCategoryNameEn: String?,
         animalCategoryNameJa: String?
     ): List<AnimalSubcategory> {
-        return animalLocalDataSource.listAnimalSubcategory(
+        var data = animalLocalDataSource.listAnimalSubcategory(
             animalCategoryNameEn,
             animalCategoryNameJa
         )
+        if (data.isEmpty()) {
+            loadAnimalMetadata(true)
+            data = animalLocalDataSource.listAnimalSubcategory(
+                animalCategoryNameEn,
+                animalCategoryNameJa
+            )
+        }
+        return data
+    }
+
+    override suspend fun listAnimalSearchSortKey(): List<AnimalSearchSortKey> {
+        var data = animalLocalDataSource.listAnimalSearchSortKey()
+        if (data.isEmpty()) {
+            loadAnimalMetadata(true)
+            data = animalLocalDataSource.listAnimalSearchSortKey()
+        }
+        return data
     }
 
     override suspend fun getAnimalCategory(

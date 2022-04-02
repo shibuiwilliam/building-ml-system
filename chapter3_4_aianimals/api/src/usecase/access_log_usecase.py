@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
 from logging import getLogger
 
 from sqlalchemy.orm import Session
@@ -49,6 +50,8 @@ class AccessLogUsecase(AbstractAccessLogUsecase):
         if action is None:
             logger.error(f"invalid action: {request.action}")
             return
+        if request.created_at is None:
+            request.created_at = datetime.now()
         likes = self.like_repository.count(
             session=session,
             animal_ids=[request.animal_id],

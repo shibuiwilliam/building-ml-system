@@ -4,10 +4,10 @@ import androidx.annotation.VisibleForTesting
 import com.example.aianimals.middleware.AppExecutors
 import com.example.aianimals.repository.animal.Animal
 import com.example.aianimals.repository.animal.AnimalCategory
+import com.example.aianimals.repository.animal.AnimalSearchSortKey
 import com.example.aianimals.repository.animal.AnimalSubcategory
 import com.example.aianimals.repository.animal.source.AnimalDataSource
 import kotlinx.coroutines.withContext
-import java.util.*
 
 class AnimalRemoteDataSource private constructor(
     val appExecutors: AppExecutors,
@@ -26,7 +26,9 @@ class AnimalRemoteDataSource private constructor(
         this.userID = userID
     }
 
-    override suspend fun createAnimals() {}
+    override suspend fun createAnimals() {
+//        TODO
+    }
 
     override suspend fun listAnimals(
         animalCategoryNameEn: String?,
@@ -99,30 +101,135 @@ class AnimalRemoteDataSource private constructor(
         return animal
     }
 
-    override suspend fun saveAnimal(animal: Animal) {}
+    override suspend fun saveAnimal(animal: Animal) {
+//        TODO
+    }
 
     override suspend fun loadAnimalMetadata(refresh: Boolean) {}
 
     override suspend fun listAnimalCategory(): List<AnimalCategory> {
-        TODO("Not yet implemented")
+        var body: MetadataResponse? = null
+        if (token == null) {
+            return ArrayList<AnimalCategory>()
+        }
+        withContext(appExecutors.ioContext) {
+            val response = animalAPI.getMetadata(token!!)
+            if (response.isSuccessful) {
+                body = response.body()!!
+            }
+        }
+        if (body != null) {
+            return body!!.animalCategory.map {
+                AnimalCategory(
+                    id = it.id,
+                    nameEn = it.nameEn,
+                    nameJa = it.nameJa
+                )
+            }
+        }
+        return ArrayList<AnimalCategory>()
     }
 
     override suspend fun listAnimalSubcategory(
         animalCategoryNameEn: String?,
         animalCategoryNameJa: String?
     ): List<AnimalSubcategory> {
-        TODO("Not yet implemented")
+        var body: MetadataResponse? = null
+        if (token == null) {
+            return ArrayList<AnimalSubcategory>()
+        }
+        withContext(appExecutors.ioContext) {
+            val response = animalAPI.getMetadata(token!!)
+            if (response.isSuccessful) {
+                body = response.body()!!
+            }
+        }
+        if (body != null) {
+            return body!!.animalSubcategory
+                .filter { (animalCategoryNameEn != null && it.animalCategoryNameEn == animalCategoryNameEn) || (animalCategoryNameJa != null && it.animalCategoryNameJa == animalCategoryNameJa) }
+                .map {
+                    AnimalSubcategory(
+                        id = it.id,
+                        animalCategoryId = it.animalCategoryId,
+                        nameEn = it.nameEn,
+                        nameJa = it.nameJa
+                    )
+                }
+        }
+        return ArrayList<AnimalSubcategory>()
+    }
+
+    override suspend fun listAnimalSearchSortKey(): List<AnimalSearchSortKey> {
+        var body: MetadataResponse? = null
+        if (token == null) {
+            return ArrayList<AnimalSearchSortKey>()
+        }
+        withContext(appExecutors.ioContext) {
+            val response = animalAPI.getMetadata(token!!)
+            if (response.isSuccessful) {
+                body = response.body()!!
+            }
+        }
+        if (body != null) {
+            return body!!.animalSearchSortKey.map {
+                AnimalSearchSortKey(name = it)
+            }
+        }
+        return ArrayList<AnimalSearchSortKey>()
     }
 
     override suspend fun getAnimalCategory(nameEn: String?, nameJa: String?): AnimalCategory? {
-        TODO("Not yet implemented")
+        var body: MetadataResponse? = null
+        if (token == null) {
+            return null
+        }
+        withContext(appExecutors.ioContext) {
+            val response = animalAPI.getMetadata(token!!)
+            if (response.isSuccessful) {
+                body = response.body()!!
+            }
+        }
+        if (body != null) {
+            return body!!.animalCategory
+                .filter { (nameEn != null && it.nameEn == nameEn) || (nameJa != null && it.nameJa == nameJa) }
+                .map {
+                    AnimalCategory(
+                        id = it.id,
+                        nameEn = it.nameEn,
+                        nameJa = it.nameJa
+                    )
+                }[0]
+        }
+        return null
     }
 
     override suspend fun getAnimalSubcategory(
         nameEn: String?,
         nameJa: String?
     ): AnimalSubcategory? {
-        TODO("Not yet implemented")
+        var body: MetadataResponse? = null
+        if (token == null) {
+            return null
+        }
+        withContext(appExecutors.ioContext) {
+            val response = animalAPI.getMetadata(token!!)
+            if (response.isSuccessful) {
+                body = response.body()!!
+            }
+        }
+        if (body != null) {
+            return body!!.animalSubcategory
+                .filter { (nameEn != null && it.nameEn == nameEn) || (nameJa != null && it.nameJa == nameJa) }
+                .map {
+                    AnimalSubcategory(
+                        id = it.id,
+                        animalCategoryId = it.animalCategoryId,
+                        nameEn = it.nameEn,
+                        nameJa = it.nameJa
+                    )
+                }[0]
+        }
+        return null
     }
 
     override suspend fun likeAnimal(animalID: String) {

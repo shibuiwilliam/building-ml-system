@@ -101,6 +101,10 @@ class AnimalLocalDataSource private constructor(
         return listOf()
     }
 
+    override suspend fun listAnimalSearchSortKey(): List<AnimalSearchSortKey> {
+        return animalMetadataDao.listAnimalAnimalSearchSortKey()
+    }
+
     override suspend fun getAnimalCategory(
         nameEn: String?,
         nameJa: String?

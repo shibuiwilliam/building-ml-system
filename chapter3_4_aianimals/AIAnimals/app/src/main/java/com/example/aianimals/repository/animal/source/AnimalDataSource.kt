@@ -2,6 +2,7 @@ package com.example.aianimals.repository.animal.source
 
 import com.example.aianimals.repository.animal.Animal
 import com.example.aianimals.repository.animal.AnimalCategory
+import com.example.aianimals.repository.animal.AnimalSearchSortKey
 import com.example.aianimals.repository.animal.AnimalSubcategory
 
 interface AnimalDataSource {
@@ -25,6 +26,8 @@ interface AnimalDataSource {
         animalCategoryNameEn: String?,
         animalCategoryNameJa: String?
     ): List<AnimalSubcategory>
+
+    suspend fun listAnimalSearchSortKey(): List<AnimalSearchSortKey>
 
     suspend fun getAnimalCategory(
         nameEn: String?,

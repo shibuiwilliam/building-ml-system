@@ -1,12 +1,23 @@
 package com.example.aianimals.repository.animal.source.remote
 
+import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.*
+
 
 interface AnimalAPIInterface {
     @Headers("Accept:application/json, Content-Type:application/json")
     @GET("/v0/metadata")
     suspend fun getMetadata(@Header("token") token: String): Response<MetadataResponse>
+
+    @Headers("Accept:application/json, Content-Type:application/json")
+    @Multipart
+    @POST("/v0/animal")
+    suspend fun postAnimal(
+        @Header("token") token: String,
+        @Part file: MultipartBody.Part,
+        @Part json: MultipartBody.Part
+    ): Response<List<AnimalResponse>>
 
     @Headers("Accept:application/json, Content-Type:application/json")
     @POST("/v0/animal/search")
