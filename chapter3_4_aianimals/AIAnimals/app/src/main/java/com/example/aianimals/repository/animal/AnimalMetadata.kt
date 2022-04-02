@@ -27,3 +27,8 @@ data class AnimalSubcategory @JvmOverloads constructor(
     @ColumnInfo(name = "nameEn", index = true) var nameEn: String,
     @ColumnInfo(name = "nameJa", index = true) var nameJa: String,
 )
+
+@Entity(tableName = "animal_search_sort_keys")
+data class AnimalSearchSortKey @JvmOverloads constructor(
+    @PrimaryKey @ColumnInfo(name = "name") var name: String,
+)

@@ -24,4 +24,5 @@ data class AnimalSubcategoryResponse(
 data class MetadataResponse(
     val animalCategory: List<AnimalCategoryResponse>,
     val animalSubcategory: List<AnimalSubcategoryResponse>,
+    val animalSearchSortKey: List<String>
 )

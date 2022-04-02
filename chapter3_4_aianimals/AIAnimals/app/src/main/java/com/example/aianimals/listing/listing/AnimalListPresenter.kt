@@ -16,6 +16,7 @@ class AnimalListPresenter(
     private val TAG = AnimalListPresenter::class.java.simpleName
 
     override var query: String? = null
+    override var sortBy: String = "score"
     override var animalCategories: MutableList<String> = mutableListOf()
     override var animalSubcategories: MutableList<String> = mutableListOf()
     override var sortValues: MutableList<String> = mutableListOf()
@@ -51,6 +52,7 @@ class AnimalListPresenter(
                 animalSubcategoryNameEn,
                 null,
                 this@AnimalListPresenter.query,
+                this@AnimalListPresenter.sortBy,
                 this@AnimalListPresenter.currentPosition
             )
         }

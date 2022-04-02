@@ -7,6 +7,7 @@ import com.example.aianimals.repository.animal.Animal
 interface AnimalListContract {
     interface Presenter : BasePresenter {
         var query: String?
+        var sortBy: String
         var animalCategories: MutableList<String>
         var animalSubcategories: MutableList<String>
         var sortValues: MutableList<String>

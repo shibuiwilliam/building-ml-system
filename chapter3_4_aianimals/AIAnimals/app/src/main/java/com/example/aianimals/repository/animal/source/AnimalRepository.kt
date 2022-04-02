@@ -23,6 +23,7 @@ class AnimalRepository(
         animalSubcategoryNameEn: String?,
         animalSubcategoryNameJa: String?,
         query: String?,
+        sortBy: String,
         offset: Int
     ): Map<String, Animal> {
         if (BuildConfig.USE_LOCAL_DATA) {
@@ -32,6 +33,7 @@ class AnimalRepository(
                 animalSubcategoryNameEn,
                 animalSubcategoryNameJa,
                 query,
+                sortBy,
                 offset
             )
             if (localAnimals.isNotEmpty()) {
@@ -45,6 +47,7 @@ class AnimalRepository(
             animalSubcategoryNameEn,
             animalSubcategoryNameJa,
             query,
+            sortBy,
             offset
         )
         if (remoteAnimals.isNotEmpty()) {

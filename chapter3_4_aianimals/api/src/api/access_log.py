@@ -29,7 +29,7 @@ async def register_access_log(
 
 
 @router.post("", response_model=None)
-async def post_like(
+async def post_access_log(
     background_tasks: BackgroundTasks,
     request: AccessLogCreateRequest,
     token: str = Header(...),

@@ -39,6 +39,7 @@ class AnimalLocalDataSource private constructor(
         animalSubcategoryNameEn: String?,
         animalSubcategoryNameJa: String?,
         query: String?,
+        sortBy: String,
         offset: Int
     ): Map<String, Animal> {
         val animalMap = mutableMapOf<String, Animal>()
@@ -137,7 +138,7 @@ class AnimalLocalDataSource private constructor(
 
     suspend fun saveAnimalMetadata(
         animalCategories: List<AnimalCategory>,
-        animalSubcategories: List<AnimalSubcategory>
+        animalSubcategories: List<AnimalSubcategory>,
     ) {
         withContext(appExecutors.ioContext) {
             animalMetadataDao.deleteAllAnimalCategory()
