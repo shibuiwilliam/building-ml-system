@@ -5,6 +5,7 @@ import android.util.Log
 import com.example.aianimals.BuildConfig
 import com.example.aianimals.repository.animal.Animal
 import com.example.aianimals.repository.animal.AnimalCategory
+import com.example.aianimals.repository.animal.AnimalSearchSortKey
 import com.example.aianimals.repository.animal.AnimalSubcategory
 import com.example.aianimals.repository.animal.source.local.AnimalLocalDataSource
 import com.example.aianimals.repository.animal.source.remote.AnimalRemoteDataSource
@@ -90,7 +91,14 @@ class AnimalRepository(
                         nameJa = it.nameJa
                     )
                 }
-                animalLocalDataSource.saveAnimalMetadata(animalCategories, animalSubcategories)
+                val animalSearchSortKeys = animalMetadata.animalSearchSortKey.map {
+                    AnimalSearchSortKey(name=it)
+                }
+                animalLocalDataSource.saveAnimalMetadata(
+                    animalCategories,
+                    animalSubcategories,
+                    animalSearchSortKeys
+                )
             }
         }
     }

@@ -6,6 +6,7 @@ import com.example.aianimals.middleware.AppExecutors
 import com.example.aianimals.middleware.Utils
 import com.example.aianimals.repository.animal.Animal
 import com.example.aianimals.repository.animal.AnimalCategory
+import com.example.aianimals.repository.animal.AnimalSearchSortKey
 import com.example.aianimals.repository.animal.AnimalSubcategory
 import com.example.aianimals.repository.animal.source.AnimalDataSource
 import kotlinx.coroutines.withContext
@@ -139,12 +140,15 @@ class AnimalLocalDataSource private constructor(
     suspend fun saveAnimalMetadata(
         animalCategories: List<AnimalCategory>,
         animalSubcategories: List<AnimalSubcategory>,
+        animalSearchSortKeys: List<AnimalSearchSortKey>
     ) {
         withContext(appExecutors.ioContext) {
             animalMetadataDao.deleteAllAnimalCategory()
             animalMetadataDao.deleteAllAnimalSubcategory()
+            animalMetadataDao.deleteAllAnimalSearchSortKey()
             animalMetadataDao.bulkInsertAnimalCategory(animalCategories)
             animalMetadataDao.bulkInsertAnimalSubcategory(animalSubcategories)
+            animalMetadataDao.bulkInsertAnimalSearchSortKey(animalSearchSortKeys)
         }
     }
 
