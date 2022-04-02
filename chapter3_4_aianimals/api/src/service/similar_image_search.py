@@ -24,7 +24,7 @@ class SimilarImageSearchResponse(BaseModel):
         extra = Extra.forbid
 
 
-class AbstractSimilarImageSearch(ABC):
+class AbstractSimilarImageSearchService(ABC):
     def __init__(self):
         pass
 
@@ -36,7 +36,21 @@ class AbstractSimilarImageSearch(ABC):
         raise NotImplementedError
 
 
-class SimilarImageSearch(AbstractSimilarImageSearch):
+class PseudoSimilarImageSearchService(AbstractSimilarImageSearchService):
+    def __init__(self):
+        pass
+
+    def search(
+        self,
+        request: SimilarImageSearchRequest,
+    ) -> SimilarImageSearchResponse:
+        logger.info(f"request for similar image: {request}")
+        response = SimilarImageSearchResponse(ids=request.id)
+        logger.info(f"response from similar image search: {response}")
+        return response
+
+
+class SimilarImageSearchService(AbstractSimilarImageSearchService):
     def __init__(
         self,
         timeout: float = 10.0,

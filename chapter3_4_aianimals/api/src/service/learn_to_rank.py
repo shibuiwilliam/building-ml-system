@@ -34,7 +34,7 @@ class LearnToRankResponse(BaseModel):
         extra = Extra.forbid
 
 
-class LearnToRankABTestResponse(BaseModel):
+class LearnToRankServiceABTestResponse(BaseModel):
     endpoint: str
     response: LearnToRankResponse
 
@@ -42,7 +42,7 @@ class LearnToRankABTestResponse(BaseModel):
         extra = Extra.forbid
 
 
-class AbstractLearnToRank(ABC):
+class AbstractLearnToRankService(ABC):
     def __init__(self):
         pass
 
@@ -54,7 +54,21 @@ class AbstractLearnToRank(ABC):
         raise NotImplementedError
 
 
-class LearnToRankClient(AbstractLearnToRank):
+class PseudoLearnToRankService(AbstractLearnToRankService):
+    def __init__(self):
+        pass
+
+    def reorder(
+        self,
+        request: LearnToRankRequest,
+    ) -> LearnToRankResponse:
+        logger.info(f"request for learn to rank: {request}")
+        response = LearnToRankResponse(ids=request.ids)
+        logger.info(f"response from learn to rank: {response}")
+        return response
+
+
+class LearnToRankService(AbstractLearnToRankService):
     def __init__(
         self,
         timeout: float = 10.0,
@@ -98,7 +112,7 @@ class LearnToRankClient(AbstractLearnToRank):
             return LearnToRankResponse(ids=_ids)
         res_json = res.json()
         if Configurations.learn_to_rank_ab_test:
-            response = LearnToRankABTestResponse(**res_json["response"]).response
+            response = LearnToRankServiceABTestResponse(**res_json["response"]).response
         else:
             response = LearnToRankResponse(**res_json)
         logger.info(f"response from learn to rank: {response}")

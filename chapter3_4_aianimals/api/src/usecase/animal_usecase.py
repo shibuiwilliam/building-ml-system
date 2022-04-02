@@ -37,9 +37,9 @@ from src.response_object.animal import (
     SimilarAnimalSearchResponses,
 )
 from src.response_object.user import UserResponse
-from src.service.learn_to_rank import AbstractLearnToRank, LearnToRankRequest
+from src.service.learn_to_rank import AbstractLearnToRankService, LearnToRankRequest
 from src.service.local_cache import AbstractLocalCache
-from src.service.similar_image_search import AbstractSimilarImageSearch, SimilarImageSearchRequest
+from src.service.similar_image_search import AbstractSimilarImageSearchService, SimilarImageSearchRequest
 
 logger = getLogger(__name__)
 
@@ -49,8 +49,8 @@ class AbstractAnimalUsecase(ABC):
         self,
         animal_repository: AbstractAnimalRepository,
         like_repository: AbstractLikeRepository,
-        learn_to_rank: AbstractLearnToRank,
-        similar_image_search: AbstractSimilarImageSearch,
+        learn_to_rank: AbstractLearnToRankService,
+        similar_image_search: AbstractSimilarImageSearchService,
         storage_client: AbstractStorage,
         cache: AbstractCache,
         search_client: AbstractSearch,
@@ -121,8 +121,8 @@ class AnimalUsecase(AbstractAnimalUsecase):
         self,
         animal_repository: AbstractAnimalRepository,
         like_repository: AbstractLikeRepository,
-        learn_to_rank: AbstractLearnToRank,
-        similar_image_search: AbstractSimilarImageSearch,
+        learn_to_rank: AbstractLearnToRankService,
+        similar_image_search: AbstractSimilarImageSearchService,
         storage_client: AbstractStorage,
         cache: AbstractCache,
         search_client: AbstractSearch,

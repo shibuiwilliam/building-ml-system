@@ -19,9 +19,13 @@ from src.repository.like_repository import AbstractLikeRepository, LikeRepositor
 from src.repository.user_repository import AbstractUserRepository, UserRepository
 from src.repository.violation_repository import AbstractViolationRepository, ViolationRepository
 from src.repository.violation_type_repository import AbstractViolationTypeRepository, ViolationTypeRepository
-from src.service.learn_to_rank import AbstractLearnToRank, LearnToRankClient
+from src.service.learn_to_rank import AbstractLearnToRankService, LearnToRankService, PseudoLearnToRankService
 from src.service.local_cache import AbstractLocalCache, LocalCache
-from src.service.similar_image_search import AbstractSimilarImageSearch, SimilarImageSearch
+from src.service.similar_image_search import (
+    AbstractSimilarImageSearchService,
+    PseudoSimilarImageSearchService,
+    SimilarImageSearchService,
+)
 from src.usecase.access_log_usecase import AbstractAccessLogUsecase, AccessLogUsecase
 from src.usecase.animal_category_usecase import AbstractAnimalCategoryUsecase, AnimalCategoryUsecase
 from src.usecase.animal_subcategory_usecase import AbstractAnimalSubcategoryUsecase, AnimalSubcategoryUsecase
@@ -44,6 +48,8 @@ class Container(object):
         search_client: AbstractSearch,
         messaging: AbstractMessaging,
         crypt: AbstractCrypt,
+        learn_to_rank: AbstractLearnToRankService,
+        similar_image_search: AbstractSimilarImageSearchService,
     ):
         self.database = database
         self.storage_client = storage_client
@@ -64,8 +70,8 @@ class Container(object):
         self.violation_repository: AbstractViolationRepository = ViolationRepository()
         self.access_log_repository: AbstractAccessLogRepository = AccessLogRepository()
 
-        self.learn_to_rank: AbstractLearnToRank = LearnToRankClient()
-        self.similar_image_search: AbstractSimilarImageSearch = SimilarImageSearch()
+        self.learn_to_rank = learn_to_rank
+        self.similar_image_search = similar_image_search
         self.local_cache: AbstractLocalCache = LocalCache(
             animal_category_repository=self.animal_category_repository,
             animal_subcategory_repository=self.animal_subcategory_repository,
@@ -116,8 +122,12 @@ class Container(object):
 
 if Configurations.run_environment == RUN_ENVIRONMENT.LOCAL.value:
     storage_client: AbstractStorage = LocalStorage()
+    learn_to_rank: AbstractLearnToRankService = PseudoLearnToRankService()
+    similar_image_search: AbstractSimilarImageSearchService = PseudoSimilarImageSearchService()
 elif Configurations.run_environment == RUN_ENVIRONMENT.CLOUD.value:
     storage_client = GoogleCloudStorage()
+    learn_to_rank = LearnToRankService()
+    similar_image_search = SimilarImageSearchService()
 
 container = Container(
     storage_client=storage_client,
@@ -126,4 +136,6 @@ container = Container(
     search_client=ElasticsearchClient(),
     messaging=RabbitmqMessaging(),
     crypt=Crypt(key_file_path=Configurations.key_file_path),
+    learn_to_rank=learn_to_rank,
+    similar_image_search=similar_image_search,
 )
