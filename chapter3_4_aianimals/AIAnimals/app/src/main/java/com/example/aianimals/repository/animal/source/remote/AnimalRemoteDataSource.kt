@@ -34,6 +34,7 @@ class AnimalRemoteDataSource private constructor(
         animalSubcategoryNameEn: String?,
         animalSubcategoryNameJa: String?,
         query: String?,
+        sortBy: String,
         offset: Int
     ): Map<String, Animal> {
         if (token == null) {
@@ -50,7 +51,8 @@ class AnimalRemoteDataSource private constructor(
                 animalCategoryNameJa = animalCategoryNameJa,
                 animalSubcategoryNameEn = animalSubcategoryNameEn,
                 animalSubcategoryNameJa = animalSubcategoryNameJa,
-                phrases = phrases
+                phrases = phrases,
+                sortBy = sortBy
             )
             val response = animalAPI.postSearchAnimal(
                 token!!,

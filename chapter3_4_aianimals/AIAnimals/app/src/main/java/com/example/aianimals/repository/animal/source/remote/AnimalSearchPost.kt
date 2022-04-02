@@ -5,5 +5,6 @@ data class AnimalSearchPost(
     val animalCategoryNameJa: String?,
     val animalSubcategoryNameEn: String?,
     val animalSubcategoryNameJa: String?,
-    val phrases: List<String>
+    val phrases: List<String>,
+    val sortBy: String
 )

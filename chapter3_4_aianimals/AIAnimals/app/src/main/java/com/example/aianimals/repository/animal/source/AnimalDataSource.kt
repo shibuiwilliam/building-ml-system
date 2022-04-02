@@ -12,6 +12,7 @@ interface AnimalDataSource {
         animalSubcategoryNameEn: String?,
         animalSubcategoryNameJa: String?,
         query: String?,
+        sortBy: String,
         offset: Int
     ): Map<String, Animal>
 

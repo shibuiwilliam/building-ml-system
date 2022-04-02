@@ -1,7 +1,7 @@
 package com.example.aianimals.repository.animal.source.remote
 
 data class AnimalSearchResult(
-    val score: Float,
+    val score: Float?,
     val id: String,
     val name: String,
     val description: String,
@@ -17,6 +17,6 @@ data class AnimalSearchResult(
 
 data class AnimalSearchResponse(
     val hits: Int,
-    val maxScore: Float,
+    val maxScore: Float?,
     val results: List<AnimalSearchResult>
 )

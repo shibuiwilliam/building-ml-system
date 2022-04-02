@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from logging import getLogger
 
 from sqlalchemy.orm import Session
+from src.entities.animal import AnimalSearchSortKey
 from src.entities.animal_category import AnimalCategoryQuery
 from src.entities.animal_subcategory import AnimalSubcategoryQuery
 from src.repository.animal_category_repository import AbstractAnimalCategoryRepository
@@ -59,5 +60,6 @@ class MetadataUsecase(AbstractMetadataUsecase):
         response = MetadataResponse(
             animal_category=animal_category,
             animal_subcategory=animal_subcategory,
+            animal_search_sort_key=AnimalSearchSortKey.get_list(),
         )
         return response
