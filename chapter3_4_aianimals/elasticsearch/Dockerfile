@@ -1,4 +1,4 @@
-ARG FROM_IMAGE=docker.elastic.co/elasticsearch/elasticsearch:8.0.1
+ARG FROM_IMAGE=docker.elastic.co/elasticsearch/elasticsearch:8.1.2
 
 FROM ${FROM_IMAGE}
 

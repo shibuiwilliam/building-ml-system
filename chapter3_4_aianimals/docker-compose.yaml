@@ -74,75 +74,6 @@ services:
       - postgres
       - redis
 
-  api:
-    container_name: api
-    image: shibui/building-ml-system:ai_animals_api_0.0.0
-    volumes:
-      - ./api/secrets/secret.key:/opt/secrets/secret.key
-    restart: always
-    networks:
-      - default
-    ports:
-      - 8000:8000
-    environment:
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=aianimals
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_DB=0
-      - RABBITMQ_HOST=rabbitmq
-      - RABBITMQ_USER=user
-      - RABBITMQ_PASSWORD=password
-      - ES_HOST=http://es:9200
-      - ANIMAL_REGISTRY_QUEUE=animal
-      - ANIMAL_VIOLATION_QUEUE_NO_ANIMAL_VIOLATION=no_animal_violation
-      - LOG_LEVEL=INFO
-      - RUN_ENVIRONMENT=local
-      - KEY_FILE_PATH=/opt/secrets/secret.key
-      - WORKERS=1
-      - PORT=8000
-    command: ./run.sh
-    hostname: api
-    depends_on:
-      - postgres
-      - redis
-      - rabbitmq
-
-  es:
-    container_name: es
-    image: shibui/building-ml-system:ai_animals_elasticsearch_0.0.0
-    volumes:
-      - ./infrastructure/local_conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
-    restart: always
-    networks:
-      - default
-    ports:
-      - 127.0.0.1:9200:9200
-      - 127.0.0.1:9201:9201
-      - 127.0.0.1:9300:9300
-    environment:
-      - discovery.type=single-node
-    hostname: es
-    depends_on:
-      - postgres
-
-  kibana:
-    container_name: kibana
-    image: docker.elastic.co/kibana/kibana:7.16.0
-    restart: always
-    networks:
-      - default
-    ports:
-      - 127.0.0.1:5601:5601
-    environment:
-      - ELASTICSEARCH_HOSTS="http://es:9200"
-    hostname: kibana
-    depends_on:
-      - postgres
-
   search_registry:
     container_name: search_registry
     image: shibui/building-ml-system:ai_animals_data_registry_0.0.0
@@ -174,6 +105,75 @@ services:
       - redis
       - api
       - es
+
+  api:
+    container_name: api
+    image: shibui/building-ml-system:ai_animals_api_0.0.0
+    volumes:
+      - ./api/secrets/secret.key:/opt/secrets/secret.key
+    restart: always
+    networks:
+      - default
+    ports:
+      - 8000:8000
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=aianimals
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=user
+      - RABBITMQ_PASSWORD=password
+      - ES_HOST=http://es:9200
+      - ANIMAL_REGISTRY_QUEUE=animal
+      - ANIMAL_VIOLATION_QUEUE_NO_ANIMAL_VIOLATION=no_animal_violation
+      - LOG_LEVEL=INFO
+      - RUN_ENVIRONMENT=local
+      - KEY_FILE_PATH=/opt/secrets/secret.key
+      - WORKERS=1
+      - PORT=8000
+    command: >
+      /bin/sh -c "sleep 60s && ./run.sh"
+    hostname: api
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+
+  es:
+    container_name: es
+    image: shibui/building-ml-system:ai_animals_elasticsearch_0.0.0
+    restart: always
+    networks:
+      - default
+    ports:
+      - 127.0.0.1:9200:9200
+      - 127.0.0.1:9201:9201
+      - 127.0.0.1:9300:9300
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+    hostname: es
+    depends_on:
+      - postgres
+
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:8.1.2
+    restart: always
+    networks:
+      - default
+    ports:
+      - 127.0.0.1:5601:5601
+    environment:
+      - ELASTICSEARCH_HOSTS="http://es:9200"
+    hostname: kibana
+    depends_on:
+      - postgres
 
 networks:
   default:
