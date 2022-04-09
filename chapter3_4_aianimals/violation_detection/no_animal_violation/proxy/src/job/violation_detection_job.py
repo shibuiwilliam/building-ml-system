@@ -8,7 +8,7 @@ from PIL import Image
 from src.configurations import Configurations
 from src.entities.animal import AnimalModel, AnimalQuery
 from src.entities.violation_type import ViolationTypeQuery
-from src.infrastructure.client.messaging import RabbitmqMessaging
+from src.infrastructure.messaging import RabbitmqMessaging
 from src.repository.animal_repository import AbstractAnimalRepository
 from src.repository.violation_type_repository import AbstractViolationTypeRepository
 from src.service.predictor import AbstractPredictor
