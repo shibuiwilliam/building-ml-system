@@ -48,21 +48,44 @@ class Infrastructures(containers.DeclarativeContainer):
     cache: AbstractCache = providers.Singleton(RedisCache)
 
 
-# class Repositories(containers.DeclarativeContainer):
-#     config = providers.Configuration()
-#     infrastructures = providers.DependenciesContainer()
+class Repositories(containers.DeclarativeContainer):
+    config = providers.Configuration()
+    infrastructures = providers.DependenciesContainer()
 
-#     table_repository: AbstractTableRepository = TableRepository()
-#     animal_category_repository: AbstractAnimalCategoryRepository = AnimalCategoryRepository(database=self.database)
-#     animal_subcategory_repository: AbstractAnimalSubcategoryRepository = AnimalSubcategoryRepository(
-#     atabase=self.database
+    table_repository: AbstractTableRepository = providers.DependenciesContainer(TableRepository)
+    animal_category_repository: AbstractAnimalCategoryRepository = providers.DependenciesContainer(
+        AnimalCategoryRepository,
+        database=infrastructures.database,
+    )
+    animal_subcategory_repository: AbstractAnimalSubcategoryRepository = providers.DependenciesContainer(
+        AnimalSubcategoryRepository,
+        database=infrastructures.database,
+    )
 
-#     animal_repository: AbstractAnimalRepository = AnimalRepository(database=self.database)
-#     user_repository: AbstractUserRepository = UserRepository(database=self.database)
-#     like_repository: AbstractLikeRepository = LikeRepository(database=self.database)
-#     violation_type_repository: AbstractViolationTypeRepository = ViolationTypeRepository(database=self.database)
-#     violation_repository: AbstractViolationRepository = ViolationRepository(database=self.database)
-#     access_log_repository: AbstractAccessLogRepository = AccessLogRepository(database=self.database)
+    animal_repository: AbstractAnimalRepository = providers.DependenciesContainer(
+        AnimalRepository,
+        database=infrastructures.database,
+    )
+    user_repository: AbstractUserRepository = providers.DependenciesContainer(
+        UserRepository,
+        database=infrastructures.database,
+    )
+    like_repository: AbstractLikeRepository = providers.DependenciesContainer(
+        LikeRepository,
+        database=infrastructures.database,
+    )
+    violation_type_repository: AbstractViolationTypeRepository = providers.DependenciesContainer(
+        ViolationTypeRepository,
+        database=infrastructures.database,
+    )
+    violation_repository: AbstractViolationRepository = providers.DependenciesContainer(
+        ViolationRepository,
+        database=infrastructures.database,
+    )
+    access_log_repository: AbstractAccessLogRepository = providers.DependenciesContainer(
+        AccessLogRepository,
+        database=infrastructures.database,
+    )
 
 
 class Container(object):

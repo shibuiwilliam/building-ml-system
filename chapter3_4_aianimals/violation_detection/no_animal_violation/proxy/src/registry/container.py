@@ -54,7 +54,7 @@ class Services(containers.DeclarativeContainer):
 class Jobs(containers.DeclarativeContainer):
     config = providers.Configuration()
     repositories = providers.DependenciesContainer()
-    predictors = providers.DependenciesContainer()
+    services = providers.DependenciesContainer()
     infrastructures = providers.DependenciesContainer()
 
     violation_detection_job: ViolationDetectionJob = providers.Factory(
@@ -62,7 +62,7 @@ class Jobs(containers.DeclarativeContainer):
         messaging=infrastructures.messaging,
         violation_type_repository=repositories.violation_type_repository,
         animal_repository=repositories.animal_repository,
-        predictor=predictors.no_violation_detection_predictor,
+        predictor=services.no_violation_detection_predictor,
     )
 
 
