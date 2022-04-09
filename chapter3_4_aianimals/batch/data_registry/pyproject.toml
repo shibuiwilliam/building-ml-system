@@ -16,6 +16,7 @@ pika = "^1.2.0"
 numpy = "^1.22.2"
 pandas = "^1.4.1"
 elasticsearch = {extras = ["async"], version = "^8.0.1"}
+dependency-injector = "^4.39.1"
 
 [tool.poetry.dev-dependencies]
 

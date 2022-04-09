@@ -17,6 +17,7 @@ tensorflow-serving-api = "^2.7.0"
 httpx = "^0.22.0"
 numpy = "^1.22.1"
 Pillow = "^9.0.1"
+dependency-injector = "^4.39.1"
 
 [tool.poetry.dev-dependencies]
 

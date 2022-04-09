@@ -17,6 +17,7 @@ fastapi = "^0.74.0"
 redis = "^4.1.4"
 onnxruntime = "^1.10.0"
 mlflow = "^1.24.0"
+dependency-injector = "^4.39.1"
 
 [tool.poetry.dev-dependencies]
 
