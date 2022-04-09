@@ -45,6 +45,7 @@ class NoViolationDetectionPredictor(AbstractPredictor):
         timeout: float = 10.0,
         retries: int = 3,
     ):
+        super().__init__()
         self.url = url
         self.height = height
         self.width = width

@@ -44,7 +44,7 @@ class Infrastructures(containers.DeclarativeContainer):
 
     database: AbstractDatabase = providers.Singleton(PostgreSQLDatabase)
     messaging: RabbitmqMessaging = providers.Singleton(RabbitmqMessaging)
-    search: ElasticsearchClient = providers.Singleton(ElasticsearchClient)
+    search: AbstractSearch = providers.Singleton(ElasticsearchClient)
     cache: AbstractCache = providers.Singleton(RedisCache)
 
 
@@ -52,129 +52,222 @@ class Repositories(containers.DeclarativeContainer):
     config = providers.Configuration()
     infrastructures = providers.DependenciesContainer()
 
-    table_repository: AbstractTableRepository = providers.DependenciesContainer(TableRepository)
-    animal_category_repository: AbstractAnimalCategoryRepository = providers.DependenciesContainer(
+    table_repository: AbstractTableRepository = providers.Factory(TableRepository)
+    animal_category_repository: AbstractAnimalCategoryRepository = providers.Factory(
         AnimalCategoryRepository,
         database=infrastructures.database,
     )
-    animal_subcategory_repository: AbstractAnimalSubcategoryRepository = providers.DependenciesContainer(
+    animal_subcategory_repository: AbstractAnimalSubcategoryRepository = providers.Factory(
         AnimalSubcategoryRepository,
         database=infrastructures.database,
     )
-
-    animal_repository: AbstractAnimalRepository = providers.DependenciesContainer(
+    animal_repository: AbstractAnimalRepository = providers.Factory(
         AnimalRepository,
         database=infrastructures.database,
     )
-    user_repository: AbstractUserRepository = providers.DependenciesContainer(
+    user_repository: AbstractUserRepository = providers.Factory(
         UserRepository,
         database=infrastructures.database,
     )
-    like_repository: AbstractLikeRepository = providers.DependenciesContainer(
+    like_repository: AbstractLikeRepository = providers.Factory(
         LikeRepository,
         database=infrastructures.database,
     )
-    violation_type_repository: AbstractViolationTypeRepository = providers.DependenciesContainer(
+    violation_type_repository: AbstractViolationTypeRepository = providers.Factory(
         ViolationTypeRepository,
         database=infrastructures.database,
     )
-    violation_repository: AbstractViolationRepository = providers.DependenciesContainer(
+    violation_repository: AbstractViolationRepository = providers.Factory(
         ViolationRepository,
         database=infrastructures.database,
     )
-    access_log_repository: AbstractAccessLogRepository = providers.DependenciesContainer(
+    access_log_repository: AbstractAccessLogRepository = providers.Factory(
         AccessLogRepository,
         database=infrastructures.database,
     )
 
 
-class Container(object):
-    def __init__(
-        self,
-        database: AbstractDatabase,
-        messaging: RabbitmqMessaging,
-        cache: AbstractCache,
-        search: AbstractSearch,
-    ):
-        self.database = database
-        self.search = search
-        self.cache = cache
-        self.messaging = messaging
-        self.messaging.init_channel()
-        for q in Configurations.animal_violation_queues:
-            self.messaging.create_queue(queue_name=q)
-        self.messaging.create_queue(queue_name=Configurations.animal_registry_queue)
-        self.messaging.create_queue(queue_name=Configurations.animal_feature_registry_queue)
+class Usecases(containers.DeclarativeContainer):
+    config = providers.Configuration()
+    repositories = providers.DependenciesContainer()
+    infrastructures = providers.DependenciesContainer()
 
-        self.table_repository: AbstractTableRepository = TableRepository()
-        self.animal_category_repository: AbstractAnimalCategoryRepository = AnimalCategoryRepository(
-            database=self.database
-        )
-        self.animal_subcategory_repository: AbstractAnimalSubcategoryRepository = AnimalSubcategoryRepository(
-            database=self.database
-        )
-        self.animal_repository: AbstractAnimalRepository = AnimalRepository(database=self.database)
-        self.user_repository: AbstractUserRepository = UserRepository(database=self.database)
-        self.like_repository: AbstractLikeRepository = LikeRepository(database=self.database)
-        self.violation_type_repository: AbstractViolationTypeRepository = ViolationTypeRepository(
-            database=self.database
-        )
-        self.violation_repository: AbstractViolationRepository = ViolationRepository(database=self.database)
-        self.access_log_repository: AbstractAccessLogRepository = AccessLogRepository(database=self.database)
-
-        self.table_usecase: AbstractTableUsecase = TableUsecase(table_repository=self.table_repository)
-        self.animal_category_usecase: AbstractAnimalCategoryUsecase = AnimalCategoryUsecase(
-            animal_category_repository=self.animal_category_repository,
-        )
-        self.animal_subcategory_usecase: AbstractAnimalSubcategoryUsecase = AnimalSubcategoryUsecase(
-            animal_subcategory_repository=self.animal_subcategory_repository,
-        )
-        self.user_usecase: AbstractUserUsecase = UserUsecase(
-            user_repository=self.user_repository,
-        )
-        self.animal_usecase: AbstractAnimalUsecase = AnimalUsecase(
-            animal_repository=self.animal_repository,
-            like_repository=self.like_repository,
-            messaging=self.messaging,
-            cache=self.cache,
-            search=self.search,
-        )
-        self.like_usecase: AbstractLikeUsecase = LikeUsecase(
-            like_repository=self.like_repository,
-        )
-        self.violation_type_usecase: AbstractViolationTypeUsecase = ViolationTypeUsecase(
-            violation_type_repository=self.violation_type_repository
-        )
-        self.violation_usecase: AbstractViolationUsecase = ViolationUsecase(
-            violation_repository=self.violation_repository,
-            animal_repository=self.animal_repository,
-        )
-        self.access_log_usecase: AbstractAccessLogUsecase = AccessLogUsecase(
-            access_log_repository=self.access_log_repository
-        )
-
-        self.initialization_job: InitializationJob = InitializationJob(
-            table_usecase=self.table_usecase,
-            animal_category_usecase=self.animal_category_usecase,
-            animal_subcategory_usecase=self.animal_subcategory_usecase,
-            user_usecase=self.user_usecase,
-            animal_usecase=self.animal_usecase,
-            violation_type_usecase=self.violation_type_usecase,
-            violation_usecase=self.violation_usecase,
-            like_usecase=self.like_usecase,
-            access_log_usecase=self.access_log_usecase,
-            messaging=self.messaging,
-            engine=self.database.engine,
-        )
-        self.animal_search_job: AnimalToSearchJob = AnimalToSearchJob(
-            animal_usecase=self.animal_usecase,
-            messaging=self.messaging,
-        )
+    table_usecase: AbstractTableUsecase = providers.Factory(
+        TableUsecase,
+        table_repository=repositories.table_repository,
+    )
+    animal_category_usecase: AbstractAnimalCategoryUsecase = providers.Factory(
+        AnimalCategoryUsecase,
+        animal_category_repository=repositories.animal_category_repository,
+    )
+    animal_subcategory_usecase: AbstractAnimalSubcategoryUsecase = providers.Factory(
+        AnimalSubcategoryUsecase,
+        animal_subcategory_repository=repositories.animal_subcategory_repository,
+    )
+    user_usecase: AbstractUserUsecase = providers.Factory(
+        UserUsecase,
+        user_repository=repositories.user_repository,
+    )
+    animal_usecase: AbstractAnimalUsecase = providers.Factory(
+        AnimalUsecase,
+        animal_repository=repositories.animal_repository,
+        like_repository=repositories.like_repository,
+        messaging=infrastructures.messaging,
+        cache=infrastructures.cache,
+        search=infrastructures.search,
+    )
+    like_usecase: AbstractLikeUsecase = providers.Factory(
+        LikeUsecase,
+        like_repository=repositories.like_repository,
+    )
+    violation_type_usecase: AbstractViolationTypeUsecase = providers.Factory(
+        ViolationTypeUsecase, violation_type_repository=repositories.violation_type_repository
+    )
+    violation_usecase: AbstractViolationUsecase = providers.Factory(
+        ViolationUsecase,
+        violation_repository=repositories.violation_repository,
+        animal_repository=repositories.animal_repository,
+    )
+    access_log_usecase: AbstractAccessLogUsecase = providers.Factory(
+        AccessLogUsecase,
+        access_log_repository=repositories.access_log_repository,
+    )
 
 
-container = Container(
-    database=PostgreSQLDatabase(),
-    search=ElasticsearchClient(),
-    messaging=RabbitmqMessaging(),
-    cache=RedisCache(),
-)
+class Jobs(containers.DeclarativeContainer):
+    config = providers.Configuration()
+    usecases = providers.DependenciesContainer()
+    infrastructures = providers.DependenciesContainer()
+
+    initialization_job: InitializationJob = providers.Factory(
+        InitializationJob,
+        table_usecase=usecases.table_usecase,
+        animal_category_usecase=usecases.animal_category_usecase,
+        animal_subcategory_usecase=usecases.animal_subcategory_usecase,
+        user_usecase=usecases.user_usecase,
+        animal_usecase=usecases.animal_usecase,
+        violation_type_usecase=usecases.violation_type_usecase,
+        violation_usecase=usecases.violation_usecase,
+        like_usecase=usecases.like_usecase,
+        access_log_usecase=usecases.access_log_usecase,
+        messaging=infrastructures.messaging,
+        engine=infrastructures.database.engine,
+    )
+    animal_search_job: AnimalToSearchJob = providers.Factory(
+        AnimalToSearchJob,
+        animal_usecase=usecases.animal_usecase,
+        messaging=infrastructures.messaging,
+    )
+
+
+class Container(containers.DeclarativeContainer):
+    config = providers.Configuration()
+
+    core = providers.Container(Core)
+    infrastructures = providers.Container(Infrastructures)
+    repositories = providers.Container(
+        Repositories,
+        infrastructures=infrastructures,
+    )
+    usecases = providers.Container(
+        Usecases,
+        repositories=repositories,
+        infrastructures=infrastructures,
+    )
+    jobs = providers.Container(
+        Jobs,
+        usecases=usecases,
+        infrastructures=infrastructures,
+    )
+
+
+# class Container(object):
+#     def __init__(
+#         self,
+#         database: AbstractDatabase,
+#         messaging: RabbitmqMessaging,
+#         cache: AbstractCache,
+#         search: AbstractSearch,
+#     ):
+#         self.database = database
+#         self.search = search
+#         self.cache = cache
+#         self.messaging = messaging
+#         self.messaging.init_channel()
+#         for q in Configurations.animal_violation_queues:
+#             self.messaging.create_queue(queue_name=q)
+#         self.messaging.create_queue(queue_name=Configurations.animal_registry_queue)
+#         self.messaging.create_queue(queue_name=Configurations.animal_feature_registry_queue)
+
+#         self.table_repository: AbstractTableRepository = TableRepository()
+#         self.animal_category_repository: AbstractAnimalCategoryRepository = AnimalCategoryRepository(
+#             database=self.database
+#         )
+#         self.animal_subcategory_repository: AbstractAnimalSubcategoryRepository = AnimalSubcategoryRepository(
+#             database=self.database
+#         )
+#         self.animal_repository: AbstractAnimalRepository = AnimalRepository(database=self.database)
+#         self.user_repository: AbstractUserRepository = UserRepository(database=self.database)
+#         self.like_repository: AbstractLikeRepository = LikeRepository(database=self.database)
+#         self.violation_type_repository: AbstractViolationTypeRepository = ViolationTypeRepository(
+#             database=self.database
+#         )
+#         self.violation_repository: AbstractViolationRepository = ViolationRepository(database=self.database)
+#         self.access_log_repository: AbstractAccessLogRepository = AccessLogRepository(database=self.database)
+
+#         self.table_usecase: AbstractTableUsecase = TableUsecase(table_repository=self.table_repository)
+#         self.animal_category_usecase: AbstractAnimalCategoryUsecase = AnimalCategoryUsecase(
+#             animal_category_repository=self.animal_category_repository,
+#         )
+#         self.animal_subcategory_usecase: AbstractAnimalSubcategoryUsecase = AnimalSubcategoryUsecase(
+#             animal_subcategory_repository=self.animal_subcategory_repository,
+#         )
+#         self.user_usecase: AbstractUserUsecase = UserUsecase(
+#             user_repository=self.user_repository,
+#         )
+#         self.animal_usecase: AbstractAnimalUsecase = AnimalUsecase(
+#             animal_repository=self.animal_repository,
+#             like_repository=self.like_repository,
+#             messaging=self.messaging,
+#             cache=self.cache,
+#             search=self.search,
+#         )
+#         self.like_usecase: AbstractLikeUsecase = LikeUsecase(
+#             like_repository=self.like_repository,
+#         )
+#         self.violation_type_usecase: AbstractViolationTypeUsecase = ViolationTypeUsecase(
+#             violation_type_repository=self.violation_type_repository
+#         )
+#         self.violation_usecase: AbstractViolationUsecase = ViolationUsecase(
+#             violation_repository=self.violation_repository,
+#             animal_repository=self.animal_repository,
+#         )
+#         self.access_log_usecase: AbstractAccessLogUsecase = AccessLogUsecase(
+#             access_log_repository=self.access_log_repository
+#         )
+
+#         self.initialization_job: InitializationJob = InitializationJob(
+#             table_usecase=self.table_usecase,
+#             animal_category_usecase=self.animal_category_usecase,
+#             animal_subcategory_usecase=self.animal_subcategory_usecase,
+#             user_usecase=self.user_usecase,
+#             animal_usecase=self.animal_usecase,
+#             violation_type_usecase=self.violation_type_usecase,
+#             violation_usecase=self.violation_usecase,
+#             like_usecase=self.like_usecase,
+#             access_log_usecase=self.access_log_usecase,
+#             messaging=self.messaging,
+#             engine=self.database.engine,
+#         )
+#         self.animal_search_job: AnimalToSearchJob = AnimalToSearchJob(
+#             animal_usecase=self.animal_usecase,
+#             messaging=self.messaging,
+#         )
+
+
+# container = Container(
+#     database=PostgreSQLDatabase(),
+#     search=ElasticsearchClient(),
+#     messaging=RabbitmqMessaging(),
+#     cache=RedisCache(),
+# )
