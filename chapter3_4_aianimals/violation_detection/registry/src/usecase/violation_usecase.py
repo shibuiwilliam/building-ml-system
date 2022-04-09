@@ -1,17 +1,15 @@
+import logging
 from abc import ABC, abstractmethod
 from typing import Optional
 
 from src.entities.animal import AnimalUpdate
 from src.entities.violation import ViolationCreate
-from src.middleware.logger import configure_logger
 from src.middleware.strings import get_uuid
 from src.repository.animal_repository import AbstractAnimalRepository
 from src.repository.violation_repository import AbstractViolationRepository
 from src.repository.violation_type_repository import AbstractViolationTypeRepository
 from src.request_object.violation import ViolationCreateRequest
 from src.response_object.violation import ViolationResponse
-
-logger = configure_logger(__name__)
 
 
 class AbstractViolationUsecase(ABC):
@@ -21,6 +19,7 @@ class AbstractViolationUsecase(ABC):
         violation_type_repository: AbstractViolationTypeRepository,
         animal_repository: AbstractAnimalRepository,
     ):
+        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.violation_repository = violation_repository
         self.violation_type_repository = violation_type_repository
         self.animal_repository = animal_repository

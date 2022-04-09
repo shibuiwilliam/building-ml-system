@@ -1,14 +1,12 @@
+import logging
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
 from sqlalchemy import and_
 from src.entities.violation import ViolationCreate, ViolationModel, ViolationQuery
 from src.infrastructure.database import AbstractDatabase
-from src.middleware.logger import configure_logger
 from src.schema.table import TABLES
 from src.schema.violation import Violation
-
-logger = configure_logger(__name__)
 
 
 class AbstractViolationRepository(ABC):
@@ -16,6 +14,7 @@ class AbstractViolationRepository(ABC):
         self,
         database: AbstractDatabase,
     ):
+        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.database = database
 
     @abstractmethod

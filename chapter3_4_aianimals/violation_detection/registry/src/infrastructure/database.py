@@ -1,17 +1,16 @@
+import logging
 import os
 from abc import ABC, abstractmethod
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker
-from src.middleware.logger import configure_logger
-
-logger = configure_logger(__name__)
 
 
 class AbstractDatabase(ABC):
     def __init__(self):
         self.engine: Engine
+        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
     @abstractmethod
     def get_session(self):

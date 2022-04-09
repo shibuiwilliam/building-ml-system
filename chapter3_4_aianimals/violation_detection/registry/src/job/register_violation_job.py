@@ -1,11 +1,9 @@
 import json
+import logging
 
-from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging
-from src.middleware.logger import configure_logger
+from src.infrastructure.messaging import RabbitmqMessaging
 from src.request_object.violation import ViolationCreateRequest
 from src.usecase.violation_usecase import AbstractViolationUsecase
-
-logger = configure_logger(__name__)
 
 
 class RegisterViolationJob(object):
@@ -14,6 +12,7 @@ class RegisterViolationJob(object):
         violation_usecase: AbstractViolationUsecase,
         messaging: RabbitmqMessaging,
     ):
+        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.violation_usecase = violation_usecase
         self.messaging = messaging
 
@@ -23,7 +22,7 @@ class RegisterViolationJob(object):
     ):
         def callback(ch, method, properties, body):
             data = json.loads(body)
-            logger.info(f"consumed data: {data}")
+            self.logger.info(f"consumed data: {data}")
             violation = ViolationCreateRequest(**data)
             self.violation_usecase.register(request=violation)
             ch.basic_ack(delivery_tag=method.delivery_tag)
@@ -39,10 +38,10 @@ class RegisterViolationJob(object):
                 queue=queue_name,
                 on_message_callback=callback,
             )
-            logger.info(f"Waiting for {queue_name} queue...")
+            self.logger.info(f"Waiting for {queue_name} queue...")
             self.messaging.channel.start_consuming()
         except Exception as e:
-            logger.exception(e)
+            self.logger.exception(e)
             raise e
         finally:
             self.messaging.close()
