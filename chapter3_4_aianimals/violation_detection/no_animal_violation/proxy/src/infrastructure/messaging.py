@@ -1,11 +1,9 @@
 import json
+import logging
 import os
 from typing import Dict
 
 import pika
-from src.middleware.logger import configure_logger
-
-logger = configure_logger(__name__)
 
 
 class RabbitmqMessaging(object):

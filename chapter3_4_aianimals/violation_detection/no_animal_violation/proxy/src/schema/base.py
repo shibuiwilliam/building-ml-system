@@ -1,6 +1,5 @@
-from sqlalchemy.ext.declarative import declarative_base
-from src.middleware.logger import configure_logger
+import logging
 
-logger = configure_logger(__name__)
+from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()

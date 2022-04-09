@@ -1,4 +1,5 @@
 import json
+import logging
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
@@ -6,9 +7,6 @@ import httpx
 import numpy as np
 from PIL import Image
 from pydantic import BaseModel
-from src.middleware.logger import configure_logger
-
-logger = configure_logger(__name__)
 
 
 class Prediction(BaseModel):
@@ -17,7 +15,7 @@ class Prediction(BaseModel):
 
 class AbstractPredictor(ABC):
     def __init__(self):
-        pass
+        self.logger = logging.getLogger(__name__)
 
     @abstractmethod
     def _preprocess(
@@ -80,10 +78,10 @@ class NoViolationDetectionPredictor(AbstractPredictor):
                 headers=self.headers,
             )
         if res.status_code != 200:
-            logger.error(f"prediction failed")
+            self.logger.error(f"prediction failed")
             return None
         response = res.json()
-        logger.info(f"prediction: {response}")
+        self.logger.info(f"prediction: {response}")
         return response["outputs"][0]
 
     def predict(

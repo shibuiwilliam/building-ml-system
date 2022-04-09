@@ -1,4 +1,5 @@
 import json
+import logging
 from io import BytesIO
 from typing import Dict, Optional
 
@@ -7,13 +8,10 @@ from PIL import Image
 from src.configurations import Configurations
 from src.entities.animal import AnimalModel, AnimalQuery
 from src.entities.violation_type import ViolationTypeQuery
-from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging
-from src.middleware.logger import configure_logger
+from src.infrastructure.client.messaging import RabbitmqMessaging
 from src.repository.animal_repository import AbstractAnimalRepository
 from src.repository.violation_type_repository import AbstractViolationTypeRepository
-from src.service.predictor import AbstractPredictor, Prediction
-
-logger = configure_logger(__name__)
+from src.service.predictor import AbstractPredictor
 
 
 class ViolationDetectionJob(object):
@@ -26,6 +24,7 @@ class ViolationDetectionJob(object):
         timeout: float = 10.0,
         retries: int = 3,
     ):
+        self.logger = logging.getLogger(__name__)
         self.messaging = messaging
         self.animal_repository = animal_repository
         self.violation_type_repository = violation_type_repository
@@ -48,7 +47,7 @@ class ViolationDetectionJob(object):
         ) as client:
             res = client.get(animal.photo_url)
         if res.status_code != 200:
-            logger.error(f"failed to download {animal.id} {animal.photo_url}")
+            self.logger.error(f"failed to download {animal.id} {animal.photo_url}")
             return None
         img = Image.open(BytesIO(res.content))
         if img.mode == "RGBA":
@@ -57,7 +56,7 @@ class ViolationDetectionJob(object):
             img = img_rgb
         prediction = self.predictor.predict(img=img)
         if prediction is None:
-            logger.error(f"failed to predict {animal.id}")
+            self.logger.error(f"failed to predict {animal.id}")
             return None
         return {
             "animal_id": animal.id,
@@ -86,7 +85,7 @@ class ViolationDetectionJob(object):
     ):
         def callback(ch, method, properties, body):
             data = json.loads(body)
-            logger.info(f"consumed data: {data}")
+            self.logger.info(f"consumed data: {data}")
             animals = self.animal_repository.select(
                 query=AnimalQuery(id=data["id"]),
                 limit=1,
@@ -94,7 +93,7 @@ class ViolationDetectionJob(object):
             )
 
             if len(animals) != 1:
-                logger.error(f"invalid animal select; cannot ack {method.delivery_tag}")
+                self.logger.error(f"invalid animal select; cannot ack {method.delivery_tag}")
 
             animal = animals[0]
             if Configurations.pseudo_prediction:
@@ -103,7 +102,7 @@ class ViolationDetectionJob(object):
                 violation = self.detect_violation(animal=animal)
 
             if violation is None:
-                logger.error(f"no prediction; cannot ack {method.delivery_tag}")
+                self.logger.error(f"no prediction; cannot ack {method.delivery_tag}")
             else:
                 self.messaging.publish(
                     queue_name=registration_queue,
@@ -126,11 +125,11 @@ class ViolationDetectionJob(object):
                 queue=consuming_queue,
                 on_message_callback=callback,
             )
-            logger.info(f"Waiting for {consuming_queue} queue...")
+            self.logger.info(f"Waiting for {consuming_queue} queue...")
             self.messaging.channel.start_consuming()
 
         except Exception as e:
-            logger.exception(e)
+            self.logger.exception(e)
             raise e
         finally:
             self.messaging.close()

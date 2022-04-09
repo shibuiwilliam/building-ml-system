@@ -1,11 +1,7 @@
-from logging import getLogger
-
 from sqlalchemy import Column, DateTime, String
 from sqlalchemy.sql.functions import current_timestamp
 from src.schema.base import Base
 from src.schema.table import TABLES
-
-logger = getLogger(__name__)
 
 
 class ViolationType(Base):
