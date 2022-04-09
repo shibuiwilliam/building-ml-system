@@ -14,6 +14,7 @@ class AbstractViolationTypeRepository(ABC):
         self,
         database: AbstractDatabase,
     ):
+        self.logger = logging.getLogger(__name__)
         self.database = database
 
     @abstractmethod
