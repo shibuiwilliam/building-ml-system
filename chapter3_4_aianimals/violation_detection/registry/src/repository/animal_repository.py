@@ -9,7 +9,7 @@ from src.schema.animal import Animal
 
 class AbstractAnimalRepository(ABC):
     def __init__(self, database: AbstractDatabase):
-        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
+        self.logger = logging.getLogger(__name__)
         self.database = database
 
     @abstractmethod

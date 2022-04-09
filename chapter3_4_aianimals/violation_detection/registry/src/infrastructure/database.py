@@ -10,7 +10,7 @@ from sqlalchemy.orm import sessionmaker
 class AbstractDatabase(ABC):
     def __init__(self):
         self.engine: Engine
-        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
+        self.logger = logging.getLogger(__name__)
 
     @abstractmethod
     def get_session(self):

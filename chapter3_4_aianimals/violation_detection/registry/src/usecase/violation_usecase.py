@@ -19,7 +19,7 @@ class AbstractViolationUsecase(ABC):
         violation_type_repository: AbstractViolationTypeRepository,
         animal_repository: AbstractAnimalRepository,
     ):
-        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
+        self.logger = logging.getLogger(__name__)
         self.violation_repository = violation_repository
         self.violation_type_repository = violation_type_repository
         self.animal_repository = animal_repository

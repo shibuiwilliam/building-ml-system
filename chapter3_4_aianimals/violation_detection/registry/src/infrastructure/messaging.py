@@ -6,7 +6,7 @@ import pika
 
 class RabbitmqMessaging(object):
     def __init__(self):
-        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
+        self.logger = logging.getLogger(__name__)
 
         self.__rabbitmq_host = os.getenv("RABBITMQ_HOST", "localhost")
         self.__rebbitmq_user = os.environ["RABBITMQ_USER"]

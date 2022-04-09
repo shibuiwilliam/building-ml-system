@@ -10,6 +10,7 @@ click==8.0.4; python_version >= "3.6"
 cloudpickle==2.0.0; python_version >= "3.6"
 colorama==0.4.4; python_version >= "3.6" and python_full_version < "3.0.0" and platform_system == "Windows" or platform_system == "Windows" and python_version >= "3.6" and python_full_version >= "3.5.0"
 databricks-cli==0.16.4; python_version >= "3.6"
+dependency-injector==4.39.1
 dill==0.3.4; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.1.0" and python_version >= "3.6"
 docker==5.0.3; python_version >= "3.6"
 entrypoints==0.4; python_version >= "3.6"

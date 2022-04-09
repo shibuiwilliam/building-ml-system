@@ -12,7 +12,7 @@ class RegisterViolationJob(object):
         violation_usecase: AbstractViolationUsecase,
         messaging: RabbitmqMessaging,
     ):
-        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
+        self.logger = logging.getLogger(__name__)
         self.violation_usecase = violation_usecase
         self.messaging = messaging
 
