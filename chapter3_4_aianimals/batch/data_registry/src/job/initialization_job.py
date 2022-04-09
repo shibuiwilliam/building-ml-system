@@ -2,8 +2,8 @@ import json
 from datetime import datetime
 from typing import Dict, List
 
-from sqlalchemy.engine import Engine
 from src.configurations import Configurations
+from src.infrastructure.database import AbstractDatabase
 from src.infrastructure.messaging import RabbitmqMessaging
 from src.job.abstract_job import AbstractJob
 from src.request_object.access_log import AccessLogCreateRequest
@@ -48,7 +48,7 @@ class InitializationJob(AbstractJob):
         like_usecase: AbstractLikeUsecase,
         access_log_usecase: AbstractAccessLogUsecase,
         messaging: RabbitmqMessaging,
-        engine: Engine,
+        database: AbstractDatabase,
     ):
         super().__init__()
         self.table_usecase = table_usecase
@@ -61,7 +61,7 @@ class InitializationJob(AbstractJob):
         self.like_usecase = like_usecase
         self.access_log_usecase = access_log_usecase
         self.messaging = messaging
-        self.engine = engine
+        self.database = database
 
     def __create_table(self):
         tables: List[Base] = [
@@ -78,7 +78,7 @@ class InitializationJob(AbstractJob):
         for table in tables:
             self.logger.info(f"create table: {table.__table__}")
             self.table_usecase.create_table(
-                engine=self.engine,
+                engine=self.database.engine,
                 table=table,
                 checkfirst=True,
             )
@@ -92,7 +92,7 @@ class InitializationJob(AbstractJob):
         for index in indices:
             self.logger.info(f"create index: {index}")
             self.table_usecase.create_index(
-                engine=self.engine,
+                engine=self.database.engine,
                 table=table,
                 column=index["column"],
                 checkfirst=True,
