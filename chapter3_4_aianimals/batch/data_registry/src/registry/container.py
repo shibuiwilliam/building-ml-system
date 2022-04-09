@@ -2,13 +2,10 @@ import logging.config
 
 from dependency_injector import containers, providers
 from src.configurations import Configurations
-from src.infrastructure.cache import AbstractCache
-from src.infrastructure.client.elastic_search import ElasticsearchClient
-from src.infrastructure.client.postgresql_database import PostgreSQLDatabase
-from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging
-from src.infrastructure.client.redis_cache import RedisCache
-from src.infrastructure.database import AbstractDatabase
-from src.infrastructure.search import AbstractSearch
+from src.infrastructure.cache import AbstractCache, RedisCache
+from src.infrastructure.database import AbstractDatabase, PostgreSQLDatabase
+from src.infrastructure.messaging import RabbitmqMessaging
+from src.infrastructure.search import AbstractSearch, ElasticsearchClient
 from src.job.animal_to_search_job import AnimalToSearchJob
 from src.job.initialization_job import InitializationJob
 from src.repository.access_log_repository import AbstractAccessLogRepository, AccessLogRepository
@@ -47,6 +44,25 @@ class Infrastructures(containers.DeclarativeContainer):
 
     database: AbstractDatabase = providers.Singleton(PostgreSQLDatabase)
     messaging: RabbitmqMessaging = providers.Singleton(RabbitmqMessaging)
+    search: ElasticsearchClient = providers.Singleton(ElasticsearchClient)
+    cache: AbstractCache = providers.Singleton(RedisCache)
+
+
+# class Repositories(containers.DeclarativeContainer):
+#     config = providers.Configuration()
+#     infrastructures = providers.DependenciesContainer()
+
+#     table_repository: AbstractTableRepository = TableRepository()
+#     animal_category_repository: AbstractAnimalCategoryRepository = AnimalCategoryRepository(database=self.database)
+#     animal_subcategory_repository: AbstractAnimalSubcategoryRepository = AnimalSubcategoryRepository(
+#     atabase=self.database
+
+#     animal_repository: AbstractAnimalRepository = AnimalRepository(database=self.database)
+#     user_repository: AbstractUserRepository = UserRepository(database=self.database)
+#     like_repository: AbstractLikeRepository = LikeRepository(database=self.database)
+#     violation_type_repository: AbstractViolationTypeRepository = ViolationTypeRepository(database=self.database)
+#     violation_repository: AbstractViolationRepository = ViolationRepository(database=self.database)
+#     access_log_repository: AbstractAccessLogRepository = AccessLogRepository(database=self.database)
 
 
 class Container(object):

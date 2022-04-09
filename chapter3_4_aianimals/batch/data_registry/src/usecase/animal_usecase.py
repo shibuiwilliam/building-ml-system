@@ -7,7 +7,7 @@ from src.configurations import Configurations
 from src.entities.animal import AnimalCreate, AnimalQuery
 from src.entities.animal_search import ANIMAL_MAPPING, ANIMAL_MAPPING_NAME, AnimalDocument
 from src.infrastructure.cache import AbstractCache
-from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging
+from src.infrastructure.messaging import RabbitmqMessaging
 from src.infrastructure.search import AbstractSearch
 from src.middleware.logger import configure_logger
 from src.repository.animal_repository import AbstractAnimalRepository

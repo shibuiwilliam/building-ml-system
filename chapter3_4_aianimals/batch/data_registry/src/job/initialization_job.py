@@ -5,7 +5,7 @@ from typing import Dict, List
 
 from sqlalchemy.engine import Engine
 from src.configurations import Configurations
-from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging
+from src.infrastructure.messaging import RabbitmqMessaging
 from src.job.abstract_job import AbstractJob
 from src.middleware.logger import configure_logger
 from src.request_object.access_log import AccessLogCreateRequest

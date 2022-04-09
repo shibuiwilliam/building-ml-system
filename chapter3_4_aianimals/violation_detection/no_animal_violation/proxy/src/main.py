@@ -1,10 +1,11 @@
 from dependency_injector.wiring import Provide, inject
 from src.configurations import Configurations
+from src.job.violation_detection_job import ViolationDetectionJob
 from src.registry.container import Container
 
 
 @inject
-def main(violation_detection_job: Provide[Container.jobs.violation_detection_job]):
+def main(violation_detection_job: ViolationDetectionJob = Provide[Container.jobs.violation_detection_job]):
     violation_detection_job.run(
         consuming_queue=Configurations.consuming_queue,
         registration_queue=Configurations.registration_queue,
