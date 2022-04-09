@@ -17,7 +17,6 @@ def main(
     for q in Configurations.animal_violation_queues:
         messaging.create_queue(queue_name=q)
     messaging.create_queue(queue_name=Configurations.animal_registry_queue)
-    messaging.create_queue(queue_name=Configurations.animal_feature_registry_queue)
 
     if Configurations.job == JOBS.ANIMAL_TO_SEARCH_JOB.value.name:
         animal_search_job.run()

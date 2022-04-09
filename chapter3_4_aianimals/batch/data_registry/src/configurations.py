@@ -35,7 +35,6 @@ class Configurations:
     )
 
     animal_registry_queue = os.getenv("ANIMAL_REGISTRY_QUEUE", "animal")
-    animal_feature_registry_queue = os.getenv("ANIMAL_FEATURE_REGISTRY_QUEUE", "animal_feature")
 
     animal_violation_queues = []
     for k, v in os.environ.items():

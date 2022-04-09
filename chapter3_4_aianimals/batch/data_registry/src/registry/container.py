@@ -151,7 +151,7 @@ class Jobs(containers.DeclarativeContainer):
         like_usecase=usecases.like_usecase,
         access_log_usecase=usecases.access_log_usecase,
         messaging=infrastructures.messaging,
-        engine=infrastructures.database.engine,
+        database=infrastructures.database,
     )
     animal_search_job: AnimalToSearchJob = providers.Factory(
         AnimalToSearchJob,
