@@ -44,7 +44,7 @@ class AccessLogUsecase(AbstractAccessLogUsecase):
     ):
         action = Action.value_to_key(value=request.action)
         if action is None:
-            logger.error(f"invalid action: {request.action}")
+            self.logger.error(f"invalid action: {request.action}")
             return
 
         self.access_log_repository.insert(
@@ -86,4 +86,4 @@ class AccessLogUsecase(AbstractAccessLogUsecase):
                 records=records[i : i + 200],
                 commit=True,
             )
-            logger.info(f"bulk register access log: {i} to {i+200}")
+            self.logger.info(f"bulk register access log: {i} to {i+200}")

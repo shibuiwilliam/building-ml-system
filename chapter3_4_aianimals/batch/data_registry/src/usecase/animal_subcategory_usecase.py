@@ -56,13 +56,13 @@ class AnimalSubcategoryUsecase(AbstractAnimalSubcategoryUsecase):
         self,
         request: AnimalSubcategoryCreateRequest,
     ) -> Optional[AnimalSubcategoryResponse]:
-        logger.info(f"register: {request}")
+        self.logger.info(f"register: {request}")
         exists = self.animal_subcategory_repository.select(
             query=AnimalSubcategoryQuery(id=request.id),
         )
         if len(exists) > 0:
             response = AnimalSubcategoryResponse(**exists[0].dict())
-            logger.info(f"exists: {response}")
+            self.logger.info(f"exists: {response}")
             return response
 
         data = self.animal_subcategory_repository.insert(
@@ -76,6 +76,6 @@ class AnimalSubcategoryUsecase(AbstractAnimalSubcategoryUsecase):
         )
         if data is not None:
             response = AnimalSubcategoryResponse(**data.dict())
-            logger.info(f"done register: {response}")
+            self.logger.info(f"done register: {response}")
             return response
         return None

@@ -71,7 +71,7 @@ class LikeUsecase(AbstractLikeUsecase):
         self,
         request: LikeCreateRequest,
     ) -> Optional[LikeResponse]:
-        logger.info(f"register: {request}")
+        self.logger.info(f"register: {request}")
         exists = self.like_repository.select(
             query=LikeQuery(
                 animal_id=request.animal_id,
@@ -80,7 +80,7 @@ class LikeUsecase(AbstractLikeUsecase):
         )
         if len(exists) > 0:
             response = LikeResponse(**exists[0].dict())
-            logger.info(f"exists: {response}")
+            self.logger.info(f"exists: {response}")
             return response
 
         data = self.like_repository.insert(
@@ -91,10 +91,10 @@ class LikeUsecase(AbstractLikeUsecase):
             ),
             commit=True,
         )
-        logger.info(f"registered: {data}")
+        self.logger.info(f"registered: {data}")
         if data is not None:
             response = LikeResponse(**data.dict())
-            logger.info(f"done register: {response}")
+            self.logger.info(f"done register: {response}")
             return response
         return None
 
@@ -117,4 +117,4 @@ class LikeUsecase(AbstractLikeUsecase):
                 records=_records,
                 commit=True,
             )
-            logger.info(f"bulk register like: {i} to {i+200}")
+            self.logger.info(f"bulk register like: {i} to {i+200}")

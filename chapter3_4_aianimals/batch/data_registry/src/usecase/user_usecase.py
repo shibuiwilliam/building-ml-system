@@ -72,13 +72,13 @@ class UserUsecase(AbstractUserUsecase):
         self,
         request: UserCreateRequest,
     ) -> Optional[UserResponse]:
-        logger.info(f"register: {request}")
+        self.logger.info(f"register: {request}")
         exists = self.user_repository.select(
             query=UserQuery(id=request.id),
         )
         if len(exists) > 0:
             response = UserResponse(**exists[0].dict())
-            logger.info(f"exists: {response}")
+            self.logger.info(f"exists: {response}")
             return response
 
         data = self.user_repository.insert(
@@ -94,7 +94,7 @@ class UserUsecase(AbstractUserUsecase):
         )
         if data is not None:
             response = UserResponse(**data.dict())
-            logger.info(f"done register: {response}")
+            self.logger.info(f"done register: {response}")
             return response
         return None
 
@@ -120,4 +120,4 @@ class UserUsecase(AbstractUserUsecase):
                 records=records[i : i + 200],
                 commit=True,
             )
-            logger.info(f"bulk register user: {i} to {i+200}")
+            self.logger.info(f"bulk register user: {i} to {i+200}")

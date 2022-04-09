@@ -56,13 +56,13 @@ class AnimalCategoryUsecase(AbstractAnimalCategoryUsecase):
         self,
         request: AnimalCategoryCreateRequest,
     ) -> Optional[AnimalCategoryResponse]:
-        logger.info(f"register: {request}")
+        self.logger.info(f"register: {request}")
         exists = self.animal_category_repository.select(
             query=AnimalCategoryQuery(id=request.id),
         )
         if len(exists) > 0:
             response = AnimalCategoryResponse(**exists[0].dict())
-            logger.info(f"exists: {response}")
+            self.logger.info(f"exists: {response}")
             return response
 
         data = self.animal_category_repository.insert(
@@ -75,6 +75,6 @@ class AnimalCategoryUsecase(AbstractAnimalCategoryUsecase):
         )
         if data is not None:
             response = AnimalCategoryResponse(**data.dict())
-            logger.info(f"done register: {response}")
+            self.logger.info(f"done register: {response}")
             return response
         return None

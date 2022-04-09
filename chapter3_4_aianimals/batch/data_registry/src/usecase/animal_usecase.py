@@ -119,13 +119,13 @@ class AnimalUsecase(AbstractAnimalUsecase):
         self,
         request: AnimalCreateRequest,
     ) -> Optional[AnimalResponse]:
-        logger.info(f"register: {request}")
+        self.logger.info(f"register: {request}")
         exists = self.animal_repository.select(
             query=AnimalQuery(id=request.id),
         )
         if len(exists) > 0:
             response = AnimalResponse(**exists[0].dict())
-            logger.info(f"data already exists: {response}")
+            self.logger.info(f"data already exists: {response}")
             return response
 
         record = AnimalCreate(
@@ -153,7 +153,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
                     queue_name=q,
                     body={"id": data.id},
                 )
-            logger.info(f"done register: {response}")
+            self.logger.info(f"done register: {response}")
             return response
         return None
 
@@ -173,7 +173,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
         self,
         animal_id: str,
     ):
-        logger.info(f"animal_id: {animal_id}")
+        self.logger.info(f"animal_id: {animal_id}")
         query = AnimalQuery(
             id=animal_id,
             deactivated=False,
@@ -216,12 +216,12 @@ class AnimalUsecase(AbstractAnimalUsecase):
                 id=animal.id,
                 body=document.dict(),
             )
-        logger.info(f"registered: {animal_id}")
+        self.logger.info(f"registered: {animal_id}")
 
     def register_document_from_queue(self):
         def callback(ch, method, properties, body):
             data = json.loads(body)
-            logger.info(f"consumed data: {data}")
+            self.logger.info(f"consumed data: {data}")
             self.register_document(animal_id=data["id"])
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
@@ -229,7 +229,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
             queue=Configurations.animal_registry_queue,
             on_message_callback=callback,
         )
-        logger.info(f"Waiting for {Configurations.animal_registry_queue} queue...")
+        self.logger.info(f"Waiting for {Configurations.animal_registry_queue} queue...")
         self.messaging.channel.start_consuming()
 
     def bulk_register(
@@ -256,7 +256,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
                 records=_records,
                 commit=True,
             )
-            logger.info(f"bulk register animal: {i} to {i+200}")
+            self.logger.info(f"bulk register animal: {i} to {i+200}")
             for r in _records:
                 self.messaging.publish(
                     queue_name=Configurations.animal_registry_queue,

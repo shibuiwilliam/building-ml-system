@@ -72,13 +72,13 @@ class ViolationUsecase(AbstractViolationUsecase):
         self,
         request: ViolationCreateRequest,
     ) -> Optional[ViolationResponse]:
-        logger.info(f"register: {request}")
+        self.logger.info(f"register: {request}")
         exists = self.violation_repository.select(
             query=ViolationQuery(id=request.id),
         )
         if len(exists) > 0:
             response = ViolationResponse(**exists[0].dict())
-            logger.info(f"exists: {response}")
+            self.logger.info(f"exists: {response}")
             return response
 
         data = self.violation_repository.insert(
@@ -101,6 +101,6 @@ class ViolationUsecase(AbstractViolationUsecase):
         )
         if data is not None:
             response = ViolationResponse(**data.dict())
-            logger.info(f"done register: {response}")
+            self.logger.info(f"done register: {response}")
             return response
         return None

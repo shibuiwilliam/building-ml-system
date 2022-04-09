@@ -41,13 +41,13 @@ class TableRepository(AbstractTableRepository):
         table: Base,
         checkfirst: bool = True,
     ):
-        logger.info(f"create table: {table.__table__}")
+        self.logger.info(f"create table: {table.__table__}")
         Base.metadata.create_all(
             engine,
             checkfirst=checkfirst,
             tables=[table.__table__],
         )
-        logger.info(f"done create table: {table.__table__}")
+        self.logger.info(f"done create table: {table.__table__}")
 
     def create_index(
         self,
@@ -58,7 +58,7 @@ class TableRepository(AbstractTableRepository):
         unique: bool = False,
     ) -> Index:
         index_name = f"{table.__tablename__}_{column.name}_index"
-        logger.info(f"create index: {index_name}")
+        self.logger.info(f"create index: {index_name}")
         index = Index(
             index_name,
             column,
@@ -68,5 +68,5 @@ class TableRepository(AbstractTableRepository):
             bind=engine,
             checkfirst=checkfirst,
         )
-        logger.info(f"done create index: {index_name}")
+        self.logger.info(f"done create index: {index_name}")
         return index
