@@ -33,7 +33,7 @@ class AbstractTableRepository(ABC):
 
 class TableRepository(AbstractTableRepository):
     def __init__(self):
-        pass
+        super().__init__()
 
     def create_table(
         self,
