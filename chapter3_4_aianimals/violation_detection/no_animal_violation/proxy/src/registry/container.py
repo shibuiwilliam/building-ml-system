@@ -22,8 +22,8 @@ class Core(containers.DeclarativeContainer):
 class Infrastructures(containers.DeclarativeContainer):
     config = providers.Configuration()
 
-    database: AbstractDatabase = providers.Singleton(PostgreSQLDatabase())
-    messaging: RabbitmqMessaging = providers.Singleton(RabbitmqMessaging())
+    database: AbstractDatabase = providers.Singleton(PostgreSQLDatabase)
+    messaging: RabbitmqMessaging = providers.Singleton(RabbitmqMessaging)
 
 
 class Repositories(containers.DeclarativeContainer):

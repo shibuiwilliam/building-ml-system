@@ -39,3 +39,5 @@ class Configurations:
     for k, v in os.environ.items():
         if k.startswith("ANIMAL_VIOLATION_QUEUE_"):
             animal_violation_queues.append(v)
+
+    logging_file = "/opt/src/logging.ini"

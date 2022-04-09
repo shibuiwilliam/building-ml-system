@@ -1,3 +1,6 @@
+import logging.config
+
+from dependency_injector import containers, providers
 from src.configurations import Configurations
 from src.infrastructure.cache import AbstractCache
 from src.infrastructure.client.elastic_search import ElasticsearchClient
@@ -8,7 +11,6 @@ from src.infrastructure.database import AbstractDatabase
 from src.infrastructure.search import AbstractSearch
 from src.job.animal_to_search_job import AnimalToSearchJob
 from src.job.initialization_job import InitializationJob
-from src.middleware.logger import configure_logger
 from src.repository.access_log_repository import AbstractAccessLogRepository, AccessLogRepository
 from src.repository.animal_category_repository import AbstractAnimalCategoryRepository, AnimalCategoryRepository
 from src.repository.animal_repository import AbstractAnimalRepository, AnimalRepository
@@ -31,7 +33,20 @@ from src.usecase.user_usecase import AbstractUserUsecase, UserUsecase
 from src.usecase.violation_type_usecase import AbstractViolationTypeUsecase, ViolationTypeUsecase
 from src.usecase.violation_usecase import AbstractViolationUsecase, ViolationUsecase
 
-logger = configure_logger(__name__)
+
+class Core(containers.DeclarativeContainer):
+    config = providers.Configuration()
+    logging = providers.Resource(
+        logging.config.fileConfig,
+        fname=Configurations.logging_file,
+    )
+
+
+class Infrastructures(containers.DeclarativeContainer):
+    config = providers.Configuration()
+
+    database: AbstractDatabase = providers.Singleton(PostgreSQLDatabase)
+    messaging: RabbitmqMessaging = providers.Singleton(RabbitmqMessaging)
 
 
 class Container(object):
