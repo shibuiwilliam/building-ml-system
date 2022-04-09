@@ -1,48 +1,88 @@
-from src.infrastructure.client.postgresql_database import PostgreSQLDatabase
-from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging
-from src.infrastructure.database import AbstractDatabase
+import logging.config
+
+from dependency_injector import containers, providers
+from src.configurations import Configurations
+from src.infrastructure.database import AbstractDatabase, PostgreSQLDatabase
+from src.infrastructure.messaging import RabbitmqMessaging
 from src.job.register_violation_job import RegisterViolationJob
-from src.middleware.logger import configure_logger
-from src.repository.animal_repository import AbstractAnimalRepository
-from src.repository.implementation.animal_repository import AnimalRepository
-from src.repository.implementation.violation_repository import ViolationRepository
-from src.repository.implementation.violation_type_repository import ViolationTypeRepository
-from src.repository.violation_repository import AbstractViolationRepository
-from src.repository.violation_type_repository import AbstractViolationTypeRepository
-from src.usecase.implementation.violation_usecase import ViolationUsecase
-from src.usecase.violation_usecase import AbstractViolationUsecase
-
-logger = configure_logger(__name__)
+from src.repository.animal_repository import AbstractAnimalRepository, AnimalRepository
+from src.repository.violation_repository import AbstractViolationRepository, ViolationRepository
+from src.repository.violation_type_repository import AbstractViolationTypeRepository, ViolationTypeRepository
+from src.usecase.violation_usecase import AbstractViolationUsecase, ViolationUsecase
 
 
-class Container(object):
-    def __init__(
-        self,
-        database: AbstractDatabase,
-        messaging: RabbitmqMessaging,
-    ):
-        self.database = database
-        self.messaging = messaging
-
-        self.animal_repository: AbstractAnimalRepository = AnimalRepository(database=self.database)
-        self.violation_type_repository: AbstractViolationTypeRepository = ViolationTypeRepository(
-            database=self.database
-        )
-        self.violation_repository: AbstractViolationRepository = ViolationRepository(database=database)
-
-        self.violation_usecase: AbstractViolationUsecase = ViolationUsecase(
-            violation_repository=self.violation_repository,
-            violation_type_repository=self.violation_type_repository,
-            animal_repository=self.animal_repository,
-        )
-
-        self.register_violation_job: RegisterViolationJob = RegisterViolationJob(
-            violation_usecase=self.violation_usecase,
-            messaging=self.messaging,
-        )
+class Core(containers.DeclarativeContainer):
+    config = providers.Configuration()
+    logging = providers.Resource(
+        logging.config.fileConfig,
+        fname=Configurations.logging_file,
+    )
 
 
-container = Container(
-    database=PostgreSQLDatabase(),
-    messaging=RabbitmqMessaging(),
-)
+class Infrastructures(containers.DeclarativeContainer):
+    config = providers.Configuration()
+
+    database: AbstractDatabase = providers.Singleton(PostgreSQLDatabase())
+    messaging: RabbitmqMessaging = providers.Singleton(RabbitmqMessaging())
+
+
+class Repositories(containers.DeclarativeContainer):
+    config = providers.Configuration()
+    infrastructures = providers.DependenciesContainer()
+
+    animal_repository: AbstractAnimalRepository = providers.Factory(
+        AnimalRepository,
+        database=infrastructures.database,
+    )
+    violation_type_repository: AbstractViolationTypeRepository = providers.Factory(
+        ViolationTypeRepository,
+        database=infrastructures.database,
+    )
+    violation_repository: AbstractViolationRepository = providers.Factory(
+        ViolationRepository,
+        database=infrastructures.database,
+    )
+
+
+class Usecases(containers.DeclarativeContainer):
+    config = providers.Configuration()
+    repositories = providers.DependenciesContainer()
+
+    violation_usecase: AbstractViolationUsecase = providers.Factory(
+        ViolationUsecase,
+        violation_repository=repositories.violation_repository,
+        violation_type_repository=repositories.violation_type_repository,
+        animal_repository=repositories.animal_repository,
+    )
+
+
+class Jobs(containers.DeclarativeContainer):
+    config = providers.Configuration()
+    usecases = providers.DependenciesContainer()
+    infrastructures = providers.DependenciesContainer()
+
+    register_violation_job: RegisterViolationJob = providers.Factory(
+        RegisterViolationJob,
+        violation_usecase=usecases.violation_usecase,
+        messaging=infrastructures.messaging,
+    )
+
+
+class Container(containers.DeclarativeContainer):
+    config = providers.Configuration()
+
+    core = providers.Container(Core)
+    infrastructures = providers.Container(Infrastructures)
+    repositories = providers.Container(
+        Repositories,
+        infrastructures=infrastructures,
+    )
+    usecases = providers.Container(
+        Usecases,
+        repositories=repositories,
+    )
+    jobs = providers.Container(
+        Jobs,
+        usecases=usecases,
+        infrastructures=infrastructures,
+    )

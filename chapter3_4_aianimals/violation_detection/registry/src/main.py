@@ -1,14 +1,15 @@
+from dependency_injector.wiring import Provide, inject
 from src.configurations import Configurations
-from src.middleware.logger import configure_logger
-from src.registry.container import container
-
-logger = configure_logger(__name__)
+from src.registry.container import Container
 
 
-def main():
-    logger.info("START...")
-    container.register_violation_job.run(queue_name=Configurations.violation_queue)
+@inject
+def main(register_violation_job: Provide[Container.jobs.register_violation_job]):
+    register_violation_job.run(queue_name=Configurations.violation_queue)
 
 
 if __name__ == "__main__":
+    container = Container()
+    container.init_resources()
+    container.wire(modules=[__name__])
     main()
