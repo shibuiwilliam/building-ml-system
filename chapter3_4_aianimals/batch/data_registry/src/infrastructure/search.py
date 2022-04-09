@@ -1,16 +1,14 @@
+import logging
 import os
 from abc import ABC, abstractmethod
 from typing import Dict, Union
 
 from elasticsearch import Elasticsearch
-from src.middleware.logger import configure_logger
-
-logger = configure_logger(__name__)
 
 
 class AbstractSearch(ABC):
     def __init__(self):
-        pass
+        self.logger = logging.getLogger(__name__)
 
     @abstractmethod
     def create_index(
@@ -84,12 +82,12 @@ class ElasticsearchClient(AbstractSearch):
         index: str,
         body: Dict,
     ):
-        logger.info(f"register index {index} with body {body}")
+        self.logger.info(f"register index {index} with body {body}")
         self.es_client.indices.create(
             index=index,
             body=body,
         )
-        logger.info(f"done register index {index} with body {body}")
+        self.logger.info(f"done register index {index} with body {body}")
 
     def get_index(
         self,
@@ -102,7 +100,7 @@ class ElasticsearchClient(AbstractSearch):
         index: str,
     ) -> bool:
         indices = self.es_client.cat.indices(index="*", h="index").splitlines()
-        logger.info(f"indices: {indices}")
+        self.logger.info(f"indices: {indices}")
         return index in indices
 
     def create_document(
@@ -111,7 +109,7 @@ class ElasticsearchClient(AbstractSearch):
         id: Union[str, int],
         body: Dict,
     ):
-        logger.info(f"register document in index {index} with id {id} and body {body}")
+        self.logger.info(f"register document in index {index} with id {id} and body {body}")
         self.es_client.create(
             index=index,
             id=id,
@@ -124,7 +122,7 @@ class ElasticsearchClient(AbstractSearch):
         id: Union[str, int],
         doc: Dict,
     ):
-        logger.info(f"update document in index {index} with id {id} and body {doc}")
+        self.logger.info(f"update document in index {index} with id {id} and body {doc}")
         self.es_client.update(
             index=index,
             id=id,
@@ -141,5 +139,5 @@ class ElasticsearchClient(AbstractSearch):
             index=index,
             id=id,
         )
-        logger.info(f"exists: {exists}")
+        self.logger.info(f"exists: {exists}")
         return exists

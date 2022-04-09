@@ -1,13 +1,11 @@
+import logging
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
 from src.entities.animal_subcategory import AnimalSubcategoryCreate, AnimalSubcategoryQuery
-from src.middleware.logger import configure_logger
 from src.repository.animal_subcategory_repository import AbstractAnimalSubcategoryRepository
 from src.request_object.animal_subcategory import AnimalSubcategoryCreateRequest, AnimalSubcategoryRequest
 from src.response_object.animal_subcategory import AnimalSubcategoryResponse
-
-logger = configure_logger(__name__)
 
 
 class AbstractAnimalSubcategoryUsecase(ABC):
@@ -15,6 +13,7 @@ class AbstractAnimalSubcategoryUsecase(ABC):
         self,
         animal_subcategory_repository: AbstractAnimalSubcategoryRepository,
     ):
+        self.logger = logging.getLogger(__name__)
         self.animal_subcategory_repository = animal_subcategory_repository
 
     @abstractmethod

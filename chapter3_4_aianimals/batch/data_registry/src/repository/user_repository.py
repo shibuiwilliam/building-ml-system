@@ -1,14 +1,12 @@
+import logging
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
 from sqlalchemy import and_
 from src.entities.user import UserCreate, UserModel, UserQuery
 from src.infrastructure.database import AbstractDatabase
-from src.middleware.logger import configure_logger
 from src.schema.table import TABLES
 from src.schema.user import User
-
-logger = configure_logger(__name__)
 
 
 class AbstractUserRepository(ABC):
@@ -16,6 +14,7 @@ class AbstractUserRepository(ABC):
         self,
         database: AbstractDatabase,
     ):
+        self.logger = logging.getLogger(__name__)
         self.database = database
 
     @abstractmethod

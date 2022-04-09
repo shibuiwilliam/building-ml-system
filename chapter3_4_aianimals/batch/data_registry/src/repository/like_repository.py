@@ -1,3 +1,4 @@
+import logging
 from abc import ABC, abstractmethod
 from typing import Dict, List, Optional
 
@@ -5,11 +6,8 @@ from sqlalchemy import and_, func
 from src.entities.common import Count
 from src.entities.like import LikeCreate, LikeModel, LikeQuery
 from src.infrastructure.database import AbstractDatabase
-from src.middleware.logger import configure_logger
 from src.schema.like import Like
 from src.schema.table import TABLES
-
-logger = configure_logger(__name__)
 
 
 class AbstractLikeRepository(ABC):
@@ -17,6 +15,7 @@ class AbstractLikeRepository(ABC):
         self,
         database: AbstractDatabase,
     ):
+        self.logger = logging.getLogger(__name__)
         self.database = database
 
     @abstractmethod

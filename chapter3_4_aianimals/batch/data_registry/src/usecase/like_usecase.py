@@ -1,14 +1,12 @@
+import logging
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
 from src.entities.like import LikeCreate, LikeQuery
-from src.middleware.logger import configure_logger
 from src.middleware.strings import get_uuid
 from src.repository.like_repository import AbstractLikeRepository
 from src.request_object.like import LikeCreateRequest, LikeRequest
 from src.response_object.like import LikeResponse
-
-logger = configure_logger(__name__)
 
 
 class AbstractLikeUsecase(ABC):
@@ -16,6 +14,7 @@ class AbstractLikeUsecase(ABC):
         self,
         like_repository: AbstractLikeRepository,
     ):
+        self.logger = logging.getLogger(__name__)
         self.like_repository = like_repository
 
     @abstractmethod

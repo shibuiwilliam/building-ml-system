@@ -1,13 +1,11 @@
+import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import List
 
 from src.entities.access_log import AccessLogCreate, Action
-from src.middleware.logger import configure_logger
 from src.repository.access_log_repository import AbstractAccessLogRepository
 from src.request_object.access_log import AccessLogCreateRequest
-
-logger = configure_logger(__name__)
 
 
 class AbstractAccessLogUsecase(ABC):
@@ -15,6 +13,7 @@ class AbstractAccessLogUsecase(ABC):
         self,
         access_log_repository: AbstractAccessLogRepository,
     ):
+        self.logger = logging.getLogger(__name__)
         self.access_log_repository = access_log_repository
 
     @abstractmethod

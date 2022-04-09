@@ -1,13 +1,11 @@
 import json
 from datetime import datetime
-from re import I
 from typing import Dict, List
 
 from sqlalchemy.engine import Engine
 from src.configurations import Configurations
 from src.infrastructure.messaging import RabbitmqMessaging
 from src.job.abstract_job import AbstractJob
-from src.middleware.logger import configure_logger
 from src.request_object.access_log import AccessLogCreateRequest
 from src.request_object.animal import AnimalCreateRequest
 from src.request_object.animal_category import AnimalCategoryCreateRequest
@@ -35,8 +33,6 @@ from src.usecase.table_usecase import AbstractTableUsecase
 from src.usecase.user_usecase import AbstractUserUsecase
 from src.usecase.violation_type_usecase import AbstractViolationTypeUsecase
 from src.usecase.violation_usecase import AbstractViolationUsecase
-
-logger = configure_logger(__name__)
 
 
 class InitializationJob(AbstractJob):
@@ -80,13 +76,13 @@ class InitializationJob(AbstractJob):
             AnimalFeature,
         ]
         for table in tables:
-            logger.info(f"create table: {table.__table__}")
+            self.logger.info(f"create table: {table.__table__}")
             self.table_usecase.create_table(
                 engine=self.engine,
                 table=table,
                 checkfirst=True,
             )
-            logger.info(f"done create table: {table.__table__}")
+            self.logger.info(f"done create table: {table.__table__}")
 
     def __create_index(
         self,
@@ -94,7 +90,7 @@ class InitializationJob(AbstractJob):
         table: Base,
     ):
         for index in indices:
-            logger.info(f"create index: {index}")
+            self.logger.info(f"create index: {index}")
             self.table_usecase.create_index(
                 engine=self.engine,
                 table=table,
@@ -102,7 +98,7 @@ class InitializationJob(AbstractJob):
                 checkfirst=True,
                 unique=index["unique"],
             )
-            logger.info(f"done create index: {index}")
+            self.logger.info(f"done create index: {index}")
 
     def __create_indices(self):
         animal_category_indices = [
@@ -184,28 +180,28 @@ class InitializationJob(AbstractJob):
         self,
         file_path: str,
     ):
-        logger.info(f"register animal category: {file_path}")
+        self.logger.info(f"register animal category: {file_path}")
         with open(file_path, "r") as f:
             data = json.load(f)
         for k, v in data.items():
-            logger.info(f"animal category {k} {v}")
+            self.logger.info(f"animal category {k} {v}")
             request = AnimalCategoryCreateRequest(
                 id=v["category"],
                 name_en=v["name_en"],
                 name_ja=v["name_ja"],
             )
             self.animal_category_usecase.register(request=request)
-        logger.info(f"done register animal category: {file_path}")
+        self.logger.info(f"done register animal category: {file_path}")
 
     def __register_animal_subcategory(
         self,
         file_path: str,
     ):
-        logger.info(f"register animal subcategory: {file_path}")
+        self.logger.info(f"register animal subcategory: {file_path}")
         with open(file_path, "r") as f:
             data = json.load(f)
         for k, v in data.items():
-            logger.info(f"animal subcategory {k} {v}")
+            self.logger.info(f"animal subcategory {k} {v}")
             request = AnimalSubcategoryCreateRequest(
                 id=v["subcategory"],
                 animal_category_id=v["category"],
@@ -213,13 +209,13 @@ class InitializationJob(AbstractJob):
                 name_ja=v["name_ja"],
             )
             self.animal_subcategory_usecase.register(request=request)
-        logger.info(f"done register animal subcategory: {file_path}")
+        self.logger.info(f"done register animal subcategory: {file_path}")
 
     def __register_violation_type(
         self,
         file_path: str,
     ):
-        logger.info(f"register violation type: {file_path}")
+        self.logger.info(f"register violation type: {file_path}")
         with open(file_path, "r") as f:
             data = json.load(f)
         for k, v in data.items():
@@ -228,13 +224,13 @@ class InitializationJob(AbstractJob):
                 name=v["name"],
             )
             self.violation_type_usecase.register(request=request)
-        logger.info(f"done register violation type: {file_path}")
+        self.logger.info(f"done register violation type: {file_path}")
 
     def __register_user(
         self,
         file_path: str,
     ):
-        logger.info(f"register user: {file_path}")
+        self.logger.info(f"register user: {file_path}")
         with open(file_path, "r") as f:
             data = json.load(f)
         requests = []
@@ -251,13 +247,13 @@ class InitializationJob(AbstractJob):
                 )
             )
         self.user_usecase.bulk_register(requests=requests)
-        logger.info(f"done register user: {file_path}")
+        self.logger.info(f"done register user: {file_path}")
 
     def __register_animal(
         self,
         file_path: str,
     ):
-        logger.info(f"register animal: {file_path}")
+        self.logger.info(f"register animal: {file_path}")
         with open(file_path, "r") as f:
             data = json.load(f)
         try:
@@ -278,17 +274,17 @@ class InitializationJob(AbstractJob):
                 )
             self.animal_usecase.bulk_register(requests=requests)
         except Exception as e:
-            logger.exception(e)
+            self.logger.exception(e)
             raise e
         finally:
             self.messaging.close()
-        logger.info(f"done register animal: {file_path}")
+        self.logger.info(f"done register animal: {file_path}")
 
     def __register_violation(
         self,
         file_path: str,
     ):
-        logger.info(f"register violation: {file_path}")
+        self.logger.info(f"register violation: {file_path}")
         with open(file_path, "r") as f:
             data = json.load(f)
         for k, v in data.items():
@@ -301,13 +297,13 @@ class InitializationJob(AbstractJob):
                 is_effective=v["is_effective"],
             )
             self.violation_usecase.register(request=request)
-        logger.info(f"done register violation: {file_path}")
+        self.logger.info(f"done register violation: {file_path}")
 
     def __register_like(
         self,
         file_path: str,
     ):
-        logger.info(f"register like: {file_path}")
+        self.logger.info(f"register like: {file_path}")
         with open(file_path, "r") as f:
             data = json.load(f)
         requests = []
@@ -321,13 +317,13 @@ class InitializationJob(AbstractJob):
                 )
             )
         self.like_usecase.bulk_register(requests=requests)
-        logger.info(f"done register like: {file_path}")
+        self.logger.info(f"done register like: {file_path}")
 
     def __register_access_log(
         self,
         file_path: str,
     ):
-        logger.info(f"register access log: {file_path}")
+        self.logger.info(f"register access log: {file_path}")
         with open(file_path, "r") as f:
             data = json.load(f)
         requests = []
@@ -346,10 +342,10 @@ class InitializationJob(AbstractJob):
                 )
             )
         self.access_log_usecase.bulk_register(requests=requests)
-        logger.info(f"done register access_log: {file_path}")
+        self.logger.info(f"done register access_log: {file_path}")
 
     def run(self):
-        logger.info("run initialize database")
+        self.logger.info("run initialize database")
         self.__create_table()
         self.__create_indices()
         self.__register_violation_type(file_path=Configurations.violation_type_file)

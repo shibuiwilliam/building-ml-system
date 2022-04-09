@@ -1,14 +1,12 @@
+import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import List, Optional
 
 from src.entities.user import UserCreate, UserQuery
-from src.middleware.logger import configure_logger
 from src.repository.user_repository import AbstractUserRepository
 from src.request_object.user import UserCreateRequest, UserRequest
 from src.response_object.user import UserResponse
-
-logger = configure_logger(__name__)
 
 
 class AbstractUserUsecase(ABC):
@@ -16,6 +14,7 @@ class AbstractUserUsecase(ABC):
         self,
         user_repository: AbstractUserRepository,
     ):
+        self.logger = logging.getLogger(__name__)
         self.user_repository = user_repository
 
     @abstractmethod

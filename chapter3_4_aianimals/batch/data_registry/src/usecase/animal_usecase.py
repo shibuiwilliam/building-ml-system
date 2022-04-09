@@ -1,4 +1,5 @@
 import json
+import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Dict, List, Optional
@@ -9,13 +10,10 @@ from src.entities.animal_search import ANIMAL_MAPPING, ANIMAL_MAPPING_NAME, Anim
 from src.infrastructure.cache import AbstractCache
 from src.infrastructure.messaging import RabbitmqMessaging
 from src.infrastructure.search import AbstractSearch
-from src.middleware.logger import configure_logger
 from src.repository.animal_repository import AbstractAnimalRepository
 from src.repository.like_repository import AbstractLikeRepository
 from src.request_object.animal import AnimalCreateRequest, AnimalRequest
 from src.response_object.animal import AnimalResponse, AnimalResponseWithLike
-
-logger = configure_logger(__name__)
 
 
 class AbstractAnimalUsecase(ABC):
@@ -27,6 +25,7 @@ class AbstractAnimalUsecase(ABC):
         messaging: RabbitmqMessaging,
         cache: AbstractCache,
     ):
+        self.logger = logging.getLogger(__name__)
         self.animal_repository = animal_repository
         self.like_repository = like_repository
         self.search = search

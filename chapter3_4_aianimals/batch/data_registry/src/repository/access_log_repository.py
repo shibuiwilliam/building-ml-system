@@ -1,13 +1,11 @@
+import logging
 from abc import ABC, abstractmethod
 from typing import List
 
 from src.entities.access_log import AccessLogCreate
 from src.infrastructure.database import AbstractDatabase
-from src.middleware.logger import configure_logger
 from src.schema.access_log import AccessLog
 from src.schema.table import TABLES
-
-logger = configure_logger(__name__)
 
 
 class AbstractAccessLogRepository(ABC):
@@ -15,6 +13,7 @@ class AbstractAccessLogRepository(ABC):
         self,
         database: AbstractDatabase,
     ):
+        self.logger = logging.getLogger(__name__)
         self.database = database
 
     @abstractmethod

@@ -1,3 +1,4 @@
+import logging
 import os
 from abc import ABC, abstractmethod
 from typing import Optional, Union
@@ -7,7 +8,7 @@ import redis
 
 class AbstractCache(ABC):
     def __init__(self):
-        pass
+        self.logger = logging.getLogger(__name__)
 
     @abstractmethod
     def set(

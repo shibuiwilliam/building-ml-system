@@ -2,11 +2,8 @@ from sqlalchemy import Column, DateTime, ForeignKey, String
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.sql.functions import current_timestamp
 from sqlalchemy.sql.sqltypes import INT
-from src.middleware.logger import configure_logger
 from src.schema.base import Base
 from src.schema.table import TABLES
-
-logger = configure_logger(__name__)
 
 
 class AnimalFeature(Base):

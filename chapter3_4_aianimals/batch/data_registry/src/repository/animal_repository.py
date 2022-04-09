@@ -1,20 +1,19 @@
+import logging
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
 from sqlalchemy import and_
 from src.entities.animal import AnimalCreate, AnimalModel, AnimalQuery, AnimalUpdate
 from src.infrastructure.database import AbstractDatabase
-from src.middleware.logger import configure_logger
 from src.schema.animal import Animal
 from src.schema.animal_category import AnimalCategory
 from src.schema.animal_subcategory import AnimalSubcategory
 from src.schema.user import User
 
-logger = configure_logger(__name__)
-
 
 class AbstractAnimalRepository(ABC):
     def __init__(self, database: AbstractDatabase):
+        self.logger = logging.getLogger(__name__)
         self.database = database
 
     @abstractmethod

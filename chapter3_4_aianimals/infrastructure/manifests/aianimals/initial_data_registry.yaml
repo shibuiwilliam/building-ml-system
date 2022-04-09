@@ -48,8 +48,6 @@ spec:
             - "python"
             - "-m"
             - "src.main"
-            - "--job"
-            - "initialization_job"
           env:
             - name: POSTGRES_HOST
               value: postgres.data.svc.cluster.local
@@ -85,6 +83,8 @@ spec:
               value: password
             - name: RUN_ENVIRONMENT
               value: cloud
+            - name: JOB
+              value: initialization_job
             - name: LOG_LEVEL
               value: INFO
             - name: DATA_DIRECTORY

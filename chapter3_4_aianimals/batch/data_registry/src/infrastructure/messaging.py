@@ -1,16 +1,14 @@
 import json
+import logging
 import os
-from logging import getLogger
 from typing import Dict
 
 import pika
 
-logger = getLogger(__name__)
-
 
 class RabbitmqMessaging(object):
     def __init__(self):
-        super().__init__()
+        self.logger = logging.getLogger(__name__)
         self.__rabbitmq_host = os.getenv("RABBITMQ_HOST", "localhost")
         self.__rebbitmq_user = os.environ["RABBITMQ_USER"]
         self.__rabbitmq_password = os.environ["RABBITMQ_PASSWORD"]

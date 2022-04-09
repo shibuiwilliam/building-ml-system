@@ -1,14 +1,12 @@
+import logging
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
 from sqlalchemy import and_
 from src.entities.animal_subcategory import AnimalSubcategoryCreate, AnimalSubcategoryModel, AnimalSubcategoryQuery
 from src.infrastructure.database import AbstractDatabase
-from src.middleware.logger import configure_logger
 from src.schema.animal_subcategory import AnimalSubcategory
 from src.schema.table import TABLES
-
-logger = configure_logger(__name__)
 
 
 class AbstractAnimalSubcategoryRepository(ABC):
@@ -16,6 +14,7 @@ class AbstractAnimalSubcategoryRepository(ABC):
         self,
         database: AbstractDatabase,
     ):
+        self.logger = logging.getLogger(__name__)
         self.database = database
 
     @abstractmethod
