@@ -1,6 +1,10 @@
 package com.example.aianimals.listing.listing
 
+import android.util.Log
 import com.example.aianimals.middleware.AppExecutors
+import com.example.aianimals.repository.access_log.AccessLog
+import com.example.aianimals.repository.access_log.AccessLogAction
+import com.example.aianimals.repository.access_log.source.AccessLogRepository
 import com.example.aianimals.repository.animal.Animal
 import com.example.aianimals.repository.animal.source.AnimalRepository
 import com.example.aianimals.repository.login.source.LoginRepository
@@ -10,6 +14,7 @@ import kotlinx.coroutines.withContext
 class AnimalListPresenter(
     private val animalRepository: AnimalRepository,
     private val loginRepository: LoginRepository,
+    private val accessLogRepository: AccessLogRepository,
     private val animalListView: AnimalListContract.View,
     private val appExecutors: AppExecutors = AppExecutors()
 ) : AnimalListContract.Presenter {
@@ -107,9 +112,9 @@ class AnimalListPresenter(
         selectedAnimalSubcategory = "ALL"
     }
 
-    override fun loadSortValues() = runBlocking{
+    override fun loadSortValues() = runBlocking {
         sortValues.clear()
-        withContext(appExecutors.ioContext){
+        withContext(appExecutors.ioContext) {
             val svs = animalRepository.listAnimalSearchSortKey()
             for (sv in svs) {
                 sortValues.add(sv.name)
@@ -120,6 +125,38 @@ class AnimalListPresenter(
 
     override fun likeAnimal(animal: Animal) = runBlocking {
         animalRepository.likeAnimal(animal.id)
+
+        val phrases: ArrayList<String> = ArrayList()
+        if (this@AnimalListPresenter.query != null) {
+            phrases.addAll(this@AnimalListPresenter.query!!.split("\\s".toRegex()))
+        }
+
+        var animalCategoryID: Int? = null
+        var animalSubcategoryID: Int? = null
+        withContext(appExecutors.ioContext) {
+            if (selectedAnimalCategory != "ALL") {
+                animalCategoryID = animalRepository.getAnimalCategory(selectedAnimalCategory, null)?.id
+            }
+            if (selectedAnimalSubcategory != "ALL") {
+                animalSubcategoryID =
+                    animalRepository.getAnimalSubcategory(selectedAnimalSubcategory, null)?.id
+            }
+        }
+
+        Log.i(
+            TAG,
+            "access log ${AccessLogAction.LIKE.str} animal_id ${animal.id} phrases $phrases animalCategoryID $animalCategoryID animalSubcategoryID $animalSubcategoryID"
+        )
+
+        accessLogRepository.createAccessLog(
+            AccessLog(
+                phrases,
+                animalCategoryID,
+                animalSubcategoryID,
+                animal.id,
+                AccessLogAction.LIKE.str
+            )
+        )
     }
 
     override fun logout() = runBlocking {

@@ -64,10 +64,11 @@ class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
             animalLikeButton = findViewById(R.id.animal_likes_button)
 
             requireActivity().onBackPressedDispatcher.addCallback(
-                this@AnimalDetailFragment,
+                viewLifecycleOwner,
                 object : OnBackPressedCallback(true) {
                     override fun handleOnBackPressed() {
                         val intent = Intent(context, AnimalListActivity::class.java)
+                        presenter.stayLong(presenter.animal!!)
                         startActivity(intent)
                     }
                 }

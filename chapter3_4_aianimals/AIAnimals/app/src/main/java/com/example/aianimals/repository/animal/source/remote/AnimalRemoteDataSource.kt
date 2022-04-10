@@ -178,7 +178,10 @@ class AnimalRemoteDataSource private constructor(
         return ArrayList<AnimalSearchSortKey>()
     }
 
-    override suspend fun getAnimalCategory(nameEn: String?, nameJa: String?): AnimalCategory? {
+    override suspend fun getAnimalCategory(
+        nameEn: String?,
+        nameJa: String?
+    ): AnimalCategory? {
         var body: MetadataResponse? = null
         if (token == null) {
             return null
@@ -233,16 +236,13 @@ class AnimalRemoteDataSource private constructor(
     }
 
     override suspend fun likeAnimal(animalID: String) {
-        if (token == null || userID == null) {
+        if (token == null) {
             return
         }
         withContext(appExecutors.ioContext) {
             animalAPI.postLikeAnimal(
                 token!!,
-                AnimalLikePost(
-                    animalID,
-                    userID!!
-                )
+                AnimalLikePost(animalID)
             )
         }
     }

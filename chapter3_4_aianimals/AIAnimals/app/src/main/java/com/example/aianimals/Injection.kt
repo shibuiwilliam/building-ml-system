@@ -3,6 +3,10 @@ package com.example.aianimals
 import android.content.Context
 import com.example.aianimals.middleware.AppExecutors
 import com.example.aianimals.repository.AIAnimalsDatabase
+import com.example.aianimals.repository.access_log.source.AccessLogRepository
+import com.example.aianimals.repository.access_log.source.local.AccessLogLocalDataSource
+import com.example.aianimals.repository.access_log.source.remote.AccessLogAPIClient
+import com.example.aianimals.repository.access_log.source.remote.AccessLogRemoteDataSource
 import com.example.aianimals.repository.animal.source.AnimalRepository
 import com.example.aianimals.repository.animal.source.local.AnimalLocalDataSource
 import com.example.aianimals.repository.animal.source.remote.AnimalAPIClient
@@ -38,6 +42,17 @@ object Injection {
             LoginRemoteDataSource.getInstance(
                 AppExecutors(),
                 LoginAPIClient.loginAPI
+            )
+        )
+    }
+
+    fun provideAccessLogReposiotry(context: Context): AccessLogRepository {
+        val database = AIAnimalsDatabase.getInstance(context)
+        return AccessLogRepository.getInstance(
+            AccessLogLocalDataSource.getInstance(AppExecutors()),
+            AccessLogRemoteDataSource.getInstance(
+                AppExecutors(),
+                AccessLogAPIClient.accessLogAPI
             )
         )
     }

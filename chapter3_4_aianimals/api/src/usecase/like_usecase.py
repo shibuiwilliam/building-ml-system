@@ -2,9 +2,7 @@ from abc import ABC, abstractmethod
 from logging import getLogger
 from typing import List, Optional
 
-from fastapi import BackgroundTasks
 from sqlalchemy.orm import Session
-from src.configurations import Configurations
 from src.entities.like import LikeCreate, LikeDelete, LikeQuery
 from src.infrastructure.cache import AbstractCache
 from src.middleware.strings import get_uuid
@@ -39,7 +37,6 @@ class AbstractLikeUsecase(ABC):
         self,
         session: Session,
         request: LikeCreateRequest,
-        background_tasks: BackgroundTasks,
     ) -> Optional[LikeResponse]:
         raise NotImplementedError
 
@@ -88,7 +85,6 @@ class LikeUsecase(AbstractLikeUsecase):
         self,
         session: Session,
         request: LikeCreateRequest,
-        background_tasks: BackgroundTasks,
     ) -> Optional[LikeResponse]:
         query = LikeQuery(
             animal_id=request.animal_id,
@@ -118,11 +114,6 @@ class LikeUsecase(AbstractLikeUsecase):
         logger.info(f"registered: {data}")
         if data is not None:
             response = LikeResponse(**data.dict())
-            background_tasks.add_task(
-                self.cache.encache,
-                Configurations.animal_registry_cache,
-                data.animal_id,
-            )
             return response
         return None
 

@@ -12,4 +12,25 @@ class AccessLogLocalDataSource private constructor(
     override suspend fun createAccessLog(accessLog: AccessLog) {
         TODO("Not yet implemented")
     }
+
+    companion object {
+        private var INSTANCE: AccessLogLocalDataSource? = null
+
+        @JvmStatic
+        fun getInstance(
+            appExecutors: AppExecutors,
+        ): AccessLogLocalDataSource {
+            if (INSTANCE == null) {
+                synchronized(AccessLogLocalDataSource::javaClass) {
+                    INSTANCE = AccessLogLocalDataSource(appExecutors)
+                }
+            }
+            return INSTANCE!!
+        }
+
+        @JvmStatic
+        fun destroyInstance() {
+            INSTANCE = null
+        }
+    }
 }

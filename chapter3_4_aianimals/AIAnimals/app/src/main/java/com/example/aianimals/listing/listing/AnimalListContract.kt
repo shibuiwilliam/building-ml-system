@@ -14,6 +14,7 @@ interface AnimalListContract {
         var selectedAnimalSubcategory: String
         var selectedSortValue: String
         var currentPosition: Int
+
         fun searchAnimals(): Map<String, Animal>
         fun listAnimals(query: String?)
         fun appendAnimals()

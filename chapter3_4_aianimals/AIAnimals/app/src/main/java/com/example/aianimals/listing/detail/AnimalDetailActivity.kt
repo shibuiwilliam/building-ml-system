@@ -2,6 +2,7 @@ package com.example.aianimals.listing.detail
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -15,6 +16,8 @@ import com.example.aianimals.posting.registration.AnimalRegistrationActivity
 import com.google.android.material.navigation.NavigationView
 
 class AnimalDetailActivity : AppCompatActivity() {
+    private val TAG = AnimalDetailActivity::class.java.simpleName
+
     private lateinit var animalDetailPresenter: AnimalDetailPresenter
 
     private lateinit var drawerLayout: DrawerLayout
@@ -27,36 +30,6 @@ class AnimalDetailActivity : AppCompatActivity() {
         setupActionBar(R.id.toolbar) {
             setHomeAsUpIndicator(R.drawable.ic_menu)
             setDisplayHomeAsUpEnabled(true)
-        }
-
-        drawerLayout = findViewById(R.id.drawer_layout)
-        navigationView = findViewById(R.id.navigation_view)
-        navigationView.setNavigationItemSelectedListener { menuItem ->
-            if (menuItem.itemId == R.id.register_animal) {
-                val intent = Intent(
-                    this@AnimalDetailActivity,
-                    AnimalRegistrationActivity::class.java
-                )
-                startActivity(intent)
-            }
-            if (menuItem.itemId == R.id.list_animal) {
-                val intent = Intent(
-                    this@AnimalDetailActivity,
-                    AnimalListActivity::class.java
-                )
-                startActivity(intent)
-            }
-            if (menuItem.itemId == R.id.logout) {
-                animalDetailPresenter.logout()
-                val intent = Intent(
-                    this@AnimalDetailActivity,
-                    LoginActivity::class.java
-                )
-                startActivity(intent)
-            }
-            menuItem.isChecked = true
-            drawerLayout.closeDrawers()
-            true
         }
 
         val animalID = intent.getStringExtra(EXTRA_ANIMAL_ID)!!
@@ -74,8 +47,45 @@ class AnimalDetailActivity : AppCompatActivity() {
             animalID,
             Injection.provideAnimalRepository(applicationContext),
             Injection.provideLoginRepository(applicationContext),
+            Injection.provideAccessLogReposiotry(applicationContext),
             animalDetailFragment
         )
+        animalDetailPresenter.queryString = intent.getStringExtra(EXTRA_QUERY_STRING)
+        animalDetailPresenter.queryAnimalCategory = intent.getStringExtra(EXTRA_QUERY_ANIMAL_CATEGORY)!!
+        animalDetailPresenter.queryAnimalSubcategory = intent.getStringExtra(EXTRA_QUERY_ANIMAL_SUBCATEGORY)!!
+
+        drawerLayout = findViewById(R.id.drawer_layout)
+        navigationView = findViewById(R.id.navigation_view)
+        navigationView.setNavigationItemSelectedListener { menuItem ->
+            if (menuItem.itemId == R.id.register_animal) {
+                animalDetailPresenter.stayLong(animalDetailPresenter.animal!!)
+                val intent = Intent(
+                    this@AnimalDetailActivity,
+                    AnimalRegistrationActivity::class.java
+                )
+                startActivity(intent)
+            }
+            if (menuItem.itemId == R.id.list_animal) {
+                animalDetailPresenter.stayLong(animalDetailPresenter.animal!!)
+                val intent = Intent(
+                    this@AnimalDetailActivity,
+                    AnimalListActivity::class.java
+                )
+                startActivity(intent)
+            }
+            if (menuItem.itemId == R.id.logout) {
+                animalDetailPresenter.stayLong(animalDetailPresenter.animal!!)
+                animalDetailPresenter.logout()
+                val intent = Intent(
+                    this@AnimalDetailActivity,
+                    LoginActivity::class.java
+                )
+                startActivity(intent)
+            }
+            menuItem.isChecked = true
+            drawerLayout.closeDrawers()
+            true
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -88,5 +98,8 @@ class AnimalDetailActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_ANIMAL_ID = "ANIMAL_ID"
+        const val EXTRA_QUERY_STRING: String = "QUERY_STRING"
+        const val EXTRA_QUERY_ANIMAL_CATEGORY: String = "QUERY_ANIMAL_CATEGORY"
+        const val EXTRA_QUERY_ANIMAL_SUBCATEGORY: String = "QUERY_ANIMAL_SUBCATEGORY"
     }
 }

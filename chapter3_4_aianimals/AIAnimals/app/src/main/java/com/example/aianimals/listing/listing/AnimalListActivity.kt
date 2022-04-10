@@ -66,6 +66,7 @@ class AnimalListActivity : AppCompatActivity() {
         animalListPresenter = AnimalListPresenter(
             Injection.provideAnimalRepository(applicationContext),
             Injection.provideLoginRepository(applicationContext),
+            Injection.provideAccessLogReposiotry(applicationContext),
             animalListFragment
         ).apply {
             if (savedInstanceState != null) {

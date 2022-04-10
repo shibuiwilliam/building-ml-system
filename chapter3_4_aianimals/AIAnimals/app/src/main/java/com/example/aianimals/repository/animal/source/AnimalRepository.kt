@@ -143,14 +143,22 @@ class AnimalRepository(
         nameEn: String?,
         nameJa: String?
     ): AnimalCategory? {
-        return animalLocalDataSource.getAnimalCategory(nameEn, nameJa)
+        val data = animalLocalDataSource.getAnimalCategory(nameEn, nameJa)
+        if (data != null) {
+            return data
+        }
+        return animalRemoteDataSource.getAnimalCategory(nameEn, nameJa)
     }
 
     override suspend fun getAnimalSubcategory(
         nameEn: String?,
         nameJa: String?
     ): AnimalSubcategory? {
-        return animalLocalDataSource.getAnimalSubcategory(nameEn, nameJa)
+        val data = animalLocalDataSource.getAnimalSubcategory(nameEn, nameJa)
+        if (data != null) {
+            return data
+        }
+        return animalRemoteDataSource.getAnimalSubcategory(nameEn, nameJa)
     }
 
     override suspend fun likeAnimal(animalID: String) {

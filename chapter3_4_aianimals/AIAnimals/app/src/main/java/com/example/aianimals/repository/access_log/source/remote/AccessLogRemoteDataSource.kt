@@ -13,6 +13,10 @@ class AccessLogRemoteDataSource private constructor(
 
     private var token: String? = null
 
+    fun setToken(token: String?) {
+        this.token = token
+    }
+
     override suspend fun createAccessLog(accessLog: AccessLog) {
         if (token == null) {
             return
@@ -28,6 +32,28 @@ class AccessLogRemoteDataSource private constructor(
                     accessLog.action
                 )
             )
+        }
+    }
+
+    companion object {
+        private var INSTANCE: AccessLogRemoteDataSource? = null
+
+        @JvmStatic
+        fun getInstance(
+            appExecutors: AppExecutors,
+            accessLogAPI: AccessLogAPIInterface
+        ): AccessLogRemoteDataSource {
+            if (INSTANCE == null) {
+                synchronized(AccessLogRemoteDataSource::javaClass) {
+                    INSTANCE = AccessLogRemoteDataSource(appExecutors, accessLogAPI)
+                }
+            }
+            return INSTANCE!!
+        }
+
+        @JvmStatic
+        fun destroyInstance() {
+            INSTANCE = null
         }
     }
 }
