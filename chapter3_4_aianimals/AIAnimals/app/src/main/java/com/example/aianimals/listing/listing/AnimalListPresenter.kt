@@ -16,7 +16,6 @@ class AnimalListPresenter(
     private val TAG = AnimalListPresenter::class.java.simpleName
 
     override var query: String? = null
-    override var sortBy: String = "score"
     override var animalCategories: MutableList<String> = mutableListOf()
     override var animalSubcategories: MutableList<String> = mutableListOf()
     override var sortValues: MutableList<String> = mutableListOf()
@@ -52,7 +51,7 @@ class AnimalListPresenter(
                 animalSubcategoryNameEn,
                 null,
                 this@AnimalListPresenter.query,
-                this@AnimalListPresenter.sortBy,
+                this@AnimalListPresenter.selectedSortValue,
                 this@AnimalListPresenter.currentPosition
             )
         }
@@ -108,11 +107,15 @@ class AnimalListPresenter(
         selectedAnimalSubcategory = "ALL"
     }
 
-    override fun loadSortValues() {
-        sortValues.add("Newest")
-        sortValues.add("Liked")
-        sortValues.add("AI")
-        selectedSortValue = "Newest"
+    override fun loadSortValues() = runBlocking{
+        sortValues.clear()
+        withContext(appExecutors.ioContext){
+            val svs = animalRepository.listAnimalSearchSortKey()
+            for (sv in svs) {
+                sortValues.add(sv.name)
+            }
+        }
+        selectedSortValue = "created_at"
     }
 
     override fun likeAnimal(animal: Animal) = runBlocking {

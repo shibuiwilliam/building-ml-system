@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.aianimals.middleware.Converters
+import com.example.aianimals.repository.access_log.AccessLog
 import com.example.aianimals.repository.animal.Animal
 import com.example.aianimals.repository.animal.AnimalCategory
 import com.example.aianimals.repository.animal.AnimalSearchSortKey

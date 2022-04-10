@@ -12,7 +12,6 @@ class AccessLogRemoteDataSource private constructor(
     private val TAG = AccessLogRemoteDataSource::class.java.simpleName
 
     private var token: String? = null
-    private var userID: String? = null
 
     override suspend fun createAccessLog(accessLog: AccessLog) {
         if (token == null) {
