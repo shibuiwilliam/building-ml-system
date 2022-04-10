@@ -17,6 +17,10 @@ interface AnimalDataSource {
         offset: Int
     ): Map<String, Animal>
 
+    suspend fun searchAnimalsByImage(
+        animalID: String
+    ): Map<String, Animal>
+
     suspend fun getAnimal(animalID: String): Animal?
     suspend fun saveAnimal(animal: Animal)
 

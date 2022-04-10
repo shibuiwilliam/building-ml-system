@@ -24,7 +24,7 @@ import com.example.aianimals.repository.login.source.local.LoginDao
         AnimalSubcategory::class,
         AnimalSearchSortKey::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

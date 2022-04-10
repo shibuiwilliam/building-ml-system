@@ -9,6 +9,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.aianimals.R
 import com.example.aianimals.listing.listing.AnimalListActivity
@@ -18,27 +20,31 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
     override lateinit var presenter: AnimalDetailContract.Presenter
 
+    private lateinit var similarAnimalRecyclerViewAdapter: SimilarAnimalRecyclerViewAdapter
+
     private lateinit var animalImageView: ImageView
     private lateinit var animalNameView: TextView
-    private lateinit var animalLikesView: TextView
     private lateinit var animalSubmitDateView: TextView
     private lateinit var animalDescriptionView: TextView
     private lateinit var animalLikeButton: ExtendedFloatingActionButton
+    private lateinit var similarAnimalsView: RecyclerView
 
     override fun showAnimal(animal: Animal) {
         animalNameView.text = animal.name
-        animalLikesView.text = animal.likes.toString()
         animalSubmitDateView.text = animal.date
         animalDescriptionView.text = animal.description
 
         animalNameView.visibility = View.VISIBLE
-        animalLikesView.visibility = View.VISIBLE
         animalSubmitDateView.visibility = View.VISIBLE
         animalDescriptionView.visibility = View.VISIBLE
 
         Glide.with(this).load(animal.imageUrl).into(animalImageView)
         animalImageView.visibility = View.VISIBLE
-        animalLikeButton.text = animal.likes.toString()
+        animalLikeButton.text = animal.like.toString()
+    }
+
+    override fun appendAnimals(animals: Map<String, Animal>) {
+        TODO("Not yet implemented")
     }
 
     override fun onCreateView(
@@ -56,9 +62,10 @@ class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
         {
             activity?.title = getString(R.string.animal_detail)
 
+            similarAnimalRecyclerViewAdapter = SimilarAnimalRecyclerViewAdapter(context, mutableMapOf(), presenter)
+
             animalImageView = findViewById(R.id.animal_image)
             animalNameView = findViewById(R.id.animal_name)
-            animalLikesView = findViewById(R.id.animal_likes)
             animalSubmitDateView = findViewById(R.id.animal_submit_date)
             animalDescriptionView = findViewById(R.id.animal_description)
             animalLikeButton = findViewById(R.id.animal_likes_button)
@@ -77,6 +84,16 @@ class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
             animalLikeButton.setOnClickListener {
                 presenter.likeAnimal(presenter.animal!!)
             }
+
+            similarAnimalsView = findViewById<RecyclerView>(R.id.similar_animals_view).apply {
+                adapter = similarAnimalRecyclerViewAdapter
+            }
+            similarAnimalsView.layoutManager = GridLayoutManager(
+                context,
+                1,
+                RecyclerView.HORIZONTAL,
+                false
+            )
         }
         return root
     }

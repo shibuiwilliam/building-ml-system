@@ -101,7 +101,7 @@ services:
       - JOB=animal_to_search_job
       - DATA_DIRECTORY=/opt/dataset/data/
     command: >
-      /bin/sh -c "sleep 20s && python -m src.main"
+      /bin/sh -c "sleep 90s && python -m src.main"
     depends_on:
       - postgres
       - redis

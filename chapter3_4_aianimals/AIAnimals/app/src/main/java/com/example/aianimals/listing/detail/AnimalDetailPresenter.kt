@@ -28,6 +28,7 @@ class AnimalDetailPresenter(
     override var queryAnimalCategory: String = "ALL"
     override var queryAnimalSubcategory: String = "ALL"
     override var startTime: Long = 0L
+    override var currentPosition: Int = 0
 
     private var phrases: ArrayList<String> = ArrayList()
     private var animalCategory: AnimalCategory? = null
@@ -65,6 +66,23 @@ class AnimalDetailPresenter(
 
             animalDetailView.showAnimal(animal!!)
         }
+    }
+
+    override fun searchSimilarAnimal(): Map<String, Animal> = runBlocking {
+        var animals = mapOf<String, Animal>()
+        withContext(appExecutors.ioContext) {
+            animals = animalRepository.searchAnimalsByImage(animal!!.id)
+        }
+        return@runBlocking animals
+    }
+
+    override fun appendAnimals() {
+        val animals = searchSimilarAnimal()
+        if (animals.isEmpty()) {
+            return
+        }
+        currentPosition += animals.size
+        animalDetailView.appendAnimals(animals)
     }
 
     override fun likeAnimal(animal: Animal) = runBlocking {

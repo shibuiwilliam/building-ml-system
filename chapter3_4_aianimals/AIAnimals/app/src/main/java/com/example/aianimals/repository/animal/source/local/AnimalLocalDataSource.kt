@@ -59,6 +59,19 @@ class AnimalLocalDataSource private constructor(
         return animalMap
     }
 
+    override suspend fun searchAnimalsByImage(animalID: String): Map<String, Animal> {
+        val animalMap = mutableMapOf<String, Animal>()
+        withContext(appExecutors.ioContext) {
+            val animals = animalDao.listAnimals()
+            withContext(appExecutors.defaultContext) {
+                if (animals.isNotEmpty()) {
+                    animals.forEach { animalMap[it.id] = it }
+                }
+            }
+        }
+        return animalMap
+    }
+
     override suspend fun getAnimal(animalID: String): Animal? {
         var animal: Animal? = null
         withContext(appExecutors.ioContext) {

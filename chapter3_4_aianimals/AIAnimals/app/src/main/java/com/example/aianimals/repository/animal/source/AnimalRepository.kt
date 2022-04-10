@@ -27,8 +27,9 @@ class AnimalRepository(
         sortBy: String,
         offset: Int
     ): Map<String, Animal> {
+        var animals: Map<String, Animal> = mapOf()
         if (BuildConfig.USE_LOCAL_DATA) {
-            val localAnimals = animalLocalDataSource.listAnimals(
+            animals = animalLocalDataSource.listAnimals(
                 animalCategoryNameEn,
                 animalCategoryNameJa,
                 animalSubcategoryNameEn,
@@ -37,12 +38,12 @@ class AnimalRepository(
                 sortBy,
                 offset
             )
-            if (localAnimals.isNotEmpty()) {
-                return localAnimals
+            if (animals.isNotEmpty()) {
+                return animals
             }
         }
 
-        val remoteAnimals = animalRemoteDataSource.listAnimals(
+        animals = animalRemoteDataSource.listAnimals(
             animalCategoryNameEn,
             animalCategoryNameJa,
             animalSubcategoryNameEn,
@@ -51,10 +52,14 @@ class AnimalRepository(
             sortBy,
             offset
         )
-        if (remoteAnimals.isNotEmpty()) {
-            return remoteAnimals
+        return animals
+    }
+
+    override suspend fun searchAnimalsByImage(animalID: String): Map<String, Animal> {
+        if (BuildConfig.USE_LOCAL_DATA) {
+            return animalLocalDataSource.searchAnimalsByImage(animalID)
         }
-        return mapOf()
+        return animalRemoteDataSource.searchAnimalsByImage(animalID)
     }
 
     override suspend fun getAnimal(animalID: String): Animal? {

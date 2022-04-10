@@ -1,5 +1,6 @@
 package com.example.aianimals.repository.animal.source.remote
 
+import android.util.Log
 import androidx.annotation.VisibleForTesting
 import com.example.aianimals.middleware.AppExecutors
 import com.example.aianimals.repository.animal.Animal
@@ -68,7 +69,32 @@ class AnimalRemoteDataSource private constructor(
                     name = it.name,
                     description = it.description,
                     date = it.created_at,
-                    likes = it.likes,
+                    like = it.like,
+                    imageUrl = it.photoUrl
+                )
+            }
+        }
+        return animals
+    }
+
+    override suspend fun searchAnimalsByImage(animalID: String): Map<String, Animal> {
+        if (token == null) {
+            return mapOf()
+        }
+        val animals = mutableMapOf<String, Animal>()
+        withContext(appExecutors.ioContext) {
+            val similarAnimalSearchPost = SimilarAnimalSearchPost(animalID)
+            val response = animalAPI.postSearchSimilarAnimal(
+                token!!,
+                similarAnimalSearchPost
+            )
+            response.body()!!.results.forEach {
+                animals[it.id] = Animal(
+                    id = it.id,
+                    name = it.name,
+                    description = it.description,
+                    date = it.created_at,
+                    like = it.like,
                     imageUrl = it.photoUrl
                 )
             }
@@ -93,7 +119,7 @@ class AnimalRemoteDataSource private constructor(
                     name = body[0].name,
                     description = body[0].description,
                     date = body[0].created_at,
-                    likes = body[0].likes,
+                    like = body[0].like,
                     imageUrl = body[0].photoUrl
                 )
             }

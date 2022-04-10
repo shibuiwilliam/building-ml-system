@@ -1,6 +1,7 @@
 package com.example.aianimals.listing.listing
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -50,7 +51,7 @@ class AnimalListRecyclerViewAdapter(
     override fun onBindViewHolder(holder: AnimalListRecyclerViewHolder, position: Int) {
         val animal = animals[position]
         Glide.with(context).load(animal.imageUrl).into(holder.animalImageView)
-        holder.animalLikesButton.text = animal.likes.toString()
+        holder.animalLikesButton.text = animal.like.toString()
         holder.itemView.setOnClickListener {
             onAnimalCellClickListener.onItemClick(animal)
         }

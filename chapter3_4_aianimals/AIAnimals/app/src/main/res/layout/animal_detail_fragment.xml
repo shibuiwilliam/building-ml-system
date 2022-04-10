@@ -26,20 +26,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5"/>
-
-    <TextView
-        android:id="@+id/animal_likes"
-        android:textSize="16dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintVertical_bias="0.6"/>
+        app:layout_constraintTop_toBottomOf="@id/animal_image"
+        app:layout_constraintBottom_toTopOf="@id/animal_submit_date" />
 
     <TextView
         android:id="@+id/animal_submit_date"
@@ -48,20 +36,20 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.7" />
+        app:layout_constraintTop_toBottomOf="@id/animal_name"
+        app:layout_constraintBottom_toTopOf="@id/animal_description" />
 
     <TextView
         android:id="@+id/animal_description"
         android:textSize="16dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="350dp"
+        android:layout_height="150dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintVertical_bias="0.8"/>
+        app:layout_constraintTop_toBottomOf="@id/animal_submit_date"
+        app:layout_constraintBottom_toTopOf="@id/coordinatorLayout"
+        app:layout_constraintVertical_bias="0.7"
+        android:scrollbars="vertical" />
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/coordinatorLayout"
@@ -69,8 +57,8 @@
         android:layout_height="50dp"
         android:layout_margin="10dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintVertical_bias="0.9" >
+        app:layout_constraintBottom_toTopOf="@id/similar_animals_view"
+        app:layout_constraintVertical_bias="0.8" >
 
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/animal_likes_button"
@@ -81,5 +69,15 @@
             android:alpha="0.5"/>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/similar_animals_view"
+        android:layout_width="wrap_content"
+        android:layout_height="150dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.9"
+        android:scrollbars="horizontal"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -32,10 +32,8 @@ interface AnimalAPIInterface {
     @POST("/v0/animal/search/similar")
     suspend fun postSearchSimilarAnimal(
         @Header("token") token: String,
-        @Query("limit") limit: Int = 100,
-        @Query("offset") offset: Int = 0,
         @Body post: SimilarAnimalSearchPost
-    ): Response<List<AnimalResponse>>
+    ): Response<SimilarAnimalSearchResponse>
 
     @Headers("Accept:application/json, Content-Type:application/json")
     @GET("/v0/animal")

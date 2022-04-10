@@ -12,6 +12,6 @@ data class Animal @JvmOverloads constructor(
     @ColumnInfo(name = "name") var name: String = "",
     @ColumnInfo(name = "description") var description: String = "",
     @ColumnInfo(name = "date") var date: String = "",
-    @ColumnInfo(name = "likes") var likes: Int = 0,
+    @ColumnInfo(name = "like") var like: Int = 0,
     @ColumnInfo(name = "imageUrl") var imageUrl: String = "https://www.anicom-sompo.co.jp/nekonoshiori/wp-content/uploads/2018/12/724-2.jpg"
 )
