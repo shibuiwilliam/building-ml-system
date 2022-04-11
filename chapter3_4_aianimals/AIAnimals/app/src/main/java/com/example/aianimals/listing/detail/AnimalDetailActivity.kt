@@ -2,7 +2,6 @@ package com.example.aianimals.listing.detail
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -51,8 +50,10 @@ class AnimalDetailActivity : AppCompatActivity() {
             animalDetailFragment
         )
         animalDetailPresenter.queryString = intent.getStringExtra(EXTRA_QUERY_STRING)
-        animalDetailPresenter.queryAnimalCategory = intent.getStringExtra(EXTRA_QUERY_ANIMAL_CATEGORY)!!
-        animalDetailPresenter.queryAnimalSubcategory = intent.getStringExtra(EXTRA_QUERY_ANIMAL_SUBCATEGORY)!!
+        animalDetailPresenter.queryAnimalCategory =
+            intent.getStringExtra(EXTRA_QUERY_ANIMAL_CATEGORY)!!
+        animalDetailPresenter.queryAnimalSubcategory =
+            intent.getStringExtra(EXTRA_QUERY_ANIMAL_SUBCATEGORY)!!
 
         drawerLayout = findViewById(R.id.drawer_layout)
         navigationView = findViewById(R.id.navigation_view)

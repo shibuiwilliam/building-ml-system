@@ -14,7 +14,8 @@ class SimilarAnimalRecyclerViewAdapter(
     context: Context,
     animals: Map<String, Animal>,
     presenter: AnimalDetailContract.Presenter
-): RecyclerView.Adapter<SimilarAnimalRecyclerViewAdapter.SimilarAnimalRecyclerViewHolder>() {
+) : RecyclerView.Adapter<SimilarAnimalRecyclerViewAdapter.SimilarAnimalRecyclerViewHolder>() {
+    private val TAG = SimilarAnimalRecyclerViewAdapter::class.java.simpleName
 
     var animals: MutableList<Animal> = animals.values.toMutableList()
         set(animals) {
@@ -30,23 +31,25 @@ class SimilarAnimalRecyclerViewAdapter(
     interface OnAnimalCellClickListener {
         fun onItemClick(animal: Animal)
     }
+
+    fun setOnAnimalCellClickListener(onAnimalCellClickListener: OnAnimalCellClickListener) {
+        this.onAnimalCellClickListener = onAnimalCellClickListener
+    }
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
     ): SimilarAnimalRecyclerViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val view = inflater.inflate(R.layout.animal_detail_fragment_cell, parent,false)
+        val view = inflater.inflate(R.layout.animal_detail_fragment_cell, parent, false)
         return SimilarAnimalRecyclerViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: SimilarAnimalRecyclerViewHolder, position: Int) {
         val animal = animals[position]
         Glide.with(context).load(animal.imageUrl).into(holder.animalImageView)
-        holder.itemView.setOnClickListener{
+        holder.itemView.setOnClickListener {
             onAnimalCellClickListener.onItemClick(animal)
-        }
-        if (position == animals.size - 1){
-            presenter.appendAnimals()
         }
     }
 
@@ -54,7 +57,8 @@ class SimilarAnimalRecyclerViewAdapter(
         return animals.size
     }
 
-    inner class SimilarAnimalRecyclerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class SimilarAnimalRecyclerViewHolder(itemView: View) :
+        RecyclerView.ViewHolder(itemView) {
         var animalImageView: ImageView = itemView.findViewById(R.id.animal_detail_image)
     }
 

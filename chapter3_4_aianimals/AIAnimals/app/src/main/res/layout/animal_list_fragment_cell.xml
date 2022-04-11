@@ -21,8 +21,8 @@
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/coordinatorLayout"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="75dp"
+        android:layout_height="40dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" >
 
@@ -31,8 +31,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="1dp"
+            android:alpha="0.7"
             android:textAlignment="center"
-            android:alpha="0.5"/>
+            android:textSize="10sp" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

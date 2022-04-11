@@ -3,18 +3,18 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/animal_list_cell"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="96dp"
     xmlns:tools="http://schemas.android.com/tools">
 
     <ImageView
         android:id="@+id/animal_detail_image"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="2dp"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
-        app:layout_constrainedWidth="true"
+        app:layout_constrainedHeight="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

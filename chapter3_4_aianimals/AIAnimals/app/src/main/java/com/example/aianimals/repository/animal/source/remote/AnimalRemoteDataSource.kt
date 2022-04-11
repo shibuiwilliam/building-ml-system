@@ -1,6 +1,5 @@
 package com.example.aianimals.repository.animal.source.remote
 
-import android.util.Log
 import androidx.annotation.VisibleForTesting
 import com.example.aianimals.middleware.AppExecutors
 import com.example.aianimals.repository.animal.Animal

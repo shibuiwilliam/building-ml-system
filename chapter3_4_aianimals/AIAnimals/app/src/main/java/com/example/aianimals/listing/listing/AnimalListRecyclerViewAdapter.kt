@@ -1,7 +1,6 @@
 package com.example.aianimals.listing.listing
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,7 +32,6 @@ class AnimalListRecyclerViewAdapter(
     interface OnAnimalCellClickListener {
         fun onItemClick(animal: Animal)
     }
-
 
     fun setOnAnimalCellClickListener(onAnimalCellClickListener: OnAnimalCellClickListener) {
         this.onAnimalCellClickListener = onAnimalCellClickListener

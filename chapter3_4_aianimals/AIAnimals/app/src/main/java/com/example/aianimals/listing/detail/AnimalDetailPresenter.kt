@@ -28,7 +28,6 @@ class AnimalDetailPresenter(
     override var queryAnimalCategory: String = "ALL"
     override var queryAnimalSubcategory: String = "ALL"
     override var startTime: Long = 0L
-    override var currentPosition: Int = 0
 
     private var phrases: ArrayList<String> = ArrayList()
     private var animalCategory: AnimalCategory? = null
@@ -41,10 +40,10 @@ class AnimalDetailPresenter(
 
     override fun start() {
         formatQuery()
-        getAnimal(this.animalID)
+        showAnimal()
     }
 
-    override fun getAnimal(animalID: String) = runBlocking {
+    override fun showAnimal() = runBlocking {
         withContext(appExecutors.ioContext) {
             animal = animalRepository.getAnimal(animalID)
         }
@@ -56,9 +55,9 @@ class AnimalDetailPresenter(
 
             accessLogRepository.createAccessLog(
                 AccessLog(
-                    this@AnimalDetailPresenter.phrases,
-                    this@AnimalDetailPresenter.animalCategory?.id,
-                    this@AnimalDetailPresenter.animalSubcategory?.id,
+                    phrases,
+                    animalCategory?.id,
+                    animalSubcategory?.id,
                     animalID,
                     AccessLogAction.SELECT.str
                 )
@@ -69,20 +68,11 @@ class AnimalDetailPresenter(
     }
 
     override fun searchSimilarAnimal(): Map<String, Animal> = runBlocking {
-        var animals = mapOf<String, Animal>()
+        var similarAnimals = mapOf<String, Animal>()
         withContext(appExecutors.ioContext) {
-            animals = animalRepository.searchAnimalsByImage(animal!!.id)
+            similarAnimals = animalRepository.searchAnimalsByImage(animal!!.id)
         }
-        return@runBlocking animals
-    }
-
-    override fun appendAnimals() {
-        val animals = searchSimilarAnimal()
-        if (animals.isEmpty()) {
-            return
-        }
-        currentPosition += animals.size
-        animalDetailView.appendAnimals(animals)
+        return@runBlocking similarAnimals
     }
 
     override fun likeAnimal(animal: Animal) = runBlocking {
@@ -129,20 +119,34 @@ class AnimalDetailPresenter(
     private fun formatQuery() = runBlocking {
         this@AnimalDetailPresenter.phrases.clear()
         if (this@AnimalDetailPresenter.queryString != null) {
-            this@AnimalDetailPresenter.phrases.addAll(this@AnimalDetailPresenter.queryString!!.split("\\s".toRegex()))
+            this@AnimalDetailPresenter.phrases.addAll(
+                this@AnimalDetailPresenter.queryString!!.split(
+                    "\\s".toRegex()
+                )
+            )
         }
 
         withContext(appExecutors.ioContext) {
             if (this@AnimalDetailPresenter.queryAnimalCategory != "ALL") {
-                this@AnimalDetailPresenter.animalCategory = animalRepository.getAnimalCategory(this@AnimalDetailPresenter.queryAnimalCategory, null)
+                this@AnimalDetailPresenter.animalCategory = animalRepository.getAnimalCategory(
+                    this@AnimalDetailPresenter.queryAnimalCategory,
+                    null
+                )
             }
 
             if (this@AnimalDetailPresenter.queryAnimalSubcategory != "ALL") {
-                this@AnimalDetailPresenter.animalSubcategory = animalRepository.getAnimalSubcategory(this@AnimalDetailPresenter.queryAnimalSubcategory, null)
+                this@AnimalDetailPresenter.animalSubcategory =
+                    animalRepository.getAnimalSubcategory(
+                        this@AnimalDetailPresenter.queryAnimalSubcategory,
+                        null
+                    )
             }
         }
 
-        Log.i(TAG, "Query phrases ${this@AnimalDetailPresenter.phrases} animalCategory ${this@AnimalDetailPresenter.animalCategory} animalSubcategory ${this@AnimalDetailPresenter.animalSubcategory}")
+        Log.i(
+            TAG,
+            "Query phrases ${this@AnimalDetailPresenter.phrases} animalCategory ${this@AnimalDetailPresenter.animalCategory} animalSubcategory ${this@AnimalDetailPresenter.animalSubcategory}"
+        )
     }
 
     override fun logout() = runBlocking {

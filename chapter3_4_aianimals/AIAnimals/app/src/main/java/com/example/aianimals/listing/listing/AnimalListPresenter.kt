@@ -135,7 +135,8 @@ class AnimalListPresenter(
         var animalSubcategoryID: Int? = null
         withContext(appExecutors.ioContext) {
             if (selectedAnimalCategory != "ALL") {
-                animalCategoryID = animalRepository.getAnimalCategory(selectedAnimalCategory, null)?.id
+                animalCategoryID =
+                    animalRepository.getAnimalCategory(selectedAnimalCategory, null)?.id
             }
             if (selectedAnimalSubcategory != "ALL") {
                 animalSubcategoryID =

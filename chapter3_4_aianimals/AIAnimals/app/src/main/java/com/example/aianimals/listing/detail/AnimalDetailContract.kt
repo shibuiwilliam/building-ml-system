@@ -11,11 +11,9 @@ class AnimalDetailContract {
         var queryAnimalCategory: String
         var queryAnimalSubcategory: String
         var startTime: Long
-        var currentPosition: Int
 
-        fun getAnimal(animalID: String)
+        fun showAnimal()
         fun searchSimilarAnimal(): Map<String, Animal>
-        fun appendAnimals()
         fun likeAnimal(animal: Animal)
         fun stayLong(animal: Animal)
         fun logout()
@@ -23,6 +21,5 @@ class AnimalDetailContract {
 
     interface View : BaseView<Presenter> {
         fun showAnimal(animal: Animal)
-        fun appendAnimals(animals: Map<String, Animal>)
     }
 }

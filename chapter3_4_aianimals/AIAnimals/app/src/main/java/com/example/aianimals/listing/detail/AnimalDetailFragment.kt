@@ -18,6 +18,8 @@ import com.example.aianimals.repository.animal.Animal
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 
 class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
+    private val TAG = AnimalDetailFragment::class.java.simpleName
+
     override lateinit var presenter: AnimalDetailContract.Presenter
 
     private lateinit var similarAnimalRecyclerViewAdapter: SimilarAnimalRecyclerViewAdapter
@@ -41,10 +43,10 @@ class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
         Glide.with(this).load(animal.imageUrl).into(animalImageView)
         animalImageView.visibility = View.VISIBLE
         animalLikeButton.text = animal.like.toString()
-    }
 
-    override fun appendAnimals(animals: Map<String, Animal>) {
-        TODO("Not yet implemented")
+        val similarAnimals = presenter.searchSimilarAnimal()
+        similarAnimalRecyclerViewAdapter.animals = similarAnimals.values.toMutableList()
+        similarAnimalsView.visibility = View.VISIBLE
     }
 
     override fun onCreateView(
@@ -62,7 +64,8 @@ class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
         {
             activity?.title = getString(R.string.animal_detail)
 
-            similarAnimalRecyclerViewAdapter = SimilarAnimalRecyclerViewAdapter(context, mutableMapOf(), presenter)
+            similarAnimalRecyclerViewAdapter =
+                SimilarAnimalRecyclerViewAdapter(context, mutableMapOf(), presenter)
 
             animalImageView = findViewById(R.id.animal_image)
             animalNameView = findViewById(R.id.animal_name)
@@ -93,6 +96,26 @@ class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
                 1,
                 RecyclerView.HORIZONTAL,
                 false
+            )
+
+            similarAnimalRecyclerViewAdapter.setOnAnimalCellClickListener(
+                object : SimilarAnimalRecyclerViewAdapter.OnAnimalCellClickListener {
+                    override fun onItemClick(animal: Animal) {
+                        val intent = Intent(context, AnimalDetailActivity::class.java).apply {
+                            putExtra(AnimalDetailActivity.EXTRA_ANIMAL_ID, animal.id)
+                            putExtra(AnimalDetailActivity.EXTRA_QUERY_STRING, "image_search")
+                            putExtra(
+                                AnimalDetailActivity.EXTRA_QUERY_ANIMAL_CATEGORY,
+                                "ALL"
+                            )
+                            putExtra(
+                                AnimalDetailActivity.EXTRA_QUERY_ANIMAL_SUBCATEGORY,
+                                "ALL"
+                            )
+                        }
+                        startActivity(intent)
+                    }
+                }
             )
         }
         return root

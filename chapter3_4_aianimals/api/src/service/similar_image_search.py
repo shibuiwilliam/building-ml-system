@@ -45,7 +45,15 @@ class PseudoSimilarImageSearchService(AbstractSimilarImageSearchService):
         request: SimilarImageSearchRequest,
     ) -> SimilarImageSearchResponse:
         logger.info(f"request for similar image: {request}")
-        response = SimilarImageSearchResponse(ids=[request.id])
+        response = SimilarImageSearchResponse(
+            ids=[
+                request.id,
+                "f6986fbc0de241e48b27af2987e6387a",  # pseudo similar image
+                "63cabf72d6614832ba1a376320a4148d",  # pseudo similar image
+                "20507ed1b2f54067b8617e55d1d63338",  # pseudo similar image
+                "b810c191e8d146dfb62dc839e0eabdbc",  # pseudo similar image
+            ]
+        )
         logger.info(f"response from similar image search: {response}")
         return response
 
