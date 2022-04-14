@@ -727,6 +727,7 @@ push_edge_ai_model_personalization:
 build_edge_ai_personalization_model:
 	docker run \
 		-it \
+		--rm \
 		-v $(EDGE_AI_MODEL_PERSONALIZATION_DIR)/model:/tmp/model \
 		--name edge_ai_personalization_model \
 		$(DOCKER_EDGE_AI_MODEL_PERSONALIZATION_IMAGE_NAME) \
