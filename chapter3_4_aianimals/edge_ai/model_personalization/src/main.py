@@ -149,10 +149,9 @@ def main():
             "restore": model.restore.get_concrete_function(),
         },
     )
-
-    converter = tf.lite.TFLiteConverter.from_saved_model(saved_model)
     logger.info(f"saved to {saved_model}")
 
+    converter = tf.lite.TFLiteConverter.from_saved_model(saved_model)
     converter.target_spec.supported_ops = [
         tf.lite.OpsSet.TFLITE_BUILTINS,
         tf.lite.OpsSet.SELECT_TF_OPS,
