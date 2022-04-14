@@ -1,7 +1,7 @@
 import os
 
 import tensorflow as tf
-from src.middleware import configure_logger
+from src.middleware.logger import configure_logger
 
 logger = configure_logger(__name__)
 
