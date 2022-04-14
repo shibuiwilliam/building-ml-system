@@ -137,7 +137,7 @@ def main():
     model = Model()
     output_dir = "/tmp/model"
     saved_model = os.path.join(output_dir, "saved_model")
-    tflite_path = os.path.join(output_dir, "model.tflite")
+    tflite_path = os.path.join(output_dir, "model_personalization.tflite")
 
     tf.saved_model.save(
         model,
