@@ -11,7 +11,7 @@ class Model(tf.Module):
         self.model = tf.keras.Sequential(
             [
                 tf.keras.layers.Flatten(
-                    input_shape=(1024),
+                    input_shape=(1024,),
                     name="flatten",
                 ),
                 tf.keras.layers.Dense(
