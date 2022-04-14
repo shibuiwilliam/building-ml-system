@@ -723,6 +723,17 @@ build_edge_ai_model_personalization:
 push_edge_ai_model_personalization: 
 	docker push $(DOCKER_EDGE_AI_MODEL_PERSONALIZATION_IMAGE_NAME)
 
+.PHONY: build_edge_ai_personalization_model
+build_edge_ai_personalization_model:
+	docker run \
+		-it \
+		-d \
+		--rm \
+		-v $(EDGE_AI_MODEL_PERSONALIZATION_DIR)/model:/tmp/model \
+		--name edge_ai_personalization_model \
+		$(DOCKER_EDGE_AI_MODEL_PERSONALIZATION_IMAGE_NAME) \
+		python -m src.main
+
 
 ############ DOCKER COMPOSE COMMANDS ############
 .PHONY: up

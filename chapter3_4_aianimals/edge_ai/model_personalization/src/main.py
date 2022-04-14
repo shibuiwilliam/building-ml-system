@@ -1,4 +1,9 @@
+import os
+
 import tensorflow as tf
+from src.middleware import configure_logger
+
+logger = configure_logger(__name__)
 
 
 class Model(tf.Module):
@@ -128,9 +133,11 @@ class Model(tf.Module):
 
 
 def main():
+    logger.info("Start...")
     model = Model()
-    saved_model = "/tmp/saved_model"
-    tflite_path = "/tmp/model.tflite"
+    output_dir = "/tmp/model"
+    saved_model = os.path.join(output_dir, "saved_model")
+    tflite_path = os.path.join(output_dir, "model.tflite")
 
     tf.saved_model.save(
         model,
@@ -144,6 +151,8 @@ def main():
     )
 
     converter = tf.lite.TFLiteConverter.from_saved_model(saved_model)
+    logger.info(f"saved to {saved_model}")
+
     converter.target_spec.supported_ops = [
         tf.lite.OpsSet.TFLITE_BUILTINS,
         tf.lite.OpsSet.SELECT_TF_OPS,
@@ -152,6 +161,9 @@ def main():
     tflite_model = converter.convert()
     with open(tflite_path, "wb") as f:
         f.write(tflite_model)
+    logger.info(f"saved to {tflite_path}")
+
+    logger.info("Done...")
 
 
 if __name__ == "__main__":
