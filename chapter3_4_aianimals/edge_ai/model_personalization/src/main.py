@@ -1,25 +1,16 @@
 import tensorflow as tf
 
-IMAGE_SIZE = 224
-
 
 class Model(tf.Module):
     def __init__(self):
         self.model = tf.keras.Sequential(
             [
-                tf.keras.applications.MobileNetV3Small(
-                    input_shape=(
-                        IMAGE_SIZE,
-                        IMAGE_SIZE,
-                        3,
-                    ),
-                    include_top=False,
-                    weights="imagenet",
-                    alpha=1.0,
-                    include_preprocessing=True,
+                tf.keras.layers.Flatten(
+                    input_shape=(1024),
+                    name="flatten",
                 ),
                 tf.keras.layers.Dense(
-                    128,
+                    256,
                     activation="relu",
                     name="dense_1",
                 ),
@@ -36,22 +27,14 @@ class Model(tf.Module):
             loss=tf.keras.losses.CategoricalCrossentropy(from_logits=True),
         )
 
-    # The `train` function takes a batch of input images and labels.
     @tf.function(
         input_signature=[
             tf.TensorSpec(
-                [
-                    None,
-                    IMAGE_SIZE,
-                    IMAGE_SIZE,
-                ],
+                [None, 1024],
                 tf.float32,
             ),
             tf.TensorSpec(
-                [
-                    None,
-                    2,
-                ],
+                [None, 2],
                 tf.float32,
             ),
         ]
@@ -79,11 +62,7 @@ class Model(tf.Module):
     @tf.function(
         input_signature=[
             tf.TensorSpec(
-                [
-                    None,
-                    IMAGE_SIZE,
-                    IMAGE_SIZE,
-                ],
+                [None, 1024],
                 tf.float32,
             ),
         ]
