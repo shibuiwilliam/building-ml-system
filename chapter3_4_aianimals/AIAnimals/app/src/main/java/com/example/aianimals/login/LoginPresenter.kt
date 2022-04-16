@@ -8,8 +8,6 @@ import com.example.aianimals.repository.access_log.source.AccessLogRepository
 import com.example.aianimals.repository.animal.source.AnimalRepository
 import com.example.aianimals.repository.login.source.LoginRepository
 import com.example.aianimals.repository.login.source.Result
-import com.example.aianimals.service.FeatureExtractionModel
-import com.example.aianimals.service.PersonalizedModel
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
@@ -18,8 +16,6 @@ class LoginPresenter(
     private val loginRepository: LoginRepository,
     private val animalRepository: AnimalRepository,
     private val accessLogRepository: AccessLogRepository,
-    private val featureExtractionModel: FeatureExtractionModel,
-    private val personalizedModel: PersonalizedModel,
     private val appExecutors: AppExecutors = AppExecutors()
 ) : LoginContract.Presenter {
     private val TAG = LoginPresenter::class.java.simpleName

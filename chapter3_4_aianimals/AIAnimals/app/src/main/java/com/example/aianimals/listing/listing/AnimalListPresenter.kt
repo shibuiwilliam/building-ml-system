@@ -8,8 +8,6 @@ import com.example.aianimals.repository.access_log.source.AccessLogRepository
 import com.example.aianimals.repository.animal.Animal
 import com.example.aianimals.repository.animal.source.AnimalRepository
 import com.example.aianimals.repository.login.source.LoginRepository
-import com.example.aianimals.service.FeatureExtractionModel
-import com.example.aianimals.service.PersonalizedModel
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
