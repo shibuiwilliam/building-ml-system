@@ -10,6 +10,8 @@ import com.example.aianimals.repository.animal.AnimalCategory
 import com.example.aianimals.repository.animal.AnimalSubcategory
 import com.example.aianimals.repository.animal.source.AnimalRepository
 import com.example.aianimals.repository.login.source.LoginRepository
+import com.example.aianimals.service.FeatureExtractionModel
+import com.example.aianimals.service.PersonalizedModel
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 

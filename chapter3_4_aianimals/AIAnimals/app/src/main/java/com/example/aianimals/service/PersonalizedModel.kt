@@ -1,8 +1,6 @@
 package com.example.aianimals.service
 
 import org.tensorflow.lite.Interpreter
-import java.lang.Exception
-import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 import java.nio.MappedByteBuffer
 
@@ -16,7 +14,7 @@ class PersonalizedModel(private var modelLoader: ModelLoader) {
     }
 
     private fun loadModel() {
-        val loadedModel = this.modelLoader.loadMappedFile(MODEL_NAME) ?: throw Exception("")
+        val loadedModel = this.modelLoader.loadMappedFile(DIRECTORY, MODEL_NAME) ?: throw Exception("")
         this.model = loadedModel
     }
 
@@ -45,10 +43,26 @@ class PersonalizedModel(private var modelLoader: ModelLoader) {
         this.interpreter.close()
     }
 
-    companion object{
+    companion object {
+        const val DIRECTORY = "model"
         const val MODEL_NAME = "model_personalization.tflite"
         const val INPUT_SIZE = 1024
         const val BATCH_SIZE = 16
         const val NUM_CLASSES = 2
+
+        private var INSTANCE: PersonalizedModel? = null
+
+        @JvmStatic
+        fun getInstance(modelLoader: ModelLoader): PersonalizedModel {
+            return INSTANCE ?: PersonalizedModel(modelLoader).apply { INSTANCE = this }
+        }
+
+        @JvmStatic
+        fun destroyInstance() {
+            if (INSTANCE != null) {
+                INSTANCE!!.close()
+            }
+            INSTANCE = null
+        }
     }
 }

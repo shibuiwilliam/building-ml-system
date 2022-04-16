@@ -3,20 +3,16 @@ package com.example.aianimals.service
 import android.graphics.Bitmap
 import android.util.Log
 import org.tensorflow.lite.DataType
-import org.tensorflow.lite.Delegate
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.gpu.GpuDelegate
-import org.tensorflow.lite.support.common.ops.DequantizeOp
 import org.tensorflow.lite.support.common.ops.NormalizeOp
-import java.lang.Exception
-import java.nio.MappedByteBuffer
-import org.tensorflow.lite.support.image.ImageProcessor;
-import org.tensorflow.lite.support.image.TensorImage;
-import org.tensorflow.lite.support.image.ops.ResizeOp;
+import org.tensorflow.lite.support.image.ImageProcessor
+import org.tensorflow.lite.support.image.TensorImage
+import org.tensorflow.lite.support.image.ops.ResizeOp
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
+import java.nio.MappedByteBuffer
 
-class FeatureExtractionModel(
-    private var modelLoader: ModelLoader) {
+class FeatureExtractionModel(private var modelLoader: ModelLoader) {
     private val TAG = FeatureExtractionModel::class.java.simpleName
 
     private lateinit var model: MappedByteBuffer
@@ -30,7 +26,7 @@ class FeatureExtractionModel(
     }
 
     private fun loadModel() {
-        val loadedModel = this.modelLoader.loadMappedFile(MODEL_NAME) ?: throw Exception("")
+        val loadedModel = this.modelLoader.loadMappedFile(DIRECTORY, MODEL_NAME) ?: throw Exception("")
         this.model = loadedModel
     }
 
@@ -73,17 +69,34 @@ class FeatureExtractionModel(
     }
 
     sealed class DelegateOptions {
-        object CPU: DelegateOptions()
-        object GPU: DelegateOptions()
-        object NNAPI: DelegateOptions()
+        object CPU : DelegateOptions()
+        object GPU : DelegateOptions()
+        object NNAPI : DelegateOptions()
     }
 
     companion object {
-        const val MODEL_NAME = "lite-model_imagenet_mobilenet_v3_small_100_224_feature_vector_5_default_1.tflite"
+        const val DIRECTORY = "model"
+        const val MODEL_NAME =
+            "lite-model_imagenet_mobilenet_v3_small_100_224_feature_vector_5_default_1.tflite"
         const val INPUT_HEIGHT = 224
         const val INPUT_WIDTH = 224
         const val OUTPUT_SIZE = 1024
         const val NUM_THREADS = 4
-        val DELEGATE: DelegateOptions = DelegateOptions.GPU
+        val DELEGATE: DelegateOptions = DelegateOptions.NNAPI
+
+        private var INSTANCE: FeatureExtractionModel? = null
+
+        @JvmStatic
+        fun getInstance(modelLoader: ModelLoader): FeatureExtractionModel {
+            return INSTANCE ?: FeatureExtractionModel(modelLoader).apply { INSTANCE = this }
+        }
+
+        @JvmStatic
+        fun destroyInstance() {
+            if (INSTANCE != null) {
+                INSTANCE!!.close()
+            }
+            INSTANCE = null
+        }
     }
 }

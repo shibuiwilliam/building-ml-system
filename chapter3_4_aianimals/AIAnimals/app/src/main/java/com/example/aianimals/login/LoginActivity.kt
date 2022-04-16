@@ -27,7 +27,9 @@ class LoginActivity : AppCompatActivity() {
             loginFragment,
             Injection.provideLoginRepository(applicationContext),
             Injection.provideAnimalRepository(applicationContext),
-            Injection.provideAccessLogReposiotry(applicationContext)
+            Injection.provideAccessLogReposiotry(applicationContext),
+            Injection.provideFeatureExtractionModel(applicationContext),
+            Injection.providePersonalizedModel(applicationContext)
         ).apply {
             if (savedInstanceState != null) {
                 isLoggedIn = savedInstanceState.getBoolean(IS_LOGGED_IN)

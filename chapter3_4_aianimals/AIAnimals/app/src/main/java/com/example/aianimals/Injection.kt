@@ -15,6 +15,9 @@ import com.example.aianimals.repository.login.source.LoginRepository
 import com.example.aianimals.repository.login.source.local.LoginLocalDataSource
 import com.example.aianimals.repository.login.source.remote.LoginAPIClient
 import com.example.aianimals.repository.login.source.remote.LoginRemoteDataSource
+import com.example.aianimals.service.FeatureExtractionModel
+import com.example.aianimals.service.ModelLoader
+import com.example.aianimals.service.PersonalizedModel
 
 object Injection {
     fun provideAnimalRepository(context: Context): AnimalRepository {
@@ -47,7 +50,6 @@ object Injection {
     }
 
     fun provideAccessLogReposiotry(context: Context): AccessLogRepository {
-        val database = AIAnimalsDatabase.getInstance(context)
         return AccessLogRepository.getInstance(
             AccessLogLocalDataSource.getInstance(AppExecutors()),
             AccessLogRemoteDataSource.getInstance(
@@ -55,5 +57,13 @@ object Injection {
                 AccessLogAPIClient.accessLogAPI
             )
         )
+    }
+
+    fun provideFeatureExtractionModel(context: Context): FeatureExtractionModel {
+        return FeatureExtractionModel.getInstance(ModelLoader(context))
+    }
+
+    fun providePersonalizedModel(context: Context): PersonalizedModel{
+        return PersonalizedModel.getInstance(ModelLoader(context))
     }
 }
