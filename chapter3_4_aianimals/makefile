@@ -696,44 +696,6 @@ deploy_no_animal_violation_serving: registry_violation_detection
 		-f $(VIOLATION_DETECTION_MANIFEST_DIR)/no_animal_violation_serving.yaml
 
 
-############ EDGE AI MODEL PERSONALIZATION COMMANDS ############
-EDGE_AI_MODEL_PERSONALIZATION_DIR := $(DIR)/edge_ai/model_personalization
-EDGE_AI_MODEL_PERSONALIZATION_VERSION := $(shell cd ${EDGE_AI_MODEL_PERSONALIZATION_DIR} && poetry version -s)
-DOCKERFILE_EDGE_AI_MODEL_PERSONALIZATION = $(EDGE_AI_MODEL_PERSONALIZATION_DIR)/$(DOCKERFILE)
-DOCKER_EDGE_AI_MODEL_PERSONALIZATION_TAG = $(TAG)_edge_ai_model_personalization
-DOCKER_EDGE_AI_MODEL_PERSONALIZATION_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_EDGE_AI_MODEL_PERSONALIZATION_TAG)_$(EDGE_AI_MODEL_PERSONALIZATION_VERSION)
-
-.PHONY: req_edge_ai_model_personalization
-req_edge_ai_model_personalization:
-	cd $(EDGE_AI_MODEL_PERSONALIZATION_DIR) && \
-	poetry export \
-		--without-hashes \
-		-f requirements.txt \
-		--output requirements.txt
-
-.PHONY: build_edge_ai_model_personalization
-build_edge_ai_model_personalization: 
-	docker build \
-		--platform x86_64 \
-		-t $(DOCKER_EDGE_AI_MODEL_PERSONALIZATION_IMAGE_NAME) \
-		-f $(DOCKERFILE_EDGE_AI_MODEL_PERSONALIZATION) \
-		.
-
-.PHONY: push_edge_ai_model_personalization
-push_edge_ai_model_personalization: 
-	docker push $(DOCKER_EDGE_AI_MODEL_PERSONALIZATION_IMAGE_NAME)
-
-.PHONY: build_edge_ai_personalization_model
-build_edge_ai_personalization_model:
-	docker run \
-		-it \
-		--rm \
-		-v $(EDGE_AI_MODEL_PERSONALIZATION_DIR)/model:/tmp/model \
-		--name edge_ai_personalization_model \
-		$(DOCKER_EDGE_AI_MODEL_PERSONALIZATION_IMAGE_NAME) \
-		python -m src.main
-
-
 ############ DOCKER COMPOSE COMMANDS ############
 .PHONY: up
 up:
@@ -843,8 +805,7 @@ req_all: \
 	req_search_learn_to_rank_train \
 	req_search_similar_image_search_train \
 	req_search_similar_image_search_proxy \
-	req_search_learn_to_rank_lgbm_api \
-	req_edge_ai_model_personalization
+	req_search_learn_to_rank_lgbm_api
 
 .PHONY: build_all
 build_all: \
@@ -864,8 +825,7 @@ build_all: \
 	build_search_learn_to_rank_train \
 	build_search_similar_image_search_train \
 	build_search_similar_image_search_proxy \
-	build_search_learn_to_rank_lgbm_api \
-	build_edge_ai_model_personalization
+	build_search_learn_to_rank_lgbm_api
 	
 .PHONY: push_all
 push_all: \
@@ -885,6 +845,5 @@ push_all: \
 	push_search_learn_to_rank_train \
 	push_search_similar_image_search_train \
 	push_search_similar_image_search_proxy \
-	push_search_learn_to_rank_lgbm_api \
-	push_edge_ai_model_personalization
+	push_search_learn_to_rank_lgbm_api
 	
