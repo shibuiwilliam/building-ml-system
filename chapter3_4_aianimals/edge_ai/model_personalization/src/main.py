@@ -78,10 +78,7 @@ class Model(tf.Module):
             logits,
             axis=-1,
         )
-        return {
-            "output": probabilities,
-            "logits": logits,
-        }
+        return {"output": probabilities}
 
     @tf.function(
         input_signature=[
