@@ -32,6 +32,6 @@ app.include_router(
 )
 
 instrumentator = Instrumentator()
-instrumentator.add(metrics.default())
+instrumentator.add(metrics.default()).add(metrics.requests())
 instrumentator.instrument(app)
 instrumentator.expose(app)
