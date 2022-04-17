@@ -32,4 +32,7 @@ app.include_router(
     tags=["reorder"],
 )
 
-Instrumentator().add(metrics.default()).instrument(app).expose(app)
+instrumentator = Instrumentator()
+instrumentator.add(metrics.default())
+instrumentator.instrument(app)
+instrumentator.expose(app)
