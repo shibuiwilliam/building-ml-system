@@ -230,7 +230,7 @@ spec:
               memory: "4000Mi"
             requests:
               cpu: 500m
-              memory: "500Mi"
+              memory: "1000Mi"
           volumeMounts:
             - name: grafana-datasources
               mountPath: /etc/grafana/provisioning/datasources

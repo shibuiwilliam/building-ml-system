@@ -110,7 +110,7 @@ spec:
             - "{{inputs.parameters.deployment}}"
             - "--containers={{inputs.parameters.containers}}"
             - "MLFLOW_PARAM_JSON={{inputs.parameters.mlflow-params}}"
-            - "PSEUDO_PREDICTION='0"
+            - "PSEUDO_PREDICTION=0"
 
     imagePullSecrets:
       - name: regcred

@@ -23,7 +23,7 @@ spec:
                     value: model-loader
                   - name: mlflow-params
                     value: "{{steps.violation-detection-no-animal-violation-train.outputs.parameters.mlflow-params}}"
-          - - name: violation-detection-no-animal-violation-proxy-update
+            - name: violation-detection-no-animal-violation-proxy-update
               template: violation-detection-no-animal-violation-proxy-update
               arguments:
                 parameters:
@@ -100,7 +100,7 @@ spec:
             - "{{inputs.parameters.deployment}}"
             - "--containers={{inputs.parameters.containers}}"
             - "MLFLOW_PARAM_JSON={{inputs.parameters.mlflow-params}}"
-            - "OFF='0'"
+            - "RUN='1'"
             - "PSEUDO_PREDICTION='0'"
     imagePullSecrets:
       - name: regcred
