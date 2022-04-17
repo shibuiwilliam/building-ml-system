@@ -23,7 +23,6 @@ elasticsearch = {extras = ["async"], version = "^8.0.1"}
 httpx = "^0.22.0"
 dependency-injector = "^4.39.1"
 prometheus-client = "^0.14.1"
-prometheus-fastapi-instrumentator = "^5.7.1"
 
 [tool.poetry.dev-dependencies]
 

@@ -484,18 +484,6 @@ python-versions = ">=3.6"
 twisted = ["twisted"]
 
 [[package]]
-name = "prometheus-fastapi-instrumentator"
-version = "5.7.1"
-description = "Instrument your FastAPI with Prometheus metrics"
-category = "main"
-optional = false
-python-versions = ">=3.6.0,<4.0.0"
-
-[package.dependencies]
-fastapi = ">=0.38.1,<1.0.0"
-prometheus-client = ">=0.8.0,<1.0.0"
-
-[[package]]
 name = "protobuf"
 version = "3.19.4"
 description = "Protocol Buffers"
@@ -756,7 +744,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "3.9.7"
-content-hash = "b52a3a8966deb58751f904ba59d20e2f663a69cea00d2930b41153b9c563cd02"
+content-hash = "6c5178c6509456f0c26f06a4af689d9c7db8ca8b5ab0b51ef9a6c3d23b7b6bee"
 
 [metadata.files]
 aiofiles = [
@@ -1284,10 +1272,6 @@ pika = [
 prometheus-client = [
     {file = "prometheus_client-0.14.1-py3-none-any.whl", hash = "sha256:522fded625282822a89e2773452f42df14b5a8e84a86433e3f8a189c1d54dc01"},
     {file = "prometheus_client-0.14.1.tar.gz", hash = "sha256:5459c427624961076277fdc6dc50540e2bacb98eebde99886e59ec55ed92093a"},
-]
-prometheus-fastapi-instrumentator = [
-    {file = "prometheus-fastapi-instrumentator-5.7.1.tar.gz", hash = "sha256:5371f1b494e2b00017a02898d854119b4929025d1a203670b07b3f42dd0b5526"},
-    {file = "prometheus_fastapi_instrumentator-5.7.1-py3-none-any.whl", hash = "sha256:da40ea0df14b0e95d584769747fba777522a8df6a8c47cec2edf798f1fff49b5"},
 ]
 protobuf = [
     {file = "protobuf-3.19.4-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:f51d5a9f137f7a2cec2d326a74b6e3fc79d635d69ffe1b036d39fc7d75430d37"},
