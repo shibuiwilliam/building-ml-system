@@ -4,10 +4,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from src.api import access_log, animal, animal_category, health_check, like, metadata, user, violation
 from src.configurations import Configurations
-from src.constants import RUN_ENVIRONMENT
 from src.exceptions.custom_exceptions import APINotAllowedException, DatabaseException, StorageClientException
-from starlette_prometheus import metrics, PrometheusMiddleware
-
 
 logger = getLogger(__name__)
 
@@ -22,11 +19,6 @@ app = FastAPI(
     docs_url=f"{base_prefix}/docs",
     redoc_url=f"{base_prefix}/redoc",
 )
-
-if Configurations.run_environment == RUN_ENVIRONMENT.CLOUD.value:
-    logger.info("run in cloud with prometheus logging")
-    app.add_middleware(PrometheusMiddleware)
-    app.add_route("{base_prefix}/metrics", metrics)
 
 
 @app.exception_handler(DatabaseException)
