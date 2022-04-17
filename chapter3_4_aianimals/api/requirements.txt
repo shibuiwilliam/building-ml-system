@@ -1,7 +1,7 @@
 aiofiles==0.8.0; python_version >= "3.6" and python_version < "4.0"
 aiohttp==3.8.1; python_version >= "3.6" and python_version < "4"
 aiosignal==1.2.0; python_version >= "3.6" and python_version < "4"
-anyio==3.5.0; python_version >= "3.7" and python_full_version >= "3.6.2" and python_version < "4.0"
+anyio==3.5.0; python_version >= "3.6" and python_full_version >= "3.6.2"
 asgiref==3.5.0; python_version >= "3.7"
 async-timeout==4.0.2; python_version >= "3.6" and python_version < "4"
 attrs==21.4.0; python_version >= "3.6" and python_full_version < "3.0.0" and python_version < "4" or python_version >= "3.6" and python_version < "4" and python_full_version >= "3.5.0"
@@ -34,7 +34,8 @@ idna==3.3
 multidict==6.0.2; python_version >= "3.7" and python_version < "4"
 packaging==21.3; python_version >= "3.6"
 pika==1.2.0
-prometheus-client==0.12.0; python_version >= "3.7" and python_full_version < "3.0.0" and python_version < "4.0" or python_version >= "3.7" and python_version < "4.0" and python_full_version >= "3.4.0"
+prometheus-client==0.14.1; python_version >= "3.6"
+prometheus-fastapi-instrumentator==5.7.1; python_full_version >= "3.6.0" and python_full_version < "4.0.0"
 protobuf==3.19.4; python_version >= "3.7"
 psycopg2-binary==2.9.3; python_version >= "3.6"
 pyasn1-modules==0.2.8; python_version >= "3.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.7"
@@ -48,10 +49,9 @@ requests==2.27.1; python_version >= "3.7" and python_full_version < "3.0.0" or p
 rfc3986==1.5.0; python_version >= "3.6"
 rsa==4.8; python_version >= "3.6" and python_version < "4" and (python_version >= "3.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.7")
 six==1.16.0; python_version >= "3.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.7"
-sniffio==1.2.0; python_version >= "3.7" and python_full_version >= "3.6.2" and python_version < "4.0"
+sniffio==1.2.0; python_version >= "3.6" and python_full_version >= "3.6.2"
 sqlalchemy==1.4.31; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.6.0")
-starlette-prometheus==0.9.0; python_version >= "3.7" and python_version < "4.0"
-starlette==0.16.0; python_version >= "3.7" and python_full_version >= "3.6.1" and python_version < "4.0"
+starlette==0.16.0; python_version >= "3.6" and python_full_version >= "3.6.1" and python_full_version < "4.0.0"
 typing-extensions==4.1.1; python_version >= "3.6" and python_full_version >= "3.6.1"
 urllib3==1.26.8; python_version >= "3.7" and python_full_version < "3.0.0" and python_version < "4" or python_full_version >= "3.6.0" and python_version < "4" and python_version >= "3.7"
 uvicorn==0.15.0
