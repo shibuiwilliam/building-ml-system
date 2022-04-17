@@ -351,8 +351,7 @@ registry_monitoring: deploy_monitoring_ns
 
 .PHONY: deploy_monitoring
 deploy_monitoring: registry_monitoring
-	kubectl create -f $(MONITORING_MANIFEST_DIR)/kube_prometheus_manifest/setup
-	kubectl apply -f $(MONITORING_MANIFEST_DIR)/kube_prometheus_manifest
+	kubectl -n monitoring apply -f $(MONITORING_MANIFEST_DIR)/prometheus.yaml
 
 
 ############ ELASTICSEARCH COMMANDS ############

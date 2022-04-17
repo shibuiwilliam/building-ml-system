@@ -1,6 +1,7 @@
 from logging import getLogger
 
 from fastapi import FastAPI
+from prometheus_fastapi_instrumentator import Instrumentator, metrics
 from src.api import health_check, reorder
 from src.configurations import Configurations
 
@@ -30,3 +31,7 @@ app.include_router(
     prefix=f"{base_prefix}/reorder",
     tags=["reorder"],
 )
+
+Instrumentator().add(metrics.latency(buckets=(1, 2, 3,),),).instrument(
+    app
+).expose(app)
