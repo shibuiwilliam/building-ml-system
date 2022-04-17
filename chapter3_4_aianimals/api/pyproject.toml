@@ -22,6 +22,7 @@ google-cloud-storage = "^2.1.0"
 elasticsearch = {extras = ["async"], version = "^8.0.1"}
 httpx = "^0.22.0"
 dependency-injector = "^4.39.1"
+starlette-prometheus = "^0.9.0"
 
 [tool.poetry.dev-dependencies]
 
