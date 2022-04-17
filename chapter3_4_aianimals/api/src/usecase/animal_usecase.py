@@ -262,7 +262,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
         offset: int = 0,
     ) -> AnimalSearchResponses:
         search_id = get_uuid()
-        logger.info(f"{search_id} {request}")
+        model_name = None
         sort_by = AnimalSearchSortKey.value_to_key(value=request.sort_by)
         query = AnimalSearchQuery(
             animal_category_name_en=request.animal_category_name_en,
@@ -284,6 +284,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
             logger.info(f"hit cache: {key}")
             searched = AnimalSearchResponses(**cache)
             searched.search_id = search_id
+            logger.info(f"request: {request}; response: {searched}")
             return searched
         results = self.search_client.search(
             index=ANIMAL_INDEX,
@@ -314,6 +315,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
                 )
                 learn_to_rank_request.query_animal_subcategory_id = animal_subcategory_id
             ranked_ids = self.learn_to_rank.reorder(request=learn_to_rank_request)
+            model_name = ranked_ids.model_name
             _results = [_ids[i] for i in ranked_ids.ids]
             results.results = _results
 
@@ -324,7 +326,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
             offset=results.offset,
             search_id=search_id,
             sort_by=sort_by.value,
-            model_name="",
+            model_name=model_name,
         )
         if query.sort_by != AnimalSearchSortKey.LEARN_TO_RANK:
             background_tasks.add_task(
@@ -332,6 +334,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
                 key,
                 searched,
             )
+        logger.info(f"request: {request}; response: {searched}")
         return searched
 
     def search_similar_image(
@@ -340,7 +343,6 @@ class AnimalUsecase(AbstractAnimalUsecase):
         request: SimilarAnimalSearchRequest,
     ) -> SimilarAnimalSearchResponses:
         search_id = get_uuid()
-        logger.info(f"{search_id} {request}")
         search_request = SimilarImageSearchRequest(id=request.id)
         response = self.similar_image_search.search(request=search_request)
         query = AnimalIDs(ids=response.ids)
@@ -368,9 +370,11 @@ class AnimalUsecase(AbstractAnimalUsecase):
             )
             for a in animals
         ]
-        return SimilarAnimalSearchResponses(
+        searched = SimilarAnimalSearchResponses(
             results=responses,
             search_id=search_id,
             sort_by="image_similarity",
-            model_name="",
+            model_name=response.model_name,
         )
+        logger.info(f"request: {request}; response: {searched}")
+        return searched

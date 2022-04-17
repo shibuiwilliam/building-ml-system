@@ -59,6 +59,8 @@ spec:
               value: INFO
             - name: PSEUDO_PREDICTION
               value: "0"
+            - name: MLFLOW_PARAM_JSON
+              value: "{}"
             - name: PREDICTOR_URL
               value: http://similar-image-search-serving.search.svc.cluster.local:8501/v1/models/similar_image_search:predict
             - name: PREDICTOR_HEIGHT

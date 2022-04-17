@@ -22,7 +22,9 @@ def make_query_id(
     animal_subcategory_id: Optional[int],
 ) -> str:
     animal_idstring = ".".join(sorted(animal_ids))
-    query_key = f"{Configurations.model_name}_{phrases}_{animal_category_id}_{animal_subcategory_id}_{animal_idstring}"
+    query_key = (
+        f"{Configurations.model_version}_{phrases}_{animal_category_id}_{animal_subcategory_id}_{animal_idstring}"
+    )
     return get_md5_hash(string=query_key)
 
 

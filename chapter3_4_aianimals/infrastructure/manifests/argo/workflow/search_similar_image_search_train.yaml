@@ -23,6 +23,16 @@ spec:
                     value: model-loader
                   - name: mlflow-params
                     value: "{{steps.search-similar-image-search-train.outputs.parameters.mlflow-params}}"
+            - name: search-similar-image-search-proxy-update
+              template: search-similar-image-search-proxy-update
+              arguments:
+                parameters:
+                  - name: deployment
+                    value: similar-image-search-proxy
+                  - name: containers
+                    value: similar-image-search-proxy
+                  - name: mlflow-params
+                    value: "{{steps.search-similar-image-search-train.outputs.parameters.mlflow-params}}"
 
       - name: search-similar-image-search-train
         container:
@@ -80,6 +90,27 @@ spec:
             - "MLFLOW_PARAM_JSON={{inputs.parameters.mlflow-params}}"
             - "TARGET_ARTIFACTS=saved_model"
             - "TARGET_URLS=''"
+
+      - name: search-similar-image-search-proxy-update
+        serviceAccountName: user-admin
+        inputs:
+          parameters:
+            - name: deployment
+            - name: containers
+            - name: mlflow-params
+        container:
+          image: shibui/building-ml-system:ai_animals_k8s_client_0.0.0
+          command: [kubectl]
+          args:
+            - -n
+            - search
+            - set
+            - env
+            - deployment
+            - "{{inputs.parameters.deployment}}"
+            - "--containers={{inputs.parameters.containers}}"
+            - "MLFLOW_PARAM_JSON={{inputs.parameters.mlflow-params}}"
+            - "PSEUDO_PREDICTION='0"
 
     imagePullSecrets:
       - name: regcred

@@ -7,7 +7,7 @@ class Configurations(object):
     api_description = os.getenv("API_DESCRIPTION", "")
     version = os.getenv("VERSION", "0.0.0")
 
-    model_name = os.getenv("MODEL_VERSION", "learn_to_rank_lightgbm_ranker_0.0.0")
+    model_version = os.getenv("MODEL_VERSION", "learn_to_rank_lightgbm_ranker_0.0.0")
 
     mlflow_param_json = os.getenv("MLFLOW_PARAM_JSON", None)
     mlflow_param = {}

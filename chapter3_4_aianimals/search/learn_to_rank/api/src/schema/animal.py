@@ -1,6 +1,7 @@
 from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Extra
+from src.configurations import Configurations
 
 
 class AnimalRequest(BaseModel):
@@ -15,6 +16,7 @@ class AnimalRequest(BaseModel):
 
 class AnimalResponse(BaseModel):
     ids: List[str]
+    model_name: Optional[str] = Configurations.mlflow_run_id
 
     class Config:
         extra = Extra.forbid

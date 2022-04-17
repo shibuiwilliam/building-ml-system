@@ -1,7 +1,7 @@
 import json
 from abc import ABC, abstractmethod
 from logging import getLogger
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import httpx
 from pydantic import BaseModel, Extra
@@ -19,6 +19,7 @@ class SimilarImageSearchRequest(BaseModel):
 
 class SimilarImageSearchResponse(BaseModel):
     ids: List[str]
+    model_name: Optional[str] = None
 
     class Config:
         extra = Extra.forbid
@@ -95,7 +96,10 @@ class SimilarImageSearchService(AbstractSimilarImageSearchService):
             )
         if res.status_code != 200:
             logger.error(f"failed to request similar image search: {res}")
-            return SimilarImageSearchResponse(ids=[id])
+            return SimilarImageSearchResponse(
+                ids=[id],
+                model_name=None,
+            )
         res_json = res.json()
         response = SimilarImageSearchResponse(**res_json)
         logger.info(f"response from similar image search: {response}")

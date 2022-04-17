@@ -29,6 +29,7 @@ class LearnToRankABTestRequest(BaseModel):
 
 class LearnToRankResponse(BaseModel):
     ids: List[str]
+    model_name: Optional[str] = None
 
     class Config:
         extra = Extra.forbid
