@@ -31,4 +31,4 @@ app.include_router(
     tags=["similar_image_search"],
 )
 
-Instrumentator().add(metrics.default()).add(metrics.latency()).instrument(app).expose(app)
+Instrumentator().add(metrics.default()).instrument(app).expose(app)
