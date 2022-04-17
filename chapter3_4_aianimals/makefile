@@ -766,12 +766,14 @@ initialize_deployment: deploy_kube_system \
 	registry_mlflow \
 	registry_argo \
 	registry_search \
+	registry_monitoring \
 	secret_api
 
 .PHONY: deploy_first
 deploy_first: deploy_data \
 	deploy_es \
-	deploy_argo
+	deploy_argo \
+	deploy_monitoring
 
 .PHONY: deploy_second
 deploy_second: deploy_mlflow \
@@ -806,7 +808,8 @@ delete_namespaces:
 	kubectl delete ns mlflow & \
 	kubectl delete ns search & \
 	kubectl delete ns elastic-search & \
-	kubectl delete ns elastic-system
+	kubectl delete ns elastic-system & \
+	kubectl delete ns monitoring
 
 ############ ALL COMMANDS ############
 .PHONY: req_all
