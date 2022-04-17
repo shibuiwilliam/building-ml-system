@@ -312,8 +312,8 @@ registry_argo: deploy_argo_ns
 
 .PHONY: deploy_argo
 deploy_argo: registry_argo
-	kubectl -n argo apply -f $(ARGO_MANIFEST_DIR)/argo_clusterrolebinding.yaml
-	kubectl -n argo apply -f $(ARGO_MANIFEST_DIR)/quick_argo.yaml
+	kubectl -n argo apply -f $(ARGO_MANIFEST_DIR)/argo_clusterrolebinding.yaml && \
+	kubectl -n argo apply -f https://github.com/argoproj/argo-workflows/releases/download/v3.3.1/quick-start-postgres.yaml
 
 .PHONY: port_forward_argo
 port_forward_argo:
@@ -335,6 +335,24 @@ create_argo_no_animal_violation_train:
 .PHONY: submit_argo_learn_to_rank_lgbm_ranker_train
 submit_argo_learn_to_rank_lgbm_ranker_train:
 	argo submit infrastructure/manifests/argo/workflow/search_learn_to_rank_lgbm_ranker_train.yaml
+
+
+############ MONITORING COMMANDS ############
+MONITORING_MANIFEST_DIR := $(K8S_DIR)/manifests/monitoring
+
+.PHONY: deploy_monitoring_ns
+deploy_monitoring_ns:
+	kubectl apply -f $(MONITORING_MANIFEST_DIR)/namespace.yaml
+
+.PHONY: registry_monitoring
+registry_monitoring: deploy_monitoring_ns
+	@cd $(K8S_SECRET_DIR) && \
+		NAMESPACE=monitoring ./private_registry_secret.sh
+
+.PHONY: deploy_monitoring
+deploy_monitoring: registry_monitoring
+	kubectl create -f $(MONITORING_MANIFEST_DIR)/kube_prometheus_manifest/setup
+	kubectl apply -f $(MONITORING_MANIFEST_DIR)/kube_prometheus_manifest
 
 
 ############ ELASTICSEARCH COMMANDS ############
@@ -367,8 +385,8 @@ registry_es: deploy_es_ns
 
 .PHONY: deploy_es
 deploy_es: registry_es
-	kubectl apply -f $(ES_MANIFEST_DIR)/crds.yaml && \
-	kubectl apply -f $(ES_MANIFEST_DIR)/operator.yaml && \
+	kubectl apply -f https://download.elastic.co/downloads/eck/2.1.0/crds.yaml && \
+	kubectl apply -f https://download.elastic.co/downloads/eck/2.1.0/operator.yaml && \
 	kubectl apply -f $(ES_MANIFEST_DIR)/deployment.yaml
 
 .PHONY: es_password
