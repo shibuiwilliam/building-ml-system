@@ -7,7 +7,7 @@ from time import sleep
 
 @inject
 def main(violation_detection_job: ViolationDetectionJob = Provide[Container.jobs.violation_detection_job]):
-    if Configurations.off:
+    if not Configurations.run:
         while True:
             print("off...")
             sleep(10)

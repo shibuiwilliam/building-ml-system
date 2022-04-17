@@ -51,8 +51,8 @@ spec:
               value: no_animal_violation
             - name: REGISTRATION_QUEUE
               value: violation
-            - name: OFF
-              value: "1"
+            - name: RUN
+              value: "0"
             - name: PSEUDO_PREDICTION
               value: "0"
             - name: MLFLOW_PARAM_JSON

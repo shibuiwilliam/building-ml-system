@@ -8,7 +8,7 @@ class Configurations:
     consuming_queue = os.getenv("CONSUMING_QUEUE", "no_animal_violation")
     registration_queue = os.getenv("REGISTRATION_QUEUE", "violation")
 
-    off = bool(int(os.getenv("OFF", "0")))
+    run = bool(int(os.getenv("RUN", "0")))
     pseudo_prediction = bool(int(os.getenv("PSEUDO_PREDICTION", "0")))
 
     predictor_url = os.getenv("PREDICTOR_URL", "http://localhost:8501/v1/models/no_animal_violation:predict")
