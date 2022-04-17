@@ -115,6 +115,11 @@ data:
         metrics_path: /metrics
         static_configs:
         - targets: ['learn-to-rank-lgbm-regression.search.svc.cluster.local:10100']
+      - job_name: 'search-similar-image-search-proxy'
+        honor_labels: true
+        metrics_path: /metrics
+        static_configs:
+        - targets: ['similar-image-search-proxy.search.svc.cluster.local:15000']
 ---
 apiVersion: apps/v1
 kind: Deployment

@@ -1,7 +1,7 @@
 from logging import getLogger
 
 from fastapi import FastAPI
-from prometheus_fastapi_instrumentator import Instrumentator
+from prometheus_fastapi_instrumentator import Instrumentator, metrics
 from src.api import health_check, similar_image_search
 from src.configurations import Configurations
 
@@ -31,4 +31,4 @@ app.include_router(
     tags=["similar_image_search"],
 )
 
-Instrumentator().instrument(app).expose(app)
+Instrumentator().add(metrics.default()).add(metrics.latency()).instrument(app).expose(app)

@@ -352,6 +352,7 @@ registry_monitoring: deploy_monitoring_ns
 .PHONY: deploy_monitoring
 deploy_monitoring: registry_monitoring
 	kubectl -n monitoring apply -f $(MONITORING_MANIFEST_DIR)/prometheus.yaml
+	kubectl -n monitoring apply -f $(MONITORING_MANIFEST_DIR)/grafana.yaml
 
 
 ############ ELASTICSEARCH COMMANDS ############
