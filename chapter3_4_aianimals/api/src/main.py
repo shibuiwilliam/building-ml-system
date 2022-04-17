@@ -22,7 +22,7 @@ app = FastAPI(
     redoc_url=f"{base_prefix}/redoc",
 )
 
-if Configurations.run_environment == RUN_ENVIRONMENT.cloud.value:
+if Configurations.run_environment == RUN_ENVIRONMENT.CLOUD.value:
     from prometheus_fastapi_instrumentator import Instrumentator
 
     Instrumentator().instrument(app).expose(app)
