@@ -51,8 +51,12 @@ spec:
               value: no_animal_violation
             - name: REGISTRATION_QUEUE
               value: violation
+            - name: OFF
+              value: "1"
             - name: PSEUDO_PREDICTION
               value: "0"
+            - name: MLFLOW_PARAM_JSON
+              value: "{}"
             - name: PREDICTOR_URL
               value: http://no-animal-violation-serving.violation-detection.svc.cluster.local:8501/v1/models/no_animal_violation:predict
             - name: PREDICTOR_HEIGHT

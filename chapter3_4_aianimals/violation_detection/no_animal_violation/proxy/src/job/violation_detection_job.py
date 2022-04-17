@@ -62,7 +62,7 @@ class ViolationDetectionJob(object):
             "animal_id": animal.id,
             "violation_type_id": self.violation_type_id,
             "probability": prediction.violation_probability,
-            "judge": "administrator",
+            "judge": Configurations.model_name,
             "is_effective": True,
         }
 
