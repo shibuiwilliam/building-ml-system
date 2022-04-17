@@ -340,12 +340,12 @@ class InitializationJob(AbstractJob):
             requests.append(
                 AccessLogCreateRequest(
                     id=v["id"],
-                    search_id=["search_id"],
+                    search_id=v["search_id"],
                     phrases=v["phrases"],
                     animal_category_id=v["animal_category_id"],
                     animal_subcategory_id=v["animal_subcategory_id"],
-                    sort_by=["sort_by"],
-                    model_name=["model_name"],
+                    sort_by=v["sort_by"],
+                    model_name=v["model_name"],
                     user_id=v["user_id"],
                     likes=v["likes"],
                     animal_id=v["animal_id"],

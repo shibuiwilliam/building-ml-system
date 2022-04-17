@@ -100,10 +100,6 @@ registry_mlflow: deploy_mlflow_ns
 deploy_mlflow: registry_mlflow
 	kubectl apply -f $(MLFLOW_MANIFEST_DIR)/mlflow.yaml
 
-.PHONY: port_forward_mlflow
-port_forward_mlflow:
-	kubectl -n mlflow port-forward service/mlflow 5000:5000 &
-
 
 ############ BASE_TEXT_PROCESSING COMMANDS ############
 BASE_TEXT_PROCESSING_DIR := $(DIR)/base_text_processing
@@ -238,10 +234,6 @@ secret_api:
 deploy_api: registry_api
 	kubectl apply -f $(API_MANIFEST_DIR)/api.yaml
 
-.PHONY: port_forward_api
-port_forward_api:
-	kubectl -n aianimals port-forward service/api 8000:8000 &
-
 
 ############ BATCH COMMANDS ############
 BATCH_MANIFEST_DIR := $(K8S_DIR)/manifests/aianimals
@@ -311,11 +303,6 @@ registry_argo: deploy_argo_ns
 deploy_argo: registry_argo
 	kubectl -n argo apply -f $(ARGO_MANIFEST_DIR)/argo_clusterrolebinding.yaml && \
 	kubectl -n argo apply -f https://github.com/argoproj/argo-workflows/releases/download/v3.3.1/quick-start-postgres.yaml
-
-.PHONY: port_forward_argo
-port_forward_argo:
-	kubectl -n argo port-forward service/argo-server 2746:2746 &
-	echo "Open https://127.0.0.1:2746"
 
 .PHONY: create_argo_similar_image_search_train_cron
 create_argo_similar_image_search_train_cron:
@@ -391,14 +378,6 @@ es_password:
 	kubectl -n elastic-search \
 		get secret elastic-search-es-elastic-user \
 		-o go-template='{{.data.elastic | base64decode}}'
-
-.PHONY: port_forward_es
-port_forward_es:
-	kubectl -n elastic-search port-forward service/elastic-search-es-http 9200:9200 &
-
-.PHONY: port_forward_kibana
-port_forward_kibana:
-	kubectl -n elastic-search port-forward service/kibana-kb-http 5601:5601 &
 
 
 ############ SEARCH COMMANDS ############
