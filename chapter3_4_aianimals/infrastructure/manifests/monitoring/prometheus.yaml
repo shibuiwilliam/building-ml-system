@@ -105,6 +105,16 @@ data:
         metrics_path: /metrics
         static_configs:
         - targets: ['pushgateway:9091']
+      - job_name: 'search-learn-to-rank-lgbm-ranker'
+        honor_labels: true
+        metrics_path: /metrics
+        static_configs:
+        - targets: ['learn-to-rank-lgbm-ranker.search.svc.cluster.local:10000']
+      - job_name: 'search-learn-to-rank-lgbm-regression'
+        honor_labels: true
+        metrics_path: /metrics
+        static_configs:
+        - targets: ['learn-to-rank-lgbm-regression.search.svc.cluster.local:10100']
 ---
 apiVersion: apps/v1
 kind: Deployment
