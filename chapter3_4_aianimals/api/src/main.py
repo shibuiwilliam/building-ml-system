@@ -24,6 +24,7 @@ app = FastAPI(
 )
 
 if Configurations.run_environment == RUN_ENVIRONMENT.CLOUD.value:
+    logger.info("run in cloud with prometheus logging")
     app.add_middleware(PrometheusMiddleware)
     app.add_route("{base_prefix}/metrics", metrics)
 
