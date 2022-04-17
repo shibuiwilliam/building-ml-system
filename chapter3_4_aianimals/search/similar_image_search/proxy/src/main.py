@@ -1,6 +1,7 @@
 from logging import getLogger
 
 from fastapi import FastAPI
+from prometheus_fastapi_instrumentator import Instrumentator
 from src.api import health_check, similar_image_search
 from src.configurations import Configurations
 
@@ -29,3 +30,5 @@ app.include_router(
     prefix=f"{base_prefix}/similar-image-search",
     tags=["similar_image_search"],
 )
+
+Instrumentator().instrument(app).expose(app)
