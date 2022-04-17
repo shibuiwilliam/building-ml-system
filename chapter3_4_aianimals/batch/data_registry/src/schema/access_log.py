@@ -12,6 +12,11 @@ class AccessLog(Base):
         String(32),
         primary_key=True,
     )
+    search_id = Column(
+        String(64),
+        nullable=False,
+        unique=False,
+    )
     phrases = Column(
         JSON,
         nullable=False,
@@ -26,6 +31,16 @@ class AccessLog(Base):
     animal_subcategory_id = Column(
         INT,
         ForeignKey(f"{TABLES.ANIMAL_SUBCATEGORY.value}.id"),
+        nullable=True,
+        unique=False,
+    )
+    sort_by = Column(
+        String(64),
+        nullable=False,
+        unique=False,
+    )
+    model_name = Column(
+        String(64),
         nullable=True,
         unique=False,
     )

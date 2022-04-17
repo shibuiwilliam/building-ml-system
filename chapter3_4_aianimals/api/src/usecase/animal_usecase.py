@@ -261,6 +261,8 @@ class AnimalUsecase(AbstractAnimalUsecase):
         limit: int = 100,
         offset: int = 0,
     ) -> AnimalSearchResponses:
+        search_id = get_uuid()
+        logger.info(f"{search_id} {request}")
         sort_by = AnimalSearchSortKey.value_to_key(value=request.sort_by)
         query = AnimalSearchQuery(
             animal_category_name_en=request.animal_category_name_en,
@@ -281,6 +283,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
             cache = json.loads(cached)
             logger.info(f"hit cache: {key}")
             searched = AnimalSearchResponses(**cache)
+            searched.search_id = search_id
             return searched
         results = self.search_client.search(
             index=ANIMAL_INDEX,
@@ -319,6 +322,9 @@ class AnimalUsecase(AbstractAnimalUsecase):
             max_score=results.max_score,
             results=[AnimalSearchResponse(**r.dict()) for r in results.results],
             offset=results.offset,
+            search_id=search_id,
+            sort_by=sort_by.value,
+            model_name="",
         )
         if query.sort_by != AnimalSearchSortKey.LEARN_TO_RANK:
             background_tasks.add_task(
@@ -333,6 +339,8 @@ class AnimalUsecase(AbstractAnimalUsecase):
         session: Session,
         request: SimilarAnimalSearchRequest,
     ) -> SimilarAnimalSearchResponses:
+        search_id = get_uuid()
+        logger.info(f"{search_id} {request}")
         search_request = SimilarImageSearchRequest(id=request.id)
         response = self.similar_image_search.search(request=search_request)
         query = AnimalIDs(ids=response.ids)
@@ -360,4 +368,9 @@ class AnimalUsecase(AbstractAnimalUsecase):
             )
             for a in animals
         ]
-        return SimilarAnimalSearchResponses(results=responses)
+        return SimilarAnimalSearchResponses(
+            results=responses,
+            search_id=search_id,
+            sort_by="image_similarity",
+            model_name="",
+        )

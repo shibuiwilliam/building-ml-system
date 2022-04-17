@@ -142,6 +142,11 @@ class InitializationJob(AbstractJob):
             {"column": Violation.probability, "unique": False},
             {"column": Violation.is_effective, "unique": False},
         ]
+        access_log_indices = [
+            {"column": AccessLog.sort_by, "unique": False},
+            {"column": AccessLog.model_name, "unique": False},
+            {"column": AccessLog.search_id, "unique": True},
+        ]
 
         self.__create_index(
             indices=animal_category_indices,
@@ -173,6 +178,10 @@ class InitializationJob(AbstractJob):
         )
         self.__create_index(
             indices=violation_indices,
+            table=Violation,
+        )
+        self.__create_index(
+            indices=access_log_indices,
             table=Violation,
         )
 
@@ -331,9 +340,12 @@ class InitializationJob(AbstractJob):
             requests.append(
                 AccessLogCreateRequest(
                     id=v["id"],
+                    search_id=["search_id"],
                     phrases=v["phrases"],
                     animal_category_id=v["animal_category_id"],
                     animal_subcategory_id=v["animal_subcategory_id"],
+                    sort_by=["sort_by"],
+                    model_name=["model_name"],
                     user_id=v["user_id"],
                     likes=v["likes"],
                     animal_id=v["animal_id"],

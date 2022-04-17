@@ -53,6 +53,9 @@ class AnimalSearchResponses(BaseModel):
     max_score: Optional[float]
     results: List[AnimalSearchResponse]
     offset: int
+    search_id: str
+    sort_by: str
+    model_name: Optional[str]
 
     class Config:
         extra = Extra.forbid
@@ -77,6 +80,9 @@ class SimilarAnimalSearchResponse(BaseModel):
 
 class SimilarAnimalSearchResponses(BaseModel):
     results: List[SimilarAnimalSearchResponse]
+    search_id: str
+    sort_by: str
+    model_name: Optional[str]
 
     class Config:
         extra = Extra.forbid

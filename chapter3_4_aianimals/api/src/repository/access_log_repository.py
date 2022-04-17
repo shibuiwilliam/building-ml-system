@@ -37,9 +37,12 @@ class AccessLogRepository(AbstractAccessLogRepository):
         action = record.action.value
         data = AccessLog(
             id=record.id,
+            search_id=record.search_id,
             phrases=record.phrases,
             animal_category_id=record.animal_category_id,
             animal_subcategory_id=record.animal_subcategory_id,
+            sort_by=record.sort_by,
+            model_name=record.model_name,
             user_id=record.user_id,
             likes=record.likes,
             animal_id=record.animal_id,

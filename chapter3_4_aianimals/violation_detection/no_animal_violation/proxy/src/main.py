@@ -1,8 +1,9 @@
+from time import sleep
+
 from dependency_injector.wiring import Provide, inject
 from src.configurations import Configurations
 from src.job.violation_detection_job import ViolationDetectionJob
 from src.registry.container import Container
-from time import sleep
 
 
 @inject

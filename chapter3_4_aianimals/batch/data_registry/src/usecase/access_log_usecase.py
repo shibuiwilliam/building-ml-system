@@ -50,9 +50,12 @@ class AccessLogUsecase(AbstractAccessLogUsecase):
         self.access_log_repository.insert(
             record=AccessLogCreate(
                 id=request.id,
+                search_id=request.search_id,
                 phrases=request.phrases,
                 animal_category_id=request.animal_category_id,
                 animal_subcategory_id=request.animal_subcategory_id,
+                sort_by=request.sort_by,
+                model_name=request.model_name,
                 user_id=request.user_id,
                 likes=request.likes,
                 animal_id=request.animal_id,
@@ -69,9 +72,12 @@ class AccessLogUsecase(AbstractAccessLogUsecase):
         records = [
             AccessLogCreate(
                 id=request.id,
+                search_id=request.search_id,
                 phrases=request.phrases,
                 animal_category_id=request.animal_category_id,
                 animal_subcategory_id=request.animal_subcategory_id,
+                sort_by=request.sort_by,
+                model_name=request.model_name,
                 user_id=request.user_id,
                 likes=request.likes,
                 animal_id=request.animal_id,
