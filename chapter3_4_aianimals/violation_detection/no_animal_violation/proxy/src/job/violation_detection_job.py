@@ -75,7 +75,7 @@ class ViolationDetectionJob(object):
             "violation_type_id": self.violation_type_id,
             "probability": 0.05,
             "judge": "administrator",
-            "is_effective": True,
+            "is_effective": False,
         }
 
     def run(
