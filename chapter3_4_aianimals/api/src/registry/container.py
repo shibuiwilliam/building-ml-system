@@ -6,7 +6,7 @@ from src.infrastructure.cache import AbstractCache, RedisCache
 from src.infrastructure.database import AbstractDatabase, PostgreSQLDatabase
 from src.infrastructure.messaging import AbstractMessaging, RabbitmqMessaging
 from src.infrastructure.search import AbstractSearch, ElasticsearchClient
-from src.infrastructure.storage import AbstractStorage, GoogleCloudStorage, LocalStorage
+from src.infrastructure.storage import AbstractStorage, LocalStorage
 from src.middleware.crypt import AbstractCrypt, Crypt
 from src.repository.access_log_repository import AbstractAccessLogRepository, AccessLogRepository
 from src.repository.animal_category_repository import AbstractAnimalCategoryRepository, AnimalCategoryRepository
@@ -121,16 +121,14 @@ class Container(object):
 
 
 if Configurations.run_environment == RUN_ENVIRONMENT.LOCAL.value:
-    storage_client: AbstractStorage = LocalStorage()
     learn_to_rank: AbstractLearnToRankService = PseudoLearnToRankService()
     similar_image_search: AbstractSimilarImageSearchService = PseudoSimilarImageSearchService()
 elif Configurations.run_environment == RUN_ENVIRONMENT.CLOUD.value:
-    storage_client = GoogleCloudStorage()
     learn_to_rank = LearnToRankService()
     similar_image_search = SimilarImageSearchService()
 
 container = Container(
-    storage_client=storage_client,
+    storage_client=LocalStorage(),
     database=PostgreSQLDatabase(),
     cache=RedisCache(),
     search_client=ElasticsearchClient(),
