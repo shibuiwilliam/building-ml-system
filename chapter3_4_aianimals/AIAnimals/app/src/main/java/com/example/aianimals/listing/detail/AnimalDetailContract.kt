@@ -10,7 +10,11 @@ class AnimalDetailContract {
         var queryString: String?
         var queryAnimalCategory: String
         var queryAnimalSubcategory: String
+        var querySortBy: String
+        var usedModelName: String?
         var startTime: Long
+
+        var searchID: String
 
         fun showAnimal()
         fun searchSimilarAnimal(): Map<String, Animal>

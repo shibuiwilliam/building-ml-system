@@ -154,7 +154,7 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
                     id: Long
                 ) {
                     val spinnerParent = parent as Spinner
-                    presenter.selectedSortValue = spinnerParent.selectedItem as String
+                    presenter.selectedSortBy = spinnerParent.selectedItem as String
                     presenter.listAnimals(presenter.query)
                 }
 
@@ -207,6 +207,15 @@ class AnimalListFragment : Fragment(), AnimalListContract.View {
                                 AnimalDetailActivity.EXTRA_QUERY_ANIMAL_SUBCATEGORY,
                                 presenter.selectedAnimalSubcategory
                             )
+                            putExtra(
+                                AnimalDetailActivity.EXTRA_QUERY_SORT_BY,
+                                presenter.selectedSortBy
+                            )
+                            putExtra(
+                                AnimalDetailActivity.EXTRA_MODEL_NAME,
+                                presenter.modelName
+                            )
+                            putExtra(AnimalDetailActivity.EXTRA_SEARCH_ID, presenter.searchID)
                         }
                         startActivity(intent)
                     }

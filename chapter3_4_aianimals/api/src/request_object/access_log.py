@@ -10,7 +10,7 @@ class AccessLogCreateRequest(BaseModel):
     animal_category_id: Optional[int] = None
     animal_subcategory_id: Optional[int] = None
     sort_by: str
-    model_name: Optional[str]
+    model_name: Optional[str] = None
     user_id: Optional[str]
     animal_id: str
     action: str

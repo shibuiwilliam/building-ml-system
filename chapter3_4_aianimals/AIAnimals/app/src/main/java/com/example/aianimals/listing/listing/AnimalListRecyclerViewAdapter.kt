@@ -48,7 +48,7 @@ class AnimalListRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: AnimalListRecyclerViewHolder, position: Int) {
         val animal = animals[position]
-        Glide.with(context).load(animal.imageUrl).into(holder.animalImageView)
+        Glide.with(context).load(animal.photoUrl).into(holder.animalImageView)
         holder.animalLikesButton.text = animal.like.toString()
         holder.itemView.setOnClickListener {
             onAnimalCellClickListener.onItemClick(animal)

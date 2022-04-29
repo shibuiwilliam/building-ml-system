@@ -33,14 +33,14 @@ class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
 
     override fun showAnimal(animal: Animal) {
         animalNameView.text = animal.name
-        animalSubmitDateView.text = animal.date
+        animalSubmitDateView.text = animal.created_at
         animalDescriptionView.text = animal.description
 
         animalNameView.visibility = View.VISIBLE
         animalSubmitDateView.visibility = View.VISIBLE
         animalDescriptionView.visibility = View.VISIBLE
 
-        Glide.with(this).load(animal.imageUrl).into(animalImageView)
+        Glide.with(this).load(animal.photoUrl).into(animalImageView)
         animalImageView.visibility = View.VISIBLE
         animalLikeButton.text = animal.like.toString()
 
@@ -112,6 +112,9 @@ class AnimalDetailFragment : Fragment(), AnimalDetailContract.View {
                                 AnimalDetailActivity.EXTRA_QUERY_ANIMAL_SUBCATEGORY,
                                 "ALL"
                             )
+                            putExtra(AnimalDetailActivity.EXTRA_QUERY_SORT_BY, "image_similarity")
+                            putExtra(AnimalDetailActivity.EXTRA_MODEL_NAME, presenter.usedModelName)
+                            putExtra(AnimalDetailActivity.EXTRA_SEARCH_ID, presenter.searchID)
                         }
                         startActivity(intent)
                     }

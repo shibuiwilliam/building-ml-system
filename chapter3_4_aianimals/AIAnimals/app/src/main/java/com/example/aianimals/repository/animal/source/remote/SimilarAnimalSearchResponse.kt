@@ -15,5 +15,8 @@ data class SimilarAnimalSearchResult(
 )
 
 data class SimilarAnimalSearchResponse(
-    val results: List<SimilarAnimalSearchResult>
+    val results: List<SimilarAnimalSearchResult>,
+    val searchId: String,
+    val sortBy: String,
+    val modelName: String?
 )

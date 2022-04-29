@@ -6,10 +6,10 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.aianimals.middleware.Converters
-import com.example.aianimals.repository.animal.Animal
 import com.example.aianimals.repository.animal.AnimalCategory
 import com.example.aianimals.repository.animal.AnimalSearchSortKey
 import com.example.aianimals.repository.animal.AnimalSubcategory
+import com.example.aianimals.repository.animal.source.local.Animal
 import com.example.aianimals.repository.animal.source.local.AnimalDao
 import com.example.aianimals.repository.animal.source.local.AnimalMetadataDao
 import com.example.aianimals.repository.login.Login
@@ -24,7 +24,7 @@ import com.example.aianimals.repository.login.source.local.LoginDao
         AnimalSubcategory::class,
         AnimalSearchSortKey::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

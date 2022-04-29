@@ -27,7 +27,11 @@ class AnimalDetailPresenter(
     override var queryString: String? = null
     override var queryAnimalCategory: String = "ALL"
     override var queryAnimalSubcategory: String = "ALL"
+    override var querySortBy: String = "created_at"
+    override var usedModelName: String? = null
     override var startTime: Long = 0L
+
+    override var searchID: String = ""
 
     private var phrases: ArrayList<String> = ArrayList()
     private var animalCategory: AnimalCategory? = null
@@ -55,10 +59,13 @@ class AnimalDetailPresenter(
 
             accessLogRepository.createAccessLog(
                 AccessLog(
-                    phrases,
-                    animalCategory?.id,
-                    animalSubcategory?.id,
-                    animalID,
+                    this@AnimalDetailPresenter.searchID,
+                    this@AnimalDetailPresenter.phrases,
+                    this@AnimalDetailPresenter.animalCategory?.id,
+                    this@AnimalDetailPresenter.animalSubcategory?.id,
+                    this@AnimalDetailPresenter.querySortBy,
+                    this@AnimalDetailPresenter.usedModelName,
+                    this@AnimalDetailPresenter.animalID,
                     AccessLogAction.SELECT.str
                 )
             )
@@ -68,9 +75,10 @@ class AnimalDetailPresenter(
     }
 
     override fun searchSimilarAnimal(): Map<String, Animal> = runBlocking {
-        var similarAnimals = mapOf<String, Animal>()
+        val similarAnimals = mutableMapOf<String, Animal>()
         withContext(appExecutors.ioContext) {
-            similarAnimals = animalRepository.searchAnimalsByImage(animal!!.id)
+            val response = animalRepository.searchAnimalsByImage(animal!!.id)
+            response.animals.forEach { similarAnimals[it.id] = it }
         }
         return@runBlocking similarAnimals
     }
@@ -85,9 +93,12 @@ class AnimalDetailPresenter(
 
         accessLogRepository.createAccessLog(
             AccessLog(
+                this@AnimalDetailPresenter.searchID,
                 this@AnimalDetailPresenter.phrases,
                 this@AnimalDetailPresenter.animalCategory?.id,
                 this@AnimalDetailPresenter.animalSubcategory?.id,
+                this@AnimalDetailPresenter.querySortBy,
+                this@AnimalDetailPresenter.usedModelName,
                 animal.id,
                 AccessLogAction.LIKE.str
             )
@@ -106,9 +117,12 @@ class AnimalDetailPresenter(
 
             accessLogRepository.createAccessLog(
                 AccessLog(
+                    this@AnimalDetailPresenter.searchID,
                     this@AnimalDetailPresenter.phrases,
                     this@AnimalDetailPresenter.animalCategory?.id,
                     this@AnimalDetailPresenter.animalSubcategory?.id,
+                    this@AnimalDetailPresenter.querySortBy,
+                    this@AnimalDetailPresenter.usedModelName,
                     animal.id,
                     AccessLogAction.SEE_LONG.str
                 )

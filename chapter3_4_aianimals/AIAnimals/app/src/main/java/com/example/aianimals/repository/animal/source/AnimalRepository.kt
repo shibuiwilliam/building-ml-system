@@ -3,10 +3,7 @@ package com.example.aianimals.repository.animal.source
 
 import android.util.Log
 import com.example.aianimals.BuildConfig
-import com.example.aianimals.repository.animal.Animal
-import com.example.aianimals.repository.animal.AnimalCategory
-import com.example.aianimals.repository.animal.AnimalSearchSortKey
-import com.example.aianimals.repository.animal.AnimalSubcategory
+import com.example.aianimals.repository.animal.*
 import com.example.aianimals.repository.animal.source.local.AnimalLocalDataSource
 import com.example.aianimals.repository.animal.source.remote.AnimalRemoteDataSource
 
@@ -26,10 +23,9 @@ class AnimalRepository(
         query: String?,
         sortBy: String,
         offset: Int
-    ): Map<String, Animal> {
-        var animals: Map<String, Animal> = mapOf()
+    ): Animals {
         if (BuildConfig.USE_LOCAL_DATA) {
-            animals = animalLocalDataSource.listAnimals(
+            return animalLocalDataSource.listAnimals(
                 animalCategoryNameEn,
                 animalCategoryNameJa,
                 animalSubcategoryNameEn,
@@ -38,12 +34,8 @@ class AnimalRepository(
                 sortBy,
                 offset
             )
-            if (animals.isNotEmpty()) {
-                return animals
-            }
         }
-
-        animals = animalRemoteDataSource.listAnimals(
+        return animalRemoteDataSource.listAnimals(
             animalCategoryNameEn,
             animalCategoryNameJa,
             animalSubcategoryNameEn,
@@ -52,10 +44,9 @@ class AnimalRepository(
             sortBy,
             offset
         )
-        return animals
     }
 
-    override suspend fun searchAnimalsByImage(animalID: String): Map<String, Animal> {
+    override suspend fun searchAnimalsByImage(animalID: String): Animals {
         if (BuildConfig.USE_LOCAL_DATA) {
             return animalLocalDataSource.searchAnimalsByImage(animalID)
         }

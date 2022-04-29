@@ -1,9 +1,6 @@
 package com.example.aianimals.repository.animal.source
 
-import com.example.aianimals.repository.animal.Animal
-import com.example.aianimals.repository.animal.AnimalCategory
-import com.example.aianimals.repository.animal.AnimalSearchSortKey
-import com.example.aianimals.repository.animal.AnimalSubcategory
+import com.example.aianimals.repository.animal.*
 
 interface AnimalDataSource {
     suspend fun createAnimals()
@@ -15,11 +12,11 @@ interface AnimalDataSource {
         query: String?,
         sortBy: String,
         offset: Int
-    ): Map<String, Animal>
+    ): Animals
 
     suspend fun searchAnimalsByImage(
         animalID: String
-    ): Map<String, Animal>
+    ): Animals
 
     suspend fun getAnimal(animalID: String): Animal?
     suspend fun saveAnimal(animal: Animal)

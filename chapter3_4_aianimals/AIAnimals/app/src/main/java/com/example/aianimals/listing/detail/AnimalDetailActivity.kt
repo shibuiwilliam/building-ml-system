@@ -54,6 +54,9 @@ class AnimalDetailActivity : AppCompatActivity() {
             intent.getStringExtra(EXTRA_QUERY_ANIMAL_CATEGORY)!!
         animalDetailPresenter.queryAnimalSubcategory =
             intent.getStringExtra(EXTRA_QUERY_ANIMAL_SUBCATEGORY)!!
+        animalDetailPresenter.querySortBy = intent.getStringExtra(EXTRA_QUERY_SORT_BY)!!
+        animalDetailPresenter.usedModelName = intent.getStringExtra(EXTRA_MODEL_NAME)
+        animalDetailPresenter.searchID = intent.getStringExtra(EXTRA_SEARCH_ID)!!
 
         drawerLayout = findViewById(R.id.drawer_layout)
         navigationView = findViewById(R.id.navigation_view)
@@ -102,5 +105,8 @@ class AnimalDetailActivity : AppCompatActivity() {
         const val EXTRA_QUERY_STRING: String = "QUERY_STRING"
         const val EXTRA_QUERY_ANIMAL_CATEGORY: String = "QUERY_ANIMAL_CATEGORY"
         const val EXTRA_QUERY_ANIMAL_SUBCATEGORY: String = "QUERY_ANIMAL_SUBCATEGORY"
+        const val EXTRA_QUERY_SORT_BY: String = "QUERY_SORT_BY"
+        const val EXTRA_MODEL_NAME: String = "QUERY_MODEL_NAME"
+        const val EXTRA_SEARCH_ID: String = "SEARCH_ID"
     }
 }

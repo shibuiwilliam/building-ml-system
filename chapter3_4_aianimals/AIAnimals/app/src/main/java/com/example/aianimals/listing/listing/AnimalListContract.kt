@@ -12,8 +12,11 @@ interface AnimalListContract {
         var sortValues: MutableList<String>
         var selectedAnimalCategory: String
         var selectedAnimalSubcategory: String
-        var selectedSortValue: String
+        var selectedSortBy: String
+        var modelName: String?
         var currentPosition: Int
+
+        var searchID: String
 
         fun searchAnimals(): Map<String, Animal>
         fun listAnimals(query: String?)

@@ -47,7 +47,7 @@ class SimilarAnimalRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: SimilarAnimalRecyclerViewHolder, position: Int) {
         val animal = animals[position]
-        Glide.with(context).load(animal.imageUrl).into(holder.animalImageView)
+        Glide.with(context).load(animal.photoUrl).into(holder.animalImageView)
         holder.itemView.setOnClickListener {
             onAnimalCellClickListener.onItemClick(animal)
         }

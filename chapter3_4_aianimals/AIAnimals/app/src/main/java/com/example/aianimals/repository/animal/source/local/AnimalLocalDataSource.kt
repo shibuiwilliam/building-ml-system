@@ -4,12 +4,12 @@ import android.util.Log
 import androidx.annotation.VisibleForTesting
 import com.example.aianimals.middleware.AppExecutors
 import com.example.aianimals.middleware.Utils
+import com.example.aianimals.repository.animal.*
 import com.example.aianimals.repository.animal.Animal
-import com.example.aianimals.repository.animal.AnimalCategory
-import com.example.aianimals.repository.animal.AnimalSearchSortKey
-import com.example.aianimals.repository.animal.AnimalSubcategory
 import com.example.aianimals.repository.animal.source.AnimalDataSource
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.*
 
 class AnimalLocalDataSource private constructor(
     val appExecutors: AppExecutors,
@@ -25,12 +25,12 @@ class AnimalLocalDataSource private constructor(
                 id,
                 "ネコ",
                 "かわいい",
-                "2020/11/24",
                 0,
-                "https://storage.googleapis.com/aianimals/images/0016e503d29a4be9a4b852f2a5b44525.jpg"
+                "https://storage.googleapis.com/aianimals/images/0016e503d29a4be9a4b852f2a5b44525.jpg",
+                "2020/11/24",
             )
             saveAnimal(animal)
-            Log.i("AnimalRepository", "animal: ${animal}")
+            Log.i("AnimalRepository", "animal: $animal")
         }
     }
 
@@ -42,47 +42,100 @@ class AnimalLocalDataSource private constructor(
         query: String?,
         sortBy: String,
         offset: Int
-    ): Map<String, Animal> {
-        val animalMap = mutableMapOf<String, Animal>()
+    ): Animals {
+        val animals = mutableListOf<Animal>()
         withContext(appExecutors.ioContext) {
             val count = animalDao.countAnimals()
             if (count == 0) {
+                Log.i(TAG, "add pseudo animals")
                 createAnimals()
             }
-            val animals = animalDao.listAnimals()
+            val localAnimals = animalDao.listAnimals()
             withContext(appExecutors.defaultContext) {
-                if (animals.isNotEmpty()) {
-                    animals.forEach { animalMap[it.id] = it }
+                if (localAnimals.isNotEmpty()) {
+                    localAnimals.forEach { it ->
+                        animals.add(
+                            Animal(
+                                it.id,
+                                it.name,
+                                it.description,
+                                it.like,
+                                it.photoUrl,
+                                it.created_at
+                            )
+                        )
+                    }
                 }
             }
         }
-        return animalMap
+        return Animals(
+            animals,
+            animals.size,
+            "",
+            sortBy,
+            null
+        )
     }
 
-    override suspend fun searchAnimalsByImage(animalID: String): Map<String, Animal> {
-        val animalMap = mutableMapOf<String, Animal>()
+    override suspend fun searchAnimalsByImage(animalID: String): Animals {
+        val animals = mutableListOf<Animal>()
         withContext(appExecutors.ioContext) {
-            val animals = animalDao.listAnimals()
+            val localAnimals = animalDao.listAnimals()
             withContext(appExecutors.defaultContext) {
-                if (animals.isNotEmpty()) {
-                    animals.forEach { animalMap[it.id] = it }
+                if (localAnimals.isNotEmpty()) {
+                    localAnimals.forEach { it ->
+                        animals.add(
+                            Animal(
+                                it.id,
+                                it.name,
+                                it.description,
+                                it.like,
+                                it.photoUrl,
+                                it.created_at
+                            )
+                        )
+                    }
                 }
             }
         }
-        return animalMap
+        return Animals(
+            animals,
+            animals.size,
+            "",
+            "image_similarity",
+            null
+        )
     }
 
     override suspend fun getAnimal(animalID: String): Animal? {
         var animal: Animal? = null
         withContext(appExecutors.ioContext) {
-            animal = animalDao.getAnimal(animalID)
+            val localAnimal = animalDao.getAnimal(animalID)
+            if (localAnimal != null) {
+                animal = Animal(
+                    localAnimal.id,
+                    localAnimal.name,
+                    localAnimal.description,
+                    localAnimal.like,
+                    localAnimal.photoUrl,
+                    SimpleDateFormat("yyyy/MM/dd").format(Date()).toString(),
+                )
+            }
         }
         return animal
     }
 
     override suspend fun saveAnimal(animal: Animal) {
+        val localAnimal = com.example.aianimals.repository.animal.source.local.Animal(
+            animal.id,
+            animal.name,
+            animal.description,
+            animal.like,
+            animal.photoUrl,
+            animal.created_at,
+        )
         withContext(appExecutors.ioContext) {
-            animalDao.insertAnimal(animal)
+            animalDao.insertAnimal(localAnimal)
         }
     }
 

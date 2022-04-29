@@ -18,5 +18,9 @@ data class AnimalSearchResult(
 data class AnimalSearchResponse(
     val hits: Int,
     val maxScore: Float?,
-    val results: List<AnimalSearchResult>
+    val results: List<AnimalSearchResult>,
+    val offset: Int,
+    val searchId: String,
+    val sortBy: String,
+    val modelName: String?
 )

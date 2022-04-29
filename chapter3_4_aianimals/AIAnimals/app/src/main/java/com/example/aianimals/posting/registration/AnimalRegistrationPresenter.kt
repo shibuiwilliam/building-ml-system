@@ -13,14 +13,14 @@ import java.util.*
 import kotlin.coroutines.CoroutineContext
 
 class AnimalRegistrationPresenter(
-    private val imageUri: String?,
+    private val photoUrl: String?,
     private val animalRepository: AnimalRepository,
     private val loginRepository: LoginRepository,
     private val animalRegistrationView: AnimalRegistrationContract.View,
     private val context: CoroutineContext = Dispatchers.Default
 ) : AnimalRegistrationContract.Presenter {
     private val TAG = AnimalRegistrationPresenter::class.java.simpleName
-    private var _imageUrl = imageUri
+    private var _photoUrl = photoUrl
 
     init {
         this.animalRegistrationView.presenter = this
@@ -45,11 +45,11 @@ class AnimalRegistrationPresenter(
     }
 
     override fun getImageUri(): String? {
-        return this._imageUrl
+        return this._photoUrl
     }
 
     override fun setImageUri(imageUri: String?) {
-        this._imageUrl = imageUri
+        this._photoUrl = imageUri
     }
 
     override fun start() {
@@ -63,7 +63,7 @@ class AnimalRegistrationPresenter(
     }
 
     override fun showImage() {
-        this.animalRegistrationView.showImage(this._imageUrl)
+        this.animalRegistrationView.showImage(this._photoUrl)
     }
 
     override fun addAnimal(animal: Animal) = runBlocking {
@@ -72,7 +72,7 @@ class AnimalRegistrationPresenter(
     }
 
     override fun makeAnimal(): Animal? {
-        if (animalName == null || animalDescription == null || this._imageUrl == null) {
+        if (animalName == null || animalDescription == null || this._photoUrl == null) {
             return null
         }
         val id = Utils.generateUUID()
@@ -82,9 +82,9 @@ class AnimalRegistrationPresenter(
             id,
             animalName!!,
             animalDescription!!,
-            today,
             0,
-            this._imageUrl!!
+            this._photoUrl!!,
+            today
         )
     }
 

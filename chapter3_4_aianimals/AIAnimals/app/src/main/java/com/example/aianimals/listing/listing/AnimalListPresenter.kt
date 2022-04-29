@@ -27,9 +27,12 @@ class AnimalListPresenter(
 
     override lateinit var selectedAnimalCategory: String
     override lateinit var selectedAnimalSubcategory: String
-    override lateinit var selectedSortValue: String
+    override lateinit var selectedSortBy: String
+    override var modelName: String? = null
 
     override var currentPosition: Int = 0
+
+    override var searchID: String = ""
 
     init {
         this.animalListView.presenter = this
@@ -44,21 +47,25 @@ class AnimalListPresenter(
     }
 
     override fun searchAnimals(): Map<String, Animal> = runBlocking {
-        var animals = mapOf<String, Animal>()
+        val animals = mutableMapOf<String, Animal>()
         withContext(appExecutors.ioContext) {
             val animalCategoryNameEn =
                 if (selectedAnimalCategory == "ALL") null else selectedAnimalCategory
             val animalSubcategoryNameEn =
                 if (selectedAnimalSubcategory == "ALL") null else selectedAnimalSubcategory
-            animals = animalRepository.listAnimals(
+            val response = animalRepository.listAnimals(
                 animalCategoryNameEn,
                 null,
                 animalSubcategoryNameEn,
                 null,
                 this@AnimalListPresenter.query,
-                this@AnimalListPresenter.selectedSortValue,
+                this@AnimalListPresenter.selectedSortBy,
                 this@AnimalListPresenter.currentPosition
             )
+            response.animals.forEach { animals[it.id] = it }
+            selectedSortBy = response.sortBy
+            modelName = response.modelName
+            searchID = response.searchID
         }
         return@runBlocking animals
     }
@@ -120,7 +127,7 @@ class AnimalListPresenter(
                 sortValues.add(sv.name)
             }
         }
-        selectedSortValue = "created_at"
+        selectedSortBy = "created_at"
     }
 
     override fun likeAnimal(animal: Animal) = runBlocking {
@@ -151,9 +158,12 @@ class AnimalListPresenter(
 
         accessLogRepository.createAccessLog(
             AccessLog(
+                searchID,
                 phrases,
                 animalCategoryID,
                 animalSubcategoryID,
+                selectedSortBy,
+                modelName,
                 animal.id,
                 AccessLogAction.LIKE.str
             )

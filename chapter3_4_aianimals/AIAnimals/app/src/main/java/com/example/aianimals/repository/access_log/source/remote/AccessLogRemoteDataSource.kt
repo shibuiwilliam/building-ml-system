@@ -25,9 +25,12 @@ class AccessLogRemoteDataSource private constructor(
             accessLogAPI.postAccessLog(
                 token!!,
                 AccessLogPost(
+                    accessLog.searchID,
                     accessLog.phrases,
                     accessLog.animalCategoryID,
                     accessLog.animalSubcategoryID,
+                    accessLog.sortBy,
+                    accessLog.modelName,
                     accessLog.animalID,
                     accessLog.action
                 )

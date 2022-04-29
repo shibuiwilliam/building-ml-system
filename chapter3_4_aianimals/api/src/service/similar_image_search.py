@@ -53,7 +53,8 @@ class PseudoSimilarImageSearchService(AbstractSimilarImageSearchService):
                 "63cabf72d6614832ba1a376320a4148d",  # pseudo similar image
                 "20507ed1b2f54067b8617e55d1d63338",  # pseudo similar image
                 "b810c191e8d146dfb62dc839e0eabdbc",  # pseudo similar image
-            ]
+            ],
+            model_name="pseudo",
         )
         logger.info(f"response from similar image search: {response}")
         return response

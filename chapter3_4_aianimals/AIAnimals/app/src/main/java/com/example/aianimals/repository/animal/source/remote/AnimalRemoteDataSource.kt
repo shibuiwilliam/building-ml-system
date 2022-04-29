@@ -2,10 +2,7 @@ package com.example.aianimals.repository.animal.source.remote
 
 import androidx.annotation.VisibleForTesting
 import com.example.aianimals.middleware.AppExecutors
-import com.example.aianimals.repository.animal.Animal
-import com.example.aianimals.repository.animal.AnimalCategory
-import com.example.aianimals.repository.animal.AnimalSearchSortKey
-import com.example.aianimals.repository.animal.AnimalSubcategory
+import com.example.aianimals.repository.animal.*
 import com.example.aianimals.repository.animal.source.AnimalDataSource
 import kotlinx.coroutines.withContext
 
@@ -38,11 +35,19 @@ class AnimalRemoteDataSource private constructor(
         query: String?,
         sortBy: String,
         offset: Int
-    ): Map<String, Animal> {
+    ): Animals {
+        val animals = mutableListOf<Animal>()
+        var modelName: String? = null
+        var searchID: String = ""
         if (token == null) {
-            return mapOf()
+            return Animals(
+                animals,
+                0,
+                searchID,
+                sortBy,
+                modelName,
+            )
         }
-        val animals = mutableMapOf<String, Animal>()
         withContext(appExecutors.ioContext) {
             val phrases = mutableListOf<String>()
             if (query != null) {
@@ -63,24 +68,42 @@ class AnimalRemoteDataSource private constructor(
                 animalSearchPost,
             )
             response.body()!!.results.forEach {
-                animals[it.id] = Animal(
-                    id = it.id,
-                    name = it.name,
-                    description = it.description,
-                    date = it.created_at,
-                    like = it.like,
-                    imageUrl = it.photoUrl
+                animals.add(
+                    Animal(
+                        id = it.id,
+                        name = it.name,
+                        description = it.description,
+                        like = it.like,
+                        photoUrl = it.photoUrl,
+                        created_at = it.created_at
+                    )
                 )
             }
+            modelName = response.body()!!.modelName
+            searchID = response.body()!!.searchId
         }
-        return animals
+        return Animals(
+            animals,
+            animals.size,
+            searchID,
+            sortBy,
+            modelName
+        )
     }
 
-    override suspend fun searchAnimalsByImage(animalID: String): Map<String, Animal> {
+    override suspend fun searchAnimalsByImage(animalID: String): Animals {
+        val animals = mutableListOf<Animal>()
+        var modelName: String? = null
+        var searchID: String = ""
         if (token == null) {
-            return mapOf()
+            return Animals(
+                animals,
+                0,
+                searchID,
+                "image_similarity",
+                modelName,
+            )
         }
-        val animals = mutableMapOf<String, Animal>()
         withContext(appExecutors.ioContext) {
             val similarAnimalSearchPost = SimilarAnimalSearchPost(animalID)
             val response = animalAPI.postSearchSimilarAnimal(
@@ -88,17 +111,27 @@ class AnimalRemoteDataSource private constructor(
                 similarAnimalSearchPost
             )
             response.body()!!.results.forEach {
-                animals[it.id] = Animal(
-                    id = it.id,
-                    name = it.name,
-                    description = it.description,
-                    date = it.created_at,
-                    like = it.like,
-                    imageUrl = it.photoUrl
+                animals.add(
+                    Animal(
+                        id = it.id,
+                        name = it.name,
+                        description = it.description,
+                        like = it.like,
+                        photoUrl = it.photoUrl,
+                        created_at = it.created_at
+                    )
                 )
             }
+            modelName = response.body()!!.modelName
+            searchID = response.body()!!.searchId
         }
-        return animals
+        return Animals(
+            animals,
+            animals.size,
+            searchID,
+            "image_similarity",
+            modelName
+        )
     }
 
     override suspend fun getAnimal(animalID: String): Animal? {
@@ -117,9 +150,9 @@ class AnimalRemoteDataSource private constructor(
                     id = body[0].id,
                     name = body[0].name,
                     description = body[0].description,
-                    date = body[0].created_at,
                     like = body[0].like,
-                    imageUrl = body[0].photoUrl
+                    photoUrl = body[0].photoUrl,
+                    created_at = body[0].created_at,
                 )
             }
         }

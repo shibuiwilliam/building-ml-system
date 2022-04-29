@@ -55,7 +55,7 @@ class AnimalSearchResponses(BaseModel):
     offset: int
     search_id: str
     sort_by: str
-    model_name: Optional[str]
+    model_name: Optional[str] = None
 
     class Config:
         extra = Extra.forbid
@@ -82,7 +82,7 @@ class SimilarAnimalSearchResponses(BaseModel):
     results: List[SimilarAnimalSearchResponse]
     search_id: str
     sort_by: str
-    model_name: Optional[str]
+    model_name: Optional[str] = None
 
     class Config:
         extra = Extra.forbid

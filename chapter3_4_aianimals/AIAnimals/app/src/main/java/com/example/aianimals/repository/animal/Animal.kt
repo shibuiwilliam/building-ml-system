@@ -1,17 +1,18 @@
 package com.example.aianimals.repository.animal
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import com.example.aianimals.middleware.Utils
+data class Animal(
+    val id: String,
+    val name: String,
+    val description: String,
+    val like: Int,
+    val photoUrl: String,
+    val created_at: String
+)
 
-
-@Entity(tableName = "animals")
-data class Animal @JvmOverloads constructor(
-    @PrimaryKey @ColumnInfo(name = "id") var id: String = Utils.generateUUID(),
-    @ColumnInfo(name = "name") var name: String = "",
-    @ColumnInfo(name = "description") var description: String = "",
-    @ColumnInfo(name = "date") var date: String = "",
-    @ColumnInfo(name = "like") var like: Int = 0,
-    @ColumnInfo(name = "imageUrl") var imageUrl: String = "https://www.anicom-sompo.co.jp/nekonoshiori/wp-content/uploads/2018/12/724-2.jpg"
+data class Animals(
+    val animals: List<Animal>,
+    val size: Int,
+    val searchID: String,
+    val sortBy: String,
+    val modelName: String?
 )

@@ -64,7 +64,10 @@ class PseudoLearnToRankService(AbstractLearnToRankService):
         request: LearnToRankRequest,
     ) -> LearnToRankResponse:
         logger.info(f"request for learn to rank: {request}")
-        response = LearnToRankResponse(ids=request.ids)
+        response = LearnToRankResponse(
+            ids=request.ids,
+            model_name="pseudo",
+        )
         logger.info(f"response from learn to rank: {response}")
         return response
 
