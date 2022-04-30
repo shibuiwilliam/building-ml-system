@@ -47,8 +47,6 @@ spec:
               value: mobilenet_v3
             - name: MLFLOW_TRACKING_URI
               value: http://mlflow.mlflow.svc.cluster.local:5000
-            - name: MLFLOW_EXPERIMENT
-              value: violation_detection_no_animal_violation_detection
           resources:
             requests:
               memory: 20000Mi

@@ -10,17 +10,43 @@ from src.middleware.logger import configure_logger
 logger = configure_logger(__name__)
 
 
-def load_image_and_label(
-    filepath: str,
-    label: int,
+def load_dataset(
+    dataset: TrainTestDataset,
     image_shape: ImageShape,
-) -> Tuple[Optional[NDArray[(Any, Any, Any, Any), float]], Optional[int]]:
-    if os.path.exists(filepath):
-        img = Image.open(filepath).convert(image_shape.color)
-        img = img.resize((image_shape.height, image_shape.width))
-        arr = np.array(img).astype(np.float32) / 255.0
-        return arr, label
-    return None, None
+) -> Tuple[
+    Tuple[
+        NDArray[(Any, Any, Any, Any), float],
+        NDArray[(Any, 2), int],
+    ],
+    Tuple[
+        NDArray[(Any, Any, Any, Any), float],
+        NDArray[(Any, 2), int],
+    ],
+]:
+    logger.info("start loading image")
+    x_train, y_train = load_images_and_labels(
+        negative_filepaths=dataset.train_dataset.negative_filepaths,
+        positive_filepaths=dataset.train_dataset.positive_filepaths,
+        image_shape=image_shape,
+    )
+    x_test, y_test = load_images_and_labels(
+        negative_filepaths=dataset.test_dataset.negative_filepaths,
+        positive_filepaths=dataset.test_dataset.positive_filepaths,
+        image_shape=image_shape,
+    )
+    logger.info(
+        f"""
+Loaded dataset:
+    Train: {x_train.shape}
+        Negatives: {len(dataset.train_dataset.negative_filepaths)}
+        Positives: {len(dataset.train_dataset.positive_filepaths)}
+    Test: {x_test.shape}
+        Negatives: {len(dataset.test_dataset.negative_filepaths)}
+        Positives: {len(dataset.test_dataset.positive_filepaths)}
+    """
+    )
+    logger.info("done loading image")
+    return (x_train, y_train), (x_test, y_test)
 
 
 def load_images_and_labels(
@@ -71,40 +97,14 @@ def load_images_and_labels(
     return x, y
 
 
-def load_dataset(
-    dataset: TrainTestDataset,
+def load_image_and_label(
+    filepath: str,
+    label: int,
     image_shape: ImageShape,
-) -> Tuple[
-    Tuple[
-        NDArray[(Any, Any, Any, Any), float],
-        NDArray[(Any, 2), int],
-    ],
-    Tuple[
-        NDArray[(Any, Any, Any, Any), float],
-        NDArray[(Any, 2), int],
-    ],
-]:
-    logger.info("start loading image")
-    x_train, y_train = load_images_and_labels(
-        negative_filepaths=dataset.train_dataset.negative_filepaths,
-        positive_filepaths=dataset.train_dataset.positive_filepaths,
-        image_shape=image_shape,
-    )
-    x_test, y_test = load_images_and_labels(
-        negative_filepaths=dataset.test_dataset.negative_filepaths,
-        positive_filepaths=dataset.test_dataset.positive_filepaths,
-        image_shape=image_shape,
-    )
-    logger.info(
-        f"""
-Loaded dataset:
-    Train: {x_train.shape}
-        Negatives: {len(dataset.train_dataset.negative_filepaths)}
-        Positives: {len(dataset.train_dataset.positive_filepaths)}
-    Test: {x_test.shape}
-        Negatives: {len(dataset.test_dataset.negative_filepaths)}
-        Positives: {len(dataset.test_dataset.positive_filepaths)}
-    """
-    )
-    logger.info("done loading image")
-    return (x_train, y_train), (x_test, y_test)
+) -> Tuple[Optional[NDArray[(Any, Any, Any, Any), float]], Optional[int]]:
+    if os.path.exists(filepath):
+        img = Image.open(filepath).convert(image_shape.color)
+        img = img.resize((image_shape.height, image_shape.width))
+        arr = np.array(img).astype(np.float32) / 255.0
+        return arr, label
+    return None, None

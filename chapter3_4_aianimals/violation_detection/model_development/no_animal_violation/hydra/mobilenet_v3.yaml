@@ -1,4 +1,4 @@
-task_name: no_animal_violation_detection
+task_name: violation_detection_no_animal_violation_detection
 dataset:
   train:
     negative_file: /opt/data/train_animal.txt

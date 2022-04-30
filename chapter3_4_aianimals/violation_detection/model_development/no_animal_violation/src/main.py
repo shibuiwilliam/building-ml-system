@@ -24,9 +24,10 @@ logger = configure_logger(__name__)
 def main(cfg: DictConfig):
     logger.info(f"config: {cfg}")
     cwd = os.getcwd()
-    experiment_name = os.getenv("MLFLOW_EXPERIMENT", "no_animal_violation_detection")
+    task_name = cfg.get("task_name", "violation_detection_no_animal_violation_detection")
+    experiment_name = task_name
     now = datetime.now().strftime("%Y%m%d_%H%M%S")
-    run_name = f"{cfg.task_name}_{now}"
+    run_name = f"{task_name}_{now}"
 
     logger.info(f"current working directory: {cwd}")
     logger.info(f"experiment_name: {experiment_name}")

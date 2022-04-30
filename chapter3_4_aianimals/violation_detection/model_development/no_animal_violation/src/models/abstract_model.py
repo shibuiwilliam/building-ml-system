@@ -8,13 +8,6 @@ from src.middleware.logger import configure_logger
 logger = configure_logger(__name__)
 
 
-class LabelPrediction(BaseModel):
-    file_name: str
-    label: int
-    prediction: List[float]
-    predicted_label: int
-
-
 class Evaluation(BaseModel):
     threshold: float
     accuracy: float
@@ -56,9 +49,9 @@ class AbstractModel(ABC):
     @abstractmethod
     def train(
         self,
-        x_train: NDArray[(Any, 299, 299, 3), float],
+        x_train: NDArray[(Any, 224, 224, 3), float],
         y_train: NDArray[(Any, 2), int],
-        x_test: NDArray[(Any, 299, 299, 3), float],
+        x_test: NDArray[(Any, 224, 224, 3), float],
         y_test: NDArray[(Any, 2), int],
         artifact_path: str,
         batch_size: int = 32,
@@ -72,7 +65,7 @@ class AbstractModel(ABC):
     @abstractmethod
     def evaluate(
         self,
-        x: NDArray[(Any, 299, 299, 3), float],
+        x: NDArray[(Any, 224, 224, 3), float],
         y: NDArray[(Any, 2), int],
         threshold: float = 0.5,
     ) -> Evaluation:
@@ -81,7 +74,7 @@ class AbstractModel(ABC):
     @abstractmethod
     def predict(
         self,
-        x: NDArray[(Any, 299, 299, 3), float],
+        x: NDArray[(Any, 224, 224, 3), float],
     ) -> NDArray[(Any, 2), float]:
         raise NotImplementedError
 
