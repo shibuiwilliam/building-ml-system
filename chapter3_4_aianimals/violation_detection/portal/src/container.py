@@ -1,10 +1,10 @@
 import logging.config
 
 from database import DBClient
-from depencency_injector.providers import Configuration, Container, DependenciesContainer, Factory, Resource, Singleton
+from dependency_injector.providers import Configuration, Container, DependenciesContainer, Factory, Resource, Singleton
 from dependency_injector.containers import DeclarativeContainer
 from model import AnimalRepository, ViolationRepository, ViolationTypeRepository
-from view import ViolationView
+from view import ViolationListView
 from view_model import AnimalViewModel, ViolationTypeViewModel, ViolationViewModel
 
 
@@ -12,7 +12,7 @@ class Core(DeclarativeContainer):
     config = Configuration()
     logging = Resource(
         logging.config.fileConfig,
-        fname="logging.ini",
+        fname="src/logging.ini",
     )
 
 
@@ -62,8 +62,8 @@ class View(DeclarativeContainer):
     config = Configuration()
     view_models = DependenciesContainer()
 
-    violation_view = Factory(
-        ViolationView,
+    violation_list_view = Factory(
+        ViolationListView,
         animal_view_model=view_models.animal_view_model,
         violation_type_view_model=view_models.violation_type_view_model,
         violation_view_model=view_models.violation_view_model,

@@ -17,4 +17,4 @@ RUN apt-get -y update && \
 
 COPY ${LOCAL_DIR}/src/ /${PROJECT_DIR}/src/
 
-CMD [ "python", "-m", "main" ]
+CMD [ "streamlit", "run", "src/main.py" ]

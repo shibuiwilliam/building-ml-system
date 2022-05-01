@@ -177,6 +177,27 @@ services:
     depends_on:
       - postgres
 
+  violation_portal:
+    container_name: violation_portal
+    image: shibui/building-ml-system:ai_animals_violation_detection_portal_0.0.0
+    restart: always
+    networks:
+      - default
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=aianimals
+    command:
+      - streamlit
+      - run
+      - src/main.py
+    ports:
+      - 8501:8501
+    depends_on:
+      - postgres
+
 networks:
   default:
     name: aianimals

@@ -83,14 +83,14 @@ class Violation(BaseModel):
 
 
 class VIOLATION_SORT_BY(Enum):
+    UPDATED_AT = "updated_at"
+    ANIMAL_CREATED_AT = "animal_created_at"
     ID = "id"
     ANIMAL_ID = "animal_id"
     VIOLATION_TYPE_NAME = "violation_type_name"
     JUDGE = "judge"
     PROBABILITY = "probability"
     IS_EFFECTIVE = "is_effective"
-    ANIMAL_CREATED_AT = "animal_created_at"
-    UPDATED_AT = "updated_at"
 
     @staticmethod
     def has_value(value: str) -> bool:
@@ -265,7 +265,7 @@ class AbstractViolationRepository(ABC):
     def select(
         self,
         violation_query: Optional[ViolationQuery] = None,
-        sort_by: VIOLATION_SORT_BY = VIOLATION_SORT_BY.ID,
+        sort_by: str = VIOLATION_SORT_BY.ID.value,
         limit: int = 200,
         offset: int = 0,
     ) -> List[Violation]:
@@ -283,7 +283,7 @@ class ViolationRepository(BaseRepository, AbstractViolationRepository):
     def select(
         self,
         violation_query: Optional[ViolationQuery] = None,
-        sort_by: VIOLATION_SORT_BY = VIOLATION_SORT_BY.ID,
+        sort_by: str = VIOLATION_SORT_BY.ID.value,
         limit: int = 200,
         offset: int = 0,
     ) -> List[Violation]:
@@ -298,7 +298,7 @@ class ViolationRepository(BaseRepository, AbstractViolationRepository):
                 {self.violation_table}.probability AS probability,
                 {self.violation_table}.is_effective AS is_effective,
                 {self.animal_table}.created_at AS animal_created_at,
-                {self.violation_table}.updated_at AS updated_at,
+                {self.violation_table}.updated_at AS updated_at
             FROM 
                 {self.violation_table}
             LEFT JOIN
@@ -358,7 +358,7 @@ class ViolationRepository(BaseRepository, AbstractViolationRepository):
 
         query += f"""
             ORDER BY
-                {sort_by.value}
+                {sort_by}
             LIMIT
                 {limit}
             OFFSET
