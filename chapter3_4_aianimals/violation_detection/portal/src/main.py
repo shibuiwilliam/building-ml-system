@@ -1,13 +1,13 @@
 from container import Application
 from dependency_injector.wiring import Provide, inject
-from view import AbstractViolationListView
+from view import AbstractSidePane
 
 
 @inject
 def main(
-    violation_list_view: AbstractViolationListView = Provide[Application.views.violation_list_view],
+    side_pane: AbstractSidePane = Provide[Application.views.side_pane],
 ):
-    violation_list_view.build()
+    side_pane.build()
 
 
 if __name__ == "__main__":

@@ -60,20 +60,9 @@ class ViolationQuery(BaseModel):
     violation_type_id: Optional[str] = None
     judge: Optional[str] = None
     is_effective: Optional[bool] = None
+    is_administrator_checked: Optional[bool] = None
     animal_days_from: Optional[int] = None
     days_from: Optional[int] = None
-
-    class Config:
-        extra = Extra.forbid
-
-
-class ViolationCreate(BaseModel):
-    id: str
-    animal_id: str
-    violation_type_id: str
-    probability: float
-    judge: str
-    is_effective: bool
 
     class Config:
         extra = Extra.forbid
@@ -83,10 +72,14 @@ class Violation(BaseModel):
     id: str
     animal_id: str
     animal_name: str
+    animal_description: str
+    is_animal_deactivated: bool
+    photo_url: str
     violation_type_name: str
     judge: str
     probability: float
     is_effective: bool
+    is_administrator_checked: bool
     animal_created_at: datetime
     updated_at: datetime
 
@@ -111,6 +104,15 @@ class VIOLATION_SORT_BY(Enum):
     @staticmethod
     def get_list() -> List[str]:
         return [v.value for v in VIOLATION_SORT_BY.__members__.values()]
+
+
+class SORT(Enum):
+    DESC = "DESC"
+    ASC = "ASC"
+
+    @staticmethod
+    def get_list() -> List[str]:
+        return [v.value for v in SORT.__members__.values()]
 
 
 class BaseRepository(object):
@@ -236,9 +238,9 @@ class AnimalRepository(BaseRepository, AbstractAnimalRepository):
         UPDATE
             {self.animal_table}
         SET
-            {self.animal_table}.deactivated = {deactivated}
+            deactivated = {deactivated}
         WHERE
-            {self.animal_table}.id = %s
+            id = %s
         """
         self.execute_insert_or_update_query(
             query=query,
@@ -304,15 +306,24 @@ class AbstractViolationRepository(ABC):
         self,
         violation_query: Optional[ViolationQuery] = None,
         sort_by: str = VIOLATION_SORT_BY.ID.value,
+        sort: str = SORT.ASC.value,
         limit: int = 200,
         offset: int = 0,
     ) -> List[Violation]:
         raise NotImplementedError
 
     @abstractmethod
-    def insert(
+    def update_is_effective(
         self,
-        violation: ViolationCreate,
+        violation_id: str,
+        is_effective: bool,
+    ):
+        raise NotImplementedError
+
+    @abstractmethod
+    def update_is_administrator_checked(
+        self,
+        violation_id: str,
     ):
         raise NotImplementedError
 
@@ -329,6 +340,7 @@ class ViolationRepository(BaseRepository, AbstractViolationRepository):
         self,
         violation_query: Optional[ViolationQuery] = None,
         sort_by: str = VIOLATION_SORT_BY.ID.value,
+        sort: str = SORT.ASC.value,
         limit: int = 200,
         offset: int = 0,
     ) -> List[Violation]:
@@ -338,10 +350,14 @@ class ViolationRepository(BaseRepository, AbstractViolationRepository):
                 {self.violation_table}.id AS id,
                 {self.animal_table}.id AS animal_id,
                 {self.animal_table}.name AS animal_name,
+                {self.animal_table}.description AS animal_description,
+                {self.animal_table}.deactivated AS is_animal_deactivated,
+                {self.animal_table}.photo_url AS photo_url,
                 {self.violation_type_table}.name AS violation_type_name,
                 {self.violation_table}.judge AS judge,
                 {self.violation_table}.probability AS probability,
                 {self.violation_table}.is_effective AS is_effective,
+                {self.violation_table}.is_administrator_checked,
                 {self.animal_table}.created_at AS animal_created_at,
                 {self.violation_table}.updated_at AS updated_at
             FROM 
@@ -389,6 +405,12 @@ class ViolationRepository(BaseRepository, AbstractViolationRepository):
                 {where} {self.violation_table}.is_effective = %s
                 """
                 where = "AND"
+            if violation_query.is_administrator_checked is not None:
+                parameters.append(violation_query.is_administrator_checked)
+                query += f"""
+                {where} {self.violation_table}.is_administrator_checked = %s
+                """
+                where = "AND"
             if violation_query.animal_days_from is not None:
                 parameters.append(violation_query.animal_days_from)
                 query += f"""
@@ -403,7 +425,7 @@ class ViolationRepository(BaseRepository, AbstractViolationRepository):
 
         query += f"""
             ORDER BY
-                {sort_by}
+                {sort_by} {sort}
             LIMIT
                 {limit}
             OFFSET
@@ -418,24 +440,37 @@ class ViolationRepository(BaseRepository, AbstractViolationRepository):
         data = [Violation(**r) for r in records]
         return data
 
-    def insert(
+    def update_is_effective(
         self,
-        violation: ViolationCreate,
+        violation_id: str,
+        is_effective: bool,
     ):
-        _columns = [k for k, v in violation.dict().items() if v is not None]
-        columns = ",".join(_columns)
-        parameters = tuple([v for k, v in violation.dict().items() if v is not None])
-        values = ",".join(["%s" for _ in parameters])
         query = f"""
-        INSERT INTO 
+        UPDATE
             {self.violation_table}
-            ({columns})
-        VALUES
-            ({values})
-        ;
+        SET
+            is_effective = {is_effective}
+        WHERE
+            id = %s
         """
-
         self.execute_insert_or_update_query(
             query=query,
-            parameters=parameters,
+            parameters=tuple([violation_id]),
+        )
+
+    def update_is_administrator_checked(
+        self,
+        violation_id: str,
+    ):
+        query = f"""
+        UPDATE
+            {self.violation_table}
+        SET
+            is_administrator_checked = true
+        WHERE
+            id = %s
+        """
+        self.execute_insert_or_update_query(
+            query=query,
+            parameters=tuple([violation_id]),
         )

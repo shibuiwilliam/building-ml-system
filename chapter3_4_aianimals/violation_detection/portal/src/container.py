@@ -4,7 +4,7 @@ from database import DBClient
 from dependency_injector.containers import DeclarativeContainer
 from dependency_injector.providers import Configuration, Container, DependenciesContainer, Factory, Resource, Singleton
 from model import AnimalRepository, ViolationRepository, ViolationTypeRepository
-from view import ViolationListView
+from view import ViolationListView, ViolationCheckView, SidePane
 from view_model import AnimalViewModel, ViolationTypeViewModel, ViolationViewModel
 
 
@@ -47,6 +47,7 @@ class ViewModels(DeclarativeContainer):
     animal_view_model = Factory(
         AnimalViewModel,
         animal_repository=models.animal_repository,
+        violation_repository=models.violation_repository,
     )
     violation_type_view_model = Factory(
         ViolationTypeViewModel,
@@ -54,6 +55,7 @@ class ViewModels(DeclarativeContainer):
     )
     violation_view_model = Factory(
         ViolationViewModel,
+        animal_repository=models.animal_repository,
         violation_repository=models.violation_repository,
     )
 
@@ -67,6 +69,17 @@ class View(DeclarativeContainer):
         animal_view_model=view_models.animal_view_model,
         violation_type_view_model=view_models.violation_type_view_model,
         violation_view_model=view_models.violation_view_model,
+    )
+    violation_check_view = Factory(
+        ViolationCheckView,
+        animal_view_model=view_models.animal_view_model,
+        violation_type_view_model=view_models.violation_type_view_model,
+        violation_view_model=view_models.violation_view_model,
+    )
+    side_pane = Factory(
+        SidePane,
+        violation_list_view=violation_list_view,
+        violation_check_view=violation_check_view,
     )
 
 
