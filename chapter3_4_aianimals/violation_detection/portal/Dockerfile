@@ -16,6 +16,5 @@ RUN apt-get -y update && \
     pip install --no-cache-dir -r requirements.txt
 
 COPY ${LOCAL_DIR}/src/ /${PROJECT_DIR}/src/
-COPY ${LOCAL_DIR}/logging.ini /${PROJECT_DIR}/logging.ini
 
 CMD [ "python", "-m", "main" ]
