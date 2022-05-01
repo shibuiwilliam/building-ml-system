@@ -37,49 +37,6 @@ class ViolationDetectionJob(object):
             retries=retries,
         )
 
-    def detect_violation(
-        self,
-        animal: AnimalModel,
-    ) -> Optional[Dict]:
-        with httpx.Client(
-            timeout=self.timeout,
-            transport=self.transport,
-        ) as client:
-            res = client.get(animal.photo_url)
-        if res.status_code != 200:
-            self.logger.error(f"failed to download {animal.id} {animal.photo_url}")
-            return None
-        img = Image.open(BytesIO(res.content))
-        if img.mode == "RGBA":
-            img_rgb = Image.new("RGB", (img.height, img.width), (255, 255, 255))
-            img_rgb.paste(img, mask=img.split()[3])
-            img = img_rgb
-        prediction = self.predictor.predict(img=img)
-        if prediction is None:
-            self.logger.error(f"failed to predict {animal.id}")
-            return None
-        return {
-            "animal_id": animal.id,
-            "violation_type_id": self.violation_type_id,
-            "probability": prediction.violation_probability,
-            "judge": Configurations.model_name,
-            "is_effective": True,
-            "is_administrator_checked": False,
-        }
-
-    def pseudo_detect_violation(
-        self,
-        animal: AnimalModel,
-    ) -> Optional[Dict]:
-        return {
-            "animal_id": animal.id,
-            "violation_type_id": self.violation_type_id,
-            "probability": 0.05,
-            "judge": "administrator",
-            "is_effective": False,
-            "is_administrator_checked": False,
-        }
-
     def run(
         self,
         consuming_queue: str,
@@ -135,3 +92,46 @@ class ViolationDetectionJob(object):
             raise e
         finally:
             self.messaging.close()
+
+    def pseudo_detect_violation(
+        self,
+        animal: AnimalModel,
+    ) -> Optional[Dict]:
+        return {
+            "animal_id": animal.id,
+            "violation_type_id": self.violation_type_id,
+            "probability": 0.05,
+            "judge": "administrator",
+            "is_effective": False,
+            "is_administrator_checked": False,
+        }
+
+    def detect_violation(
+        self,
+        animal: AnimalModel,
+    ) -> Optional[Dict]:
+        with httpx.Client(
+            timeout=self.timeout,
+            transport=self.transport,
+        ) as client:
+            res = client.get(animal.photo_url)
+        if res.status_code != 200:
+            self.logger.error(f"failed to download {animal.id} {animal.photo_url}")
+            return None
+        img = Image.open(BytesIO(res.content))
+        if img.mode == "RGBA":
+            img_rgb = Image.new("RGB", (img.height, img.width), (255, 255, 255))
+            img_rgb.paste(img, mask=img.split()[3])
+            img = img_rgb
+        prediction = self.predictor.predict(img=img)
+        if prediction is None:
+            self.logger.error(f"failed to predict {animal.id}")
+            return None
+        return {
+            "animal_id": animal.id,
+            "violation_type_id": self.violation_type_id,
+            "probability": prediction.violation_probability,
+            "judge": Configurations.model_name,
+            "is_effective": True,
+            "is_administrator_checked": False,
+        }

@@ -2,6 +2,7 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Optional
 
+from src.configurations import Configurations
 from src.entities.animal import AnimalUpdate
 from src.entities.violation import ViolationCreate
 from src.middleware.strings import get_uuid
@@ -64,7 +65,8 @@ class ViolationUsecase(AbstractViolationUsecase):
             commit=True,
         )
 
-        if record.is_effective and record.probability > 0.9:
+        threshold = Configurations.thresholds.get(request.violation_type_id, 0.9)
+        if record.is_effective and record.probability > threshold:
             animal_update = AnimalUpdate(
                 id=request.animal_id,
                 deactivated=True,
