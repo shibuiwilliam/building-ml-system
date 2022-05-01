@@ -603,6 +603,39 @@ deploy_violation_detection_registry: registry_violation_detection
 		-f $(VIOLATION_DETECTION_MANIFEST_DIR)/registry.yaml
 
 
+############ VIOLATION_DETECTION_PORTAL COMMANDS ############
+VIOLATION_DETECTION_PORTAL_DIR := $(DIR)/violation_detection/portal
+VIOLATION_DETECTION_PORTAL_VERSION := $(shell cd ${VIOLATION_DETECTION_PORTAL_DIR} && poetry version -s)
+DOCKERFILE_VIOLATION_DETECTION_PORTAL = $(VIOLATION_DETECTION_PORTAL_DIR)/$(DOCKERFILE)
+DOCKER_VIOLATION_DETECTION_PORTAL_TAG = $(TAG)_violation_detection_portal
+DOCKER_VIOLATION_DETECTION_PORTAL_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_VIOLATION_DETECTION_PORTAL_TAG)_$(VIOLATION_DETECTION_PORTAL_VERSION)
+
+.PHONY: req_violation_detection_portal
+req_violation_detection_portal:
+	cd $(VIOLATION_DETECTION_PORTAL_DIR) && \
+	poetry export \
+		--without-hashes \
+		-f requirements.txt \
+		--output requirements.txt
+
+.PHONY: build_violation_detection_portal
+build_violation_detection_portal: 
+	docker build \
+		--platform x86_64 \
+		-t $(DOCKER_VIOLATION_DETECTION_PORTAL_IMAGE_NAME) \
+		-f $(DOCKERFILE_VIOLATION_DETECTION_PORTAL) \
+		.
+
+.PHONY: push_violation_detection_portal
+push_violation_detection_portal: 
+	docker push $(DOCKER_VIOLATION_DETECTION_PORTAL_IMAGE_NAME)
+
+.PHONY: deploy_violation_detection_portal
+deploy_violation_detection_portal: portal_violation_detection
+	kubectl apply \
+		-f $(VIOLATION_DETECTION_MANIFEST_DIR)/portal.yaml
+
+
 ############ NO_ANIMAL_VIOLATION_TRAIN COMMANDS ############
 NO_ANIMAL_VIOLATION_TRAIN_DIR := $(DIR)/violation_detection/model_development/no_animal_violation
 NO_ANIMAL_VIOLATION_TRAIN_VERSION := $(shell cd ${NO_ANIMAL_VIOLATION_TRAIN_DIR} && poetry version -s)
@@ -802,7 +835,8 @@ req_all: \
 	req_search_learn_to_rank_train \
 	req_search_similar_image_search_train \
 	req_search_similar_image_search_proxy \
-	req_search_learn_to_rank_lgbm_api
+	req_search_learn_to_rank_lgbm_api \
+	req_violation_detection_portal
 
 .PHONY: build_all
 build_all: \
@@ -822,7 +856,8 @@ build_all: \
 	build_search_learn_to_rank_train \
 	build_search_similar_image_search_train \
 	build_search_similar_image_search_proxy \
-	build_search_learn_to_rank_lgbm_api
+	build_search_learn_to_rank_lgbm_api \
+	build_violation_detection_portal
 	
 .PHONY: push_all
 push_all: \
@@ -842,5 +877,6 @@ push_all: \
 	push_search_learn_to_rank_train \
 	push_search_similar_image_search_train \
 	push_search_similar_image_search_proxy \
-	push_search_learn_to_rank_lgbm_api
+	push_search_learn_to_rank_lgbm_api \
+	push_violation_detection_portal
 	
