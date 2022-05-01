@@ -11,6 +11,7 @@ class ViolationRequest(BaseModel):
     probability_upper_bound: Optional[float]
     judge: Optional[str]
     is_effective: Optional[bool]
+    is_administrator_checked: Optional[bool]
 
     class Config:
         extra = Extra.forbid
@@ -22,6 +23,7 @@ class ViolationCreateRequest(BaseModel):
     probability: float
     judge: str
     is_effective: bool
+    is_administrator_checked: bool
 
     class Config:
         extra = Extra.forbid

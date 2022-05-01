@@ -63,6 +63,8 @@ class ViolationRepository(AbstractViolationRepository):
                 filters.append(Violation.judge == query.judge)
             if query.is_effective is not None:
                 filters.append(Violation.is_effective == query.is_effective)
+            if query.is_administrator_checked is not None:
+                filters.append(Violation.is_administrator_checked == query.is_administrator_checked)
         results = session.query(Violation).filter(and_(*filters)).order_by(Violation.id).limit(limit).offset(offset)
         data = [
             ViolationModel(
@@ -72,6 +74,7 @@ class ViolationRepository(AbstractViolationRepository):
                 probability=d.probability,
                 judge=d.judge,
                 is_effective=d.is_effective,
+                is_administrator_checked=d.is_administrator_checked,
                 created_at=d.created_at,
                 updated_at=d.updated_at,
             )

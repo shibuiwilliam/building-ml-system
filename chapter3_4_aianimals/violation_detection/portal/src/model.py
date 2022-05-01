@@ -67,6 +67,18 @@ class ViolationQuery(BaseModel):
         extra = Extra.forbid
 
 
+class ViolationCreate(BaseModel):
+    id: str
+    animal_id: str
+    violation_type_id: str
+    probability: float
+    judge: str
+    is_effective: bool
+
+    class Config:
+        extra = Extra.forbid
+
+
 class Violation(BaseModel):
     id: str
     animal_id: str
@@ -151,6 +163,14 @@ class AbstractAnimalRepository(ABC):
     ) -> List[Animal]:
         raise NotImplementedError
 
+    @abstractmethod
+    def update_deactivated(
+        self,
+        animal_id: str,
+        deactivated: bool,
+    ):
+        raise NotImplementedError
+
 
 class AnimalRepository(BaseRepository, AbstractAnimalRepository):
     def __init__(
@@ -206,6 +226,24 @@ class AnimalRepository(BaseRepository, AbstractAnimalRepository):
         )
         data = [Animal(**r) for r in records]
         return data
+
+    def update_deactivated(
+        self,
+        animal_id: str,
+        deactivated: bool,
+    ):
+        query = f"""
+        UPDATE
+            {self.animal_table}
+        SET
+            {self.animal_table}.deactivated = {deactivated}
+        WHERE
+            {self.animal_table}.id = %s
+        """
+        self.execute_insert_or_update_query(
+            query=query,
+            parameters=tuple([animal_id]),
+        )
 
 
 class AbstractViolationTypeRepository(ABC):
@@ -269,6 +307,13 @@ class AbstractViolationRepository(ABC):
         limit: int = 200,
         offset: int = 0,
     ) -> List[Violation]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def insert(
+        self,
+        violation: ViolationCreate,
+    ):
         raise NotImplementedError
 
 
@@ -372,3 +417,25 @@ class ViolationRepository(BaseRepository, AbstractViolationRepository):
         )
         data = [Violation(**r) for r in records]
         return data
+
+    def insert(
+        self,
+        violation: ViolationCreate,
+    ):
+        _columns = [k for k, v in violation.dict().items() if v is not None]
+        columns = ",".join(_columns)
+        parameters = tuple([v for k, v in violation.dict().items() if v is not None])
+        values = ",".join(["%s" for _ in parameters])
+        query = f"""
+        INSERT INTO 
+            {self.violation_table}
+            ({columns})
+        VALUES
+            ({values})
+        ;
+        """
+
+        self.execute_insert_or_update_query(
+            query=query,
+            parameters=parameters,
+        )

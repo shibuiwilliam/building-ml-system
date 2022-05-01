@@ -119,3 +119,19 @@ class ViolationListView(BaseView, AbstractViolationListView):
             aggregated_violation_df=aggregated_violation_df,
             column=aggregated_violation,
         )
+
+
+class AbstractViolationCheckView(ABC):
+    def __init__(
+        self,
+        animal_view_model: AbstractAnimalViewModel,
+        violation_type_view_model: AbstractViolationTypeViewModel,
+        violation_view_model: AbstractViolationViewModel,
+    ):
+        self.animal_view_model = animal_view_model
+        self.violation_type_view_model = violation_type_view_model
+        self.violation_view_model = violation_view_model
+
+    @abstractmethod
+    def build(self):
+        raise NotImplementedError

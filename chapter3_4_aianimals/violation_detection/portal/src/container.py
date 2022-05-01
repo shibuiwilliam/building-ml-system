@@ -1,8 +1,8 @@
 import logging.config
 
 from database import DBClient
-from dependency_injector.providers import Configuration, Container, DependenciesContainer, Factory, Resource, Singleton
 from dependency_injector.containers import DeclarativeContainer
+from dependency_injector.providers import Configuration, Container, DependenciesContainer, Factory, Resource, Singleton
 from model import AnimalRepository, ViolationRepository, ViolationTypeRepository
 from view import ViolationListView
 from view_model import AnimalViewModel, ViolationTypeViewModel, ViolationViewModel

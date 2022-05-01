@@ -7,6 +7,7 @@ class ViolationCreateRequest(BaseModel):
     probability: float
     judge: str
     is_effective: bool
+    is_administrator_checked: bool
 
     class Config:
         extra = Extra.forbid

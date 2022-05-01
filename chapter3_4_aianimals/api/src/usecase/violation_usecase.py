@@ -79,6 +79,7 @@ class ViolationUsecase(AbstractViolationUsecase):
             probability=request.probability,
             judge=request.judge,
             is_effective=request.is_effective,
+            is_administrator_checked=request.is_administrator_checked,
         )
         data = self.violation_repository.insert(
             session=session,

@@ -1,8 +1,8 @@
 import logging
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional
 from enum import Enum
+from typing import Dict, List, Optional
 
 import pandas as pd
 from model import (
@@ -11,9 +11,11 @@ from model import (
     AbstractViolationRepository,
     AbstractViolationTypeRepository,
     AnimalQuery,
+    ViolationCreate,
     ViolationQuery,
 )
 from pydantic import BaseModel
+from strings import get_uuid
 
 
 class BaseViewModel(object):
@@ -33,6 +35,20 @@ class AbstractAnimalViewModel(ABC):
         self,
         ids: Optional[List[str]] = None,
     ) -> pd.DataFrame:
+        raise NotImplementedError
+
+    @abstractmethod
+    def activate(
+        self,
+        animal_id: str,
+    ):
+        raise NotImplementedError
+
+    @abstractmethod
+    def deactivate(
+        self,
+        animal_id: str,
+    ):
         raise NotImplementedError
 
 
@@ -68,6 +84,24 @@ class AnimalViewModel(BaseViewModel, AbstractAnimalViewModel):
         animal_dicts = [animal.dict() for animal in animals]
         dataframe = pd.DataFrame(animal_dicts)
         return dataframe
+
+    def activate(
+        self,
+        animal_id: str,
+    ):
+        self.animal_repository.update_deactivated(
+            animal_id=animal_id,
+            deactivated=False,
+        )
+
+    def deactivate(
+        self,
+        animal_id: str,
+    ):
+        self.animal_repository.update_deactivated(
+            animal_id=animal_id,
+            deactivated=True,
+        )
 
 
 class AbstractViolationTypeViewModel(ABC):
@@ -182,6 +216,17 @@ class AbstractViolationViewModel(ABC):
     ) -> pd.DataFrame:
         raise NotImplementedError
 
+    @abstractmethod
+    def register_violation(
+        self,
+        animal_id: str,
+        violation_type_id: str,
+        probability: float = 1.0,
+        judge: str = "administrator",
+        is_effective: bool = True,
+    ):
+        raise NotImplementedError
+
 
 class ViolationViewModel(BaseViewModel, AbstractViolationViewModel):
     def __init__(
@@ -248,3 +293,22 @@ class ViolationViewModel(BaseViewModel, AbstractViolationViewModel):
     ) -> pd.DataFrame:
         aggregated_df = violation_df.groupby(violation_df[column].dt.date).size().reset_index(name="count")
         return aggregated_df
+
+    def register_violation(
+        self,
+        animal_id: str,
+        violation_type_id: str,
+        probability: float = 1.0,
+        judge: str = "administrator",
+        is_effective: bool = True,
+    ):
+        violation_id = get_uuid()
+        violation = ViolationCreate(
+            id=violation_id,
+            animal_id=animal_id,
+            violation_type_id=violation_type_id,
+            probability=probability,
+            judge=judge,
+            is_effective=is_effective,
+        )
+        self.violation_repository.insert(violation=violation)

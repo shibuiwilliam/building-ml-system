@@ -141,6 +141,7 @@ class InitializationJob(AbstractJob):
             {"column": Violation.judge, "unique": False},
             {"column": Violation.probability, "unique": False},
             {"column": Violation.is_effective, "unique": False},
+            {"column": Violation.is_administrator_checked, "unique": False},
         ]
         access_log_indices = [
             {"column": AccessLog.sort_by, "unique": False},
@@ -304,6 +305,7 @@ class InitializationJob(AbstractJob):
                 probability=v["probability"],
                 judge=v["judge"],
                 is_effective=v["is_effective"],
+                is_administrator_checked=False,
             )
             self.violation_usecase.register(request=request)
         self.logger.info(f"done register violation: {file_path}")

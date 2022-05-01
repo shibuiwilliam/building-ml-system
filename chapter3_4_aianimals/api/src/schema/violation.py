@@ -42,6 +42,11 @@ class Violation(Base):
         nullable=False,
         unique=False,
     )
+    is_administrator_checked = Column(
+        Boolean,
+        nullable=False,
+        unique=False,
+    )
     created_at = Column(
         DateTime(timezone=True),
         server_default=current_timestamp(),

@@ -64,6 +64,7 @@ class ViolationDetectionJob(object):
             "probability": prediction.violation_probability,
             "judge": Configurations.model_name,
             "is_effective": True,
+            "is_administrator_checked": False,
         }
 
     def pseudo_detect_violation(
@@ -76,6 +77,7 @@ class ViolationDetectionJob(object):
             "probability": 0.05,
             "judge": "administrator",
             "is_effective": False,
+            "is_administrator_checked": False,
         }
 
     def run(

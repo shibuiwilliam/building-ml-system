@@ -10,6 +10,7 @@ class ViolationResponse(BaseModel):
     probability: float
     judge: str
     is_effective: bool
+    is_administrator_checked: bool
     created_at: datetime
     updated_at: datetime
 
