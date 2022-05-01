@@ -1,0 +1,194 @@
+import logging
+from abc import ABC, abstractmethod
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional
+
+import pandas as pd
+from model import (
+    VIOLATION_SORT_BY,
+    AbstractAnimalRepository,
+    AbstractViolationRepository,
+    AbstractViolationTypeRepository,
+    AnimalQuery,
+    ViolationQuery,
+)
+from pydantic import BaseModel
+
+
+class BaseViewModel(object):
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+
+
+class AbstractAnimalViewModel(ABC):
+    def __init__(
+        self,
+        animal_repository: AbstractAnimalRepository,
+    ):
+        self.animal_repository = animal_repository
+
+    @abstractmethod
+    def get_animals(
+        self,
+        ids: Optional[List[str]] = None,
+    ) -> pd.DataFrame:
+        raise NotImplementedError
+
+
+class AnimalViewModel(BaseViewModel, AbstractAnimalViewModel):
+    def __init__(
+        self,
+        animal_repository: AbstractAnimalRepository,
+    ):
+        BaseViewModel.__init__(self)
+        AbstractAnimalViewModel.__init__(
+            self,
+            animal_repository=animal_repository,
+        )
+
+    def get_animals(
+        self,
+        ids: Optional[List[str]] = None,
+    ) -> pd.DataFrame:
+        query = AnimalQuery(ids=ids)
+        limit: int = 200
+        offset: int = 0
+        animals = []
+        while True:
+            _animals = self.animal_repository.select(
+                animal_query=query,
+                limit=limit,
+                offset=offset,
+            )
+            if len(_animals) == 0:
+                break
+            animals.extend(_animals)
+            offset += limit
+        animal_dicts = [animal.dict() for animal in animals]
+        dataframe = pd.DataFrame(animal_dicts)
+        return dataframe
+
+
+class AbstractViolationTypeViewModel(ABC):
+    def __init__(
+        self,
+        violation_type_repository: AbstractViolationTypeRepository,
+    ):
+        self.violation_type_repository = violation_type_repository
+
+    @abstractmethod
+    def get_violation_types(self) -> Dict[str, str]:
+        raise NotImplementedError
+
+
+class ViolationTypeViewModel(BaseViewModel, AbstractViolationTypeViewModel):
+    def __init__(
+        self,
+        violation_type_repository: AbstractViolationTypeRepository,
+    ):
+        BaseViewModel.__init__(self)
+        AbstractViolationTypeViewModel.__init__(
+            self,
+            violation_type_repository=violation_type_repository,
+        )
+
+        class Cache(BaseModel):
+            is_cached: bool = False
+            cache: Dict[str, str] = {}
+            cached_at: datetime = datetime.now()
+
+        self.__cache: Cache = Cache()
+
+    def get_violation_types(self) -> Dict[str, str]:
+        one_hour_ago = datetime.now() - timedelta(hours=-1)
+        if self.__cache.is_cached and self.__cache.cached_at > one_hour_ago:
+            return self.__cache.cache
+
+        violation_types = self.violation_type_repository.select(
+            limit=200,
+            offset=0,
+        )
+        violation_type_dict = {v.id: v.name for v in violation_types}
+        self.__cache.is_cached = True
+        self.__cache.cache = violation_type_dict
+        self.__cache.cached_at = datetime.now()
+        return violation_type_dict
+
+
+class AbstractViolationViewModel(ABC):
+    def __init__(
+        self,
+        violation_repository: AbstractViolationRepository,
+    ):
+        self.violation_repository = violation_repository
+
+    @abstractmethod
+    def list_violation_sort_by(self) -> List[VIOLATION_SORT_BY]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_violation_types(
+        self,
+        ids: Optional[List[str]] = None,
+        animal_id: Optional[str] = None,
+        violation_type_id: Optional[str] = None,
+        judge: Optional[str] = None,
+        is_effective: Optional[bool] = None,
+        animal_days_from: Optional[int] = None,
+        days_from: Optional[int] = None,
+        sort_by: VIOLATION_SORT_BY = VIOLATION_SORT_BY.ID,
+    ) -> pd.DataFrame:
+        raise NotImplementedError
+
+
+class ViolationViewModel(BaseViewModel, AbstractViolationViewModel):
+    def __init__(
+        self,
+        violation_repository: AbstractViolationRepository,
+    ):
+        BaseViewModel.__init__(self)
+        AbstractViolationViewModel.__init__(
+            self,
+            violation_repository=violation_repository,
+        )
+
+    def list_violation_sort_by(self) -> List[VIOLATION_SORT_BY]:
+        return [v for v in VIOLATION_SORT_BY.__members__.values()]
+
+    def get_violation_types(
+        self,
+        ids: Optional[List[str]] = None,
+        animal_id: Optional[str] = None,
+        violation_type_id: Optional[str] = None,
+        judge: Optional[str] = None,
+        is_effective: Optional[bool] = None,
+        animal_days_from: Optional[int] = None,
+        days_from: Optional[int] = None,
+        sort_by: VIOLATION_SORT_BY = VIOLATION_SORT_BY.ID,
+    ) -> pd.DataFrame:
+        query = ViolationQuery(
+            ids=ids,
+            animal_id=animal_id,
+            violation_type_id=violation_type_id,
+            judge=judge,
+            is_effective=is_effective,
+            animal_days_from=animal_days_from,
+            days_from=days_from,
+        )
+        limit: int = 200
+        offset: int = 0
+        violations = []
+        while True:
+            _violations = self.violation_repository.select(
+                violation_query=query,
+                sort_by=sort_by,
+                limit=limit,
+                offset=offset,
+            )
+            if len(_violations) == 0:
+                break
+            violations.extend(_violations)
+            offset += limit
+        violation_dicts = [violation.dict() for violation in violations]
+        dataframe = pd.DataFrame(violation_dicts)
+        return dataframe

@@ -1,15 +1,13 @@
+import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
 from enum import Enum
-from logging import getLogger
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import psycopg2
 from database import AbstractDBClient
 from psycopg2.extras import DictCursor
 from pydantic import BaseModel, Extra
-
-logger = getLogger(__name__)
 
 
 class TABLES(Enum):
@@ -62,6 +60,7 @@ class ViolationQuery(BaseModel):
     violation_type_id: Optional[str] = None
     judge: Optional[str] = None
     is_effective: Optional[bool] = None
+    animal_days_from: Optional[int] = None
     days_from: Optional[int] = None
 
     class Config:
@@ -76,11 +75,30 @@ class Violation(BaseModel):
     judge: str
     probability: float
     is_effective: bool
-    created_at: datetime
+    animal_created_at: datetime
     updated_at: datetime
 
     class Config:
         extra = Extra.forbid
+
+
+class VIOLATION_SORT_BY(Enum):
+    ID = "id"
+    ANIMAL_ID = "animal_id"
+    VIOLATION_TYPE_NAME = "violation_type_name"
+    JUDGE = "judge"
+    PROBABILITY = "probability"
+    IS_EFFECTIVE = "is_effective"
+    ANIMAL_CREATED_AT = "animal_created_at"
+    UPDATED_AT = "updated_at"
+
+    @staticmethod
+    def has_value(value: str) -> bool:
+        return value in [v.value for v in VIOLATION_SORT_BY.__members__.values()]
+
+    @staticmethod
+    def get_list() -> List[str]:
+        return [v.value for v in VIOLATION_SORT_BY.__members__.values()]
 
 
 class BaseRepository(object):
@@ -89,13 +107,14 @@ class BaseRepository(object):
         db_client: AbstractDBClient,
     ):
         self.db_client = db_client
+        self.logger = logging.getLogger(__name__)
 
     def execute_select_query(
         self,
         query: str,
         parameters: Optional[Tuple] = None,
     ) -> List[Dict[str, Any]]:
-        logger.info(f"select query: {query}, parameters: {parameters}")
+        self.logger.info(f"select query: {query}, parameters: {parameters}")
         with self.db_client.get_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cursor:
                 cursor.execute(query, parameters)
@@ -107,7 +126,7 @@ class BaseRepository(object):
         query: str,
         parameters: Optional[Tuple] = None,
     ) -> bool:
-        logger.debug(f"insert or update query: {query}, parameters: {parameters}")
+        self.logger.debug(f"insert or update query: {query}, parameters: {parameters}")
         with self.db_client.get_connection() as conn:
             try:
                 with conn.cursor(cursor_factory=DictCursor) as cursor:
@@ -246,6 +265,7 @@ class AbstractViolationRepository(ABC):
     def select(
         self,
         violation_query: Optional[ViolationQuery] = None,
+        sort_by: VIOLATION_SORT_BY = VIOLATION_SORT_BY.ID,
         limit: int = 200,
         offset: int = 0,
     ) -> List[Violation]:
@@ -263,6 +283,7 @@ class ViolationRepository(BaseRepository, AbstractViolationRepository):
     def select(
         self,
         violation_query: Optional[ViolationQuery] = None,
+        sort_by: VIOLATION_SORT_BY = VIOLATION_SORT_BY.ID,
         limit: int = 200,
         offset: int = 0,
     ) -> List[Violation]:
@@ -276,7 +297,7 @@ class ViolationRepository(BaseRepository, AbstractViolationRepository):
                 {self.violation_table}.judge AS judge,
                 {self.violation_table}.probability AS probability,
                 {self.violation_table}.is_effective AS is_effective,
-                {self.violation_table}.created_at AS created_at,
+                {self.animal_table}.created_at AS animal_created_at,
                 {self.violation_table}.updated_at AS updated_at,
             FROM 
                 {self.violation_table}
@@ -323,6 +344,12 @@ class ViolationRepository(BaseRepository, AbstractViolationRepository):
                 {where} {self.violation_table}.is_effective = %s
                 """
                 where = "AND"
+            if violation_query.animal_days_from is not None:
+                parameters.append(violation_query.animal_days_from)
+                query += f"""
+                {where} {self.animal_table}.created_at > NOW() - interval `%s DAY'
+                """
+                where = "AND"
             if violation_query.days_from is not None:
                 parameters.append(violation_query.days_from)
                 query += f"""
@@ -330,6 +357,8 @@ class ViolationRepository(BaseRepository, AbstractViolationRepository):
                 """
 
         query += f"""
+            ORDER BY
+                {sort_by.value}
             LIMIT
                 {limit}
             OFFSET
