@@ -6,14 +6,14 @@ from typing import Dict, List, Optional
 
 import pandas as pd
 from model import (
-    VIOLATION_SORT_BY,
     SORT,
+    VIOLATION_SORT_BY,
     AbstractAnimalRepository,
     AbstractViolationRepository,
     AbstractViolationTypeRepository,
     AnimalQuery,
-    ViolationQuery,
     Violation,
+    ViolationQuery,
 )
 from pydantic import BaseModel, Extra
 

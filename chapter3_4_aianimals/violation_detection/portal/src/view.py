@@ -1,17 +1,12 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import List, Optional
 from enum import Enum
+from typing import List, Optional
 
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
-from service import (
-    AbstractAnimalService,
-    AbstractViolationTypeService,
-    AbstractViolationService,
-    ViolationData,
-)
+from service import AbstractAnimalService, AbstractViolationService, AbstractViolationTypeService, ViolationData
 
 
 class VIEWS(Enum):

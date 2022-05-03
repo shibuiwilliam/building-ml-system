@@ -4,8 +4,8 @@ from database import DBClient
 from dependency_injector.containers import DeclarativeContainer
 from dependency_injector.providers import Configuration, Container, DependenciesContainer, Factory, Resource, Singleton
 from model import AnimalRepository, ViolationRepository, ViolationTypeRepository
-from view import ViolationListView, ViolationCheckView, SidePane
-from service import AnimalService, ViolationTypeService, ViolationService
+from service import AnimalService, ViolationService, ViolationTypeService
+from view import SidePane, ViolationCheckView, ViolationListView
 
 
 class Core(DeclarativeContainer):
