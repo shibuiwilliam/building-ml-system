@@ -37,12 +37,12 @@ class ViolationData(BaseModel):
         extra = Extra.forbid
 
 
-class BaseViewModel(object):
+class BaseService(object):
     def __init__(self):
         self.logger = logging.getLogger(__name__)
 
 
-class AbstractAnimalViewModel(ABC):
+class AbstractAnimalService(ABC):
     def __init__(
         self,
         animal_repository: AbstractAnimalRepository,
@@ -73,14 +73,14 @@ class AbstractAnimalViewModel(ABC):
         raise NotImplementedError
 
 
-class AnimalViewModel(BaseViewModel, AbstractAnimalViewModel):
+class AnimalService(BaseService, AbstractAnimalService):
     def __init__(
         self,
         animal_repository: AbstractAnimalRepository,
         violation_repository: AbstractViolationRepository,
     ):
-        BaseViewModel.__init__(self)
-        AbstractAnimalViewModel.__init__(
+        BaseService.__init__(self)
+        AbstractAnimalService.__init__(
             self,
             animal_repository=animal_repository,
             violation_repository=violation_repository,
@@ -139,7 +139,7 @@ class AnimalViewModel(BaseViewModel, AbstractAnimalViewModel):
         )
 
 
-class AbstractViolationTypeViewModel(ABC):
+class AbstractViolationTypeService(ABC):
     def __init__(
         self,
         violation_type_repository: AbstractViolationTypeRepository,
@@ -151,13 +151,13 @@ class AbstractViolationTypeViewModel(ABC):
         raise NotImplementedError
 
 
-class ViolationTypeViewModel(BaseViewModel, AbstractViolationTypeViewModel):
+class ViolationTypeService(BaseService, AbstractViolationTypeService):
     def __init__(
         self,
         violation_type_repository: AbstractViolationTypeRepository,
     ):
-        BaseViewModel.__init__(self)
-        AbstractViolationTypeViewModel.__init__(
+        BaseService.__init__(self)
+        AbstractViolationTypeService.__init__(
             self,
             violation_type_repository=violation_type_repository,
         )
@@ -210,7 +210,7 @@ class AGGREGATE_VIOLATION(Enum):
         return [v.value for v in AGGREGATE_VIOLATION.__members__.values()]
 
 
-class AbstractViolationViewModel(ABC):
+class AbstractViolationService(ABC):
     def __init__(
         self,
         animal_repository: AbstractAnimalRepository,
@@ -284,14 +284,14 @@ class AbstractViolationViewModel(ABC):
         raise NotImplementedError
 
 
-class ViolationViewModel(BaseViewModel, AbstractViolationViewModel):
+class ViolationService(BaseService, AbstractViolationService):
     def __init__(
         self,
         animal_repository: AbstractAnimalRepository,
         violation_repository: AbstractViolationRepository,
     ):
-        BaseViewModel.__init__(self)
-        AbstractViolationViewModel.__init__(
+        BaseService.__init__(self)
+        AbstractViolationService.__init__(
             self,
             animal_repository=animal_repository,
             violation_repository=violation_repository,

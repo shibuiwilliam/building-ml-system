@@ -6,10 +6,10 @@ from enum import Enum
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
-from view_model import (
-    AbstractAnimalViewModel,
-    AbstractViolationTypeViewModel,
-    AbstractViolationViewModel,
+from service import (
+    AbstractAnimalService,
+    AbstractViolationTypeService,
+    AbstractViolationService,
     ViolationData,
 )
 
@@ -23,7 +23,7 @@ class VIEWS(Enum):
         return value in [v.value for v in VIEWS.__members__.values()]
 
     @staticmethod
-    def get_list() -> List[int]:
+    def get_list() -> List[str]:
         return [v.value for v in VIEWS.__members__.values()]
 
 
@@ -35,13 +35,13 @@ class BaseView(object):
 class AbstractViolationListView(ABC):
     def __init__(
         self,
-        animal_view_model: AbstractAnimalViewModel,
-        violation_type_view_model: AbstractViolationTypeViewModel,
-        violation_view_model: AbstractViolationViewModel,
+        animal_service: AbstractAnimalService,
+        violation_type_service: AbstractViolationTypeService,
+        violation_service: AbstractViolationService,
     ):
-        self.animal_view_model = animal_view_model
-        self.violation_type_view_model = violation_type_view_model
-        self.violation_view_model = violation_view_model
+        self.animal_service = animal_service
+        self.violation_type_service = violation_type_service
+        self.violation_service = violation_service
 
     @abstractmethod
     def build(self):
@@ -51,20 +51,20 @@ class AbstractViolationListView(ABC):
 class ViolationListView(BaseView, AbstractViolationListView):
     def __init__(
         self,
-        animal_view_model: AbstractAnimalViewModel,
-        violation_type_view_model: AbstractViolationTypeViewModel,
-        violation_view_model: AbstractViolationViewModel,
+        animal_service: AbstractAnimalService,
+        violation_type_service: AbstractViolationTypeService,
+        violation_service: AbstractViolationService,
     ):
         BaseView.__init__(self)
         AbstractViolationListView.__init__(
             self,
-            animal_view_model=animal_view_model,
-            violation_type_view_model=violation_type_view_model,
-            violation_view_model=violation_view_model,
+            animal_service=animal_service,
+            violation_type_service=violation_type_service,
+            violation_service=violation_service,
         )
 
     def __build_days_from_select_box(self) -> int:
-        options = self.violation_view_model.list_days_from()
+        options = self.violation_service.list_days_from()
         selected = st.selectbox(
             label="days from",
             options=options,
@@ -73,7 +73,7 @@ class ViolationListView(BaseView, AbstractViolationListView):
         return selected
 
     def __build_sort_by_select_box(self) -> str:
-        options = self.violation_view_model.list_violation_sort_by()
+        options = self.violation_service.list_violation_sort_by()
         selected = st.selectbox(
             label="sort by",
             options=options,
@@ -82,7 +82,7 @@ class ViolationListView(BaseView, AbstractViolationListView):
         return selected
 
     def __build_sort_select_box(self) -> str:
-        options = self.violation_view_model.list_sort()
+        options = self.violation_service.list_sort()
         selected = st.selectbox(
             label="order",
             options=options,
@@ -91,7 +91,7 @@ class ViolationListView(BaseView, AbstractViolationListView):
         return selected
 
     def __build_violation_type_select_box(self) -> Optional[str]:
-        options = self.violation_type_view_model.get_violation_types()
+        options = self.violation_type_service.get_violation_types()
         _violation_type_names = ["ALL"]
         _violation_type_names.extend([v for v in options.keys()])
         _selected = st.selectbox(
@@ -103,7 +103,7 @@ class ViolationListView(BaseView, AbstractViolationListView):
         return selected
 
     def __build_aggregation_select_box(self) -> str:
-        options = self.violation_view_model.list_aggregate_violation()
+        options = self.violation_service.list_aggregate_violation()
         return options[0]
 
     def __build_table(
@@ -133,14 +133,14 @@ class ViolationListView(BaseView, AbstractViolationListView):
         sort = self.__build_sort_select_box()
         violation_type_id = self.__build_violation_type_select_box()
 
-        violation_df = self.violation_view_model.get_violations(
+        violation_df = self.violation_service.get_violations(
             violation_type_id=violation_type_id,
             days_from=days_from,
             sort_by=sort_by,
             sort=sort,
         )
         if not violation_df.empty:
-            aggregated_violation_df = self.violation_view_model.aggregate_violations(
+            aggregated_violation_df = self.violation_service.aggregate_violations(
                 violation_df=violation_df,
                 column=aggregated_violation,
             )
@@ -157,13 +157,13 @@ class ViolationListView(BaseView, AbstractViolationListView):
 class AbstractViolationCheckView(ABC):
     def __init__(
         self,
-        animal_view_model: AbstractAnimalViewModel,
-        violation_type_view_model: AbstractViolationTypeViewModel,
-        violation_view_model: AbstractViolationViewModel,
+        animal_service: AbstractAnimalService,
+        violation_type_service: AbstractViolationTypeService,
+        violation_service: AbstractViolationService,
     ):
-        self.animal_view_model = animal_view_model
-        self.violation_type_view_model = violation_type_view_model
-        self.violation_view_model = violation_view_model
+        self.animal_service = animal_service
+        self.violation_type_service = violation_type_service
+        self.violation_service = violation_service
 
     @abstractmethod
     def build(self):
@@ -173,20 +173,20 @@ class AbstractViolationCheckView(ABC):
 class ViolationCheckView(BaseView, AbstractViolationCheckView):
     def __init__(
         self,
-        animal_view_model: AbstractAnimalViewModel,
-        violation_type_view_model: AbstractViolationTypeViewModel,
-        violation_view_model: AbstractViolationViewModel,
+        animal_service: AbstractAnimalService,
+        violation_type_service: AbstractViolationTypeService,
+        violation_service: AbstractViolationService,
     ):
         BaseView.__init__(self)
         AbstractViolationCheckView.__init__(
             self,
-            animal_view_model=animal_view_model,
-            violation_type_view_model=violation_type_view_model,
-            violation_view_model=violation_view_model,
+            animal_service=animal_service,
+            violation_type_service=violation_type_service,
+            violation_service=violation_service,
         )
 
     def __build_violation_type_select_box(self) -> Optional[str]:
-        options = self.violation_type_view_model.get_violation_types()
+        options = self.violation_type_service.get_violation_types()
         _violation_type_names = ["ALL"]
         _violation_type_names.extend([v for v in options.keys()])
         _selected = st.selectbox(
@@ -218,7 +218,7 @@ class ViolationCheckView(BaseView, AbstractViolationCheckView):
         return selected
 
     def __build_sort_by_select_box(self) -> str:
-        options = self.violation_view_model.list_violation_sort_by()
+        options = self.violation_service.list_violation_sort_by()
         selected = st.selectbox(
             label="sort by",
             options=options,
@@ -227,7 +227,7 @@ class ViolationCheckView(BaseView, AbstractViolationCheckView):
         return selected
 
     def __build_sort_select_box(self) -> str:
-        options = self.violation_view_model.list_sort()
+        options = self.violation_service.list_sort()
         selected = st.selectbox(
             label="order",
             options=options,
@@ -270,14 +270,14 @@ class ViolationCheckView(BaseView, AbstractViolationCheckView):
             key=f"{violation.id}_{violation.violation_type_name}_{violation.updated_at}",
         )
         if is_administrator_checked:
-            self.violation_view_model.register_admin_check(
+            self.violation_service.register_admin_check(
                 violation_id=violation.id,
                 is_violation=is_violating,
             )
             if not is_violating:
-                self.animal_view_model.activate(animal_id=violation.animal_id)
+                self.animal_service.activate(animal_id=violation.animal_id)
             else:
-                self.animal_view_model.deactivate(animal_id=violation.animal_id)
+                self.animal_service.deactivate(animal_id=violation.animal_id)
 
     def build(self):
         st.markdown("# Violation check")
@@ -287,7 +287,7 @@ class ViolationCheckView(BaseView, AbstractViolationCheckView):
         sort_by = self.__build_sort_by_select_box()
         sort = self.__build_sort_select_box()
 
-        violations = self.violation_view_model.get_raw_violations(
+        violations = self.violation_service.get_raw_violations(
             violation_type_id=violation_type_id,
             is_effective=is_effective,
             is_administrator_checked=is_administrator_checked,

@@ -5,7 +5,7 @@ from dependency_injector.containers import DeclarativeContainer
 from dependency_injector.providers import Configuration, Container, DependenciesContainer, Factory, Resource, Singleton
 from model import AnimalRepository, ViolationRepository, ViolationTypeRepository
 from view import ViolationListView, ViolationCheckView, SidePane
-from view_model import AnimalViewModel, ViolationTypeViewModel, ViolationViewModel
+from service import AnimalService, ViolationTypeService, ViolationService
 
 
 class Core(DeclarativeContainer):
@@ -40,21 +40,21 @@ class Models(DeclarativeContainer):
     )
 
 
-class ViewModels(DeclarativeContainer):
+class Services(DeclarativeContainer):
     config = Configuration()
     models = DependenciesContainer()
 
-    animal_view_model = Factory(
-        AnimalViewModel,
+    animal_service = Factory(
+        AnimalService,
         animal_repository=models.animal_repository,
         violation_repository=models.violation_repository,
     )
-    violation_type_view_model = Factory(
-        ViolationTypeViewModel,
+    violation_type_service = Factory(
+        ViolationTypeService,
         violation_type_repository=models.violation_type_repository,
     )
-    violation_view_model = Factory(
-        ViolationViewModel,
+    violation_service = Factory(
+        ViolationService,
         animal_repository=models.animal_repository,
         violation_repository=models.violation_repository,
     )
@@ -62,19 +62,19 @@ class ViewModels(DeclarativeContainer):
 
 class View(DeclarativeContainer):
     config = Configuration()
-    view_models = DependenciesContainer()
+    services = DependenciesContainer()
 
     violation_list_view = Factory(
         ViolationListView,
-        animal_view_model=view_models.animal_view_model,
-        violation_type_view_model=view_models.violation_type_view_model,
-        violation_view_model=view_models.violation_view_model,
+        animal_service=services.animal_service,
+        violation_type_service=services.violation_type_service,
+        violation_service=services.violation_service,
     )
     violation_check_view = Factory(
         ViolationCheckView,
-        animal_view_model=view_models.animal_view_model,
-        violation_type_view_model=view_models.violation_type_view_model,
-        violation_view_model=view_models.violation_view_model,
+        animal_service=services.animal_service,
+        violation_type_service=services.violation_type_service,
+        violation_service=services.violation_service,
     )
     side_pane = Factory(
         SidePane,
@@ -99,13 +99,13 @@ class Application(DeclarativeContainer):
         config=config,
         infrastructures=infrastructures,
     )
-    view_models = Container(
-        ViewModels,
+    services = Container(
+        Services,
         config=config,
         models=models,
     )
     views = Container(
         View,
         config=config,
-        view_models=view_models,
+        services=services,
     )

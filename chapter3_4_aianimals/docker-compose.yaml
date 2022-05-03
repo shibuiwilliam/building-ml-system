@@ -177,8 +177,8 @@ services:
     depends_on:
       - postgres
 
-  violation_portal:
-    container_name: violation_portal
+  violation_detection_portal:
+    container_name: violation_detection_portal
     image: shibui/building-ml-system:ai_animals_violation_detection_portal_0.0.0
     restart: always
     networks:

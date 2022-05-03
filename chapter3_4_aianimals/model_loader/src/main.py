@@ -30,7 +30,7 @@ def download_model_from_url(url: str) -> Optional[List[str]]:
             f.write(res.content)
         logger.info(f"saved as {filename}")
         if filename.endswith(".zip"):
-            extract_dir = os.path.join("/tmp/", filename)
+            extract_dir = os.path.join("/tmp", filename)
             os.makedirs(extract_dir, exist_ok=True)
             logger.info(f"extract to {extract_dir}")
             shutil.unpack_archive(
@@ -71,7 +71,7 @@ def download_model_from_mlflow(
         )
         path = os.path.join(model_path, os.listdir(model_path)[0])
         if path.endswith(".zip"):
-            extract_dir = os.path.join("/tmp/", os.path.basename(path))
+            extract_dir = os.path.join("/tmp", os.path.basename(path))
             os.makedirs(extract_dir, exist_ok=True)
             logger.info(f"extract to {extract_dir}")
             shutil.unpack_archive(
@@ -129,6 +129,11 @@ def download_from_mlflow(save_as_list: List[str]) -> List[str]:
 
 def main():
     logger.info("download model...")
+
+    os.makedirs(
+        Configurations.target_directory,
+        exist_ok=True,
+    )
 
     try:
         model_paths = []
