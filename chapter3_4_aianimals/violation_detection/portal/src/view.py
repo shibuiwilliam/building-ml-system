@@ -6,7 +6,7 @@ from typing import List, Optional
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
-from service import AbstractAnimalService, AbstractViolationService, AbstractViolationTypeService, ViolationData
+from service import AbstractAnimalService, AbstractViolationService, AbstractViolationTypeService
 
 
 class VIEWS(Enum):
@@ -232,7 +232,7 @@ class ViolationCheckView(BaseView, AbstractViolationCheckView):
 
     def __build_violation_container(
         self,
-        violation: ViolationData,
+        violation: pd.DataFrame,
     ):
         st.markdown(f"{violation.animal_id}")
         image_col, text_col = st.columns([2, 2])
@@ -282,14 +282,14 @@ class ViolationCheckView(BaseView, AbstractViolationCheckView):
         sort_by = self.__build_sort_by_select_box()
         sort = self.__build_sort_select_box()
 
-        violations = self.violation_service.get_raw_violations(
+        violation_df = self.violation_service.get_violations(
             violation_type_id=violation_type_id,
             is_effective=is_effective,
             is_administrator_checked=is_administrator_checked,
             sort_by=sort_by,
             sort=sort,
         )
-        for violation in violations:
+        for _, violation in violation_df.iterrows():
             self.__build_violation_container(violation=violation)
 
 

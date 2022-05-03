@@ -18,25 +18,6 @@ from model import (
 from pydantic import BaseModel, Extra
 
 
-class ViolationData(BaseModel):
-    id: str
-    animal_id: str
-    animal_name: str
-    animal_description: str
-    is_animal_deactivated: bool
-    photo_url: str
-    violation_type_name: str
-    judge: str
-    probability: float
-    is_effective: bool
-    is_administrator_checked: bool
-    animal_created_at: datetime
-    updated_at: datetime
-
-    class Config:
-        extra = Extra.forbid
-
-
 class BaseService(object):
     def __init__(self):
         self.logger = logging.getLogger(__name__)
@@ -236,22 +217,6 @@ class AbstractViolationService(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_raw_violations(
-        self,
-        ids: Optional[List[str]] = None,
-        animal_id: Optional[str] = None,
-        violation_type_id: Optional[str] = None,
-        judge: Optional[str] = None,
-        is_effective: Optional[bool] = None,
-        is_administrator_checked: Optional[bool] = None,
-        animal_days_from: Optional[int] = None,
-        days_from: int = DAYS_FROM.ONE_WEEK.value,
-        sort_by: str = VIOLATION_SORT_BY.ID.value,
-        sort: str = SORT.ASC.value,
-    ) -> List[ViolationData]:
-        raise NotImplementedError
-
-    @abstractmethod
     def get_violations(
         self,
         ids: Optional[List[str]] = None,
@@ -348,51 +313,6 @@ class ViolationService(BaseService, AbstractViolationService):
             violations.extend(_violations)
             offset += limit
         return violations
-
-    def get_raw_violations(
-        self,
-        ids: Optional[List[str]] = None,
-        animal_id: Optional[str] = None,
-        violation_type_id: Optional[str] = None,
-        judge: Optional[str] = None,
-        is_effective: Optional[bool] = None,
-        is_administrator_checked: Optional[bool] = None,
-        animal_days_from: Optional[int] = None,
-        days_from: int = DAYS_FROM.ONE_WEEK.value,
-        sort_by: str = VIOLATION_SORT_BY.ID.value,
-        sort: str = SORT.ASC.value,
-    ) -> List[ViolationData]:
-        violations = self.__get_violations(
-            ids=ids,
-            animal_id=animal_id,
-            violation_type_id=violation_type_id,
-            judge=judge,
-            is_effective=is_effective,
-            is_administrator_checked=is_administrator_checked,
-            animal_days_from=animal_days_from,
-            days_from=days_from,
-            sort_by=sort_by,
-            sort=sort,
-        )
-        violation_data = [
-            ViolationData(
-                id=v.id,
-                animal_id=v.animal_id,
-                animal_name=v.animal_name,
-                animal_description=v.animal_description,
-                is_animal_deactivated=v.is_animal_deactivated,
-                photo_url=v.photo_url,
-                violation_type_name=v.violation_type_name,
-                judge=v.judge,
-                probability=v.probability,
-                is_effective=v.is_effective,
-                is_administrator_checked=v.is_administrator_checked,
-                animal_created_at=v.animal_created_at,
-                updated_at=v.updated_at,
-            )
-            for v in violations
-        ]
-        return violation_data
 
     def get_violations(
         self,
