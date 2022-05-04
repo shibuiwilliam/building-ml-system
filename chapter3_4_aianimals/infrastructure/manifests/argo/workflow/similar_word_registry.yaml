@@ -16,17 +16,18 @@ spec:
 
       - name: similar-word-registry
         initContainers:
-          image: shibui/building-ml-system:ai_animals_similar_word_registry_0.0.0
-          imagePullPolicy: Always
-          command:
-            - bash
-            - -c
-            - |
-              mkdir -p /opt/model/
-              wget https://storage.googleapis.com/aianimals/models/search/cc.ja.300.vec.gz -P /opt/model/
-          volumeMounts:
-            - mountPath: /opt/model/
-              name: data
+          - name: similar-word-registry-init
+            image: shibui/building-ml-system:ai_animals_similar_word_registry_0.0.0
+            imagePullPolicy: Always
+            command:
+              - bash
+              - -c
+              - |
+                mkdir -p /opt/model/
+                wget https://storage.googleapis.com/aianimals/models/search/cc.ja.300.vec.gz -P /opt/model/
+            volumeMounts:
+              - mountPath: /opt/model/
+                name: data
         container:
           image: shibui/building-ml-system:ai_animals_similar_word_registry_0.0.0
           imagePullPolicy: Always
