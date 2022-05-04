@@ -41,12 +41,12 @@ class SimilarWordPredictor(AbstractSimilarWordPredictor):
         self.load_model()
 
     def load_model(self):
-        self.logger.info(f"loading {self.model}")
+        self.logger.info(f"loading {self.model_path}")
         self.model = gensim.models.KeyedVectors.load_word2vec_format(
             self.model_path,
             binary=False,
         )
-        self.logger.info(f"loaded {self.model}")
+        self.logger.info(f"loaded {self.model_path}")
 
     def predict(
         self,
