@@ -337,17 +337,18 @@ deploy_argo: registry_argo
 create_argo_similar_image_search_train_cron:
 	argo cron create infrastructure/manifests/argo/workflow/search_similar_image_search_train.yaml
 
-.PHONY: create_argo_animal_feature_train_cron
-create_argo_animal_feature_train_cron:
-	argo cron create infrastructure/manifests/argo/workflow/animal_feature_train.yaml
+.PHONY: create_argo_learn_to_rank_train_cron
+create_argo_learn_to_rank_train_cron:
+	argo cron create infrastructure/manifests/argo/workflow/learn_to_rank_train.yaml
 
 .PHONY: create_argo_no_animal_violation_train
 create_argo_no_animal_violation_train:
 	argo cron create infrastructure/manifests/argo/workflow/no_animal_violation_train.yaml
 
-.PHONY: submit_argo_learn_to_rank_lgbm_ranker_train
-submit_argo_learn_to_rank_lgbm_ranker_train:
-	argo submit infrastructure/manifests/argo/workflow/search_learn_to_rank_lgbm_ranker_train.yaml
+.PHONY: create_argo_similar_word_registry
+create_argo_similar_word_registry:
+	argo cron create infrastructure/manifests/argo/workflow/similar_word_registry.yaml
+
 
 
 ############ MONITORING COMMANDS ############
@@ -835,9 +836,10 @@ deploy_searches: deploy_search_learn_to_rank_ab_test_proxy \
 	deploy_similar_image_search_proxy
 	
 .PHONY: register_argo
-register_argo: create_argo_animal_feature_train_cron \
+register_argo: create_argo_learn_to_rank_train_cron \
 	create_argo_similar_image_search_train_cron \
-	create_argo_no_animal_violation_train
+	create_argo_no_animal_violation_train \
+	create_argo_similar_word_registry
 
 .PHONY: delete_namespaces
 delete_namespaces:
