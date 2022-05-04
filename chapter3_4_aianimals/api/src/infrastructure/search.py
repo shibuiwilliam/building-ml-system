@@ -5,7 +5,6 @@ from typing import Dict, List, Optional, Union
 
 from elasticsearch import Elasticsearch
 from src.entities.animal import AnimalSearchQuery, AnimalSearchResult, AnimalSearchResults, AnimalSearchSortKey
-from src.middleware.strings import hiragana_to_katakana, katakana_to_hiragana
 
 logger = getLogger(__name__)
 
@@ -45,27 +44,41 @@ class ElasticsearchClient(AbstractSearch):
 
     def __add_must(
         self,
-        q: Dict,
         key: str,
         value: str,
     ) -> Dict:
-        if "must" in q["bool"].keys():
-            q["bool"]["must"].append(
-                {
-                    "match": {
-                        key: value,
+        return {
+            "match": {
+                key: value,
+            }
+        }
+
+    def __make_function_score(
+        self,
+        phrases: List[str],
+        boost: float = 1.0,
+    ) -> Dict:
+        return {
+            "function_score": {
+                "boost": boost,
+                "query": {
+                    "bool": {
+                        "should": [
+                            {
+                                "terms": {
+                                    "description": phrases,
+                                },
+                            },
+                            {
+                                "terms": {
+                                    "name": phrases,
+                                },
+                            },
+                        ]
                     }
-                }
-            )
-        else:
-            q["bool"]["must"] = [
-                {
-                    "match": {
-                        key: value,
-                    }
-                }
-            ]
-        return q
+                },
+            }
+        }
 
     def __make_sort(
         self,
@@ -95,24 +108,6 @@ class ElasticsearchClient(AbstractSearch):
                 )
         return sort
 
-    def __augment_query(
-        self,
-        vocab: str,
-    ) -> List[str]:
-        vocabs = [vocab]
-        if vocab in ["ねこ", "猫", "ネコ"]:
-            vocabs.extend(["ねこ", "猫", "ネコ"])
-        if vocab in ["いぬ", "犬", "イヌ"]:
-            vocabs.extend(["いぬ", "犬", "イヌ"])
-        if vocab in ["かわいい", "可愛い", "カワイイ"]:
-            vocabs.extend(["かわいい", "可愛い", "カワイイ"])
-        katakana = hiragana_to_katakana(hiragana=vocab)
-        vocabs.append(katakana)
-        hiragana = katakana_to_hiragana(katakana=vocab)
-        vocabs.append(hiragana)
-
-        return list(set(vocabs))
-
     def search(
         self,
         index: str,
@@ -121,44 +116,50 @@ class ElasticsearchClient(AbstractSearch):
         size: int = 100,
     ) -> AnimalSearchResults:
         q: Dict[str, Dict] = {"bool": {}}
+        musts = []
+        shoulds = []
         if query.animal_category_name_en is not None:
-            q = self.__add_must(
-                q=q,
+            must = self.__add_must(
                 key="animal_category_name_en",
                 value=query.animal_category_name_en,
             )
+            musts.append(must)
         if query.animal_category_name_ja is not None:
-            q = self.__add_must(
-                q=q,
+            must = self.__add_must(
                 key="animal_category_name_ja",
                 value=query.animal_category_name_ja,
             )
+            musts.append(must)
         if query.animal_subcategory_name_en is not None:
-            q = self.__add_must(
-                q=q,
+            must = self.__add_must(
                 key="animal_subcategory_name_en",
                 value=query.animal_subcategory_name_en,
             )
+            musts.append(must)
         if query.animal_subcategory_name_ja is not None:
-            q = self.__add_must(
-                q=q,
+            must = self.__add_must(
                 key="animal_subcategory_name_ja",
                 value=query.animal_subcategory_name_ja,
             )
+            musts.append(must)
         if len(query.phrases) > 0:
-            phrases = []
-            for p in query.phrases:
-                phrase = self.__augment_query(vocab=p)
-                phrases.extend(phrase)
-            query_phrase = " ".join(phrases)
-            q["bool"]["should"] = [
-                {
-                    "match": {"name": query_phrase},
-                },
-                {
-                    "match": {"description": query_phrase},
-                },
-            ]
+            should = self.__make_function_score(
+                phrases=query.phrases,
+                boost=1,
+            )
+            shoulds.append(should)
+        if query.similar_words is not None and len(query.similar_words) > 0:
+            should = self.__make_function_score(
+                phrases=query.similar_words,
+                boost=0.3,
+            )
+            shoulds.append(should)
+
+        if len(musts) > 0:
+            q["bool"]["must"] = musts
+        if len(shoulds) > 0:
+            q["bool"]["should"] = shoulds
+
         if len(q["bool"]) == 0:
             q = {"match_all": {}}
         sort = self.__make_sort(key=query.sort_by if query is not None else None)

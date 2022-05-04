@@ -1,7 +1,7 @@
 import json
 from abc import ABC, abstractmethod
 from logging import getLogger
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from fastapi import BackgroundTasks
 from sqlalchemy.orm import Session
@@ -254,6 +254,23 @@ class AnimalUsecase(AbstractAnimalUsecase):
             expire_second=60 * 10,
         )
 
+    def __make_similar_word_cache_key(
+        self,
+        word: str,
+    ) -> str:
+        return f"SIMILAR_WORD_{word}"
+
+    def __extract_similar_word_value(
+        self,
+        similar_words: str,
+    ) -> Dict[str, float]:
+        values = similar_words.split(f"{CONSTANTS.SPLITTER}{CONSTANTS.SPLITTER}")
+        extracted = {}
+        for kv in values:
+            k, v = kv.split(CONSTANTS.SPLITTER)
+            extracted[k] = float(v)
+        return extracted
+
     def search(
         self,
         request: AnimalSearchRequest,
@@ -286,6 +303,17 @@ class AnimalUsecase(AbstractAnimalUsecase):
             searched.search_id = search_id
             logger.info(f"request: {request}; response: {searched}")
             return searched
+
+        similar_words: List[str] = []
+        for phrase in request.phrases:
+            similar_words_key = self.__make_similar_word_cache_key(word=phrase)
+            cached_similar_words = self.cache.get(key=similar_words_key)
+            if cached_similar_words is not None and isinstance(cached_similar_words, str):
+                _similar_words = self.__extract_similar_word_value(similar_words=cached_similar_words)
+                similar_words.extend(list(_similar_words.keys()))
+        similar_words = list(set(similar_words))
+        AnimalSearchQuery.similar_words = similar_words
+
         results = self.search_client.search(
             index=ANIMAL_INDEX,
             query=query,

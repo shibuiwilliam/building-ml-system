@@ -56,7 +56,7 @@ class _CONSTANTS(object):
         return "token"
 
     @constant
-    def TOKEN_SPLITTER() -> str:
+    def SPLITTER() -> str:
         return "____"
 
     @constant

@@ -20,12 +20,12 @@ async def token_assertion(
             detail="authorization failure",
         )
 
-    if CONSTANTS.TOKEN_SPLITTER not in raw_token:
+    if CONSTANTS.SPLITTER not in raw_token:
         raise HTTPException(
             status_code=HTTP_403_FORBIDDEN,
             detail="authorization failure",
         )
-    user_id, handle_name, password = raw_token.split(CONSTANTS.TOKEN_SPLITTER)
+    user_id, handle_name, password = raw_token.split(CONSTANTS.SPLITTER)
 
     login_query = UserLoginQuery(
         handle_name=handle_name,

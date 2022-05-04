@@ -98,6 +98,7 @@ class AnimalSearchQuery(BaseModel):
     animal_subcategory_name_en: Optional[str]
     animal_subcategory_name_ja: Optional[str]
     phrases: List[str]
+    similar_words: Optional[List[str]] = None
     sort_by: AnimalSearchSortKey = AnimalSearchSortKey.SCORE
 
     class Config:

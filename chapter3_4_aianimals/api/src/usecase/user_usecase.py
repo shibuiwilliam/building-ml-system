@@ -126,7 +126,7 @@ class UserUsecase(AbstractUserUsecase):
         if login_assertion is None:
             return None
 
-        raw_text = f"{login_assertion.id}{CONSTANTS.TOKEN_SPLITTER}{login_assertion.handle_name}{CONSTANTS.TOKEN_SPLITTER}{login_assertion.password}"
+        raw_text = f"{login_assertion.id}{CONSTANTS.SPLITTER}{login_assertion.handle_name}{CONSTANTS.SPLITTER}{login_assertion.password}"
         encrypted_text = self.crypt.encrypt(text=raw_text)
         return UserLoginResponse(
             user_id=login_assertion.id,
