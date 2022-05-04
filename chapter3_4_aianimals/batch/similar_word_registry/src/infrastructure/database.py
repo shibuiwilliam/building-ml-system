@@ -1,10 +1,7 @@
 import os
 from abc import ABC, abstractmethod
-from logging import getLogger
 
 import psycopg2
-
-logger = getLogger(__name__)
 
 
 class AbstractDBClient(ABC):
