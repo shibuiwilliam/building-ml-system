@@ -63,7 +63,7 @@ spec:
           resources:
             requests:
               memory: 16000Mi
-              cpu: 2000m
+              cpu: 1500m
           volumeMounts:
             - mountPath: /opt/model/
               name: data

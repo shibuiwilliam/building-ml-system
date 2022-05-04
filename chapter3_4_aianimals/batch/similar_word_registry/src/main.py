@@ -1,6 +1,6 @@
 from dependency_injector.wiring import Provide, inject
-from src.registry.container import Application
 from src.job.similar_word_registration_job import AbstractSimilarWordRegistrationJob
+from src.registry.container import Application
 
 
 @inject

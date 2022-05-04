@@ -1,8 +1,8 @@
 import logging
 from typing import Any, Dict, List, Optional, Tuple
 
-from database import AbstractDBClient
 from psycopg2.extras import DictCursor
+from src.infrastructure.database import AbstractDBClient
 
 
 class BaseRepository(object):
