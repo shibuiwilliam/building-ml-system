@@ -12,6 +12,7 @@ pydantic = "^1.9.0"
 httpx = "^0.22.0"
 psycopg2-binary = "^2.9.3"
 dependency-injector = "^4.39.1"
+redis = "^4.2.2"
 
 [tool.poetry.dev-dependencies]
 
