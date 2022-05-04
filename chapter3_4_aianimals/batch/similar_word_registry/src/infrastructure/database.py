@@ -16,7 +16,7 @@ class AbstractDBClient(ABC):
         raise NotImplementedError
 
 
-class DBClient(AbstractDBClient):
+class PostgresDBClient(AbstractDBClient):
     def __init__(self):
         self.__postgres_user = os.environ["POSTGRES_USER"]
         self.__postgres_password = os.environ["POSTGRES_PASSWORD"]

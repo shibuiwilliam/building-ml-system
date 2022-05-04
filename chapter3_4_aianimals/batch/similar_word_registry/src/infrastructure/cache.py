@@ -1,6 +1,7 @@
+import os
 from abc import ABC, abstractmethod
 from typing import Optional, Union
-import os
+
 import redis
 
 
@@ -15,13 +16,6 @@ class AbstractCache(ABC):
         value: Union[str, int, float, bool, bytes],
         expire_second: int = 600,
     ):
-        raise NotImplementedError
-
-    @abstractmethod
-    def get(
-        self,
-        key: str,
-    ) -> Optional[Union[str, int, float, bool, bytes]]:
         raise NotImplementedError
 
 
@@ -43,17 +37,11 @@ class RedisCache(AbstractCache):
         self,
         key: str,
         value: Union[str, int, float, bool, bytes],
-        expire_second: int = 600,
+        expire_second: int = 60 * 60 * 24 * 7,
+        # 1 week
     ):
         self.redis_client.set(
             name=key,
             value=value,
             ex=expire_second,
         )
-
-    def get(
-        self,
-        key: str,
-    ) -> Optional[Union[str, int, float, bool, bytes]]:
-        value = self.redis_client.get(key)
-        return value

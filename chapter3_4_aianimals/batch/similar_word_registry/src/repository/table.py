@@ -7,15 +7,7 @@ logger = configure_logger(__name__)
 
 
 class TABLES(Enum):
-    ANIMAL_CATEGORY = "animal_categories"
-    ANIMAL_SUBCATEGORY = "animal_subcategories"
-    ANIMAL = "animals"
-    USER = "users"
-    LIKE = "likes"
-    VIOLATION_TYPE = "violation_types"
-    VIOLATION = "violations"
     ACCESS_LOG = "access_logs"
-    ANIMAL_FEATURE = "animal_features"
 
     @staticmethod
     def has_value(value: str) -> bool:
