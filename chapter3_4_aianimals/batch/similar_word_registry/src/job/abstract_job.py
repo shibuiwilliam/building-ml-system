@@ -1,8 +1,4 @@
-from abc import ABC, abstractmethod
-
-from src.middleware.logger import configure_logger
-
-logger = configure_logger(__name__)
+from abc import ABC
 
 
 class AbstractJob(ABC):

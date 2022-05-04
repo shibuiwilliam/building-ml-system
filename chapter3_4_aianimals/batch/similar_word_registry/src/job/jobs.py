@@ -9,8 +9,7 @@ class Job(BaseModel):
 
 
 class JOBS(Enum):
-    ANIMAL_FEATURE_INITIALIZATION_JOB = Job(name="animal_feature_initialization_job")
-    ANIMAL_FEATURE_REGISTRATION_JOB = Job(name="animal_feature_registration_job")
+    SIMILAR_WORD_REGISTRATION_JOB = Job(name="similar_word_registration_job")
 
     @staticmethod
     def has_name(name: str) -> bool:

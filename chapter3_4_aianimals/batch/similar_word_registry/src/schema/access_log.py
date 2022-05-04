@@ -2,63 +2,68 @@ from sqlalchemy import Column, DateTime, ForeignKey, String
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.sql.functions import current_timestamp
 from sqlalchemy.sql.sqltypes import INT
-from src.middleware.logger import configure_logger
 from src.schema.base import Base
 from src.schema.table import TABLES
 
-logger = configure_logger(__name__)
 
-
-class AnimalFeature(Base):
-    __tablename__ = TABLES.ANIMAL_FEATURE.value
+class AccessLog(Base):
+    __tablename__ = TABLES.ACCESS_LOG.value
     id = Column(
         String(32),
         primary_key=True,
     )
+    search_id = Column(
+        String(64),
+        nullable=False,
+        unique=False,
+    )
+    phrases = Column(
+        JSON,
+        nullable=False,
+        unique=False,
+    )
+    animal_category_id = Column(
+        INT,
+        ForeignKey(f"{TABLES.ANIMAL_CATEGORY.value}.id"),
+        nullable=True,
+        unique=False,
+    )
+    animal_subcategory_id = Column(
+        INT,
+        ForeignKey(f"{TABLES.ANIMAL_SUBCATEGORY.value}.id"),
+        nullable=True,
+        unique=False,
+    )
+    sort_by = Column(
+        String(64),
+        nullable=False,
+        unique=False,
+    )
+    model_name = Column(
+        String(64),
+        nullable=True,
+        unique=False,
+    )
+    user_id = Column(
+        String(32),
+        ForeignKey(f"{TABLES.USER.value}.id"),
+        nullable=False,
+        unique=False,
+    )
+    likes = Column(
+        INT,
+        nullable=False,
+        unique=False,
+    )
     animal_id = Column(
         String(32),
         ForeignKey(f"{TABLES.ANIMAL.value}.id"),
-        nullable=True,
+        nullable=False,
         unique=False,
     )
-    mlflow_experiment_id = Column(
-        INT,
-        nullable=True,
-        unique=False,
-    )
-    mlflow_run_id = Column(
-        String(128),
-        nullable=True,
-        unique=False,
-    )
-    animal_category_vector = Column(
-        JSON,
-        nullable=True,
-        unique=False,
-    )
-    animal_subcategory_vector = Column(
-        JSON,
-        nullable=True,
-        unique=False,
-    )
-    name_words = Column(
-        JSON,
-        nullable=True,
-        unique=False,
-    )
-    name_vector = Column(
-        JSON,
-        nullable=True,
-        unique=False,
-    )
-    description_words = Column(
-        JSON,
-        nullable=True,
-        unique=False,
-    )
-    description_vector = Column(
-        JSON,
-        nullable=True,
+    action = Column(
+        String(32),
+        nullable=False,
         unique=False,
     )
     created_at = Column(
