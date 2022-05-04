@@ -814,14 +814,14 @@ deploy_infra: deploy_data \
 	deploy_argo \
 	deploy_monitoring
 
-.PHONY: deploy_data
-deploy_data: deploy_mlflow \
-	deploy_initial_data_registry \
-	deploy_search_registry \
-	deploy_animal_feature_registry
+.PHONY: deploy_init
+deploy_init: deploy_mlflow \
+	deploy_initial_data_registry
 
 .PHONY: deploy_base
-deploy_base: deploy_api
+deploy_base: deploy_api \
+	deploy_search_registry \
+	deploy_animal_feature_registry
 
 .PHONY: deploy_violation_detections
 deploy_violation_detections: deploy_no_animal_violation_serving \
