@@ -18,4 +18,3 @@ RUN apt-get -y update && \
     pip install --no-cache-dir -r requirements.txt
 
 COPY ${LOCAL_DIR}/src/ /${PROJECT_DIR}/src/
-COPY ${LOCAL_DIR}/hydra/ /${PROJECT_DIR}/hydra/
