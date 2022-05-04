@@ -187,6 +187,35 @@ push_feature_registry:
 	docker push $(DOCKER_FEATURE_REGISTRY_IMAGE_NAME)
 
 
+############ SIMILAR_WORD REGISTRY COMMANDS ############
+SIMILAR_WORD_REGISTRY_DIR := $(DIR)/batch/similar_word_registry
+SIMILAR_WORD_REGISTRY_VERSION := $(shell cd ${SIMILAR_WORD_REGISTRY_DIR} && poetry version -s)
+DOCKERFILE_SIMILAR_WORD_REGISTRY = $(SIMILAR_WORD_REGISTRY_DIR)/$(DOCKERFILE)
+DOCKER_SIMILAR_WORD_REGISTRY_TAG = $(TAG)_similar_word_registry
+DOCKER_SIMILAR_WORD_REGISTRY_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_SIMILAR_WORD_REGISTRY_TAG)_$(SIMILAR_WORD_REGISTRY_VERSION)
+
+.PHONY: req_similar_word_registry
+req_similar_word_registry:
+	cd $(SIMILAR_WORD_REGISTRY_DIR) && \
+	poetry export \
+		--without-hashes \
+		-f requirements.txt \
+		--output requirements.txt
+
+.PHONY: build_similar_word_registry
+build_similar_word_registry: 
+	docker build \
+		--platform x86_64 \
+		--build-arg FROM_IMAGE=$(DOCKER_BASE_TEXT_PROCESSING_IMAGE_NAME) \
+		-t $(DOCKER_SIMILAR_WORD_REGISTRY_IMAGE_NAME) \
+		-f $(DOCKERFILE_SIMILAR_WORD_REGISTRY) \
+		.
+	 
+.PHONY: push_similar_word_registry
+push_similar_word_registry: 
+	docker push $(DOCKER_SIMILAR_WORD_REGISTRY_IMAGE_NAME)
+
+
 ############ API COMMANDS ############
 API_DIR := $(DIR)/api
 API_VERSION := $(shell cd ${API_DIR} && poetry version -s)
@@ -838,7 +867,8 @@ req_all: \
 	req_search_similar_image_search_train \
 	req_search_similar_image_search_proxy \
 	req_search_learn_to_rank_lgbm_api \
-	req_violation_detection_portal
+	req_violation_detection_portal \
+	req_similar_word_registry
 
 .PHONY: build_all
 build_all: \
@@ -859,7 +889,8 @@ build_all: \
 	build_search_similar_image_search_train \
 	build_search_similar_image_search_proxy \
 	build_search_learn_to_rank_lgbm_api \
-	build_violation_detection_portal
+	build_violation_detection_portal \
+	build_similar_word_registry
 	
 .PHONY: push_all
 push_all: \
@@ -880,5 +911,6 @@ push_all: \
 	push_search_similar_image_search_train \
 	push_search_similar_image_search_proxy \
 	push_search_learn_to_rank_lgbm_api \
-	push_violation_detection_portal
+	push_violation_detection_portal \
+	push_similar_word_registry
 	
