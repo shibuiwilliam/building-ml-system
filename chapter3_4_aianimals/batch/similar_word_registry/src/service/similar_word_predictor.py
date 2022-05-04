@@ -53,10 +53,14 @@ class SimilarWordPredictor(AbstractSimilarWordPredictor):
         word: str,
         topn: int = 10,
     ) -> List[Prediction]:
-        similar_words = self.model.most_similar(
-            positive=[word],
-            topn=topn,
-        )
-        results = [Prediction(similar_word=w[0], similarity=w[1]) for w in similar_words]
-        self.logger.info(f"{word}: {results}")
-        return results
+        try:
+            similar_words = self.model.most_similar(
+                positive=[word],
+                topn=topn,
+            )
+            results = [Prediction(similar_word=w[0], similarity=w[1]) for w in similar_words]
+            self.logger.info(f"{word}: {results}")
+            return results
+        except Exception as e:
+            self.logger.error(e)
+            return []

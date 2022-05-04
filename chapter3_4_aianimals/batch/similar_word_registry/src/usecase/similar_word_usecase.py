@@ -91,6 +91,9 @@ class SimilarWordUsecase(AbstractSimilarWordUsecase):
                 word=word,
                 topn=Configurations.similar_top_n,
             )
+            if len(similar_words) == 0:
+                self.logger.info(f"no similar word for {word}")
+                continue
             cache_key = self.__make_cache_key(word=word)
             cache_value = self.__make_cache_value(similar_words=similar_words)
             self.cache_client.set(
