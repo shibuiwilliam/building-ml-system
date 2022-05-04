@@ -60,6 +60,7 @@ class ViolationUsecase(AbstractViolationUsecase):
             is_effective=request.is_effective,
             is_administrator_checked=request.is_administrator_checked,
         )
+        self.logger.info(f"record: {record}")
         data = self.violation_repository.insert(
             record=record,
             commit=True,
