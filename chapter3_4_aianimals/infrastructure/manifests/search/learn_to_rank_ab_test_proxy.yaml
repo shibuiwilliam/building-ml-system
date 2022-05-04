@@ -86,7 +86,7 @@ metadata:
     app: learn-to-rank-ab-test-proxy
 spec:
   ports:
-    - name: api
+    - name: learn-to-rank-ab-test-proxy
       port: 11000
       protocol: TCP
   selector:

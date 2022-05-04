@@ -88,7 +88,7 @@ metadata:
     app: learn-to-rank-lgbm-regression
 spec:
   ports:
-    - name: api
+    - name: learn-to-rank-lgbm-regression
       port: 10100
       protocol: TCP
   selector:

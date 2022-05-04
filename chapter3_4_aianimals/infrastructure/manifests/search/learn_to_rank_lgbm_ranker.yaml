@@ -88,7 +88,7 @@ metadata:
     app: learn-to-rank-lgbm-ranker
 spec:
   ports:
-    - name: api
+    - name: learn-to-rank-lgbm-ranker
       port: 10000
       protocol: TCP
   selector:

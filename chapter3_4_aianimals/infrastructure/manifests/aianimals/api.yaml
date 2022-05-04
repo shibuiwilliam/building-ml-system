@@ -73,8 +73,6 @@ spec:
               value: "1"
             - name: SIMILAR_IMAGE_SEARCH_URL
               value: http://similar-image-search-proxy.search.svc.cluster.local:15000/v0/similar-image-search
-            - name: GCS_BUCKET
-              value: aianimals
             - name: RUN_ENVIRONMENT
               value: cloud
             - name: PORT

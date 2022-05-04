@@ -633,7 +633,7 @@ push_violation_detection_portal:
 .PHONY: deploy_violation_detection_portal
 deploy_violation_detection_portal: portal_violation_detection
 	kubectl apply \
-		-f $(VIOLATION_DETECTION_MANIFEST_DIR)/portal.yaml
+		-f $(VIOLATION_DETECTION_MANIFEST_DIR)/violation_detection_portal.yaml
 
 
 ############ NO_ANIMAL_VIOLATION_TRAIN COMMANDS ############
@@ -778,31 +778,33 @@ initialize_deployment: deploy_kube_system \
 	registry_monitoring \
 	secret_api
 
-.PHONY: deploy_first
-deploy_first: deploy_data \
+.PHONY: deploy_infra
+deploy_infra: deploy_data \
 	deploy_es \
 	deploy_argo \
 	deploy_monitoring
 
-.PHONY: deploy_second
-deploy_second: deploy_mlflow \
+.PHONY: deploy_data
+deploy_data: deploy_mlflow \
 	deploy_initial_data_registry \
-	deploy_no_animal_violation_serving \
-	deploy_similar_image_search_serving \
-	deploy_search_learn_to_rank_ab_test_proxy \
+	deploy_search_registry \
+	deploy_animal_feature_registry
+
+.PHONY: deploy_base
+deploy_base: deploy_api
+
+.PHONY: deploy_violation_detections
+deploy_violation_detections: deploy_no_animal_violation_serving \
+	deploy_violation_detection_registry \
+	deploy_no_animal_violation_proxy
+
+.PHONY: deploy_searches
+deploy_searches: deploy_search_learn_to_rank_ab_test_proxy \
 	deploy_search_learn_to_rank_lgbm_ranker_api \
 	deploy_search_learn_to_rank_lgbm_regression_api \
+	deploy_similar_image_search_serving \
 	deploy_similar_image_search_proxy
-
-.PHONY: deploy_third
-deploy_third: deploy_api \
-	deploy_search_registry \
-	deploy_animal_feature_registry \
-	deploy_violation_detection_registry
-
-.PHONY: deploy_fourth
-deploy_fourth: deploy_no_animal_violation_proxy
-
+	
 .PHONY: register_argo
 register_argo: create_argo_animal_feature_train_cron \
 	create_argo_similar_image_search_train_cron \

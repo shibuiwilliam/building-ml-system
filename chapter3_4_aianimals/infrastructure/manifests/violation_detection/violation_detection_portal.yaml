@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: violation-detection-proxy
+  namespace: violation-detection
+  labels:
+    app: violation-detection-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: violation-detection-proxy
+  template:
+    metadata:
+      labels:
+        app: violation-detection-proxy
+    spec:
+      containers:
+        - name: violation-detection-proxy
+          image: shibui/building-ml-system:ai_animals_violation_detection_portal_0.0.0
+          imagePullPolicy: Always
+          command:
+            - streamlit
+            - run
+            - src/main.py
+          ports:
+            - containerPort: 8501
+          resources:
+            limits:
+              cpu: 1000m
+              memory: "1000Mi"
+            requests:
+              cpu: 500m
+              memory: "500Mi"
+          env:
+            - name: POSTGRES_HOST
+              value: postgres.data.svc.cluster.local
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: password
+            - name: POSTGRES_DB
+              value: aianimals
+            - name: RUN_ENVIRONMENT
+              value: cloud
+      imagePullSecrets:
+        - name: regcred
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: violation-detection-proxy
+  namespace: violation-detection
+  labels:
+    app: violation-detection-proxy
+spec:
+  ports:
+    - name: violation-detection-proxy
+      port: 8501
+      protocol: TCP
+  selector:
+    app: violation-detection-proxy

@@ -82,7 +82,7 @@ metadata:
     app: similar-image-search-proxy
 spec:
   ports:
-    - name: api
+    - name: similar-image-search-proxy
       port: 15000
       protocol: TCP
   selector:
