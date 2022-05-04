@@ -312,6 +312,7 @@ class AnimalUsecase(AbstractAnimalUsecase):
                 _similar_words = self.__extract_similar_word_value(similar_words=cached_similar_words)
                 similar_words.extend(list(_similar_words.keys()))
         similar_words = list(set(similar_words))
+        logger.info(f"similar words: {similar_words}")
         AnimalSearchQuery.similar_words = similar_words
 
         results = self.search_client.search(
