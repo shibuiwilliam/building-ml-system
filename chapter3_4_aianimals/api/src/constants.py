@@ -61,7 +61,7 @@ class _CONSTANTS(object):
 
     @constant
     def ANIMAL_SEARCH_CACHE_PREFIX() -> str:
-        return "ANIMAL_SEARCH_CACHE"
+        return "ANIMAL_SEARCH"
 
 
 CONSTANTS = _CONSTANTS()

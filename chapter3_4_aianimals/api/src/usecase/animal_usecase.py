@@ -231,7 +231,6 @@ class AnimalUsecase(AbstractAnimalUsecase):
         offset: int = 0,
     ) -> str:
         key = f"{CONSTANTS.ANIMAL_SEARCH_CACHE_PREFIX}_"
-        key += f"{query.user_id}_"
         key += f"{query.animal_category_name_en}_"
         key += f"{query.animal_category_name_ja}_"
         key += f"{query.animal_subcategory_name_en}_"
@@ -303,6 +302,8 @@ class AnimalUsecase(AbstractAnimalUsecase):
             searched.search_id = search_id
             logger.info(f"request: {request}; response: {searched}")
             return searched
+
+        logger.info(f"no cache for {key}")
 
         similar_words: List[str] = []
         for phrase in request.phrases:
