@@ -145,7 +145,7 @@ class ElasticsearchClient(AbstractSearch):
         if len(query.phrases) > 0:
             should = self.__make_function_score(
                 phrases=query.phrases,
-                boost=1,
+                boost=1.0,
             )
             shoulds.append(should)
         if query.similar_words is not None and len(query.similar_words) > 0:
