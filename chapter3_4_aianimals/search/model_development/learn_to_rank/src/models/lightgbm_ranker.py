@@ -35,7 +35,7 @@ class LightGBMLearnToRankRanker(BaseLearnToRankModel):
         self,
         params: Dict = LIGHT_GBM_LEARN_TO_RANK_RANKER,
         early_stopping_rounds: int = 5,
-        eval_metrics: Union[str, List[str]] = "mse",
+        eval_metrics: Union[str, List[str]] = "ndcg",
         verbose_eval: int = 1,
     ):
         super().__init__()

@@ -330,8 +330,12 @@ registry_argo: deploy_argo_ns
 
 .PHONY: deploy_argo
 deploy_argo: registry_argo
-	kubectl -n argo apply -f $(ARGO_MANIFEST_DIR)/argo_clusterrolebinding.yaml && \
-	kubectl -n argo apply -f https://github.com/argoproj/argo-workflows/releases/download/v3.3.1/quick-start-postgres.yaml
+	kubectl \
+		-n argo apply \
+		-f $(ARGO_MANIFEST_DIR)/argo_clusterrolebinding.yaml && \
+	kubectl \
+		-n argo apply \
+		-f https://github.com/argoproj/argo-workflows/releases/download/v3.3.1/quick-start-postgres.yaml
 
 .PHONY: create_argo_similar_image_search_train_cron
 create_argo_similar_image_search_train_cron:
@@ -661,7 +665,7 @@ push_violation_detection_portal:
 	docker push $(DOCKER_VIOLATION_DETECTION_PORTAL_IMAGE_NAME)
 
 .PHONY: deploy_violation_detection_portal
-deploy_violation_detection_portal: portal_violation_detection
+deploy_violation_detection_portal:
 	kubectl apply \
 		-f $(VIOLATION_DETECTION_MANIFEST_DIR)/violation_detection_portal.yaml
 
@@ -826,7 +830,8 @@ deploy_base: deploy_api \
 .PHONY: deploy_violation_detections
 deploy_violation_detections: deploy_no_animal_violation_serving \
 	deploy_violation_detection_registry \
-	deploy_no_animal_violation_proxy
+	deploy_no_animal_violation_proxy \
+	deploy_violation_detection_portal
 
 .PHONY: deploy_searches
 deploy_searches: deploy_search_learn_to_rank_ab_test_proxy \

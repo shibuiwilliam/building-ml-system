@@ -1,30 +1,32 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: violation-detection-proxy
+  name: violation-detection-portal
   namespace: violation-detection
   labels:
-    app: violation-detection-proxy
+    app: violation-detection-portal
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: violation-detection-proxy
+      app: violation-detection-portal
   template:
     metadata:
       labels:
-        app: violation-detection-proxy
+        app: violation-detection-portal
     spec:
       containers:
-        - name: violation-detection-proxy
+        - name: violation-detection-portal
           image: shibui/building-ml-system:ai_animals_violation_detection_portal_0.0.0
           imagePullPolicy: Always
           command:
             - streamlit
             - run
             - src/main.py
+            - --server.port
+            - "9501"
           ports:
-            - containerPort: 8501
+            - containerPort: 9501
           resources:
             limits:
               cpu: 1000m
@@ -52,14 +54,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: violation-detection-proxy
+  name: violation-detection-portal
   namespace: violation-detection
   labels:
-    app: violation-detection-proxy
+    app: violation-detection-portal
 spec:
   ports:
-    - name: violation-detection-proxy
-      port: 8501
+    - name: violation-detection-portal
+      port: 9501
       protocol: TCP
   selector:
-    app: violation-detection-proxy
+    app: violation-detection-portal

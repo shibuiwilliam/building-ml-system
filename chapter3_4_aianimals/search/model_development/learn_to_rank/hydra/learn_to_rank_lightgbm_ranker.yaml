@@ -19,5 +19,5 @@ jobs:
       num_threads: 0
       seed: 1234
       early_stopping_rounds: 5
-      eval_metrics: mse
+      eval_metrics: ndcg
       verbose_eval: 1
