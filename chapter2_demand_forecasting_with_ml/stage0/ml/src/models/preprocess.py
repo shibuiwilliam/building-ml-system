@@ -9,7 +9,6 @@ from joblib import dump, load
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
-from sklearn.model_selection import BaseCrossValidator
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import FunctionTransformer, MinMaxScaler, OneHotEncoder
 from src.dataset.schema import BASE_SCHEMA, MONTHS, PREPROCESSED_SCHEMA, WEEKLY_SCHEMA, WEEKS, YEARS
@@ -30,78 +29,6 @@ def select_by_store_and_item(
         logger.info(f"items to be used: {items}")
         df = df[df["item"].isin(items)]
     return df
-
-
-class WeekBasedSplit(BaseCrossValidator):
-    def __init__(
-        self,
-        n_splits: int = 3,
-        gap: int = 2,
-        min_train_size_rate: float = 0.8,
-        max_test_size: int = 1,
-        columns: Dict = None,
-        types: Dict = None,
-    ):
-        if min_train_size_rate >= 1.0:
-            raise ValueError
-        self.n_splits = n_splits
-        self.gap = gap
-        self.min_train_size_rate = min_train_size_rate
-        self.max_test_size = max_test_size
-        self.columns = columns
-        self.types = types
-
-    def split(
-        self,
-        X: Union[np.ndarray, pd.DataFrame],
-        y=None,
-        groups=None,
-    ):
-        if isinstance(X, np.ndarray):
-            X = pd.DataFrame(X, columns=self.columns).astype(self.types)
-        year_weeks = X.year.astype(str).str.cat(X.week_of_year.astype(str), sep="_").unique()
-        year_week_index = [i for i in range(len(year_weeks))]
-        min_train_size = int(len(year_week_index) * self.min_train_size_rate)
-        candidates = year_week_index[self.gap + min_train_size : -self.gap]
-        for _ in range(self.n_splits):
-            train_position = random.choice(candidates)
-            train_year_week = year_weeks[train_position]
-            _train_year, _train_week = train_year_week.split("_")
-            train_year, train_week = int(_train_year), int(_train_week)
-
-            test_position = train_position + self.gap
-            test_year_week = year_weeks[test_position]
-            _test_year, _test_week = test_year_week.split("_")
-            test_year, test_week = int(_test_year), int(_test_week)
-
-            logger.info(
-                f"""
-train_year until: {train_year}
-train_week until: {train_week}
-test_year after: {test_year}
-test_week after: {test_week}
-                        """
-            )
-
-            x_train = X[(X.year < train_year) | ((X.year == train_year) & (X.week_of_year <= train_week))]
-            x_test = X[
-                (X.year > test_year)
-                | (
-                    (X.year == test_year)
-                    & (X.week_of_year >= test_week)
-                    & (X.week_of_year < test_week + self.max_test_size)
-                )
-            ]
-
-            yield np.array(list(x_train.index)), np.array(list(x_test.index))
-
-    def get_n_splits(
-        self,
-        X,
-        y=None,
-        groups=None,
-    ):
-        return self.n_splits
 
 
 class BasePreprocessPipeline(ABC, BaseEstimator, TransformerMixin):

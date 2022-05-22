@@ -6,16 +6,13 @@ import mlflow
 from omegaconf import DictConfig
 from src.configurations import Configurations
 from src.dataset.schema import YearAndWeek
-from src.jobs.optimize import OptimizerRunner
 from src.jobs.predict import Predictor
 from src.jobs.register import DataRegister
 from src.jobs.retrieve import DataRetriever
 from src.jobs.train import Trainer
 from src.middleware.logger import configure_logger
 from src.models.models import MODELS
-from src.models.preprocess import DataPreprocessPipeline, WeekBasedSplit
-from src.optimizer.optimizer import Optimizer
-from src.optimizer.schema import DIRECTION, METRICS
+from src.models.preprocess import DataPreprocessPipeline
 
 logger = configure_logger(__name__)
 
@@ -84,38 +81,6 @@ def main(cfg: DictConfig):
         )
         if "params" in cfg.jobs.model.keys():
             model.reset_model(params=cfg.jobs.model.params)
-
-        if cfg.jobs.optimize.run:
-            metrics = METRICS.get_metrics(name=cfg.jobs.optimize.optuna.metrics)
-            optimizer = Optimizer(
-                data=xy_train.x,
-                target=xy_train.y,
-                direction=DIRECTION.MINIMIZE,
-                cv=WeekBasedSplit(
-                    n_splits=5,
-                    gap=2,
-                    min_train_size_rate=0.8,
-                    columns=data_preprocess_pipeline.preprocessed_columns,
-                    types=data_preprocess_pipeline.preprocessed_types,
-                ),
-            )
-            optimize_runner = OptimizerRunner(
-                model=model,
-                optimizer=optimizer,
-            )
-            best_params = optimize_runner.optimize(
-                params=cfg.jobs.optimize.optuna.light_gbm.parameters,
-                n_trials=cfg.jobs.optimize.optuna.n_trials,
-                n_jobs=cfg.jobs.optimize.optuna.n_jobs,
-                metrics=metrics,
-                fit_params=dict(
-                    early_stopping_rounds=cfg.jobs.model.params.early_stopping_rounds,
-                    eval_metric=cfg.jobs.model.params.eval_metrics,
-                    verbose=cfg.jobs.model.params.verbose_eval,
-                ),
-            )
-            logger.info(f"parameter optimize results: {best_params}")
-            model.reset_model(params=best_params)
 
         if cfg.jobs.train.run:
             now = datetime.now().strftime("%Y%m%d_%H%M%S")
