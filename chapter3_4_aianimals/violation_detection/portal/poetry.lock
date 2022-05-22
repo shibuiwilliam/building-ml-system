@@ -775,14 +775,13 @@ tests = ["check-manifest", "coverage", "defusedxml", "markdown2", "olefile", "pa
 
 [[package]]
 name = "plotly"
-version = "5.7.0"
+version = "5.8.0"
 description = "An open-source, interactive data visualization library for Python"
 category = "main"
 optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
-six = "*"
 tenacity = ">=6.2.0"
 
 [[package]]
@@ -1109,7 +1108,7 @@ tests = ["pytest", "typeguard", "pygments", "littleutils", "cython"]
 
 [[package]]
 name = "streamlit"
-version = "1.8.1"
+version = "1.9.0"
 description = "The fastest way to build data apps in Python"
 category = "main"
 optional = false
@@ -1793,8 +1792,8 @@ pillow = [
     {file = "Pillow-9.1.0.tar.gz", hash = "sha256:f401ed2bbb155e1ade150ccc63db1a4f6c1909d3d378f7d1235a44e90d75fb97"},
 ]
 plotly = [
-    {file = "plotly-5.7.0-py2.py3-none-any.whl", hash = "sha256:3a35131762c6567813012462e1d496e1d3898f56ab3d386b32f103f7f0c79cf1"},
-    {file = "plotly-5.7.0.tar.gz", hash = "sha256:15ab20e9ed8b55f669b3d35e186eb48f9e1fe07321a1337b8b7df8d3573d265a"},
+    {file = "plotly-5.8.0-py2.py3-none-any.whl", hash = "sha256:0e6e2382aafe2b2978d2c1b10ea93e73ad1ec80fa9a195ff6eea62af7905dfdc"},
+    {file = "plotly-5.8.0.tar.gz", hash = "sha256:58cef3292f5994d82154d51fbc7338c48009fc47ea32ffe052ad29aaa15e0df9"},
 ]
 prometheus-client = [
     {file = "prometheus_client-0.14.1-py3-none-any.whl", hash = "sha256:522fded625282822a89e2773452f42df14b5a8e84a86433e3f8a189c1d54dc01"},
@@ -2165,8 +2164,8 @@ stack-data = [
     {file = "stack_data-0.2.0.tar.gz", hash = "sha256:45692d41bd633a9503a5195552df22b583caf16f0b27c4e58c98d88c8b648e12"},
 ]
 streamlit = [
-    {file = "streamlit-1.8.1-py2.py3-none-any.whl", hash = "sha256:24d19c420d760c88eafc3f9508cbbd77ddab4a99a3a3b4db06f7741531f120a5"},
-    {file = "streamlit-1.8.1.tar.gz", hash = "sha256:507c84439996c6ffed150a2bdd1352b46acc8a476a1012e73241f7cc2fda3056"},
+    {file = "streamlit-1.9.0-py2.py3-none-any.whl", hash = "sha256:dd7718147cfc8eb4c5a18b36b67a36de37454e7fe49ac72470ad2a43771aef13"},
+    {file = "streamlit-1.9.0.tar.gz", hash = "sha256:543c809843b0561f5aa3850af2e90f7a6df17c80906b09ab76bab498846e6797"},
 ]
 tenacity = [
     {file = "tenacity-8.0.1-py3-none-any.whl", hash = "sha256:f78f4ea81b0fabc06728c11dc2a8c01277bfc5181b321a4770471902e3eb844a"},

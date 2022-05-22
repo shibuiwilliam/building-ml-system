@@ -7,5 +7,5 @@ prometheus-client==0.14.1; python_version >= "3.6"
 psycopg2-binary==2.9.3; python_version >= "3.6"
 pydantic==1.9.0; python_full_version >= "3.6.1"
 six==1.16.0; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.3.0"
-sqlalchemy==1.4.31; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.6.0")
+sqlalchemy==1.4.36; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.6.0")
 typing-extensions==4.1.1; python_version >= "3.6" and python_full_version >= "3.6.1"

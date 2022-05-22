@@ -25,7 +25,7 @@ keras==2.8.0
 libclang==13.0.0
 markdown==3.3.6; python_version >= "3.6"
 nptyping==1.4.4; python_version >= "3.5"
-numpy==1.22.2; python_version >= "3.8"
+numpy==1.22.4; python_version >= "3.8"
 oauthlib==3.2.0; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version >= "3.6"
 opt-einsum==3.3.0; python_version >= "3.5"
 pika==1.2.0
@@ -41,7 +41,7 @@ rfc3986==1.5.0; python_version >= "3.6"
 rsa==4.8; python_version >= "3.6" and python_version < "4" and (python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.6")
 six==1.16.0; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.6"
 sniffio==1.2.0; python_full_version >= "3.6.2" and python_version >= "3.6"
-sqlalchemy==1.4.31; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.6.0")
+sqlalchemy==1.4.36; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.6.0")
 tensorboard-data-server==0.6.1; python_version >= "3.6"
 tensorboard-plugin-wit==1.8.1; python_version >= "3.6"
 tensorboard==2.8.0; python_version >= "3.6"
