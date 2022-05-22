@@ -133,6 +133,7 @@ def show_daily_item_sales(
                 .reset_index(drop=True)
                 .sort_values("date")
             )
+            sales_range_max = max(_df.sales.max() + 10, 150)
             with st.expander(
                 label=f"STORE {s} ITEM {i}",
                 expanded=True,
@@ -145,7 +146,7 @@ def show_daily_item_sales(
                     y=_df.sales,
                 )
                 fig.add_trace(sales_trace)
-                fig.update_yaxes(range=[0, 150])
+                fig.update_yaxes(range=[0, sales_range_max])
                 st.plotly_chart(fig, use_container_width=True)
                 logger.info(f"Daily STORE {s} ITEM {i}")
 
@@ -164,6 +165,7 @@ def show_weekly_item_sales(
                 .reset_index(drop=True)
                 .sort_values(["year", "month", "week_of_year"])
             )
+            sales_range_max = max(_df.sales.max() + 100, 1000)
             with st.expander(
                 label=f"STORE {s} ITEM {i}",
                 expanded=True,
@@ -178,7 +180,7 @@ def show_weekly_item_sales(
                     y=_df.sales,
                 )
                 fig.add_trace(sales_trace)
-                fig.update_yaxes(range=[0, 1000])
+                fig.update_yaxes(range=[0, sales_range_max])
                 st.plotly_chart(fig, use_container_width=True)
                 logger.info(f"Weekly STORE {s} ITEM {i}")
 
@@ -197,6 +199,7 @@ def show_monthly_item_sales(
                 .reset_index(drop=True)
                 .sort_values(["year", "month"])
             )
+            sales_range_max = max(_df.sales.max() + 500, 5000)
             with st.expander(
                 label=f"STORE {s} ITEM {i}",
                 expanded=True,
@@ -209,7 +212,7 @@ def show_monthly_item_sales(
                     y=_df.sales,
                 )
                 fig.add_trace(sales_trace)
-                fig.update_yaxes(range=[0, 5000])
+                fig.update_yaxes(range=[0, sales_range_max])
                 st.plotly_chart(fig, use_container_width=True)
                 logger.info(f"Monthly STORE {s} ITEM {i}")
 
