@@ -320,7 +320,12 @@ class ItemSalesPredictionEvaluationService(BaseService):
         if len(item_weekly_sales_predictions) == 0:
             return None
 
-        weekly_sales_predictions_df = pd.DataFrame([d.dict() for d in item_weekly_sales_predictions])
+        weekly_sales_predictions_df = (
+            pd.DataFrame([d.dict() for d in item_weekly_sales_predictions])
+            .drop("item_price", axis=1)
+            .drop("predicted_at", axis=1)
+            .drop("version", axis=1)
+        )
         logger.info(
             f"""
 weekly prediction df
@@ -332,7 +337,7 @@ weekly prediction df
         weekly_sales_evaluation_df = pd.merge(
             weekly_sales_df,
             weekly_sales_predictions_df,
-            on=["year", "week_of_year", "region", "store", "item"],
+            on=["year", "week_of_year", "store", "item"],
             how="inner",
         )
         weekly_sales_evaluation_df["diff"] = (
@@ -347,7 +352,6 @@ weekly prediction df
                 "year",
                 "month",
                 "week_of_year",
-                "region",
                 "store",
                 "item",
                 "item_price",
@@ -355,8 +359,6 @@ weekly prediction df
                 "prediction",
                 "diff",
                 "error_rate",
-                "predicted_at",
-                "version",
             ]
         ]
         logger.info(
