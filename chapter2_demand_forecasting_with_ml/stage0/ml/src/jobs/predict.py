@@ -39,8 +39,6 @@ class Predictor(object):
 Filtered prediction target data
 filtered df columns: {df.columns}
 filtered df shape: {df.shape}
-date from: {df.date.min()}
-date to: {df.date.max()}
     """
         )
         return df
