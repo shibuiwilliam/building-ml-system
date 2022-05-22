@@ -53,7 +53,7 @@ services:
     environment:
       - LOG_LEVEL=INFO
       - MLFLOW_TRACKING_URI=http://mlflow:5000
-      - TARGET_CONFIG_NAME=2021_31
+      - TARGET_CONFIG_NAME=2021_03
     command: /bin/sh -c "sleep 10s && python -m src.main"
     depends_on:
       - mlflow
