@@ -8,7 +8,6 @@ import yaml
 from lightgbm import LGBMRegressor
 from src.middleware.logger import configure_logger
 from src.models.base_model import BaseDemandForecastingModel
-from src.optimizer.schema import SUGGEST_TYPE, SearchParams
 
 logger = configure_logger(__name__)
 
@@ -42,7 +41,6 @@ class LightGBMRegressionDemandForecasting(BaseDemandForecastingModel):
 
         self.model: LGBMRegressor = None
         self.reset_model(params=self.params)
-        self.search_params: List[SearchParams] = []
         self.column_length: int = 0
 
     def reset_model(
@@ -54,36 +52,6 @@ class LightGBMRegressionDemandForecasting(BaseDemandForecastingModel):
         logger.info(f"params: {self.params}")
         self.model = LGBMRegressor(**self.params)
         logger.info(f"initialized model: {self.model}")
-
-    def define_default_search_params(self):
-        self.search_params = [
-            SearchParams(
-                name="num_leaves",
-                suggest_type=SUGGEST_TYPE.INT,
-                value_range=(2, 100),
-            ),
-            SearchParams(
-                name="max_depth",
-                suggest_type=SUGGEST_TYPE.INT,
-                value_range=(2, 100),
-            ),
-            SearchParams(
-                name="learning_rate",
-                suggest_type=SUGGEST_TYPE.UNIFORM,
-                value_range=[0.0001, 0.01],
-            ),
-            SearchParams(
-                name="feature_fraction",
-                suggest_type=SUGGEST_TYPE.UNIFORM,
-                value_range=[0.001, 0.9],
-            ),
-        ]
-
-    def define_search_params(
-        self,
-        search_params: List[SearchParams],
-    ):
-        self.search_params = search_params
 
     def train(
         self,

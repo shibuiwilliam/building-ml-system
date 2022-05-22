@@ -1,10 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional, Union
+from typing import Dict, Optional, Union
 
 import numpy as np
 import pandas as pd
 from src.middleware.logger import configure_logger
-from src.optimizer.schema import SearchParams
 
 logger = configure_logger(__name__)
 
@@ -14,7 +13,6 @@ class BaseDemandForecastingModel(ABC):
         self.name: str = "base_beverage_sales_forecasting"
         self.params: Dict = {}
         self.model = None
-        self.search_params: List[SearchParams] = []
 
     @abstractmethod
     def reset_model(
@@ -25,13 +23,6 @@ class BaseDemandForecastingModel(ABC):
 
     @abstractmethod
     def define_default_search_params(self):
-        raise NotImplementedError
-
-    @abstractmethod
-    def define_search_params(
-        self,
-        search_params: List[SearchParams],
-    ):
         raise NotImplementedError
 
     @abstractmethod
