@@ -28,6 +28,7 @@ class Predictor(object):
         target_items: Optional[List[str]] = None,
         target_stores: Optional[List[str]] = None,
     ) -> pd.DataFrame:
+        logger.info("filter data")
         df = df[(df.year == target_year) & (df.week_of_year == target_week)]
         if target_stores is not None and len(target_stores) > 0:
             df = df[df.store.isin(target_stores)]
@@ -35,8 +36,11 @@ class Predictor(object):
             df = df[df.item.isin(target_items)]
         logger.info(
             f"""
+Filtered prediction target data
 filtered df columns: {df.columns}
 filtered df shape: {df.shape}
+date from: {df.date.min()}
+date to: {df.date.max()}
     """
         )
         return df
@@ -74,8 +78,8 @@ predicted df shape: {df.shape}
             f"""
 target_year: {target_year}
 target_week: {target_week}
-target_items: {target_items}
-target_stores: {target_stores}
+target_items: {'ALL' if target_items is None else target_items}
+target_stores: {'ALL' if target_stores is None else target_stores}
     """
         )
         df = pd.concat([previous_df, data_to_be_predicted_df])

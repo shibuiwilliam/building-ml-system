@@ -142,7 +142,7 @@ y_test shape: {y_test.shape}
         date_from: date,
         date_to: date,
     ) -> pd.DataFrame:
-        logger.info("start retrieve data")
+        logger.info("start retrieve prediction data")
         data: List[DataToBePredicted] = []
         dates = dates_in_between_dates(
             date_from=date_from,
