@@ -23,41 +23,6 @@ from src.middleware.strings import get_uuid
 logger = configure_logger(__name__)
 
 
-class DATA_SOURCE(Enum):
-    LOCAL = "local"
-    DB = "db"
-
-    @staticmethod
-    def list_values() -> List[str]:
-        return [v.value for v in DATA_SOURCE.__members__.values()]
-
-    @staticmethod
-    def has_value(value: str) -> bool:
-        return value in [v.value for v in DATA_SOURCE.__members__.values()]
-
-    @staticmethod
-    def value_to_enum(value: str):
-        for v in DATA_SOURCE.__members__.values():
-            if value == v.value:
-                return v
-        raise ValueError
-
-
-def load_df_from_csv(file_path: str) -> pd.DataFrame:
-    logger.info(f"load dataframe from {file_path}")
-    df = pd.read_csv(file_path)
-    df = BASE_SCHEMA.validate(df)
-    return df
-
-
-def save_df_to_csv(
-    df: pd.DataFrame,
-    file_path: str,
-):
-    logger.info(f"save dataframe to {file_path}")
-    df.to_csv(file_path, index=False)
-
-
 class DBDataManager(object):
     def __init__(
         self,
@@ -210,6 +175,110 @@ OFFSET
         records = self.execute_select_query(
             query=query,
             parameters=tuple(parameters),
+        )
+        data = [ItemSales(**r) for r in records]
+        return data
+
+    def select_earliest_day_item_sales(self) -> List[ItemSales]:
+        query = f"""
+SELECT
+    {TABLES.ITEM_SALES_RECORDS.value}.date,
+    {TABLES.ITEM_SALES_RECORDS.value}.day_of_week,
+    {TABLES.ITEM_SALES_RECORDS.value}.week_of_year,
+    {TABLES.ITEMS.value}.name AS item,
+    {TABLES.ITEM_PRICES.value}.price AS item_price,
+    {TABLES.STORES.value}.name as store,
+    {TABLES.ITEM_SALES_RECORDS.value}.sales,
+    {TABLES.ITEM_SALES_RECORDS.value}.total_sales_amount
+FROM
+    {TABLES.ITEM_SALES_RECORDS.value}
+LEFT JOIN
+    {TABLES.ITEM_PRICES.value}
+ON
+    {TABLES.ITEM_PRICES.value}.item_id = {TABLES.ITEM_SALES_RECORDS.value}.item_id
+AND
+    (
+        {TABLES.ITEM_PRICES.value}.applied_from <= {TABLES.ITEM_SALES_RECORDS.value}.date
+        AND
+        {TABLES.ITEM_PRICES.value}.applied_to >= {TABLES.ITEM_SALES_RECORDS.value}.date
+    )
+LEFT JOIN
+    {TABLES.ITEMS.value}
+ON
+    {TABLES.ITEM_SALES_RECORDS.value}.item_id = {TABLES.ITEMS.value}.id
+LEFT JOIN
+    {TABLES.STORES.value}
+ON
+    {TABLES.ITEM_SALES_RECORDS.value}.store_id = {TABLES.STORES.value}.id
+LEFT JOIN
+    {TABLES.REGIONS.value}
+ON
+    {TABLES.STORES.value}.region_id = {TABLES.REGIONS.value}.id
+WHERE
+    {TABLES.ITEM_SALES_RECORDS.value}.date = (
+        SELECT
+            MIN({TABLES.ITEM_SALES_RECORDS.value}.date)
+        FROM 
+            {TABLES.ITEM_SALES_RECORDS.value}
+    )
+;
+"""
+
+        records = self.execute_select_query(
+            query=query,
+            parameters=None,
+        )
+        data = [ItemSales(**r) for r in records]
+        return data
+
+    def select_latest_day_item_sales(self) -> List[ItemSales]:
+        query = f"""
+SELECT
+    {TABLES.ITEM_SALES_RECORDS.value}.date,
+    {TABLES.ITEM_SALES_RECORDS.value}.day_of_week,
+    {TABLES.ITEM_SALES_RECORDS.value}.week_of_year,
+    {TABLES.ITEMS.value}.name AS item,
+    {TABLES.ITEM_PRICES.value}.price AS item_price,
+    {TABLES.STORES.value}.name as store,
+    {TABLES.ITEM_SALES_RECORDS.value}.sales,
+    {TABLES.ITEM_SALES_RECORDS.value}.total_sales_amount
+FROM
+    {TABLES.ITEM_SALES_RECORDS.value}
+LEFT JOIN
+    {TABLES.ITEM_PRICES.value}
+ON
+    {TABLES.ITEM_PRICES.value}.item_id = {TABLES.ITEM_SALES_RECORDS.value}.item_id
+AND
+    (
+        {TABLES.ITEM_PRICES.value}.applied_from <= {TABLES.ITEM_SALES_RECORDS.value}.date
+        AND
+        {TABLES.ITEM_PRICES.value}.applied_to >= {TABLES.ITEM_SALES_RECORDS.value}.date
+    )
+LEFT JOIN
+    {TABLES.ITEMS.value}
+ON
+    {TABLES.ITEM_SALES_RECORDS.value}.item_id = {TABLES.ITEMS.value}.id
+LEFT JOIN
+    {TABLES.STORES.value}
+ON
+    {TABLES.ITEM_SALES_RECORDS.value}.store_id = {TABLES.STORES.value}.id
+LEFT JOIN
+    {TABLES.REGIONS.value}
+ON
+    {TABLES.STORES.value}.region_id = {TABLES.REGIONS.value}.id
+WHERE
+    {TABLES.ITEM_SALES_RECORDS.value}.date = (
+        SELECT
+            MAX({TABLES.ITEM_SALES_RECORDS.value}.date)
+        FROM 
+            {TABLES.ITEM_SALES_RECORDS.value}
+    )
+;
+"""
+
+        records = self.execute_select_query(
+            query=query,
+            parameters=None,
         )
         data = [ItemSales(**r) for r in records]
         return data

@@ -5,12 +5,13 @@ import hydra
 import mlflow
 from omegaconf import DictConfig
 from src.configurations import Configurations
-from src.dataset.data_manager import DATA_SOURCE
+from src.dataset.data_manager import DBDataManager
 from src.dataset.schema import YearAndWeek
 from src.jobs.predict import Predictor
 from src.jobs.register import DataRegister
 from src.jobs.retrieve import DataRetriever
 from src.jobs.train import Trainer
+from src.middleware.db_client import PostgreSQLClient
 from src.middleware.logger import configure_logger
 from src.models.models import MODELS
 from src.models.preprocess import DataPreprocessPipeline
@@ -36,46 +37,60 @@ def main(cfg: DictConfig):
     mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000"))
     mlflow.set_experiment(cfg.name)
     with mlflow.start_run(run_name=run_name) as run:
-        data_source = DATA_SOURCE.value_to_enum(value=cfg.jobs.data.source)
+        db_client = PostgreSQLClient()
+        db_data_manager = DBDataManager(db_client=db_client)
+        data_retriever = DataRetriever(db_data_manager=db_data_manager)
+
+        earliest_sales_date = data_retriever.retrieve_item_sales_earliest_date()
+        if earliest_sales_date is None:
+            raise Exception("no sales record available")
+
+        latest_sales_date = data_retriever.retrieve_item_sales_latest_date()
+        if latest_sales_date is None:
+            raise Exception("no sales record available")
+
+        train_year = earliest_sales_date.isocalendar().year
+        train_week = earliest_sales_date.isocalendar().week
+        train_end_date = latest_sales_date + timedelta(days=-14)
+        train_end_year = train_end_date.isocalendar().year
+        train_end_week = train_end_date.isocalendar().week
+        test_year = latest_sales_date.isocalendar().year
+        test_week = latest_sales_date.isocalendar().week
+
         train_year_and_week = YearAndWeek(
-            year=cfg.jobs.data.train.year,
-            week_of_year=cfg.jobs.data.train.week,
+            year=train_year,
+            week_of_year=train_week,
+        )
+        train_end_year_and_week = YearAndWeek(
+            year=train_end_year,
+            week_of_year=train_end_week,
         )
         test_year_and_week = YearAndWeek(
-            year=cfg.jobs.data.test.year,
-            week_of_year=cfg.jobs.data.test.week,
+            year=test_year,
+            week_of_year=test_week,
         )
 
-        date_from = cfg.jobs.data.target_data.get("date_from", None)
-        if date_from is not None:
-            date_from = datetime.strptime(date_from, "%Y-%m-%d").date()
-        date_to = cfg.jobs.data.target_data.get("date_to", None)
-        if date_to is not None:
-            date_to = datetime.strptime(date_to, "%Y-%m-%d").date()
-
         data_preprocess_pipeline = DataPreprocessPipeline()
-        data_retriever = DataRetriever()
         raw_df = data_retriever.retrieve_dataset(
-            file_path=cfg.jobs.data.path,
-            date_from=date_from,
-            date_to=date_to,
-            item=cfg.jobs.data.target_data.item,
-            store=cfg.jobs.data.target_data.store,
-            region=cfg.jobs.data.target_data.region,
-            data_source=data_source,
+            date_from=earliest_sales_date,
+            date_to=latest_sales_date,
+            item=Configurations.target_item,
+            store=Configurations.target_store,
+            region=Configurations.target_region,
         )
         xy_train, xy_test = data_retriever.train_test_split(
             raw_df=raw_df,
             train_year_and_week=train_year_and_week,
+            train_end_year_and_week=train_end_year_and_week,
             test_year_and_week=test_year_and_week,
             data_preprocess_pipeline=data_preprocess_pipeline,
         )
 
-        mlflow.log_param("target_date_date_from", date_from)
-        mlflow.log_param("target_date_date_to", date_to)
-        mlflow.log_param("target_date_item", cfg.jobs.data.target_data.item)
-        mlflow.log_param("target_date_store", cfg.jobs.data.target_data.store)
-        mlflow.log_param("target_date_region", cfg.jobs.data.target_data.region)
+        mlflow.log_param("target_date_date_from", earliest_sales_date)
+        mlflow.log_param("target_date_date_to", latest_sales_date)
+        mlflow.log_param("target_date_item", Configurations.target_item)
+        mlflow.log_param("target_date_store", Configurations.target_store)
+        mlflow.log_param("target_date_region", Configurations.target_region)
 
         _model = MODELS.get_model(name=cfg.jobs.model.name)
         model = _model.model(
@@ -110,20 +125,17 @@ def main(cfg: DictConfig):
 
         if cfg.jobs.predict.run:
             predictor = Predictor()
-            latest_date = max(raw_df.date)
-            next_date = latest_date + timedelta(days=1)
+            next_date = latest_sales_date + timedelta(days=1)
             next_date = next_date.date()
             target_date = date.fromisocalendar(
-                year=cfg.jobs.data.predict.year,
-                week=cfg.jobs.data.predict.week,
+                year=next_date.isocalendar().year,
+                week=next_date.isocalendar().week,
                 day=7,
             )
 
             data_to_be_predicted_df = data_retriever.retrieve_prediction_data(
-                file_path=cfg.jobs.data.path,
                 date_from=next_date,
                 date_to=target_date,
-                data_source=data_source,
             )
 
             target_items = cfg.jobs.data.predict["items"]
@@ -146,12 +158,9 @@ def main(cfg: DictConfig):
             )
             logger.info(f"predictions: {predictions}")
             if cfg.jobs.predict.register:
-                data_register = DataRegister()
-                prediction_file_path = os.path.join(cwd, f"{model.name}_{now}")
+                data_register = DataRegister(db_data_manager=db_data_manager)
                 data_register.register(
                     predictions=predictions,
-                    data_source=data_source,
-                    prediction_file_path=prediction_file_path,
                     mlflow_experiment_id=run.info.experiment_id,
                     mlflow_run_id=run.info.run_id,
                 )

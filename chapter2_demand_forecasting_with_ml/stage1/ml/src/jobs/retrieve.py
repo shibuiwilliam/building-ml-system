@@ -2,7 +2,7 @@ from datetime import date
 from typing import Optional, Tuple
 
 import pandas as pd
-from src.dataset.data_manager import DATA_SOURCE, DBDataManager
+from src.dataset.data_manager import DBDataManager
 from src.dataset.schema import BASE_SCHEMA, RAW_PREDICTION_SCHEMA, X_SCHEMA, XY, Y_SCHEMA, YearAndWeek
 from src.middleware.db_client import PostgreSQLClient
 from src.middleware.logger import configure_logger
@@ -12,42 +12,48 @@ logger = configure_logger(__name__)
 
 
 class DataRetriever(object):
-    def __init__(self):
-        pass
+    def __init__(
+        self,
+        db_data_manager: DBDataManager,
+    ):
+        self.db_data_manager = db_data_manager
+
+    def retrieve_item_sales_earliest_date(self) -> Optional[date]:
+        data = self.db_data_manager.select_earliest_day_item_sales()
+        if len(data) == 0:
+            return None
+        return data[0].date
+
+    def retrieve_item_sales_latest_date(self) -> Optional[date]:
+        data = self.db_data_manager.select_latest_day_item_sales()
+        if len(data) == 0:
+            return None
+        return data[0].date
 
     def retrieve_dataset(
         self,
-        file_path: str,
         date_from: Optional[date] = None,
         date_to: Optional[date] = None,
         item: str = "ALL",
         store: str = "ALL",
         region: str = "ALL",
-        data_source: DATA_SOURCE = DATA_SOURCE.LOCAL,
     ) -> pd.DataFrame:
         logger.info("start retrieve data")
-        if data_source == DATA_SOURCE.LOCAL:
-            raw_df = pd.read_csv(file_path)
-        elif data_source == DATA_SOURCE.DB:
-            db_client = PostgreSQLClient()
-            db_data_manager = DBDataManager(db_client=db_client)
 
-            if item == "ALL":
-                item = None
-            if store == "ALL":
-                store = None
-            if region == "ALL":
-                region = None
+        if item == "ALL":
+            item = None
+        if store == "ALL":
+            store = None
+        if region == "ALL":
+            region = None
 
-            raw_df = db_data_manager.load_df_from_db(
-                date_from=date_from,
-                date_to=date_to,
-                item=item,
-                store=store,
-                region=region,
-            )
-        else:
-            raise ValueError
+        raw_df = self.db_data_manager.load_df_from_db(
+            date_from=date_from,
+            date_to=date_to,
+            item=item,
+            store=store,
+            region=region,
+        )
 
         raw_df["date"] = pd.to_datetime(raw_df["date"])
         raw_df = BASE_SCHEMA.validate(raw_df)
@@ -63,13 +69,14 @@ raw_df shape: {raw_df.shape}
         self,
         raw_df: pd.DataFrame,
         train_year_and_week: YearAndWeek,
+        train_end_year_and_week: YearAndWeek,
         test_year_and_week: YearAndWeek,
         data_preprocess_pipeline: DataPreprocessPipeline,
     ) -> Tuple[XY, XY]:
         logger.info(
             f"""
-train from {train_year_and_week.year} of {train_year_and_week.week_of_year} to {test_year_and_week.year} {test_year_and_week.week_of_year-2}
-test from {test_year_and_week.year} {test_year_and_week.week_of_year}
+train: {train_year_and_week.year} {train_year_and_week.week_of_year} to {train_end_year_and_week.year} {train_end_year_and_week.week_of_year}
+test: {test_year_and_week.year} {test_year_and_week.week_of_year}
                 """
         )
 
@@ -79,8 +86,8 @@ test from {test_year_and_week.year} {test_year_and_week.week_of_year}
             (weekly_df.year == train_year_and_week.year) & (weekly_df.week_of_year >= train_year_and_week.week_of_year)
             | ((weekly_df.year > train_year_and_week.year) & (weekly_df.year < test_year_and_week.year))
             | (
-                (weekly_df.year == test_year_and_week.year)
-                & (weekly_df.week_of_year <= test_year_and_week.week_of_year - 2)
+                (weekly_df.year == train_end_year_and_week.year)
+                & (weekly_df.week_of_year <= train_end_year_and_week.week_of_year)
             )
         ].reset_index(drop=True)
 
@@ -139,29 +146,23 @@ y_test shape: {y_test.shape}
 
     def retrieve_prediction_data(
         self,
-        file_path: str,
         date_from: date,
         date_to: date,
-        data_source: DATA_SOURCE = DATA_SOURCE.LOCAL,
     ) -> pd.DataFrame:
         logger.info("start retrieve data")
-        if data_source == DATA_SOURCE.LOCAL:
-            data_to_be_predicted = file_path
-        elif data_source == DATA_SOURCE.DB:
-            db_client = PostgreSQLClient()
-            db_data_manager = DBDataManager(db_client=db_client)
-            data_to_be_predicted = db_data_manager.select_prediction_data(
-                date_from=date_from,
-                date_to=date_to,
-            )
-            data_to_be_predicted_df = pd.DataFrame([d.dict() for d in data_to_be_predicted])
-            data_to_be_predicted_df["date"] = pd.to_datetime(data_to_be_predicted_df["date"])
-            data_to_be_predicted_df = RAW_PREDICTION_SCHEMA.validate(data_to_be_predicted_df)
 
-            logger.info(
-                f"""
+        data_to_be_predicted = self.db_data_manager.select_prediction_data(
+            date_from=date_from,
+            date_to=date_to,
+        )
+        data_to_be_predicted_df = pd.DataFrame([d.dict() for d in data_to_be_predicted])
+        data_to_be_predicted_df["date"] = pd.to_datetime(data_to_be_predicted_df["date"])
+        data_to_be_predicted_df = RAW_PREDICTION_SCHEMA.validate(data_to_be_predicted_df)
+
+        logger.info(
+            f"""
 data_to_be_predicted columns: {data_to_be_predicted_df.columns}
 data_to_be_predicted shape: {data_to_be_predicted_df.shape}
-        """
-            )
-            return data_to_be_predicted_df
+    """
+        )
+        return data_to_be_predicted_df

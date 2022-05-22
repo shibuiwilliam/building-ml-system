@@ -62,13 +62,14 @@ date to: {raw_df.date.max()}
         self,
         raw_df: pd.DataFrame,
         train_year_and_week: YearAndWeek,
+        train_end_year_and_week: YearAndWeek,
         test_year_and_week: YearAndWeek,
         data_preprocess_pipeline: DataPreprocessPipeline,
     ) -> Tuple[XY, XY]:
         logger.info(
             f"""
 Split dataset
-train: {train_year_and_week.year} {train_year_and_week.week_of_year} to {test_year_and_week.year} {test_year_and_week.week_of_year-2}
+train: {train_year_and_week.year} {train_year_and_week.week_of_year} to {train_end_year_and_week.year} {train_end_year_and_week.week_of_year}
 test: {test_year_and_week.year} {test_year_and_week.week_of_year}
                 """
         )
@@ -79,8 +80,8 @@ test: {test_year_and_week.year} {test_year_and_week.week_of_year}
             (weekly_df.year == train_year_and_week.year) & (weekly_df.week_of_year >= train_year_and_week.week_of_year)
             | ((weekly_df.year > train_year_and_week.year) & (weekly_df.year < test_year_and_week.year))
             | (
-                (weekly_df.year == test_year_and_week.year)
-                & (weekly_df.week_of_year <= test_year_and_week.week_of_year - 2)
+                (weekly_df.year == train_end_year_and_week.year)
+                & (weekly_df.week_of_year <= train_end_year_and_week.week_of_year)
             )
         ].reset_index(drop=True)
 

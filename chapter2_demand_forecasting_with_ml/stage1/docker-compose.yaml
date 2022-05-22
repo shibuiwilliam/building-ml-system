@@ -103,7 +103,7 @@ services:
       - POSTGRESQL_DBNAME=beverage_sales_forecasting
       - LOG_LEVEL=INFO
       - MLFLOW_TRACKING_URI=http://mlflow:5000
-      - TARGET_CONFIG_NAME=2021_32
+      - TARGET_CONFIG_NAME=default
     command: /bin/sh -c "sleep 30s && python -m src.main"
     depends_on:
       - data_registration

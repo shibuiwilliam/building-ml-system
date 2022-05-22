@@ -39,6 +39,11 @@ def main(cfg: DictConfig):
             year=cfg.jobs.data.train.year,
             week_of_year=cfg.jobs.data.train.week,
         )
+        train_end_date = date.fromisocalendar(cfg.jobs.data.test.year, cfg.jobs.data.test.week, 1) + timedelta(days=-2)
+        train_end_year_and_week = YearAndWeek(
+            year=train_end_date.isocalendar().year,
+            week_of_year=train_end_date.isocalendar().week,
+        )
         test_year_and_week = YearAndWeek(
             year=cfg.jobs.data.test.year,
             week_of_year=cfg.jobs.data.test.week,
@@ -63,6 +68,7 @@ def main(cfg: DictConfig):
         xy_train, xy_test = data_retriever.train_test_split(
             raw_df=raw_df,
             train_year_and_week=train_year_and_week,
+            train_end_year_and_week=train_end_year_and_week,
             test_year_and_week=test_year_and_week,
             data_preprocess_pipeline=data_preprocess_pipeline,
         )
