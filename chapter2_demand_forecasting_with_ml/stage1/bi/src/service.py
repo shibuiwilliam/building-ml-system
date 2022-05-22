@@ -322,7 +322,7 @@ class ItemSalesPredictionEvaluationService(BaseService):
 
         weekly_sales_predictions_df = (
             pd.DataFrame([d.dict() for d in item_weekly_sales_predictions])
-            .drop("item_price", axis=1)
+            .drop("id", axis=1)
             .drop("predicted_at", axis=1)
             .drop("version", axis=1)
         )
