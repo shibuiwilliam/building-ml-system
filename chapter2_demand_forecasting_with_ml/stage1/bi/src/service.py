@@ -308,7 +308,7 @@ class ItemSalesPredictionEvaluationService(BaseService):
         year: Optional[int] = None,
         week_of_year: Optional[int] = None,
         version: int = 0,
-    ) -> pd.DataFrame:
+    ) -> Optional[pd.DataFrame]:
         item_weekly_sales_predictions = self.list_item_weekly_sales_predictions(
             item=item,
             store=store,
@@ -317,6 +317,9 @@ class ItemSalesPredictionEvaluationService(BaseService):
             week_of_year=week_of_year,
             version=version,
         )
+        if len(item_weekly_sales_predictions) == 0:
+            return None
+
         weekly_sales_predictions_df = pd.DataFrame([d.dict() for d in item_weekly_sales_predictions])
         logger.info(
             f"""

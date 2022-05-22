@@ -388,6 +388,9 @@ def build_item_sales_prediction_evaluation(
         year=year,
         week_of_year=week_of_year,
     )
+    if weekly_sales_evaluation_df is None:
+        st.markdown("NO PREDICTION AVAILABLE")
+        return
     show_weekly_item_sales_evaluation(
         df=weekly_sales_evaluation_df,
         aggregate_by=aggregate_by,
