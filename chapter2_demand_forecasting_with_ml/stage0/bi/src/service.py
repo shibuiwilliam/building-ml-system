@@ -9,12 +9,12 @@ from model import Container, ItemRepository, ItemSalesRepository, ItemWeeklySale
 logger = configure_logger(__name__)
 
 
-class BaseViewModel(object):
+class BaseService(object):
     def __init__(self):
         pass
 
 
-class StoreViewModel(BaseViewModel):
+class StoreService(BaseService):
     def __init__(self):
         super().__init__()
         self.store_repository = StoreRepository()
@@ -28,7 +28,7 @@ class StoreViewModel(BaseViewModel):
         return store_names
 
 
-class ItemViewModel(BaseViewModel):
+class ItemService(BaseService):
     def __init__(self):
         super().__init__()
         self.item_repository = ItemRepository()
@@ -42,7 +42,7 @@ class ItemViewModel(BaseViewModel):
         return item_names
 
 
-class ItemSalesViewModel(BaseViewModel):
+class ItemSalesService(BaseService):
     def __init__(self):
         super().__init__()
         self.item_sales_repository = ItemSalesRepository()
@@ -189,7 +189,7 @@ monthly df
         return monthly_sales_df
 
 
-class ItemSalesPredictionEvaluationViewModel(BaseViewModel):
+class ItemSalesPredictionEvaluationService(BaseService):
     def __init__(self):
         super().__init__()
         self.item_weekly_sales_predicitons_repository = ItemWeeklySalesPredictionsRepository()

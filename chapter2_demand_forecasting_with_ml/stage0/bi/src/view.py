@@ -9,7 +9,7 @@ from configurations import Configurations
 from logger import configure_logger
 from model import Container
 from plotly.subplots import make_subplots
-from view_model import ItemSalesPredictionEvaluationViewModel, ItemSalesViewModel, ItemViewModel, StoreViewModel
+from service import ItemSalesPredictionEvaluationService, ItemSalesService, ItemService, StoreService
 
 logger = configure_logger(__name__)
 
@@ -68,9 +68,9 @@ def build_bi_selectbox() -> str:
 
 def build_store_selectbox(
     container: Container,
-    store_view_model: StoreViewModel,
+    store_service: StoreService,
 ) -> Optional[str]:
-    options = store_view_model.list_stores(container=container)
+    options = store_service.list_stores(container=container)
     options.append("ALL")
     selected = st.sidebar.selectbox(
         label="store",
@@ -81,9 +81,9 @@ def build_store_selectbox(
 
 def build_item_selectbox(
     container: Container,
-    item_view_model: ItemViewModel,
+    item_service: ItemService,
 ) -> Optional[str]:
-    options = item_view_model.list_items(container=container)
+    options = item_service.list_items(container=container)
     options.append("ALL")
     selected = st.sidebar.selectbox(
         label="item",
@@ -288,18 +288,18 @@ def show_weekly_item_sales_evaluation(
 
 def build_item_sales(
     container: Container,
-    store_view_model: StoreViewModel,
-    item_view_model: ItemViewModel,
-    item_sales_view_model: ItemSalesViewModel,
+    store_service: StoreService,
+    item_service: ItemService,
+    item_sales_service: ItemSalesService,
 ):
     logger.info("build item sales BI...")
     store = build_store_selectbox(
         container=container,
-        store_view_model=store_view_model,
+        store_service=store_service,
     )
     item = build_item_selectbox(
         container=container,
-        item_view_model=item_view_model,
+        item_service=item_service,
     )
 
     if store == "ALL":
@@ -307,7 +307,7 @@ def build_item_sales(
     if item == "ALL":
         item = None
 
-    daily_sales_df = item_sales_view_model.retrieve_daily_item_sales(
+    daily_sales_df = item_sales_service.retrieve_daily_item_sales(
         container=container,
         item=item,
         store=store,
@@ -325,14 +325,14 @@ def build_item_sales(
             items=items,
         )
     elif time_frame == TIME_FRAME.WEEKLY.value:
-        weekly_sales_df = item_sales_view_model.retrieve_weekly_item_sales(daily_sales_df=daily_sales_df)
+        weekly_sales_df = item_sales_service.retrieve_weekly_item_sales(daily_sales_df=daily_sales_df)
         show_weekly_item_sales(
             df=weekly_sales_df,
             stores=stores,
             items=items,
         )
     elif time_frame == TIME_FRAME.MONTHLY.value:
-        monthly_sales_df = item_sales_view_model.retrieve_monthly_item_sales(daily_sales_df=daily_sales_df)
+        monthly_sales_df = item_sales_service.retrieve_monthly_item_sales(daily_sales_df=daily_sales_df)
         show_monthly_item_sales(
             df=monthly_sales_df,
             stores=stores,
@@ -342,19 +342,19 @@ def build_item_sales(
 
 def build_item_sales_prediction_evaluation(
     container: Container,
-    store_view_model: StoreViewModel,
-    item_view_model: ItemViewModel,
-    item_sales_view_model: ItemSalesViewModel,
-    item_sales_prediction_evaluation_view_model: ItemSalesPredictionEvaluationViewModel,
+    store_service: StoreService,
+    item_service: ItemService,
+    item_sales_service: ItemSalesService,
+    item_sales_prediction_evaluation_service: ItemSalesPredictionEvaluationService,
 ):
     logger.info("build item sales prediction evaluation BI...")
     store = build_store_selectbox(
         container=container,
-        store_view_model=store_view_model,
+        store_service=store_service,
     )
     item = build_item_selectbox(
         container=container,
-        item_view_model=item_view_model,
+        item_service=item_service,
     )
 
     aggregate_by = build_aggregation_selectbox()
@@ -369,8 +369,8 @@ def build_item_sales_prediction_evaluation(
     if container is None or year_week is None:
         return
 
-    weekly_sales_df = item_sales_view_model.retrieve_weekly_item_sales(daily_sales_df=container.prediction_record_df)
-    weekly_sales_evaluation_df = item_sales_prediction_evaluation_view_model.aggregate_item_weekly_sales_evaluation(
+    weekly_sales_df = item_sales_service.retrieve_weekly_item_sales(daily_sales_df=container.prediction_record_df)
+    weekly_sales_evaluation_df = item_sales_prediction_evaluation_service.aggregate_item_weekly_sales_evaluation(
         container=container,
         weekly_sales_df=weekly_sales_df,
         store=store,
@@ -385,10 +385,10 @@ def build_item_sales_prediction_evaluation(
 
 
 def build(
-    store_view_model: StoreViewModel,
-    item_view_model: ItemViewModel,
-    item_sales_view_model: ItemSalesViewModel,
-    item_sales_prediction_evaluation_view_model: ItemSalesPredictionEvaluationViewModel,
+    store_service: StoreService,
+    item_service: ItemService,
+    item_sales_service: ItemSalesService,
+    item_sales_prediction_evaluation_service: ItemSalesPredictionEvaluationService,
 ):
     st.markdown("# Hi, I am BI by streamlit; Let's have a fun!")
     st.markdown("# Item sales record")
@@ -401,17 +401,17 @@ def build(
     elif bi == BI.ITEM_SALES.value:
         build_item_sales(
             container=container,
-            store_view_model=store_view_model,
-            item_view_model=item_view_model,
-            item_sales_view_model=item_sales_view_model,
+            store_service=store_service,
+            item_service=item_service,
+            item_sales_service=item_sales_service,
         )
     elif bi == BI.ITEM_SALES_PREDICTION_EVALUATION.value:
         build_item_sales_prediction_evaluation(
             container=container,
-            store_view_model=store_view_model,
-            item_view_model=item_view_model,
-            item_sales_view_model=item_sales_view_model,
-            item_sales_prediction_evaluation_view_model=item_sales_prediction_evaluation_view_model,
+            store_service=store_service,
+            item_service=item_service,
+            item_sales_service=item_sales_service,
+            item_sales_prediction_evaluation_service=item_sales_prediction_evaluation_service,
         )
     else:
         raise ValueError()

@@ -1,6 +1,6 @@
 from logger import configure_logger
 from view import build
-from view_model import ItemSalesPredictionEvaluationViewModel, ItemSalesViewModel, ItemViewModel, StoreViewModel
+from service import ItemSalesPredictionEvaluationService, ItemSalesService, ItemService, StoreService
 
 logger = configure_logger(__name__)
 
@@ -8,15 +8,15 @@ logger = configure_logger(__name__)
 def main():
     logger.info("now loading...")
     logger.info("start fun time")
-    store_view_model = StoreViewModel()
-    item_view_model = ItemViewModel()
-    item_sales_view_model = ItemSalesViewModel()
-    item_sales_prediction_evaluation_view_model = ItemSalesPredictionEvaluationViewModel()
+    store_service = StoreService()
+    item_service = ItemService()
+    item_sales_service = ItemSalesService()
+    item_sales_prediction_evaluation_service = ItemSalesPredictionEvaluationService()
     build(
-        store_view_model=store_view_model,
-        item_view_model=item_view_model,
-        item_sales_view_model=item_sales_view_model,
-        item_sales_prediction_evaluation_view_model=item_sales_prediction_evaluation_view_model,
+        store_service=store_service,
+        item_service=item_service,
+        item_sales_service=item_sales_service,
+        item_sales_prediction_evaluation_service=item_sales_prediction_evaluation_service,
     )
 
 
