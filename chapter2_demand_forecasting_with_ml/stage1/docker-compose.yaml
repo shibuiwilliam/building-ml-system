@@ -38,7 +38,7 @@ services:
        --init_sql_file_path /opt/data/create.sql \
        --region_store_file_paths /opt/data/regions.csv /opt/data/stores.csv \
        --item_file_paths /opt/data/items.csv /opt/data/item_prices.csv \
-       --item_sales_records_path /opt/data/item_sale_records_2017_2019.csv"
+       --item_sales_records_path /opt/data/item_sale_records_201701_202106.csv"
     volumes:
       - "./master_data:/opt/data"
     depends_on:
@@ -103,6 +103,7 @@ services:
       - POSTGRESQL_DBNAME=beverage_sales_forecasting
       - LOG_LEVEL=INFO
       - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - TARGET_CONFIG_NAME=2021_32
     command: /bin/sh -c "sleep 30s && python -m src.main"
     depends_on:
       - data_registration

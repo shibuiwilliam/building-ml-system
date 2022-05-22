@@ -107,40 +107,6 @@ build_mlflow:
 push_mlflow: 
 	docker push $(DOCKER_MLFLOW_IMAGE_NAME)
 
-.PHONY: run_ml
-run_ml: build_ml
-	docker run \
-		-it \
-		-d \
-		--name ml_test \
-		-v $(DIR)/data:/opt/data \
-		-v $(ML_DIR)/hydra/:/opt/hydra \
-		-v $(ML_DIR)/outputs/:/opt/outputs \
-		$(DOCKER_ML_IMAGE_NAME) \
-		python \
-			-m src.main
-
-.PHONY: rm_ml
-rm_ml:
-	docker rm -f ml_test
-
-.PHONY: mlflow_ui
-mlflow_ui:
-	docker run \
-		-it \
-		-d \
-		--name mlflow \
-		-v $(ML_DIR)/outputs/mlruns:/opt/outputs/mlruns \
-		-p 15000:5000 \
-		$(DOCKER_MLFLOW_IMAGE_NAME) \
-		mlflow server \
-			--backend-store-uri /opt/outputs/mlruns \
-			--default-artifact-root /opt/outputs/mlruns \
-			--host 0.0.0.0
-
-.PHONY: rm_mlflow
-rm_mlflow:
-	docker rm -f mlflow
 
 ############ DEMAND FORECASTING BI COMMANDS ############
 BI_DIR := $(DIR)/bi

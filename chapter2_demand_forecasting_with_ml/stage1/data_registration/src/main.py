@@ -42,10 +42,10 @@ def main(
     logger.info(
         f"""
 options:
-    init_sql_file_path: {init_sql_file_path}
-    region_store_file_paths: {region_store_file_paths}
-    item_file_paths: {item_file_paths}
-    item_sales_records_path: {item_sales_records_path}
+init_sql_file_path: {init_sql_file_path}
+region_store_file_paths: {region_store_file_paths}
+item_file_paths: {item_file_paths}
+item_sales_records_path: {item_sales_records_path}
     """
     )
     db_client = PostgreSQLClient()
