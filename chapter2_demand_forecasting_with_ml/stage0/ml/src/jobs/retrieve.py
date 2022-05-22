@@ -51,6 +51,8 @@ class DataRetriever(object):
             f"""
 raw_df columns: {raw_df.columns}
 raw_df shape: {raw_df.shape}
+date from: {raw_df.date.min()}
+date to: {raw_df.date.max()}
     """
         )
         return raw_df
