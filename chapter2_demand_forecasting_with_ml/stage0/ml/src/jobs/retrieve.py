@@ -64,8 +64,8 @@ raw_df shape: {raw_df.shape}
     ) -> Tuple[XY, XY]:
         logger.info(
             f"""
-train from {train_year_and_week.year} of {train_year_and_week.week_of_year} to {test_year_and_week.year} {test_year_and_week.week_of_year-2}
-test from {test_year_and_week.year} {test_year_and_week.week_of_year}
+train: {train_year_and_week.year} {train_year_and_week.week_of_year} to {test_year_and_week.year} {test_year_and_week.week_of_year-2}
+test: {test_year_and_week.year} {test_year_and_week.week_of_year}
                 """
         )
 
