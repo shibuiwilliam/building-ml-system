@@ -49,6 +49,7 @@ class DataRetriever(object):
         raw_df = BASE_SCHEMA.validate(raw_df)
         logger.info(
             f"""
+Loaded dataset
 raw_df columns: {raw_df.columns}
 raw_df shape: {raw_df.shape}
 date from: {raw_df.date.min()}
@@ -66,6 +67,7 @@ date to: {raw_df.date.max()}
     ) -> Tuple[XY, XY]:
         logger.info(
             f"""
+Split dataset
 train: {train_year_and_week.year} {train_year_and_week.week_of_year} to {test_year_and_week.year} {test_year_and_week.week_of_year-2}
 test: {test_year_and_week.year} {test_year_and_week.week_of_year}
                 """
@@ -132,7 +134,7 @@ y_test shape: {y_test.shape}
     """
         )
 
-        logger.info("done retrieve data")
+        logger.info("done split data")
         return XY(x=x_train, y=y_train), XY(x=x_test, y=y_test)
 
     def retrieve_prediction_data(
@@ -163,4 +165,13 @@ y_test shape: {y_test.shape}
                         ),
                     )
         data_to_be_predicted_df = pd.DataFrame([d.dict() for d in data])
+        logger.info(
+            f"""
+Loaded prediction dataset
+columns: {data_to_be_predicted_df.columns}
+shape: {data_to_be_predicted_df.shape}
+date from: {data_to_be_predicted_df.date.min()}
+date to: {data_to_be_predicted_df.date.max()}
+    """
+        )
         return data_to_be_predicted_df
