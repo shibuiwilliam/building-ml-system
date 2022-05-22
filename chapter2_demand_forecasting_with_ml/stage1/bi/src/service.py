@@ -157,6 +157,7 @@ daily df
     df columns: {df.columns}
                 """
         )
+        logger.info(df)
         return df
 
     def retrieve_weekly_item_sales(
@@ -206,6 +207,7 @@ weekly df
     df columns: {weekly_sales_df.columns}
                 """
         )
+        logger.info(weekly_sales_df)
         return weekly_sales_df
 
     def retrieve_monthly_item_sales(
@@ -323,6 +325,7 @@ class ItemSalesPredictionEvaluationService(BaseService):
         weekly_sales_predictions_df = (
             pd.DataFrame([d.dict() for d in item_weekly_sales_predictions])
             .drop("id", axis=1)
+            .drop("region", axis=1)
             .drop("predicted_at", axis=1)
             .drop("version", axis=1)
         )
@@ -340,6 +343,7 @@ weekly prediction df
             on=["year", "week_of_year", "store", "item"],
             how="inner",
         )
+        logger.info(weekly_sales_evaluation_df)
         weekly_sales_evaluation_df["diff"] = (
             weekly_sales_evaluation_df.sales.astype("float") - weekly_sales_evaluation_df.prediction
         )
