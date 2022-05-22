@@ -345,6 +345,47 @@ AND
             )
         return data
 
+    def select_latest_prediction(self) -> List[ItemWeeklySalesPredictions]:
+        query = f"""
+WITH max_year AS (
+    SELECT 
+        MAX({TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.year)
+    FROM
+        {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}
+), max_week AS (
+    SELECT 
+        MAX({TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.week_of_year)
+    FROM
+        {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}
+    WHERE
+        {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.year = max_year
+)
+
+SELECT
+    {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.store,
+    {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.item,
+    {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.year,
+    {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.week_of_year,
+    {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.prediction,
+    {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.predicted_at,
+    {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.mlflow_experiment_id,
+    {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.mlflow_run_id
+FROM
+    {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}
+WHERE
+    {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.year = max_year
+AND
+    {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.week_of_year = max_week
+;
+            """
+
+        records = self.execute_select_query(
+            query=query,
+            parameters=None,
+        )
+        data = [ItemWeeklySalesPredictions(**r) for r in records]
+        return data
+
     def insert_item_weekly_sales_predictions(
         self,
         item_weekly_sales_predictions: List[ItemWeeklySalesPredictions],

@@ -2,12 +2,6 @@ name: beverage_sales_forecasting
 jobs:
   data:
     source: db
-    train:
-      year: 2017
-      week: 1
-    predict_after:
-      year: 2021
-      week: 26
 
   model:
     name: light_gbm_regression

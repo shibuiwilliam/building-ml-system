@@ -4,7 +4,6 @@ from typing import Optional, Tuple
 import pandas as pd
 from src.dataset.data_manager import DBDataManager
 from src.dataset.schema import BASE_SCHEMA, RAW_PREDICTION_SCHEMA, X_SCHEMA, XY, Y_SCHEMA, YearAndWeek
-from src.middleware.db_client import PostgreSQLClient
 from src.middleware.logger import configure_logger
 from src.models.preprocess import DataPreprocessPipeline
 
@@ -143,6 +142,16 @@ y_test shape: {y_test.shape}
 
         logger.info("done retrieve data")
         return XY(x=x_train, y=y_train), XY(x=x_test, y=y_test)
+
+    def retrieve_prediction_latest_date(self) -> Optional[date]:
+        data = self.db_data_manager.select_latest_prediction()
+        if len(data) == 0:
+            return None
+        return date.fromisocalendar(
+            year=data[0].year,
+            week=data[0].week_of_year,
+            day=7,
+        )
 
     def retrieve_prediction_data(
         self,

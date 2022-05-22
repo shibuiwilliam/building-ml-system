@@ -127,9 +127,19 @@ def main(cfg: DictConfig):
             predictor = Predictor()
             next_date = latest_sales_date + timedelta(days=1)
             next_date = next_date.date()
+            prediction_target_year = Configurations.target_year
+            prediction_target_week = Configurations.target_week
+            if prediction_target_year is None or prediction_target_week is None:
+                prediction_latest_date = data_retriever.retrieve_prediction_latest_date()
+                if prediction_latest_date is None:
+                    raise ValueError
+                next_prediction_latest_date = prediction_latest_date + timedelta(days=1)
+                prediction_target_year = next_prediction_latest_date.isocalendar().year
+                prediction_target_week = next_prediction_latest_date.isocalendar().week
+
             target_date = date.fromisocalendar(
-                year=next_date.isocalendar().year,
-                week=next_date.isocalendar().week,
+                year=prediction_target_year,
+                week=prediction_target_week,
                 day=7,
             )
 
@@ -138,12 +148,12 @@ def main(cfg: DictConfig):
                 date_to=target_date,
             )
 
-            target_items = cfg.jobs.data.predict["items"]
-            if target_items == "ALL":
+            target_items = Configurations.target_items
+            if target_items[0] == "ALL":
                 target_items = None
 
-            target_stores = cfg.jobs.data.predict.stores
-            if target_stores == "ALL":
+            target_stores = Configurations.target_stores
+            if target_stores[0] == "ALL":
                 target_stores = None
 
             predictions = predictor.predict(
@@ -151,8 +161,8 @@ def main(cfg: DictConfig):
                 data_preprocess_pipeline=data_preprocess_pipeline,
                 previous_df=raw_df,
                 data_to_be_predicted_df=data_to_be_predicted_df,
-                target_year=cfg.jobs.data.predict.year,
-                target_week=cfg.jobs.data.predict.week,
+                target_year=prediction_target_year,
+                target_week=prediction_target_week,
                 target_items=target_items,
                 target_stores=target_stores,
             )
@@ -164,8 +174,8 @@ def main(cfg: DictConfig):
                     mlflow_experiment_id=run.info.experiment_id,
                     mlflow_run_id=run.info.run_id,
                 )
-            mlflow.log_param("predict_year", cfg.jobs.data.predict.year)
-            mlflow.log_param("predict_week", cfg.jobs.data.predict.week)
+            mlflow.log_param("predict_year", prediction_target_year)
+            mlflow.log_param("predict_week", prediction_target_week)
             mlflow.log_param("predict_items", target_items)
             mlflow.log_param("predict_stores", target_stores)
 
@@ -173,10 +183,10 @@ def main(cfg: DictConfig):
         mlflow.log_artifact(os.path.join(cwd, ".hydra/hydra.yaml"))
         mlflow.log_artifact(os.path.join(cwd, ".hydra/overrides.yaml"))
 
-        mlflow.log_param("train_year", cfg.jobs.data.train.year)
-        mlflow.log_param("train_week", cfg.jobs.data.train.week)
-        mlflow.log_param("test_year", cfg.jobs.data.test.year)
-        mlflow.log_param("test_week", cfg.jobs.data.test.week)
+        mlflow.log_param("train_year", train_year)
+        mlflow.log_param("train_week", train_week)
+        mlflow.log_param("test_year", test_year)
+        mlflow.log_param("test_week", test_week)
         mlflow.log_param("model", model.name)
         mlflow.log_params(model.params)
 
