@@ -6,7 +6,7 @@ from psycopg2 import extras
 from psycopg2.extras import DictCursor
 from pydantic import BaseModel
 from src.exceptions.exceptions import DatabaseException
-from src.middleware.database import AbstractDBClient
+from src.infrastructure.database import AbstractDBClient
 from src.middleware.logger import configure_logger
 from src.model.abstract_model import AbstractModel
 

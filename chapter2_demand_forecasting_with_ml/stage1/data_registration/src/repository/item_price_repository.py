@@ -2,7 +2,7 @@ from datetime import date
 from typing import List, Optional
 
 from src.constants import TABLES
-from src.middleware.database import AbstractDBClient
+from src.infrastructure.database import AbstractDBClient
 from src.middleware.logger import configure_logger
 from src.model.item_price_model import ItemPrice, ItemPriceUpdate
 from src.repository.abstract_repository import AbstractQuery, AbstractRepository, BaseRepository

@@ -1,4 +1,4 @@
-from src.middleware.database import AbstractDBClient
+from src.infrastructure.database import AbstractDBClient
 from src.middleware.logger import configure_logger
 from src.repository.table_repository import TableRepository
 from src.service.abstract_service import AbstractService

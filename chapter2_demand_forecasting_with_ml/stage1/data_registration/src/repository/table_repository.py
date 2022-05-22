@@ -1,4 +1,4 @@
-from src.middleware.database import AbstractDBClient
+from src.infrastructure.database import AbstractDBClient
 from src.middleware.file_reader import read_text_file
 from src.middleware.logger import configure_logger
 from src.repository.abstract_repository import BaseRepository

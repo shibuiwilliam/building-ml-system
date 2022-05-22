@@ -1,4 +1,4 @@
-from src.middleware.database import AbstractDBClient
+from src.infrastructure.database import AbstractDBClient
 from src.middleware.file_reader import read_csv_to_list
 from src.middleware.logger import configure_logger
 from src.model.region_model import Region

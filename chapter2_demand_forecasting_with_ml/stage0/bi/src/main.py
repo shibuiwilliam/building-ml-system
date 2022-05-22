@@ -1,6 +1,6 @@
 from logger import configure_logger
-from view import build
 from service import ItemSalesPredictionEvaluationService, ItemSalesService, ItemService, StoreService
+from view import build
 
 logger = configure_logger(__name__)
 

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from src.middleware.database import AbstractDBClient
+from src.infrastructure.database import AbstractDBClient
 
 
 class AbstractService(ABC):

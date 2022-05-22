@@ -2,7 +2,7 @@ from time import sleep
 from typing import Optional, Tuple
 
 import click
-from src.middleware.database import DBClient
+from src.infrastructure.database import PostgreSQLClient
 from src.middleware.logger import configure_logger
 from src.service.item_service import ItemService
 from src.service.store_service import StoreService
@@ -48,7 +48,7 @@ options:
     item_sales_records_path: {item_sales_records_path}
     """
     )
-    db_client = DBClient()
+    db_client = PostgreSQLClient()
 
     table_service = TableService(db_client=db_client)
     store_service = StoreService(db_client=db_client)

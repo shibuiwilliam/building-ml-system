@@ -4,7 +4,7 @@ from typing import Optional, Tuple
 import pandas as pd
 from src.dataset.data_manager import DATA_SOURCE, DBDataManager
 from src.dataset.schema import BASE_SCHEMA, RAW_PREDICTION_SCHEMA, X_SCHEMA, XY, Y_SCHEMA, YearAndWeek
-from src.middleware.db_client import DBClient
+from src.middleware.db_client import PostgreSQLClient
 from src.middleware.logger import configure_logger
 from src.models.preprocess import DataPreprocessPipeline
 
@@ -29,7 +29,7 @@ class DataRetriever(object):
         if data_source == DATA_SOURCE.LOCAL:
             raw_df = pd.read_csv(file_path)
         elif data_source == DATA_SOURCE.DB:
-            db_client = DBClient()
+            db_client = PostgreSQLClient()
             db_data_manager = DBDataManager(db_client=db_client)
 
             if item == "ALL":
@@ -148,7 +148,7 @@ y_test shape: {y_test.shape}
         if data_source == DATA_SOURCE.LOCAL:
             data_to_be_predicted = file_path
         elif data_source == DATA_SOURCE.DB:
-            db_client = DBClient()
+            db_client = PostgreSQLClient()
             db_data_manager = DBDataManager(db_client=db_client)
             data_to_be_predicted = db_data_manager.select_prediction_data(
                 date_from=date_from,

@@ -5,7 +5,7 @@ from typing import List, Optional
 import pandas as pd
 from src.dataset.data_manager import DATA_SOURCE, DBDataManager
 from src.dataset.schema import WEEKLY_PREDICTION_SCHEMA, ItemWeeklySalesPredictions
-from src.middleware.db_client import DBClient
+from src.middleware.db_client import PostgreSQLClient
 from src.middleware.logger import configure_logger
 
 logger = configure_logger(__name__)
@@ -46,7 +46,7 @@ class DataRegister(object):
         predictions: pd.DataFrame,
     ):
         predictions = WEEKLY_PREDICTION_SCHEMA.validate(predictions)
-        db_client = DBClient()
+        db_client = PostgreSQLClient()
         db_data_manager = DBDataManager(db_client=db_client)
         records = predictions.to_dict(orient="records")
         item_weekly_sales_predictions: List[ItemWeeklySalesPredictions] = []

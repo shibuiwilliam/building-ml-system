@@ -17,7 +17,7 @@ from schema import ItemSales, ItemWeeklySalesPredictions
 logger = configure_logger(__name__)
 
 
-class BaseViewModel(object):
+class BaseService(object):
     def __init__(
         self,
         db_client: AbstractDBClient,
@@ -25,7 +25,7 @@ class BaseViewModel(object):
         self.db_client = db_client
 
 
-class RegionViewModel(BaseViewModel):
+class RegionService(BaseService):
     def __init__(
         self,
         db_client: AbstractDBClient,
@@ -39,7 +39,7 @@ class RegionViewModel(BaseViewModel):
         return region_names
 
 
-class StoreViewModel(BaseViewModel):
+class StoreService(BaseService):
     def __init__(
         self,
         db_client: AbstractDBClient,
@@ -56,7 +56,7 @@ class StoreViewModel(BaseViewModel):
         return store_names
 
 
-class ItemViewModel(BaseViewModel):
+class ItemService(BaseService):
     def __init__(
         self,
         db_client: AbstractDBClient,
@@ -70,7 +70,7 @@ class ItemViewModel(BaseViewModel):
         return item_names
 
 
-class ItemSalesViewModel(BaseViewModel):
+class ItemSalesService(BaseService):
     def __init__(
         self,
         db_client: AbstractDBClient,
@@ -256,7 +256,7 @@ monthly df
         return monthly_sales_df
 
 
-class ItemSalesPredictionEvaluationViewModel(BaseViewModel):
+class ItemSalesPredictionEvaluationService(BaseService):
     def __init__(
         self,
         db_client: AbstractDBClient,

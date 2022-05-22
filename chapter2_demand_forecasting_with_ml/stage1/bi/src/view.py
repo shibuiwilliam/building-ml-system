@@ -5,13 +5,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 from logger import configure_logger
-from view_model import (
-    ItemSalesPredictionEvaluationViewModel,
-    ItemSalesViewModel,
-    ItemViewModel,
-    RegionViewModel,
-    StoreViewModel,
-)
+from service import ItemSalesPredictionEvaluationService, ItemSalesService, ItemService, RegionService, StoreService
 
 logger = configure_logger(__name__)
 
@@ -36,8 +30,8 @@ def build_bi_selectbox() -> str:
     return selected
 
 
-def build_region_selectbox(region_view_model: RegionViewModel) -> Optional[str]:
-    options = region_view_model.list_regions()
+def build_region_selectbox(region_service: RegionService) -> Optional[str]:
+    options = region_service.list_regions()
     options.append("ALL")
     selected = st.sidebar.selectbox(
         label="region",
@@ -47,10 +41,10 @@ def build_region_selectbox(region_view_model: RegionViewModel) -> Optional[str]:
 
 
 def build_store_selectbox(
-    store_view_model: StoreViewModel,
+    store_service: StoreService,
     region: Optional[str] = None,
 ) -> Optional[str]:
-    options = store_view_model.list_stores(region=region)
+    options = store_service.list_stores(region=region)
     options.append("ALL")
     selected = st.sidebar.selectbox(
         label="store",
@@ -60,9 +54,9 @@ def build_store_selectbox(
 
 
 def build_item_selectbox(
-    item_view_model: ItemViewModel,
+    item_service: ItemService,
 ) -> Optional[str]:
-    options = item_view_model.list_items()
+    options = item_service.list_items()
     options.append("ALL")
     selected = st.sidebar.selectbox(
         label="item",
@@ -182,17 +176,17 @@ def show_monthly_item_sales(
 
 
 def build_base(
-    region_view_model: RegionViewModel,
-    store_view_model: StoreViewModel,
-    item_view_model: ItemViewModel,
-    item_sales_view_model: ItemSalesViewModel,
+    region_service: RegionService,
+    store_service: StoreService,
+    item_service: ItemService,
+    item_sales_service: ItemSalesService,
 ) -> Tuple[Optional[str], Optional[str], Optional[str], List[str], List[str], pd.DataFrame]:
-    region = build_region_selectbox(region_view_model=region_view_model)
+    region = build_region_selectbox(region_service=region_service)
     store = build_store_selectbox(
-        store_view_model=store_view_model,
+        store_service=store_service,
         region=region,
     )
-    item = build_item_selectbox(item_view_model=item_view_model)
+    item = build_item_selectbox(item_service=item_service)
 
     if region == "ALL":
         region = None
@@ -201,7 +195,7 @@ def build_base(
     if item == "ALL":
         item = None
 
-    daily_sales_df = item_sales_view_model.retrieve_daily_item_sales(
+    daily_sales_df = item_sales_service.retrieve_daily_item_sales(
         item=item,
         store=store,
         region=region,
@@ -213,17 +207,17 @@ def build_base(
 
 
 def build_item_sales(
-    region_view_model: RegionViewModel,
-    store_view_model: StoreViewModel,
-    item_view_model: ItemViewModel,
-    item_sales_view_model: ItemSalesViewModel,
+    region_service: RegionService,
+    store_service: StoreService,
+    item_service: ItemService,
+    item_sales_service: ItemSalesService,
 ):
     logger.info("build item sales BI...")
     _, _, _, stores, items, daily_sales_df = build_base(
-        region_view_model=region_view_model,
-        store_view_model=store_view_model,
-        item_view_model=item_view_model,
-        item_sales_view_model=item_sales_view_model,
+        region_service=region_service,
+        store_service=store_service,
+        item_service=item_service,
+        item_sales_service=item_sales_service,
     )
     time_frame = build_time_frame_selectbox()
 
@@ -234,14 +228,14 @@ def build_item_sales(
             items=items,
         )
     elif time_frame == TIME_FRAME.WEEKLY.value:
-        weekly_sales_df = item_sales_view_model.retrieve_weekly_item_sales(daily_sales_df=daily_sales_df)
+        weekly_sales_df = item_sales_service.retrieve_weekly_item_sales(daily_sales_df=daily_sales_df)
         show_weekly_item_sales(
             df=weekly_sales_df,
             stores=stores,
             items=items,
         )
     elif time_frame == TIME_FRAME.MONTHLY.value:
-        monthly_sales_df = item_sales_view_model.retrieve_monthly_item_sales(daily_sales_df=daily_sales_df)
+        monthly_sales_df = item_sales_service.retrieve_monthly_item_sales(daily_sales_df=daily_sales_df)
         show_monthly_item_sales(
             df=monthly_sales_df,
             stores=stores,
@@ -250,21 +244,21 @@ def build_item_sales(
 
 
 def build_item_sales_prediction_evaluation(
-    region_view_model: RegionViewModel,
-    store_view_model: StoreViewModel,
-    item_view_model: ItemViewModel,
-    item_sales_view_model: ItemSalesViewModel,
-    item_sales_prediction_evaluation_view_model: ItemSalesPredictionEvaluationViewModel,
+    region_service: RegionService,
+    store_service: StoreService,
+    item_service: ItemService,
+    item_sales_service: ItemSalesService,
+    item_sales_prediction_evaluation_service: ItemSalesPredictionEvaluationService,
 ):
     logger.info("build item sales prediction evaluation BI...")
     region, store, item, stores, items, daily_sales_df = build_base(
-        region_view_model=region_view_model,
-        store_view_model=store_view_model,
-        item_view_model=item_view_model,
-        item_sales_view_model=item_sales_view_model,
+        region_service=region_service,
+        store_service=store_service,
+        item_service=item_service,
+        item_sales_service=item_sales_service,
     )
-    weekly_sales_df = item_sales_view_model.retrieve_weekly_item_sales(daily_sales_df=daily_sales_df)
-    weekly_sales_evaluation_df = item_sales_prediction_evaluation_view_model.aggregate_item_weekly_sales_evaluation(
+    weekly_sales_df = item_sales_service.retrieve_weekly_item_sales(daily_sales_df=daily_sales_df)
+    weekly_sales_evaluation_df = item_sales_prediction_evaluation_service.aggregate_item_weekly_sales_evaluation(
         weekly_sales_df=weekly_sales_df,
         region=region,
         store=store,
@@ -274,11 +268,11 @@ def build_item_sales_prediction_evaluation(
 
 
 def build(
-    region_view_model: RegionViewModel,
-    store_view_model: StoreViewModel,
-    item_view_model: ItemViewModel,
-    item_sales_view_model: ItemSalesViewModel,
-    item_sales_prediction_evaluation_view_model: ItemSalesPredictionEvaluationViewModel,
+    region_service: RegionService,
+    store_service: StoreService,
+    item_service: ItemService,
+    item_sales_service: ItemSalesService,
+    item_sales_prediction_evaluation_service: ItemSalesPredictionEvaluationService,
 ):
     st.markdown("# Hi, I am BI by streamlit; Let's have a fun!")
     st.markdown("# Item sales record")
@@ -289,18 +283,18 @@ def build(
         return
     elif bi == BI.ITEM_SALES.value:
         build_item_sales(
-            region_view_model=region_view_model,
-            store_view_model=store_view_model,
-            item_view_model=item_view_model,
-            item_sales_view_model=item_sales_view_model,
+            region_service=region_service,
+            store_service=store_service,
+            item_service=item_service,
+            item_sales_service=item_sales_service,
         )
     elif bi == BI.ITEM_SALES_PREDICTION_EVALUATION.value:
         build_item_sales_prediction_evaluation(
-            region_view_model=region_view_model,
-            store_view_model=store_view_model,
-            item_view_model=item_view_model,
-            item_sales_view_model=item_sales_view_model,
-            item_sales_prediction_evaluation_view_model=item_sales_prediction_evaluation_view_model,
+            region_service=region_service,
+            store_service=store_service,
+            item_service=item_service,
+            item_sales_service=item_sales_service,
+            item_sales_prediction_evaluation_service=item_sales_prediction_evaluation_service,
         )
     else:
         raise ValueError()
