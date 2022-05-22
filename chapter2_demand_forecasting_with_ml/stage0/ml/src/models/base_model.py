@@ -22,10 +22,6 @@ class BaseDemandForecastingModel(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def define_default_search_params(self):
-        raise NotImplementedError
-
-    @abstractmethod
     def train(
         self,
         x_train: Union[np.ndarray, pd.DataFrame],
