@@ -33,7 +33,6 @@ class Predictor(object):
             df = df[df.store.isin(target_stores)]
         if target_items is not None and len(target_items) > 0:
             df = df[df.item.isin(target_items)]
-        df = PREPROCESSED_SCHEMA.validate(df)
         logger.info(
             f"""
 filtered df columns: {df.columns}
