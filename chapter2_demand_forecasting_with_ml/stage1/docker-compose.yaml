@@ -73,7 +73,7 @@ services:
       - "mlflow"
       - "server"
       - "--backend-store-uri"
-      - "postgresql+psycopg2://user:password@postgres:5432/mlflow"
+      - "/opt/outputs/mlruns"
       - "--default-artifact-root"
       - "/opt/outputs/mlruns"
       - "--host"
@@ -104,7 +104,7 @@ services:
       - LOG_LEVEL=INFO
       - MLFLOW_TRACKING_URI=http://mlflow:5000
       - TARGET_CONFIG_NAME=default
-    command: /bin/sh -c "sleep 30s && python -m src.main"
+    command: /bin/sh -c "sleep 60s && python -m src.main"
     depends_on:
       - data_registration
       - mlflow
