@@ -232,7 +232,7 @@ def show_weekly_item_sales_evaluation(
         not_aggregated = "store"
     for li in loop_in:
         _df = df[df[aggregate_by] == li].reset_index(drop=True).sort_values(["year", "month", "week_of_year", sort_by])
-        absolute_min = min(_df.diff.min() - 50, -100)
+        absolute_min = min(_df["diff"].min() - 50, -100)
         absolute_max = max(max(_df.sales.max(), _df.prediction.max()) + 100, 100)
 
         with st.expander(
