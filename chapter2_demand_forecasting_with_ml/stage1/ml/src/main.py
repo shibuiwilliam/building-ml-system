@@ -35,7 +35,7 @@ def main(cfg: DictConfig):
 
     mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000"))
     mlflow.set_experiment(cfg.name)
-    with mlflow.start_run(run_name=run_name):
+    with mlflow.start_run(run_name=run_name) as run:
         data_source = DATA_SOURCE.value_to_enum(value=cfg.jobs.data.source)
         train_year_and_week = YearAndWeek(
             year=cfg.jobs.data.train.year,
@@ -152,6 +152,8 @@ def main(cfg: DictConfig):
                     predictions=predictions,
                     data_source=data_source,
                     prediction_file_path=prediction_file_path,
+                    mlflow_experiment_id=run.info.experiment_id,
+                    mlflow_run_id=run.info.run_id,
                 )
             mlflow.log_param("predict_year", cfg.jobs.data.predict.year)
             mlflow.log_param("predict_week", cfg.jobs.data.predict.week)

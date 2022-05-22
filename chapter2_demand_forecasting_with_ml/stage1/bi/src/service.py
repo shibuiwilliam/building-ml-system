@@ -12,7 +12,7 @@ from model import (
     RegionRepository,
     StoreRepository,
 )
-from schema import ItemSales, ItemWeeklySalesPredictions
+from schema import ItemSales, ItemWeeklySalesPredictions, YearWeek
 
 logger = configure_logger(__name__)
 
@@ -295,6 +295,10 @@ class ItemSalesPredictionEvaluationService(BaseService):
             logger.info(f"found {len(item_weekly_sales_predictions)} records...")
         return item_weekly_sales_predictions
 
+    def list_predicted_unique_year_week(self) -> List[YearWeek]:
+        data = self.item_weekly_sales_predicitons_repository.select_unique_year_week()
+        return data
+
     def aggregate_item_weekly_sales_evaluation(
         self,
         weekly_sales_df: pd.DataFrame,
@@ -319,7 +323,7 @@ class ItemSalesPredictionEvaluationService(BaseService):
 weekly prediction df
     df shape: {weekly_sales_predictions_df.shape}
     df columns: {weekly_sales_predictions_df.columns}
-                """
+"""
         )
         weekly_sales_evaluation_df = pd.merge(
             weekly_sales_df,
@@ -328,11 +332,12 @@ weekly prediction df
             how="inner",
         )
         weekly_sales_evaluation_df["diff"] = (
-            weekly_sales_evaluation_df["sales"].astype("float") - weekly_sales_evaluation_df["prediction"]
+            weekly_sales_evaluation_df.sales.astype("float") - weekly_sales_evaluation_df.prediction
         )
-        weekly_sales_evaluation_df["error_rate"] = weekly_sales_evaluation_df["diff"] / weekly_sales_evaluation_df[
-            "sales"
-        ].astype("float")
+
+        weekly_sales_evaluation_df[
+            "error_rate"
+        ] = weekly_sales_evaluation_df.diff / weekly_sales_evaluation_df.sales.astype("float")
         weekly_sales_evaluation_df = weekly_sales_evaluation_df[
             [
                 "year",

@@ -5,7 +5,7 @@ from constants import TABLES
 from db_client import AbstractDBClient
 from logger import configure_logger
 from psycopg2.extras import DictCursor
-from schema import Item, ItemSales, ItemWeeklySalesPredictions, Region, Store
+from schema import Item, ItemSales, ItemWeeklySalesPredictions, Region, Store, YearWeek
 
 logger = configure_logger(__name__)
 
@@ -306,4 +306,21 @@ OFFSET
             parameters=tuple(parameters),
         )
         data = [ItemWeeklySalesPredictions(**r) for r in records]
+        return data
+
+    def select_unique_year_week(self) -> List[YearWeek]:
+        query = f"""
+SELECT
+    DISTINCT year,
+    week_of_year
+FROM 
+    {self.table_name}
+;
+        """
+
+        records = self.execute_select_query(
+            query=query,
+            parameters=None,
+        )
+        data = [YearWeek(**r) for r in records]
         return data

@@ -20,14 +20,24 @@ class DataRegister(object):
         predictions: pd.DataFrame,
         data_source: DATA_SOURCE = DATA_SOURCE.LOCAL,
         prediction_file_path: Optional[str] = None,
+        mlflow_experiment_id: Optional[int] = None,
+        mlflow_run_id: Optional[str] = None,
     ):
         if data_source == DATA_SOURCE.LOCAL:
+            if prediction_file_path is None:
+                raise ValueError("prediction_file_path must not be empty")
             self.register_local(
                 predictions=predictions,
                 prediction_file_path=prediction_file_path,
             )
         else:
-            self.register_db(predictions=predictions)
+            if mlflow_experiment_id is None or mlflow_run_id is None:
+                raise ValueError("mlflow_experiment_id and mlflow_run_id must not be empty")
+            self.register_db(
+                predictions=predictions,
+                mlflow_experiment_id=mlflow_experiment_id,
+                mlflow_run_id=mlflow_run_id,
+            )
 
     def register_local(
         self,
@@ -44,6 +54,8 @@ class DataRegister(object):
     def register_db(
         self,
         predictions: pd.DataFrame,
+        mlflow_experiment_id: int,
+        mlflow_run_id: str,
     ):
         predictions = WEEKLY_PREDICTION_SCHEMA.validate(predictions)
         db_client = PostgreSQLClient()
@@ -59,6 +71,8 @@ class DataRegister(object):
                     week_of_year=int(r["week_of_year"]),
                     prediction=float(r["prediction"]),
                     predicted_at=datetime.now().date(),
+                    mlflow_experiment_id=mlflow_experiment_id,
+                    mlflow_run_id=mlflow_run_id,
                 ),
             )
         db_data_manager.insert_item_weekly_sales_predictions(

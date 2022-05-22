@@ -72,3 +72,8 @@ class ItemWeeklySales(BaseModel):
 
     class Config:
         extra = Extra.forbid
+
+
+class YearWeek(BaseModel):
+    year: int
+    week_of_year: int

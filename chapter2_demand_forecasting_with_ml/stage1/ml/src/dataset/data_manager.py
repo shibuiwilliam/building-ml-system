@@ -323,7 +323,7 @@ AND
             insert_query = f"""
 INSERT INTO
     {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}
-    (id,store_id,item_id,year,week_of_year,prediction,predicted_at,version)
+    (id,store_id,item_id,year,week_of_year,prediction,predicted_at,version,mlflow_experiment_id,mlflow_run_id)
 VALUES
     (
         %s,
@@ -347,6 +347,8 @@ VALUES
         %s,
         %s,
         %s,
+        %s,
+        %s,
         %s
     )
 ON CONFLICT
@@ -365,5 +367,7 @@ DO NOTHING
                     record.prediction,
                     record.predicted_at,
                     latest_version,
+                    record.mlflow_experiment_id,
+                    record.mlflow_run_id,
                 ),
             )

@@ -230,6 +230,8 @@ class ItemWeeklySalesPredictions(BaseModel):
     week_of_year: int
     prediction: float
     predicted_at: date
+    mlflow_experiment_id: int
+    mlflow_run_id: str
 
     class Config:
         extra = Extra.forbid
