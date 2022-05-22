@@ -126,7 +126,6 @@ def main(cfg: DictConfig):
         if cfg.jobs.predict.run:
             predictor = Predictor()
             next_date = latest_sales_date + timedelta(days=1)
-            next_date = next_date.date()
             prediction_target_year = Configurations.target_year
             prediction_target_week = Configurations.target_week
             if prediction_target_year is None or prediction_target_week is None:
