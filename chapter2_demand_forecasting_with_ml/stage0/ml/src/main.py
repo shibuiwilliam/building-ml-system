@@ -15,6 +15,7 @@ from src.models.models import MODELS
 from src.models.preprocess import DataPreprocessPipeline, WeekBasedSplit
 from src.optimizer.optimizer import Optimizer
 from src.optimizer.schema import DIRECTION, METRICS
+from src.configurations import Configurations
 
 logger = configure_logger(__name__)
 
@@ -23,7 +24,7 @@ DATE_FORMAT = "%Y-%m-%d"
 
 @hydra.main(
     config_path="/opt/hydra",
-    config_name="2021_31",
+    config_name=Configurations.target_config_name,
 )
 def main(cfg: DictConfig):
     logger.info("start ml...")
