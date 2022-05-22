@@ -377,7 +377,8 @@ def build_item_sales_prediction_evaluation(
         year = int(_year)
         week_of_year = int(_week_of_year)
         logger.info(f"target year and week: {year} {week_of_year}")
-        daily_sales_df = daily_sales_df[daily_sales_df["year"] == year & daily_sales_df["week_of_year"] == week_of_year]
+        _daily_sales_df = daily_sales_df[daily_sales_df["year"] == year][daily_sales_df["week_of_year"] == week_of_year]
+        daily_sales_df = _daily_sales_df
 
     weekly_sales_df = item_sales_service.retrieve_weekly_item_sales(daily_sales_df=daily_sales_df)
     weekly_sales_evaluation_df = item_sales_prediction_evaluation_service.aggregate_item_weekly_sales_evaluation(
