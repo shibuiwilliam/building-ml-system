@@ -355,4 +355,11 @@ weekly prediction df
                 "version",
             ]
         ]
+        logger.info(
+            f"""
+weekly sales evaluation df
+    df shape: {weekly_sales_evaluation_df.shape}
+    df columns: {weekly_sales_evaluation_df.columns}
+"""
+        )
         return weekly_sales_evaluation_df
