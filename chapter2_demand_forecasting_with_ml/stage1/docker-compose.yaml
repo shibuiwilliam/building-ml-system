@@ -104,6 +104,8 @@ services:
       - LOG_LEVEL=INFO
       - MLFLOW_TRACKING_URI=http://mlflow:5000
       - TARGET_CONFIG_NAME=default
+      - TARGET_YEAR=2021
+      - TARGET_WEEK=10
     command: /bin/sh -c "sleep 60s && python -m src.main"
     depends_on:
       - data_registration
