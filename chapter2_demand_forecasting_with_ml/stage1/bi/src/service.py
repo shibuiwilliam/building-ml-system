@@ -328,6 +328,7 @@ weekly prediction df
     df columns: {weekly_sales_predictions_df.columns}
 """
         )
+        logger.info(weekly_sales_predictions_df)
         weekly_sales_evaluation_df = pd.merge(
             weekly_sales_df,
             weekly_sales_predictions_df,
