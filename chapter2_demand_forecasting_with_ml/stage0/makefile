@@ -149,7 +149,7 @@ run_bi: build_bi
 		--name bi \
 		-p 8501:8501 \
 		-v $(DIR)/data:/opt/data \
-		-e ITEM_SALES_RECORD_FILE=/opt/data/data/item_sales_records_train_2021_03.csv \
+		-e ITEM_SALES_RECORD_FILE=/opt/data/data/item_sales_records_train_2021_31.csv \
 		-e ITEM_SALES_PREDICTION_DIR=/opt/data/prediction \
 		$(DOCKER_BI_IMAGE_NAME) \
 		streamlit run src/main.py
