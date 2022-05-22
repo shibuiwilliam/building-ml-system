@@ -4,6 +4,7 @@ from datetime import date, datetime, timedelta
 import hydra
 import mlflow
 from omegaconf import DictConfig
+from src.configurations import Configurations
 from src.dataset.schema import YearAndWeek
 from src.jobs.optimize import OptimizerRunner
 from src.jobs.predict import Predictor
@@ -15,7 +16,6 @@ from src.models.models import MODELS
 from src.models.preprocess import DataPreprocessPipeline, WeekBasedSplit
 from src.optimizer.optimizer import Optimizer
 from src.optimizer.schema import DIRECTION, METRICS
-from src.configurations import Configurations
 
 logger = configure_logger(__name__)
 
