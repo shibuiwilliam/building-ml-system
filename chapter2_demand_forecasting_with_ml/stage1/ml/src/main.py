@@ -56,15 +56,17 @@ def main(cfg: DictConfig):
             base_predict_week_of_year = cfg.jobs.predict_after.week_of_year
             prediction_latest_date = data_retriever.retrieve_prediction_latest_date()
             if prediction_latest_date is None:
-                raise ValueError
-            next_prediction_latest_date = prediction_latest_date + timedelta(days=1)
-            prediction_target_year = next_prediction_latest_date.isocalendar().year
-            prediction_target_week = next_prediction_latest_date.isocalendar().week
-            if prediction_target_year < base_predict_year:
                 prediction_target_year = base_predict_year
                 prediction_target_week = base_predict_week_of_year
-            if prediction_target_week < base_predict_week_of_year:
-                prediction_target_week = base_predict_week_of_year
+            else:
+                next_prediction_latest_date = prediction_latest_date + timedelta(days=1)
+                prediction_target_year = next_prediction_latest_date.isocalendar().year
+                prediction_target_week = next_prediction_latest_date.isocalendar().week
+                if prediction_target_year < base_predict_year:
+                    prediction_target_year = base_predict_year
+                    prediction_target_week = base_predict_week_of_year
+                if prediction_target_week < base_predict_week_of_year:
+                    prediction_target_week = base_predict_week_of_year
 
         prediction_first_date = date.fromisocalendar(
             year=prediction_target_year,
