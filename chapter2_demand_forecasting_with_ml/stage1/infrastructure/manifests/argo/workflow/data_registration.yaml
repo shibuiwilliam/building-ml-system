@@ -35,7 +35,7 @@ spec:
             - "-m"
             - "src.main"
             - "--item_sales_records_path"
-            - "/opt/data/item_sale_records_201701_202106.csv"
+            - "/opt/data/item_sale_records_202107_202112.csv"
             - "--latest_week_only"
           env:
             - name: POSTGRESQL_HOST

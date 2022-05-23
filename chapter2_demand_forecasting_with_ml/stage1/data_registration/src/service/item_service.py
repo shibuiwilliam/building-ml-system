@@ -116,6 +116,7 @@ class ItemService(AbstractService):
 
         data = read_csv_to_list(csv_file=item_sales_records_path)
         data = [d for d in data if datetime.strptime(d["date"], "%Y-%m-%d").date() in dates_in_next_week]
+        logger.info(f"target data: {data}")
 
         stores = self.store_repository.select()
         store_dict = {s.name: s.id for s in stores}
