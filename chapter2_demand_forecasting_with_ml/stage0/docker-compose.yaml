@@ -9,7 +9,7 @@ services:
     networks:
       - default
     environment:
-      - POSTGRES_USER=user
+      - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=mlflow
       - POSTGRES_INITDB_ARGS="--encoding=UTF-8"
@@ -28,7 +28,7 @@ services:
       - "mlflow"
       - "server"
       - "--backend-store-uri"
-      - "postgresql+psycopg2://user:password@postgres:5432/mlflow"
+      - "postgresql+psycopg2://postgres:password@postgres:5432/mlflow"
       - "--default-artifact-root"
       - "/opt/outputs/mlruns"
       - "--host"

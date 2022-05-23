@@ -9,7 +9,7 @@ services:
     networks:
       - default
     environment:
-      - POSTGRES_USER=user
+      - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=beverage_sales_forecasting
       - POSTGRES_INITDB_ARGS="--encoding=UTF-8"
@@ -28,7 +28,7 @@ services:
     environment:
       - POSTGRESQL_HOST=postgres
       - POSTGRESQL_PORT=5432
-      - POSTGRESQL_USER=user
+      - POSTGRESQL_USER=postgres
       - POSTGRESQL_PASSWORD=password
       - POSTGRESQL_DBNAME=beverage_sales_forecasting
       - LOG_LEVEL=DEBUG
@@ -53,7 +53,7 @@ services:
     environment:
       - POSTGRESQL_HOST=postgres
       - POSTGRESQL_PORT=5432
-      - POSTGRESQL_USER=user
+      - POSTGRESQL_USER=postgres
       - POSTGRESQL_PASSWORD=password
       - POSTGRESQL_DBNAME=beverage_sales_forecasting
       - LOG_LEVEL=DEBUG
@@ -98,7 +98,7 @@ services:
     environment:
       - POSTGRESQL_HOST=postgres
       - POSTGRESQL_PORT=5432
-      - POSTGRESQL_USER=user
+      - POSTGRESQL_USER=postgres
       - POSTGRESQL_PASSWORD=password
       - POSTGRESQL_DBNAME=beverage_sales_forecasting
       - LOG_LEVEL=INFO

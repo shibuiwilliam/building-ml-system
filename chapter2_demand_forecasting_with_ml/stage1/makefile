@@ -36,7 +36,7 @@ connect_postgres:
 		--restart="Never" \
 		--image bitnami/postgresql \
 		--env="PGPASSWORD=password" \
-		--command -- psql --host postgres.data.svc.cluster.local -U user
+		--command -- psql --host postgres.data.svc.cluster.local -U postgres
 
 
 ############ DEMAND FORECASTING DATA_REGISTRATION COMMANDS ############

@@ -43,7 +43,7 @@ spec:
             - name: POSTGRESQL_PORT
               value: "5432"
             - name: POSTGRESQL_USER
-              value: user
+              value: postgres
             - name: POSTGRESQL_PASSWORD
               value: password
             - name: POSTGRESQL_DBNAME
