@@ -73,8 +73,8 @@ def main(cfg: DictConfig):
             week=prediction_target_week,
             day=1,
         )
-        test_last_date = prediction_first_date + timedelta(days=-15)
-        train_last_date = test_last_date + timedelta(days=-15)
+        test_last_date = prediction_first_date + timedelta(days=-8)
+        train_last_date = test_last_date + timedelta(days=-8)
 
         if test_last_date > latest_sales_date:
             raise ValueError("not enough days registered to sales")
