@@ -297,10 +297,10 @@ WHERE
         dates = [f"'{d.strftime('%Y-%m-%d')}'" for d in dates]
         dates = [f"TO_DATE({d}, 'YYYY-MM-DD')" for d in dates]
         dates = f"UNNEST(ARRAY[{','.join(dates)}])"
-        stores = [f"'{s}'" for s in STORES]
-        stores = f"UNNEST(ARRAY[{','.join(stores)}])"
-        items = [f"'{i}'" for i in ITEMS]
-        items = f"UNNEST(ARRAY[{','.join(items)}])"
+        stores = ",".join([f"'{s}'" for s in STORES])
+        stores = f"UNNEST(ARRAY[{stores}])"
+        items = ",".join([f"'{i}'" for i in ITEMS])
+        items = f"UNNEST(ARRAY[{items}])"
 
         query = f"""
 SELECT

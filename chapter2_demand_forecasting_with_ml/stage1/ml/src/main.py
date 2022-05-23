@@ -102,7 +102,7 @@ def main(cfg: DictConfig):
         data_preprocess_pipeline = DataPreprocessPipeline()
         raw_df = data_retriever.retrieve_dataset(
             date_from=earliest_sales_date,
-            date_to=latest_sales_date,
+            date_to=test_last_date,
             item=Configurations.target_item,
             store=Configurations.target_store,
             region=Configurations.target_region,
@@ -116,7 +116,7 @@ def main(cfg: DictConfig):
         )
 
         mlflow.log_param("target_date_date_from", earliest_sales_date)
-        mlflow.log_param("target_date_date_to", latest_sales_date)
+        mlflow.log_param("target_date_date_to", test_last_date)
         mlflow.log_param("target_date_item", Configurations.target_item)
         mlflow.log_param("target_date_store", Configurations.target_store)
         mlflow.log_param("target_date_region", Configurations.target_region)
@@ -154,12 +154,13 @@ def main(cfg: DictConfig):
 
         if cfg.jobs.predict.run:
             predictor = Predictor()
-            next_date = latest_sales_date + timedelta(days=1)
+            next_date = test_last_date + timedelta(days=1)
             target_date = date.fromisocalendar(
                 year=prediction_target_year,
                 week=prediction_target_week,
                 day=7,
             )
+            logger.info(f"retrieve from {next_date} to {target_date}")
 
             data_to_be_predicted_df = data_retriever.retrieve_prediction_data(
                 date_from=next_date,
