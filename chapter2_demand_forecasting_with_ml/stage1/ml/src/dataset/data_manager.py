@@ -349,16 +349,21 @@ AND
         query = f"""
 WITH max_year AS (
     SELECT 
-        MAX({TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.year)
+        MAX({TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.year) AS max_year
     FROM
         {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}
 ), max_week AS (
     SELECT 
-        MAX({TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.week_of_year)
+        MAX({TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.week_of_year) AS max_week
     FROM
         {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}
     WHERE
-        {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.year = max_year
+        {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.year = (
+            SELECT 
+                max_year
+            FROM
+                max_year
+        )
 )
 
 SELECT
@@ -373,9 +378,19 @@ SELECT
 FROM
     {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}
 WHERE
-    {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.year = max_year
+    {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.year = (
+        SELECT 
+            max_year
+        FROM
+            max_year
+    )
 AND
-    {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.week_of_year = max_week
+    {TABLES.ITEM_WEEKLY_SALES_PREDICTIONS.value}.week_of_year = (
+        SELECT 
+            max_week
+        FROM
+            max_week
+    )
 ;
             """
 
