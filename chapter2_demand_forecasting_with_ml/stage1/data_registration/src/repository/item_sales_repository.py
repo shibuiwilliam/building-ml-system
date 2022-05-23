@@ -165,3 +165,29 @@ FROM
         )
         data = [ItemSales(**r) for r in records]
         return data
+
+    def select_latest(self) -> List[ItemSales]:
+        columns = ",".join(self.columns)
+        query = f"""
+SELECT
+    {columns}
+FROM
+    {self.table_name}
+WHERE
+    {self.table_name}.date = (
+        SELECT
+            MAX({self.table_name}.date)
+        FROM
+            {self.table_name}
+    )
+LIMIT
+    1
+;
+        """
+
+        records = self.execute_select_query(
+            query=query,
+            parameters=None,
+        )
+        data = [ItemSales(**r) for r in records]
+        return data

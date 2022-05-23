@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 from src.infrastructure.database import AbstractDBClient
 from src.middleware.file_reader import read_csv_to_list
@@ -105,6 +105,43 @@ class ItemService(AbstractService):
                 logger.info(f"registered {i} item sales...")
         if len(records) > 0:
             self.item_sales_repository.bulk_insert(records=records)
+
+    def register_latest_week_item_sales(
+        self,
+        item_sales_records_path: str,
+    ):
+        latest_item_sales = self.item_sales_repository.select_latest()[0]
+        dates_in_next_week = [latest_item_sales.date + timedelta(days=i) for i in range(1, 8)]
+        logger.info(f"target week dates: {dates_in_next_week}")
+
+        data = read_csv_to_list(csv_file=item_sales_records_path)
+        data = [d for d in data if datetime.strptime(d["date"], "%Y-%m-%d").date() in dates_in_next_week]
+
+        stores = self.store_repository.select()
+        store_dict = {s.name: s.id for s in stores}
+
+        items = self.item_repository.select()
+        item_dict = {i.name: i.id for i in items}
+
+        records = []
+        for d in data:
+            sales_date = datetime.strptime(d["date"], "%Y-%m-%d").date()
+            item_id = item_dict[d["item"]]
+            records.append(
+                ItemSales(
+                    id=get_uuid(),
+                    date=sales_date,
+                    day_of_week=d["day_of_week"],
+                    week_of_year=d["week_of_year"],
+                    store_id=store_dict[d["store"]],
+                    item_id=item_id,
+                    sales=int(d["sales"]),
+                    total_sales_amount=int(d["total_sales_amount"]),
+                )
+            )
+        if len(records) > 0:
+            self.item_sales_repository.bulk_insert(records=records)
+            logger.info(f"registered {len(records)} item sales...")
 
     def register_new_item_price(
         self,

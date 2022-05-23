@@ -31,11 +31,16 @@ logger = configure_logger(__name__)
     type=str,
     required=False,
 )
+@click.option(
+    "--latest_week_only",
+    is_flag=True,
+)
 def main(
     init_sql_file_path: Optional[str] = None,
     region_store_file_paths: Optional[Tuple[str, str]] = None,
     item_file_paths: Optional[Tuple[str, str]] = None,
     item_sales_records_path: Optional[str] = None,
+    latest_week_only: bool = False,
 ):
     logger.info("start jobs")
     logger.info(
@@ -45,6 +50,7 @@ init_sql_file_path: {init_sql_file_path}
 region_store_file_paths: {region_store_file_paths}
 item_file_paths: {item_file_paths}
 item_sales_records_path: {item_sales_records_path}
+latest_week_only: {latest_week_only}
     """
     )
     db_client = PostgreSQLClient()
@@ -69,7 +75,12 @@ item_sales_records_path: {item_sales_records_path}
         )
 
     if item_sales_records_path is not None:
-        item_service.register_records(item_sales_records_path=item_sales_records_path)
+        if latest_week_only:
+            item_service.register_latest_week_item_sales(item_sales_records_path=item_sales_records_path)
+        else:
+            item_service.register_records(item_sales_records_path=item_sales_records_path)
+
+    logger.info("DONE!")
 
 
 if __name__ == "__main__":
