@@ -4,6 +4,6 @@ FROM ${FROM_IMAGE}
 
 ENV PROJECT_DIR opt
 WORKDIR /${PROJECT_DIR}
-RUN pip install mlflow sqlalchemy psycopg2-binary
+RUN pip install mlflow sqlalchemy psycopg2-binary google-cloud-storage azure-storage-blob boto3
 
-CMD [ "mlflow", "server", "--backend-store-uri", "/opt/outputs/mlruns", "--default-artifact-root", "/opt/outputs/mlruns", "--host", "0.0.0.0" ]
+CMD [ "mlflow", "server", "--backend-store-uri", "/opt/outputs", "--default-artifact-root", "/opt/outputs", "--host", "0.0.0.0" ]

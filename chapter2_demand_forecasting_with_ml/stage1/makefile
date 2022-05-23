@@ -244,6 +244,10 @@ deploy_argo: registry_argo
 		-n argo apply \
 		-f https://github.com/argoproj/argo-workflows/releases/download/v3.3.1/quick-start-postgres.yaml
 
+.PHONY: create_argo_data_registration
+create_argo_data_registration:
+	argo cron create infrastructure/manifests/argo/workflow/data_registration.yaml
+
 
 ############ DEPLOYMENT COMMANDS ############
 KUBE_SYSTEM_MANIFEST_DIR := $(K8S_DIR)/manifests/kube_system
