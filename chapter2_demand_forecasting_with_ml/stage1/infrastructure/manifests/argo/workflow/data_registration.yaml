@@ -1,0 +1,68 @@
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  generateName: data-registration-pipeline-
+spec:
+  schedule: "*/10 * * * *"
+  concurrencyPolicy: "Forbid"
+  startingDeadlineSeconds: 0
+  workflowSpec:
+    entrypoint: pipeline
+    templates:
+      - name: pipeline
+        steps:
+          - - name: data-registration
+              template: data-registration
+
+      - name: data-registration
+        initContainers:
+          - name: data-registration-init
+            image: shibui/building-ml-system:beverage_sales_forecasting_data_registration_1.0.0
+            imagePullPolicy: Always
+            command:
+              - bash
+              - -c
+              - |
+                mkdir -p /opt/model/
+                wget https://storage.googleapis.com/aianimals/models/search/cc.ja.300.vec.gz -P /opt/model/
+            volumeMounts:
+              - mountPath: /opt/model/
+                name: data
+        container:
+          image: shibui/building-ml-system:beverage_sales_forecasting_data_registration_1.0.0
+          imagePullPolicy: Always
+          command:
+            - "python"
+            - "-m"
+            - "src.main"
+            - "--region_store_file_paths"
+            - "/opt/data/regions.csv /opt/data/stores.csv"
+            - "--item_file_paths"
+            - "/opt/data/items.csv"
+            - "/opt/data/item_prices.csv"
+            - "--item_sales_records_path"
+            - "/opt/data/item_sale_records_201701_202106.csv"
+          env:
+            - name: POSTGRES_HOST
+              value: postgres.data.svc.cluster.local
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_USER
+              value: user
+            - name: POSTGRES_PASSWORD
+              value: password
+            - name: POSTGRES_DB
+              value: beverage_sales_forecasting
+          resources:
+            requests:
+              memory: 1000Mi
+              cpu: 1000m
+          volumeMounts:
+            - mountPath: /opt/model/
+              name: data
+        volumes:
+          - name: data
+            emptyDir: {}
+
+    imagePullSecrets:
+      - name: regcred

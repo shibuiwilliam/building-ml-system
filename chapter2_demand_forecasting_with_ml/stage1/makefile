@@ -41,6 +41,7 @@ connect_postgres:
 
 ############ DEMAND FORECASTING DATA_REGISTRATION COMMANDS ############
 DATA_REGISTRATION_DIR := $(DIR)/data_registration
+DATA_REGISTRATION_MANIFEST_DIR := $(K8S_DIR)/manifests/beverage_sales_forecasting
 DOCKERFILE_DATA_REGISTRATION = $(DATA_REGISTRATION_DIR)/$(DOCKERFILE)
 DOCKER_DATA_REGISTRATION_TAG = $(TAG)_data_registration
 DOCKER_DATA_REGISTRATION_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_DATA_REGISTRATION_TAG)_$(VERSION)
@@ -79,6 +80,19 @@ build_data_registration:
 .PHONY: push_data_registration
 push_data_registration: 
 	docker push $(DOCKER_DATA_REGISTRATION_IMAGE_NAME)
+
+.PHONY: deploy_data_registration_ns
+deploy_data_registration_ns:
+	kubectl apply -f $(DATA_REGISTRATION_MANIFEST_DIR)/namespace.yaml 
+
+.PHONY: registry_data_registration
+registry_data_registration: deploy_data_registration_ns
+	@cd $(K8S_SECRET_DIR) && \
+		NAMESPACE=beverage-sales-forecasting ./private_registry_secret.sh
+
+.PHONY: deploy_initial_data_registration
+deploy_initial_data_registration: registry_data_registration
+	kubectl apply -f $(DATA_REGISTRATION_MANIFEST_DIR)/initial_data_registration.yaml
 
 
 ############ DEMAND FORECASTING MLFLOW COMMANDS ############
@@ -247,15 +261,19 @@ registry_default:
 initialize_deployment: deploy_kube_system \
 	registry_default \
 	registry_data \
-	register_argo \
+	registry_argo \
 	registry_mlflow \
-	registry_bi
+	registry_bi \
+	registry_data_registration
 
-.PHONY: deploy_all
-deploy_all: deploy_argo \
+.PHONY: deploy_base
+deploy_base: deploy_argo \
 	deploy_data \
 	deploy_bi \
 	deploy_mlflow
+
+.PHONY: deploy_job
+deploy_job: deploy_initial_data_registration
 
 .PHONY: delete_namespaces
 delete_namespaces:

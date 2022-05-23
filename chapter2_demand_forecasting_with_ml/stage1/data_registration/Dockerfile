@@ -10,6 +10,8 @@ COPY ${LOCAL_DIR}/requirements.txt /${PROJECT_DIR}/
 RUN apt-get -y update && \
     apt-get -y install \
     apt-utils \
+    wget \
+    curl \
     gcc && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \

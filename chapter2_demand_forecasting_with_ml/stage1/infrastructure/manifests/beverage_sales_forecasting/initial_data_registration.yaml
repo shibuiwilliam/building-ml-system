@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: initial-data-registration
+  namespace: beverage-sales-forecasting
+  labels:
+    app: initial-data-registration
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: initial-data-registration
+          image: shibui/building-ml-system:beverage_sales_forecasting_data_registration_1.0.0
+          imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: 500m
+              memory: "500Mi"
+            requests:
+              cpu: 500m
+              memory: "500Mi"
+          command:
+            - "python"
+            - "-m"
+            - "src.main"
+            - "--init_sql_file_path"
+            - "/opt/data/create.sql"
+            - "--item_file_paths"
+            - "/opt/data/items.csv"
+            - "/opt/data/item_prices.csv"
+            - "--item_sales_records_path"
+            - "/opt/data/item_sale_records_201701_202106.csv"
+          env:
+            - name: POSTGRES_HOST
+              value: postgres.data.svc.cluster.local
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_USER
+              value: user
+            - name: POSTGRES_PASSWORD
+              value: password
+            - name: POSTGRES_DB
+              value: beverage_sales_forecasting
+      imagePullSecrets:
+        - name: regcred
