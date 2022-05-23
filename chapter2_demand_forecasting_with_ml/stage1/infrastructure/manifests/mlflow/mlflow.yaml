@@ -25,7 +25,7 @@ spec:
             - "mlflow"
             - "server"
             - "--backend-store-uri"
-            - "postgresql://postgres:password@postgres.data.svc.cluster.local:5432"
+            - "postgresql://user:password@postgres.data.svc.cluster.local:5432"
             - "--artifacts-destination"
             - "gs://beverage_sales_forecasting/models"
             - "--serve-artifacts"

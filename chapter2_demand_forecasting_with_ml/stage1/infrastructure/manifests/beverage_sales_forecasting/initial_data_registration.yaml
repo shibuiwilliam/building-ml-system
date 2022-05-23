@@ -9,6 +9,24 @@ spec:
   template:
     spec:
       restartPolicy: Never
+      initContainers:
+        - name: init
+          image: shibui/building-ml-system:beverage_sales_forecasting_data_registration_1.0.0
+          imagePullPolicy: Always
+          command:
+            - bash
+            - -c
+            - |
+              mkdir -p /opt/data/
+              wget https://storage.googleapis.com/beverage_sales_forecasting/data/create.sql -P /opt/data/
+              wget https://storage.googleapis.com/beverage_sales_forecasting/data/item_prices.csv -P /opt/data/
+              wget https://storage.googleapis.com/beverage_sales_forecasting/data/items.csv -P /opt/data/
+              wget https://storage.googleapis.com/beverage_sales_forecasting/data/regions.csv -P /opt/data/
+              wget https://storage.googleapis.com/beverage_sales_forecasting/data/stores.csv -P /opt/data/
+              wget https://storage.googleapis.com/beverage_sales_forecasting/data/item_sale_records_201701_202106.csv -P /opt/data/
+          volumeMounts:
+            - mountPath: /opt/data/
+              name: data
       containers:
         - name: initial-data-registration
           image: shibui/building-ml-system:beverage_sales_forecasting_data_registration_1.0.0
@@ -26,21 +44,30 @@ spec:
             - "src.main"
             - "--init_sql_file_path"
             - "/opt/data/create.sql"
+            - "--region_store_file_paths"
+            - "/opt/data/regions.csv"
+            - "/opt/data/stores.csv"
             - "--item_file_paths"
             - "/opt/data/items.csv"
             - "/opt/data/item_prices.csv"
             - "--item_sales_records_path"
             - "/opt/data/item_sale_records_201701_202106.csv"
           env:
-            - name: POSTGRES_HOST
+            - name: POSTGRESQL_HOST
               value: postgres.data.svc.cluster.local
-            - name: POSTGRES_PORT
+            - name: POSTGRESQL_PORT
               value: "5432"
-            - name: POSTGRES_USER
+            - name: POSTGRESQL_USER
               value: user
-            - name: POSTGRES_PASSWORD
+            - name: POSTGRESQL_PASSWORD
               value: password
-            - name: POSTGRES_DB
+            - name: POSTGRESQL_DBNAME
               value: beverage_sales_forecasting
+          volumeMounts:
+            - mountPath: /opt/data/
+              name: data
+      volumes:
+        - name: data
+          emptyDir: {}
       imagePullSecrets:
         - name: regcred

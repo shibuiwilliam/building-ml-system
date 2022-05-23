@@ -72,10 +72,6 @@ item_sales_records_path: {item_sales_records_path}
     if item_sales_records_path is not None:
         item_service.register_records(item_sales_records_path=item_sales_records_path)
 
-    while True:
-        logger.info("done...")
-        sleep(120)
-
 
 if __name__ == "__main__":
     main()
