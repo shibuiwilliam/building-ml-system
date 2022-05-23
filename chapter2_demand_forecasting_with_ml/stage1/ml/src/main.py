@@ -115,11 +115,15 @@ def main(cfg: DictConfig):
             data_preprocess_pipeline=data_preprocess_pipeline,
         )
 
-        mlflow.log_param("target_date_date_from", earliest_sales_date)
-        mlflow.log_param("target_date_date_to", test_last_date)
-        mlflow.log_param("target_date_item", Configurations.target_item)
-        mlflow.log_param("target_date_store", Configurations.target_store)
-        mlflow.log_param("target_date_region", Configurations.target_region)
+        mlflow.log_param("train_start_year", train_year)
+        mlflow.log_param("train_start_week", train_week)
+        mlflow.log_param("train_end_year", train_end_year)
+        mlflow.log_param("train_end_week", train_end_week)
+        mlflow.log_param("test_year", test_year)
+        mlflow.log_param("test_week", test_week)
+        mlflow.log_param("target_data_item", Configurations.target_item)
+        mlflow.log_param("target_data_store", Configurations.target_store)
+        mlflow.log_param("target_data_region", Configurations.target_region)
 
         _model = MODELS.get_model(name=cfg.jobs.model.name)
         model = _model.model(
