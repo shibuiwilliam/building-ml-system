@@ -49,13 +49,40 @@ def main(cfg: DictConfig):
         if latest_sales_date is None:
             raise Exception("no sales record available")
 
+        prediction_target_year = Configurations.target_year
+        prediction_target_week = Configurations.target_week
+        if prediction_target_year is None or prediction_target_week is None:
+            base_predict_year = cfg.jobs.predict_after.year
+            base_predict_week_of_year = cfg.jobs.predict_after.week_of_year
+            prediction_latest_date = data_retriever.retrieve_prediction_latest_date()
+            if prediction_latest_date is None:
+                raise ValueError
+            next_prediction_latest_date = prediction_latest_date + timedelta(days=1)
+            prediction_target_year = next_prediction_latest_date.isocalendar().year
+            prediction_target_week = next_prediction_latest_date.isocalendar().week
+            if prediction_target_year < base_predict_year:
+                prediction_target_year = base_predict_year
+                prediction_target_week = base_predict_week_of_year
+            if prediction_target_week < base_predict_week_of_year:
+                prediction_target_week = base_predict_week_of_year
+
+        prediction_first_date = date.fromisocalendar(
+            year=prediction_target_year,
+            week=prediction_target_week,
+            day=1,
+        )
+        test_last_date = prediction_first_date + timedelta(days=-15)
+        train_last_date = test_last_date + timedelta(days=-15)
+
+        if test_last_date > latest_sales_date:
+            raise ValueError("not enough days registered to sales")
+
         train_year = earliest_sales_date.isocalendar().year
         train_week = earliest_sales_date.isocalendar().week
-        train_end_date = latest_sales_date + timedelta(days=-14)
-        train_end_year = train_end_date.isocalendar().year
-        train_end_week = train_end_date.isocalendar().week
-        test_year = latest_sales_date.isocalendar().year
-        test_week = latest_sales_date.isocalendar().week
+        train_end_year = train_last_date.isocalendar().year
+        train_end_week = train_last_date.isocalendar().week
+        test_year = test_last_date.isocalendar().year
+        test_week = test_last_date.isocalendar().week
 
         train_year_and_week = YearAndWeek(
             year=train_year,
@@ -126,16 +153,6 @@ def main(cfg: DictConfig):
         if cfg.jobs.predict.run:
             predictor = Predictor()
             next_date = latest_sales_date + timedelta(days=1)
-            prediction_target_year = Configurations.target_year
-            prediction_target_week = Configurations.target_week
-            if prediction_target_year is None or prediction_target_week is None:
-                prediction_latest_date = data_retriever.retrieve_prediction_latest_date()
-                if prediction_latest_date is None:
-                    raise ValueError
-                next_prediction_latest_date = prediction_latest_date + timedelta(days=1)
-                prediction_target_year = next_prediction_latest_date.isocalendar().year
-                prediction_target_week = next_prediction_latest_date.isocalendar().week
-
             target_date = date.fromisocalendar(
                 year=prediction_target_year,
                 week=prediction_target_week,
