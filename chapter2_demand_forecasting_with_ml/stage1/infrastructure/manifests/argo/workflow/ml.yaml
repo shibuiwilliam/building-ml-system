@@ -22,15 +22,15 @@ spec:
             - "-m"
             - "src.main"
           env:
-            - name: POSTGRESQL_HOST
+            - name: POSTGRES_HOST
               value: postgres.data.svc.cluster.local
-            - name: POSTGRESQL_PORT
+            - name: POSTGRES_PORT
               value: "5432"
-            - name: POSTGRESQL_USER
+            - name: POSTGRES_USER
               value: postgres
-            - name: POSTGRESQL_PASSWORD
+            - name: POSTGRES_PASSWORD
               value: password
-            - name: POSTGRESQL_DBNAME
+            - name: POSTGRES_DBNAME
               value: beverage_sales_forecasting
             - name: MLFLOW_TRACKING_URI
               value: http://mlflow.mlflow.svc.cluster.local:5000

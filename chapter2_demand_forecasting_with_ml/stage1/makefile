@@ -17,7 +17,7 @@ DATA_MANIFEST_DIR := $(K8S_DIR)/manifests/data
 
 .PHONY: deploy_data_ns
 deploy_data_ns:
-	kubectl apply -f $(DATA_MANIFEST_DIR)/namespace.yaml 
+	kubectl apply -f $(DATA_MANIFEST_DIR)/namespace.yaml
 
 .PHONY: registry_data
 registry_data: deploy_data_ns
@@ -47,21 +47,6 @@ DOCKER_DATA_REGISTRATION_TAG = $(TAG)_data_registration
 DOCKER_DATA_REGISTRATION_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_DATA_REGISTRATION_TAG)_$(VERSION)
 DOCKER_DATA_REGISTRATION_IMAGE_NAME_TEST = $(DOCKER_REPOSITORY):$(DOCKER_DATA_REGISTRATION_TAG)_$(VERSION)_$(DOCKER_TEST_TAG)
 
-.PHONY: patch_data_registration
-patch_data_registration:
-	cd $(DATA_REGISTRATION_DIR) && \
-	poetry version patch
-
-.PHONY: minor_upgrade_data_registration
-minor_upgrade_data_registration:
-	cd $(DATA_REGISTRATION_DIR) && \
-	poetry version minor
-
-.PHONY: major_upgrade_data_registration
-major_upgrade_data_registration:
-	cd $(DATA_REGISTRATION_DIR) && \
-	poetry version major
-
 .PHONY: req_data_registration
 req_data_registration:
 	cd $(DATA_REGISTRATION_DIR) && \
@@ -71,19 +56,19 @@ req_data_registration:
 		--output requirements.txt
 
 .PHONY: build_data_registration
-build_data_registration: 
+build_data_registration:
 	docker build \
 		-t $(DOCKER_DATA_REGISTRATION_IMAGE_NAME) \
 		-f $(DOCKERFILE_DATA_REGISTRATION) \
 		.
-	 
+
 .PHONY: push_data_registration
-push_data_registration: 
+push_data_registration:
 	docker push $(DOCKER_DATA_REGISTRATION_IMAGE_NAME)
 
 .PHONY: deploy_data_registration_ns
 deploy_data_registration_ns:
-	kubectl apply -f $(DATA_REGISTRATION_MANIFEST_DIR)/namespace.yaml 
+	kubectl apply -f $(DATA_REGISTRATION_MANIFEST_DIR)/namespace.yaml
 
 .PHONY: registry_data_registration
 registry_data_registration: deploy_data_registration_ns
@@ -103,19 +88,19 @@ DOCKER_MLFLOW_TAG = $(TAG)_mlflow
 DOCKER_MLFLOW_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_MLFLOW_TAG)_$(VERSION)
 
 .PHONY: build_mlflow
-build_mlflow: 
+build_mlflow:
 	docker build \
 		-t $(DOCKER_MLFLOW_IMAGE_NAME) \
 		-f $(DOCKERFILE_MLFLOW) \
 		.
-	 
+
 .PHONY: push_mlflow
-push_mlflow: 
+push_mlflow:
 	docker push $(DOCKER_MLFLOW_IMAGE_NAME)
 
 .PHONY: deploy_mlflow_ns
 deploy_mlflow_ns:
-	kubectl apply -f $(MLFLOW_MANIFEST_DIR)/namespace.yaml 
+	kubectl apply -f $(MLFLOW_MANIFEST_DIR)/namespace.yaml
 
 .PHONY: registry_mlflow
 registry_mlflow: deploy_mlflow_ns
@@ -133,21 +118,6 @@ DOCKERFILE_ML = $(ML_DIR)/$(DOCKERFILE)
 DOCKER_ML_TAG = $(TAG)_ml
 DOCKER_ML_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_ML_TAG)_$(VERSION)
 
-.PHONY: patch_ml
-patch_ml:
-	cd $(ML_DIR) && \
-	poetry version patch
-
-.PHONY: minor_upgrade_ml
-minor_upgrade_ml:
-	cd $(ML_DIR) && \
-	poetry version minor
-
-.PHONY: major_upgrade_ml
-major_upgrade_ml:
-	cd $(ML_DIR) && \
-	poetry version major
-
 .PHONY: req_ml
 req_ml:
 	cd $(ML_DIR) && \
@@ -157,14 +127,14 @@ req_ml:
 		--output requirements.txt
 
 .PHONY: build_ml
-build_ml: 
+build_ml:
 	docker build \
 		-t $(DOCKER_ML_IMAGE_NAME) \
 		-f $(DOCKERFILE_ML) \
 		.
-	 
+
 .PHONY: push_ml
-push_ml: 
+push_ml:
 	docker push $(DOCKER_ML_IMAGE_NAME)
 
 
@@ -199,19 +169,19 @@ req_bi:
 		--output requirements.txt
 
 .PHONY: build_bi
-build_bi: 
+build_bi:
 	docker build \
 		-t $(DOCKER_BI_IMAGE_NAME) \
 		-f $(DOCKERFILE_BI) \
 		.
-	 
+
 .PHONY: push_bi
-push_bi: 
+push_bi:
 	docker push $(DOCKER_BI_IMAGE_NAME)
 
 .PHONY: deploy_bi_ns
 deploy_bi_ns:
-	kubectl apply -f $(BI_MANIFEST_DIR)/namespace.yaml 
+	kubectl apply -f $(BI_MANIFEST_DIR)/namespace.yaml
 
 .PHONY: registry_bi
 registry_bi: deploy_bi_ns
@@ -244,9 +214,13 @@ deploy_argo: registry_argo
 		-n argo apply \
 		-f https://github.com/argoproj/argo-workflows/releases/download/v3.3.1/quick-start-postgres.yaml
 
-.PHONY: create_argo_data_registration_and_ml
-create_argo_data_registration_and_ml:
-	argo cron create infrastructure/manifests/argo/workflow/data_registration_and_ml.yaml
+.PHONY: create_argo_data_registration
+create_argo_data_registration:
+	argo cron create infrastructure/manifests/argo/workflow/data_registration.yaml
+
+.PHONY: create_argo_ml
+create_argo_ml:
+	argo cron create infrastructure/manifests/argo/workflow/ml.yaml
 
 
 ############ DEPLOYMENT COMMANDS ############
@@ -277,7 +251,9 @@ deploy_base: deploy_argo \
 	deploy_mlflow
 
 .PHONY: deploy_job
-deploy_job: deploy_initial_data_registration
+deploy_job: deploy_initial_data_registration \
+	create_argo_data_registration \
+	create_argo_ml
 
 .PHONY: delete_namespaces
 delete_namespaces:
@@ -288,21 +264,6 @@ delete_namespaces:
 
 
 ############ ALL COMMANDS ############
-.PHONY: patch_all
-patch_all: patch_data_registration \
-	patch_ml \
-	patch_bi
-
-.PHONY: minor_upgrade_all
-minor_upgrade_all: minor_upgrade_data_registration \
-	minor_upgrade_ml \
-	minor_upgrade_bi
-
-.PHONY: major_upgrade_all
-major_upgrade_all: major_upgrade_data_registration \
-	major_upgrade_ml \
-	major_upgrade_bi
-
 .PHONY: req_all
 req_all: req_data_registration \
 	req_ml \
@@ -313,7 +274,7 @@ build_all: build_data_registration \
 	build_ml \
 	build_mlflow \
 	build_bi
-	 
+
 .PHONY: push_all
 push_all: push_data_registration \
 	push_ml \

@@ -18,11 +18,11 @@ class AbstractDBClient(ABC):
 
 class PostgreSQLClient(AbstractDBClient):
     def __init__(self):
-        self.__postgresql_user = os.getenv("POSTGRESQL_USER")
-        self.__postgresql_password = os.getenv("POSTGRESQL_PASSWORD")
-        self.__postgresql_port = int(os.getenv("POSTGRESQL_PORT", 5432))
-        self.__postgresql_dbname = os.getenv("POSTGRESQL_DBNAME")
-        self.__postgresql_host = os.getenv("POSTGRESQL_HOST")
+        self.__postgresql_user = os.getenv("POSTGRES_USER")
+        self.__postgresql_password = os.getenv("POSTGRES_PASSWORD")
+        self.__postgresql_port = int(os.getenv("POSTGRES_PORT", 5432))
+        self.__postgresql_dbname = os.getenv("POSTGRES_DBNAME")
+        self.__postgresql_host = os.getenv("POSTGRES_HOST")
         self.__connection_string = f"host={self.__postgresql_host} port={self.__postgresql_port} dbname={self.__postgresql_dbname} user={self.__postgresql_user} password={self.__postgresql_password}"
 
     def get_connection(self):
