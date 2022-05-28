@@ -17,6 +17,7 @@ colorama==0.4.4; python_version >= "3.8" and python_full_version < "3.0.0" and p
 debugpy==1.5.1; python_version >= "3.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.7"
 decorator==5.1.1; python_version >= "3.8"
 defusedxml==0.7.1; python_version >= "3.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.7"
+dependency-injector==4.39.1
 entrypoints==0.4; python_full_version >= "3.6.1" and python_version >= "3.7"
 executing==0.8.2; python_version >= "3.8"
 gitdb==4.0.9; python_version >= "3.7"
