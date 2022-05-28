@@ -65,6 +65,12 @@ def main(cfg: DictConfig):
             item=cfg.jobs.data.target_data.item,
             store=cfg.jobs.data.target_data.store,
         )
+        logger.info(
+            f""""
+raw data
+{raw_df}
+        """
+        )
         xy_train, xy_test = data_retriever.train_test_split(
             raw_df=raw_df,
             train_year_and_week=train_year_and_week,

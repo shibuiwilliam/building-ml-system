@@ -20,21 +20,6 @@ DOCKERFILE_MLFLOW = $(ML_DIR)/$(DOCKERFILE).mlflow
 DOCKER_MLFLOW_TAG = $(TAG)_mlflow
 DOCKER_MLFLOW_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_MLFLOW_TAG)_$(VERSION)
 
-.PHONY: patch_ml
-patch_ml:
-	cd $(ML_DIR) && \
-	poetry version patch
-
-.PHONY: minor_upgrade_ml
-minor_upgrade_ml:
-	cd $(ML_DIR) && \
-	poetry version minor
-
-.PHONY: major_upgrade_ml
-major_upgrade_ml:
-	cd $(ML_DIR) && \
-	poetry version major
-
 .PHONY: req_ml
 req_ml:
 	cd $(ML_DIR) && \
@@ -44,25 +29,25 @@ req_ml:
 		--output requirements.txt
 
 .PHONY: build_ml
-build_ml: 
+build_ml:
 	docker build \
 		-t $(DOCKER_ML_IMAGE_NAME) \
 		-f $(DOCKERFILE_ML) \
 		.
-	 
+
 .PHONY: push_ml
-push_ml: 
+push_ml:
 	docker push $(DOCKER_ML_IMAGE_NAME)
 
 .PHONY: build_mlflow
-build_mlflow: 
+build_mlflow:
 	docker build \
 		-t $(DOCKER_MLFLOW_IMAGE_NAME) \
 		-f $(DOCKERFILE_MLFLOW) \
 		.
-	 
+
 .PHONY: push_mlflow
-push_mlflow: 
+push_mlflow:
 	docker push $(DOCKER_MLFLOW_IMAGE_NAME)
 
 .PHONY: run_ml
@@ -107,21 +92,6 @@ DOCKER_BI_TAG = $(TAG)_bi
 DOCKER_BI_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_BI_TAG)_$(VERSION)
 DOCKER_BI_IMAGE_NAME_TEST = $(DOCKER_REPOSITORY):$(DOCKER_BI_TAG)_$(VERSION)_$(DOCKER_TEST_TAG)
 
-.PHONY: patch_bi
-patch_bi:
-	cd $(BI_DIR) && \
-	poetry version patch
-
-.PHONY: minor_upgrade_bi
-minor_upgrade_bi:
-	cd $(BI_DIR) && \
-	poetry version minor
-
-.PHONY: major_upgrade_bi
-major_upgrade_bi:
-	cd $(BI_DIR) && \
-	poetry version major
-
 .PHONY: req_bi
 req_bi:
 	cd $(BI_DIR) && \
@@ -131,14 +101,14 @@ req_bi:
 		--output requirements.txt
 
 .PHONY: build_bi
-build_bi: 
+build_bi:
 	docker build \
 		-t $(DOCKER_BI_IMAGE_NAME) \
 		-f $(DOCKERFILE_BI) \
 		.
-	 
+
 .PHONY: push_bi
-push_bi: 
+push_bi:
 	docker push $(DOCKER_BI_IMAGE_NAME)
 
 .PHONY: run_bi
@@ -159,18 +129,6 @@ rm_bi:
 	docker rm -f bi
 
 ############ ALL COMMANDS ############
-.PHONY: patch_all
-patch_all: patch_ml \
-	patch_bi
-
-.PHONY: minor_upgrade_all
-minor_upgrade_all: minor_upgrade_ml \
-	minor_upgrade_bi
-
-.PHONY: major_upgrade_all
-major_upgrade_all: major_upgrade_ml \
-	major_upgrade_bi
-
 .PHONY: req_all
 req_all: req_ml \
 	req_bi
@@ -179,7 +137,7 @@ req_all: req_ml \
 build_all: build_ml \
 	build_mlflow \
 	build_bi
-	 
+
 .PHONY: push_all
 push_all: push_ml \
 	push_mlflow \
