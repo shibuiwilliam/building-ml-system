@@ -348,9 +348,9 @@ weekly prediction df
             weekly_sales_evaluation_df.sales.astype("float") - weekly_sales_evaluation_df.prediction
         )
 
-        weekly_sales_evaluation_df[
-            "error_rate"
-        ] = weekly_sales_evaluation_df.diff / weekly_sales_evaluation_df.sales.astype("float")
+        weekly_sales_evaluation_df["error_rate"] = weekly_sales_evaluation_df[
+            "diff"
+        ] / weekly_sales_evaluation_df.sales.astype("float")
         weekly_sales_evaluation_df = weekly_sales_evaluation_df[
             [
                 "year",
