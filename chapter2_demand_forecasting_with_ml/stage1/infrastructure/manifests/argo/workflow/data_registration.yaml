@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: CronWorkflow
 metadata:
-  generateName: data-registration-ml-pipeline-
+  generateName: data-registration-pipeline-
 spec:
   schedule: "*/10 * * * *"
   concurrencyPolicy: "Forbid"
@@ -13,8 +13,6 @@ spec:
         steps:
           - - name: data-registration
               template: data-registration
-          - - name: ml
-              template: ml
       - name: data-registration
         initContainers:
           - name: data-registration-init
@@ -60,34 +58,6 @@ spec:
         volumes:
           - name: data
             emptyDir: {}
-
-      - name: ml
-        container:
-          image: shibui/building-ml-system:beverage_sales_forecasting_ml_1.0.0
-          imagePullPolicy: Always
-          command:
-            - "python"
-            - "-m"
-            - "src.main"
-          env:
-            - name: POSTGRESQL_HOST
-              value: postgres.data.svc.cluster.local
-            - name: POSTGRESQL_PORT
-              value: "5432"
-            - name: POSTGRESQL_USER
-              value: postgres
-            - name: POSTGRESQL_PASSWORD
-              value: password
-            - name: POSTGRESQL_DBNAME
-              value: beverage_sales_forecasting
-            - name: MLFLOW_TRACKING_URI
-              value: http://mlflow.mlflow.svc.cluster.local:5000
-            - name: TARGET_CONFIG_NAME
-              value: default
-          resources:
-            requests:
-              memory: 2000Mi
-              cpu: 2000m
 
     imagePullSecrets:
       - name: regcred
