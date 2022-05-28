@@ -21,7 +21,7 @@ class PostgreSQLClient(AbstractDBClient):
         self.__postgresql_user = os.getenv("POSTGRES_USER")
         self.__postgresql_password = os.getenv("POSTGRES_PASSWORD")
         self.__postgresql_port = int(os.getenv("POSTGRES_PORT", 5432))
-        self.__postgresql_dbname = os.getenv("POSTGRES_DBNAME")
+        self.__postgresql_dbname = os.getenv("POSTGRES_DB")
         self.__postgresql_host = os.getenv("POSTGRES_HOST")
         self.__connection_string = f"host={self.__postgresql_host} port={self.__postgresql_port} dbname={self.__postgresql_dbname} user={self.__postgresql_user} password={self.__postgresql_password}"
 
