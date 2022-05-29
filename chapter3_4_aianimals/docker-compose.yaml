@@ -43,6 +43,35 @@ services:
       - RABBITMQ_DEFAULT_PASS=password
     hostname: rabbitmq
 
+  es:
+    container_name: es
+    image: shibui/building-ml-system:ai_animals_elasticsearch_0.0.0
+    restart: always
+    networks:
+      - default
+    ports:
+      - 127.0.0.1:9200:9200
+      - 127.0.0.1:9201:9201
+      - 127.0.0.1:9300:9300
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+    hostname: es
+
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:8.1.2
+    restart: always
+    networks:
+      - default
+    ports:
+      - 127.0.0.1:5601:5601
+    environment:
+      - ELASTICSEARCH_HOSTS="http://es:9200"
+    hostname: kibana
+    depends_on:
+      - es
+
   initial_data_registry:
     container_name: initial_data_registry
     image: shibui/building-ml-system:ai_animals_data_registry_0.0.0
@@ -105,7 +134,6 @@ services:
     depends_on:
       - postgres
       - redis
-      - api
       - es
 
   api:
@@ -145,58 +173,7 @@ services:
       - postgres
       - redis
       - rabbitmq
-
-  es:
-    container_name: es
-    image: shibui/building-ml-system:ai_animals_elasticsearch_0.0.0
-    restart: always
-    networks:
-      - default
-    ports:
-      - 127.0.0.1:9200:9200
-      - 127.0.0.1:9201:9201
-      - 127.0.0.1:9300:9300
-    environment:
-      - xpack.security.enabled=false
-      - discovery.type=single-node
-    hostname: es
-    depends_on:
-      - postgres
-
-  kibana:
-    container_name: kibana
-    image: docker.elastic.co/kibana/kibana:8.1.2
-    restart: always
-    networks:
-      - default
-    ports:
-      - 127.0.0.1:5601:5601
-    environment:
-      - ELASTICSEARCH_HOSTS="http://es:9200"
-    hostname: kibana
-    depends_on:
-      - postgres
-
-  violation_detection_portal:
-    container_name: violation_detection_portal
-    image: shibui/building-ml-system:ai_animals_violation_detection_portal_0.0.0
-    restart: always
-    networks:
-      - default
-    environment:
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=aianimals
-    command:
-      - streamlit
-      - run
-      - src/main.py
-    ports:
-      - 8501:8501
-    depends_on:
-      - postgres
+      - es
 
 networks:
   default:
