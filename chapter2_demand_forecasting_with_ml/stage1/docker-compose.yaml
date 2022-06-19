@@ -34,11 +34,11 @@ services:
       - LOG_LEVEL=DEBUG
     command: >
       /bin/sh -c "sleep 10s && python \
-       -m src.main \
-       --init_sql_file_path /opt/data/create.sql \
-       --region_store_file_paths /opt/data/regions.csv /opt/data/stores.csv \
-       --item_file_paths /opt/data/items.csv /opt/data/item_prices.csv \
-       --item_sales_records_path /opt/data/item_sale_records_201701_202106.csv"
+        -m src.main \
+        --init_sql_file_path /opt/data/create.sql \
+        --region_store_file_paths /opt/data/regions.csv /opt/data/stores.csv \
+        --item_file_paths /opt/data/items.csv /opt/data/item_prices.csv \
+        --item_sales_records_path /opt/data/item_sale_records_201701_202106.csv"
     volumes:
       - "./master_data:/opt/data"
     depends_on:

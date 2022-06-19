@@ -31,6 +31,7 @@ req_ml:
 .PHONY: build_ml
 build_ml:
 	docker build \
+		--platform x86_64 \
 		-t $(DOCKER_ML_IMAGE_NAME) \
 		-f $(DOCKERFILE_ML) \
 		.
@@ -42,6 +43,7 @@ push_ml:
 .PHONY: build_mlflow
 build_mlflow:
 	docker build \
+		--platform x86_64 \
 		-t $(DOCKER_MLFLOW_IMAGE_NAME) \
 		-f $(DOCKERFILE_MLFLOW) \
 		.
@@ -103,6 +105,7 @@ req_bi:
 .PHONY: build_bi
 build_bi:
 	docker build \
+		--platform x86_64 \
 		-t $(DOCKER_BI_IMAGE_NAME) \
 		-f $(DOCKERFILE_BI) \
 		.
@@ -119,7 +122,7 @@ run_bi: build_bi
 		--name bi \
 		-p 8501:8501 \
 		-v $(DIR)/data:/opt/data \
-		-e ITEM_SALES_RECORD_FILE=/opt/data/data/item_sales_records_train_2021_31.csv \
+		-e ITEM_SALES_RECORD_FILE=/opt/data/data/item_sales_records_train_2021_04.csv \
 		-e ITEM_SALES_PREDICTION_DIR=/opt/data/prediction \
 		$(DOCKER_BI_IMAGE_NAME) \
 		streamlit run src/main.py

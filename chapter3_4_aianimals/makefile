@@ -76,15 +76,15 @@ DOCKER_MLFLOW_TAG = $(TAG)_mlflow
 DOCKER_MLFLOW_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_MLFLOW_TAG)_$(MLFLOW_VERSION)
 
 .PHONY: build_mlflow
-build_mlflow: 
+build_mlflow:
 	docker build \
 		--platform x86_64 \
 		-t $(DOCKER_MLFLOW_IMAGE_NAME) \
 		-f $(DOCKERFILE_MLFLOW) \
 		.
-	 
+
 .PHONY: push_mlflow
-push_mlflow: 
+push_mlflow:
 	docker push $(DOCKER_MLFLOW_IMAGE_NAME)
 
 .PHONY: deploy_mlflow_ns

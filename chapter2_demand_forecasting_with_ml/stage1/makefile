@@ -58,6 +58,7 @@ req_data_registration:
 .PHONY: build_data_registration
 build_data_registration:
 	docker build \
+		--platform x86_64 \
 		-t $(DOCKER_DATA_REGISTRATION_IMAGE_NAME) \
 		-f $(DOCKERFILE_DATA_REGISTRATION) \
 		.
@@ -90,6 +91,7 @@ DOCKER_MLFLOW_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_MLFLOW_TAG)_$(VERSION)
 .PHONY: build_mlflow
 build_mlflow:
 	docker build \
+		--platform x86_64 \
 		-t $(DOCKER_MLFLOW_IMAGE_NAME) \
 		-f $(DOCKERFILE_MLFLOW) \
 		.
@@ -129,6 +131,7 @@ req_ml:
 .PHONY: build_ml
 build_ml:
 	docker build \
+		--platform x86_64 \
 		-t $(DOCKER_ML_IMAGE_NAME) \
 		-f $(DOCKERFILE_ML) \
 		.
@@ -171,6 +174,7 @@ req_bi:
 .PHONY: build_bi
 build_bi:
 	docker build \
+		--platform x86_64 \
 		-t $(DOCKER_BI_IMAGE_NAME) \
 		-f $(DOCKERFILE_BI) \
 		.

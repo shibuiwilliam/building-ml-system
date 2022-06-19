@@ -109,7 +109,11 @@ raw data
                 preprocess_pipeline_file_path=preprocess_pipeline_file_path,
                 save_file_path=save_file_path,
             )
-            mlflow.log_metrics(evaluation.dict())
+            mlflow.log_metric("mean_absolute_error", evaluation.mean_absolute_error)
+            mlflow.log_metric("mean_absolute_percentage_error", evaluation.mean_absolute_percentage_error)
+            mlflow.log_metric("root_mean_squared_error", evaluation.root_mean_squared_error)
+            evaluation.eval_df.to_csv("/tmp/eval_df.csv")
+            mlflow.log_artifact("/tmp/eval_df.csv", "eval_df")
             mlflow.log_artifact(artifact.preprocess_file_path, "preprocess")
             mlflow.log_artifact(artifact.model_file_path, "model")
 
