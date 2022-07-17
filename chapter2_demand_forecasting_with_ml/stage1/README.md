@@ -11,6 +11,7 @@ Stage1ではKubernetesクラスターで飲料品の需要予測モデルを学�
 
 - [Docker Engine](https://docs.docker.com/engine/install/)
 - [Kubernetes](https://kubernetes.io/ja/)
+  - Kubernetesクラスターではノードの合計で12cpu以上, 48GB以上のメモリが必要になります。
 - makeコマンドの実行環境
 - [kubectl](https://kubernetes.io/ja/docs/tasks/tools/install-kubectl/)の実行環境
 
