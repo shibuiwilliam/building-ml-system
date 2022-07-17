@@ -19,13 +19,8 @@ DATA_MANIFEST_DIR := $(K8S_DIR)/manifests/data
 deploy_data_ns:
 	kubectl apply -f $(DATA_MANIFEST_DIR)/namespace.yaml
 
-.PHONY: registry_data
-registry_data: deploy_data_ns
-	@cd $(K8S_SECRET_DIR) && \
-		NAMESPACE=data ./private_registry_secret.sh
-
 .PHONY: deploy_data
-deploy_data: registry_data
+deploy_data:
 	kubectl apply -f $(DATA_MANIFEST_DIR)/postgres.yaml
 
 .PHONY: connect_postgres
@@ -71,13 +66,8 @@ push_data_registration:
 deploy_data_registration_ns:
 	kubectl apply -f $(DATA_REGISTRATION_MANIFEST_DIR)/namespace.yaml
 
-.PHONY: registry_data_registration
-registry_data_registration: deploy_data_registration_ns
-	@cd $(K8S_SECRET_DIR) && \
-		NAMESPACE=beverage-sales-forecasting ./private_registry_secret.sh
-
 .PHONY: deploy_initial_data_registration
-deploy_initial_data_registration: registry_data_registration
+deploy_initial_data_registration:
 	kubectl apply -f $(DATA_REGISTRATION_MANIFEST_DIR)/initial_data_registration.yaml
 
 
@@ -104,13 +94,8 @@ push_mlflow:
 deploy_mlflow_ns:
 	kubectl apply -f $(MLFLOW_MANIFEST_DIR)/namespace.yaml
 
-.PHONY: registry_mlflow
-registry_mlflow: deploy_mlflow_ns
-	@cd $(K8S_SECRET_DIR) && \
-		NAMESPACE=mlflow ./private_registry_secret.sh
-
 .PHONY: deploy_mlflow
-deploy_mlflow: registry_mlflow
+deploy_mlflow:
 	kubectl apply -f $(MLFLOW_MANIFEST_DIR)/mlflow.yaml
 
 
@@ -187,13 +172,8 @@ push_bi:
 deploy_bi_ns:
 	kubectl apply -f $(BI_MANIFEST_DIR)/namespace.yaml
 
-.PHONY: registry_bi
-registry_bi: deploy_bi_ns
-	@cd $(K8S_SECRET_DIR) && \
-		NAMESPACE=beverage-sales-forecasting ./private_registry_secret.sh
-
 .PHONY: deploy_bi
-deploy_bi: registry_bi
+deploy_bi:
 	kubectl apply -f $(BI_MANIFEST_DIR)/bi.yaml
 
 
@@ -204,13 +184,8 @@ ARGO_MANIFEST_DIR := $(K8S_DIR)/manifests/argo
 deploy_argo_ns:
 	kubectl apply -f $(ARGO_MANIFEST_DIR)/namespace.yaml
 
-.PHONY: registry_argo
-registry_argo: deploy_argo_ns
-	@cd $(K8S_SECRET_DIR) && \
-		NAMESPACE=argo ./private_registry_secret.sh
-
 .PHONY: deploy_argo
-deploy_argo: registry_argo
+deploy_argo:
 	kubectl \
 		-n argo apply \
 		-f $(ARGO_MANIFEST_DIR)/argo_clusterrolebinding.yaml && \
@@ -233,11 +208,6 @@ KUBE_SYSTEM_MANIFEST_DIR := $(K8S_DIR)/manifests/kube_system
 .PHONY: deploy_kube_system
 deploy_kube_system:
 	kubectl apply -f $(KUBE_SYSTEM_MANIFEST_DIR)/pdb.yaml
-
-.PHONY: registry_default
-registry_default:
-	@cd $(K8S_SECRET_DIR) && \
-		NAMESPACE=default ./private_registry_secret.sh
 
 .PHONY: initialize_deployment
 initialize_deployment: deploy_kube_system
