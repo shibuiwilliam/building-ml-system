@@ -6,6 +6,22 @@ Stage0ではローカル環境で飲料品の需要予測モデルを学習、�
 - すべてのリソースはDockerコンテナとして起動します。
 - 環境構築およびコマンドの実行はすべてLinuxおよびmacbookで稼働確認しています。
 
+## 前提
+
+このREADMEは2021年の第4週に実行することを想定して記述しています。
+実行の対象週は [docker-compose.yaml](./docker-compose.yaml) の`ml`で環境変数で設定している`TARGET_CONFIG_NAME`で指定します。
+指定可能な対象週は[ml/hydra](./ml/hydra/)ディレクトリに用意されているファイルになります。
+[ml/hydra](./ml/hydra/)には以下が用意されています。
+
+```sh
+2020_52.yaml
+2021_03.yaml
+2021_04.yaml
+2021_31.yaml
+2021_32.yaml
+```
+
+
 ## Requirements
 
 - [Docker Engine](https://docs.docker.com/engine/install/)
@@ -576,6 +592,9 @@ docker run \
 WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
 08e9a2859722bcdc76e102d0280867f37937dfad2d72cb3c4775cd6936274b3a
 ```
+
+- なお、BIで読み込む販売実績は環境変数`ITEM_SALES_RECORD_FILE`で`/opt/data/data/item_sales_records_train_2021_04.csv`と指定しています。この環境変数で読み込むファイルは[data/data/item_sales_records_train_2021_04.csv](./data/data/item_sales_records_train_2021_04.csv)になります。
+- 異なる期間の販売実績を指定したい場合は[data/data/](./data/data/)ディレクトリ配下にあるファイルを環境変数`ITEM_SALES_RECORD_FILE`に指定してください。
 
 </details>
 
