@@ -1,6 +1,7 @@
 package com.example.aianimals.posting.registration
 
 import android.util.Log
+import android.widget.Toast
 import com.example.aianimals.middleware.Utils
 import com.example.aianimals.repository.animal.Animal
 import com.example.aianimals.repository.animal.source.AnimalRepository

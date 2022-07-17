@@ -61,6 +61,7 @@ class AnimalRegistrationFragment : Fragment(), AnimalRegistrationContract.View {
                 .show()
         } else {
             presenter.addAnimal(animal)
+            Toast.makeText(context, "現在、画像の投稿は対応していません。", Toast.LENGTH_LONG).show()
             presenter.clearCurrentValues()
             val intent = Intent(context, AnimalDetailActivity::class.java).apply {
                 putExtra(AnimalDetailActivity.EXTRA_ANIMAL_ID, animal.id)

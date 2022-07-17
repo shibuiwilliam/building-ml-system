@@ -15,15 +15,10 @@ DATA_MANIFEST_DIR := $(K8S_DIR)/manifests/data
 
 .PHONY: deploy_data_ns
 deploy_data_ns:
-	kubectl apply -f $(DATA_MANIFEST_DIR)/namespace.yaml 
-
-.PHONY: registry_data
-registry_data: deploy_data_ns
-	@cd $(K8S_SECRET_DIR) && \
-		NAMESPACE=data ./private_registry_secret.sh
+	kubectl apply -f $(DATA_MANIFEST_DIR)/namespace.yaml
 
 .PHONY: deploy_data
-deploy_data: registry_data
+deploy_data:
 	kubectl apply -f $(DATA_MANIFEST_DIR)/postgres.yaml && \
 	kubectl apply -f $(DATA_MANIFEST_DIR)/redis.yaml && \
 	kubectl apply -f $(DATA_MANIFEST_DIR)/rabbitmq.yaml
@@ -55,15 +50,15 @@ req_model_loader:
 		--output requirements.txt
 
 .PHONY: build_model_loader
-build_model_loader: 
+build_model_loader:
 	docker build \
 		--platform x86_64 \
 		-t $(DOCKER_MODEL_LOADER_IMAGE_NAME) \
 		-f $(DOCKERFILE_MODEL_LOADER) \
 		.
-	 
+
 .PHONY: push_model_loader
-push_model_loader: 
+push_model_loader:
 	docker push $(DOCKER_MODEL_LOADER_IMAGE_NAME)
 
 
@@ -89,15 +84,10 @@ push_mlflow:
 
 .PHONY: deploy_mlflow_ns
 deploy_mlflow_ns:
-	kubectl apply -f $(MLFLOW_MANIFEST_DIR)/namespace.yaml 
-
-.PHONY: registry_mlflow
-registry_mlflow: deploy_mlflow_ns
-	@cd $(K8S_SECRET_DIR) && \
-		NAMESPACE=mlflow ./private_registry_secret.sh
+	kubectl apply -f $(MLFLOW_MANIFEST_DIR)/namespace.yaml
 
 .PHONY: deploy_mlflow
-deploy_mlflow: registry_mlflow
+deploy_mlflow:
 	kubectl apply -f $(MLFLOW_MANIFEST_DIR)/mlflow.yaml
 
 
@@ -152,7 +142,7 @@ build_data_registry:
 		-t $(DOCKER_DATA_REGISTRY_IMAGE_NAME) \
 		-f $(DOCKERFILE_DATA_REGISTRY) \
 		.
-	 
+
 .PHONY: push_data_registry
 push_data_registry: 
 	docker push $(DOCKER_DATA_REGISTRY_IMAGE_NAME)
@@ -181,7 +171,7 @@ build_feature_registry:
 		-t $(DOCKER_FEATURE_REGISTRY_IMAGE_NAME) \
 		-f $(DOCKERFILE_FEATURE_REGISTRY) \
 		.
-	 
+
 .PHONY: push_feature_registry
 push_feature_registry: 
 	docker push $(DOCKER_FEATURE_REGISTRY_IMAGE_NAME)
@@ -210,7 +200,7 @@ build_similar_word_registry:
 		-t $(DOCKER_SIMILAR_WORD_REGISTRY_IMAGE_NAME) \
 		-f $(DOCKERFILE_SIMILAR_WORD_REGISTRY) \
 		.
-	 
+
 .PHONY: push_similar_word_registry
 push_similar_word_registry: 
 	docker push $(DOCKER_SIMILAR_WORD_REGISTRY_IMAGE_NAME)
@@ -248,11 +238,6 @@ push_api:
 deploy_api_ns:
 	kubectl apply -f $(API_MANIFEST_DIR)/namespace.yaml 
 
-.PHONY: registry_api
-registry_api: deploy_api_ns
-	@cd $(K8S_SECRET_DIR) && \
-		NAMESPACE=aianimals ./private_registry_secret.sh
-
 .PHONY: secret_api
 secret_api:
 	kubectl -n aianimals \
@@ -260,7 +245,7 @@ secret_api:
 		--from-file=infrastructure/secrets/secret.key
 
 .PHONY: deploy_api
-deploy_api: registry_api
+deploy_api:
 	kubectl apply -f $(API_MANIFEST_DIR)/api.yaml
 
 
@@ -268,7 +253,7 @@ deploy_api: registry_api
 BATCH_MANIFEST_DIR := $(K8S_DIR)/manifests/aianimals
 
 .PHONY: deploy_batch_config
-deploy_batch_config: registry_api
+deploy_batch_config:
 	kubectl apply \
 		-f $(BATCH_MANIFEST_DIR)/data_configmap.yaml
 
@@ -323,13 +308,8 @@ ARGO_MANIFEST_DIR := $(K8S_DIR)/manifests/argo
 deploy_argo_ns:
 	kubectl apply -f $(ARGO_MANIFEST_DIR)/namespace.yaml
 
-.PHONY: registry_argo
-registry_argo: deploy_argo_ns
-	@cd $(K8S_SECRET_DIR) && \
-		NAMESPACE=argo ./private_registry_secret.sh
-
 .PHONY: deploy_argo
-deploy_argo: registry_argo
+deploy_argo:
 	kubectl \
 		-n argo apply \
 		-f $(ARGO_MANIFEST_DIR)/argo_clusterrolebinding.yaml && \
@@ -362,13 +342,8 @@ MONITORING_MANIFEST_DIR := $(K8S_DIR)/manifests/monitoring
 deploy_monitoring_ns:
 	kubectl apply -f $(MONITORING_MANIFEST_DIR)/namespace.yaml
 
-.PHONY: registry_monitoring
-registry_monitoring: deploy_monitoring_ns
-	@cd $(K8S_SECRET_DIR) && \
-		NAMESPACE=monitoring ./private_registry_secret.sh
-
 .PHONY: deploy_monitoring
-deploy_monitoring: registry_monitoring
+deploy_monitoring:
 	kubectl -n monitoring apply -f $(MONITORING_MANIFEST_DIR)/prometheus.yaml
 	kubectl -n monitoring apply -f $(MONITORING_MANIFEST_DIR)/grafana.yaml
 
@@ -396,13 +371,8 @@ push_es:
 deploy_es_ns:
 	kubectl apply -f $(ES_MANIFEST_DIR)/namespace.yaml
 
-.PHONY: registry_es
-registry_es: deploy_es_ns
-	@cd $(K8S_SECRET_DIR) && \
-		NAMESPACE=elastic-search ./private_registry_secret.sh
-
 .PHONY: deploy_es
-deploy_es: registry_es
+deploy_es:
 	kubectl apply -f https://download.elastic.co/downloads/eck/2.1.0/crds.yaml && \
 	kubectl apply -f https://download.elastic.co/downloads/eck/2.1.0/operator.yaml && \
 	kubectl apply -f $(ES_MANIFEST_DIR)/deployment.yaml
@@ -422,11 +392,6 @@ deploy_search_ns:
 	kubectl apply \
 		-f $(SEARCH_MANIFEST_DIR)/namespace.yaml
 
-.PHONY: registry_search
-registry_search: deploy_search_ns
-	@cd $(K8S_SECRET_DIR) && \
-		NAMESPACE=search ./private_registry_secret.sh
-
 
 ############ SEARCH_LEARN_TO_RANK_TRAIN COMMANDS ############
 SEARCH_LEARN_TO_RANK_TRAIN_DIR := $(DIR)/search/model_development/learn_to_rank
@@ -445,7 +410,7 @@ req_search_learn_to_rank_train:
 		--output requirements.txt
 
 .PHONY: build_search_learn_to_rank_train
-build_search_learn_to_rank_train: 
+build_search_learn_to_rank_train:
 	docker build \
 		--platform x86_64 \
 		--build-arg FROM_IMAGE=$(DOCKER_BASE_TEXT_PROCESSING_IMAGE_NAME) \
@@ -454,7 +419,7 @@ build_search_learn_to_rank_train:
 		.
 
 .PHONY: push_search_learn_to_rank_train
-push_search_learn_to_rank_train: 
+push_search_learn_to_rank_train:
 	docker push $(DOCKER_SEARCH_LEARN_TO_RANK_TRAIN_IMAGE_NAME)
 
 
@@ -475,7 +440,7 @@ req_search_learn_to_rank_lgbm_api:
 		--output requirements.txt
 
 .PHONY: build_search_learn_to_rank_lgbm_api
-build_search_learn_to_rank_lgbm_api: 
+build_search_learn_to_rank_lgbm_api:
 	docker build \
 		--platform x86_64 \
 		--build-arg FROM_IMAGE=$(DOCKER_BASE_TEXT_PROCESSING_IMAGE_NAME) \
@@ -484,21 +449,21 @@ build_search_learn_to_rank_lgbm_api:
 		.
 
 .PHONY: push_search_learn_to_rank_lgbm_api
-push_search_learn_to_rank_lgbm_api: 
+push_search_learn_to_rank_lgbm_api:
 	docker push $(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_API_IMAGE_NAME)
 
 .PHONY: deploy_search_learn_to_rank_lgbm_ranker_api
-deploy_search_learn_to_rank_lgbm_ranker_api: 
+deploy_search_learn_to_rank_lgbm_ranker_api:
 	kubectl apply \
 		-f $(SEARCH_MANIFEST_DIR)/learn_to_rank_lgbm_ranker.yaml
 
 .PHONY: deploy_search_learn_to_rank_lgbm_regression_api
-deploy_search_learn_to_rank_lgbm_regression_api: 
+deploy_search_learn_to_rank_lgbm_regression_api:
 	kubectl apply \
 		-f $(SEARCH_MANIFEST_DIR)/learn_to_rank_lgbm_regression.yaml
 
 .PHONY: deploy_search_learn_to_rank_ab_test_proxy
-deploy_search_learn_to_rank_ab_test_proxy: 
+deploy_search_learn_to_rank_ab_test_proxy:
 	kubectl apply \
 		-f $(SEARCH_MANIFEST_DIR)/learn_to_rank_ab_test_proxy.yaml
 
@@ -528,7 +493,7 @@ build_search_similar_image_search_train:
 		.
 
 .PHONY: push_search_similar_image_search_train
-push_search_similar_image_search_train: 
+push_search_similar_image_search_train:
 	docker push $(DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_IMAGE_NAME)
 
 
@@ -548,7 +513,7 @@ req_search_similar_image_search_proxy:
 		--output requirements.txt
 
 .PHONY: build_search_similar_image_search_proxy
-build_search_similar_image_search_proxy: 
+build_search_similar_image_search_proxy:
 	docker build \
 		--platform x86_64 \
 		-t $(DOCKER_SIMILAR_IMAGE_SEARCH_PROXY_IMAGE_NAME) \
@@ -556,11 +521,11 @@ build_search_similar_image_search_proxy:
 		.
 
 .PHONY: push_search_similar_image_search_proxy
-push_search_similar_image_search_proxy: 
+push_search_similar_image_search_proxy:
 	docker push $(DOCKER_SIMILAR_IMAGE_SEARCH_PROXY_IMAGE_NAME)
 
 .PHONY: deploy_similar_image_search_proxy
-deploy_similar_image_search_proxy: registry_search
+deploy_similar_image_search_proxy:
 	kubectl apply \
 		-f $(SEARCH_MANIFEST_DIR)/similar_image_search_proxy.yaml
 
@@ -573,7 +538,7 @@ DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_SERVING_TAG = $(TAG)_search_similar_image_sea
 DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_SERVING_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_SERVING_TAG)_$(SEARCH_SIMILAR_IMAGE_SEARCH_SERVING_VERSION)
 
 .PHONY: build_search_similar_image_search_serving
-build_search_similar_image_search_serving: 
+build_search_similar_image_search_serving:
 	docker build \
 		--platform x86_64 \
 		-t $(DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_SERVING_IMAGE_NAME) \
@@ -581,11 +546,11 @@ build_search_similar_image_search_serving:
 		.
 
 .PHONY: push_search_similar_image_search_serving
-push_search_similar_image_search_serving: 
+push_search_similar_image_search_serving:
 	docker push $(DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_SERVING_IMAGE_NAME)
 
 .PHONY: deploy_similar_image_search_serving
-deploy_similar_image_search_serving: registry_search
+deploy_similar_image_search_serving:
 	kubectl apply \
 		-f $(SEARCH_MANIFEST_DIR)/similar_image_search_serving.yaml
 
@@ -597,11 +562,6 @@ VIOLATION_DETECTION_MANIFEST_DIR := $(K8S_DIR)/manifests/violation_detection
 deploy_violation_detection_ns:
 	kubectl apply \
 		-f $(VIOLATION_DETECTION_MANIFEST_DIR)/namespace.yaml
-
-.PHONY: registry_violation_detection
-registry_violation_detection: deploy_violation_detection_ns
-	@cd $(K8S_SECRET_DIR) && \
-		NAMESPACE=violation-detection ./private_registry_secret.sh
 
 
 ############ VIOLATION_DETECTION_REGISTRY COMMANDS ############
@@ -620,7 +580,7 @@ req_violation_detection_registry:
 		--output requirements.txt
 
 .PHONY: build_violation_detection_registry
-build_violation_detection_registry: 
+build_violation_detection_registry:
 	docker build \
 		--platform x86_64 \
 		-t $(DOCKER_VIOLATION_DETECTION_REGISTRY_IMAGE_NAME) \
@@ -628,11 +588,11 @@ build_violation_detection_registry:
 		.
 
 .PHONY: push_violation_detection_registry
-push_violation_detection_registry: 
+push_violation_detection_registry:
 	docker push $(DOCKER_VIOLATION_DETECTION_REGISTRY_IMAGE_NAME)
 
 .PHONY: deploy_violation_detection_registry
-deploy_violation_detection_registry: registry_violation_detection
+deploy_violation_detection_registry:
 	kubectl apply \
 		-f $(VIOLATION_DETECTION_MANIFEST_DIR)/registry.yaml
 
@@ -653,7 +613,7 @@ req_violation_detection_portal:
 		--output requirements.txt
 
 .PHONY: build_violation_detection_portal
-build_violation_detection_portal: 
+build_violation_detection_portal:
 	docker build \
 		--platform x86_64 \
 		-t $(DOCKER_VIOLATION_DETECTION_PORTAL_IMAGE_NAME) \
@@ -661,7 +621,7 @@ build_violation_detection_portal:
 		.
 
 .PHONY: push_violation_detection_portal
-push_violation_detection_portal: 
+push_violation_detection_portal:
 	docker push $(DOCKER_VIOLATION_DETECTION_PORTAL_IMAGE_NAME)
 
 .PHONY: deploy_violation_detection_portal
@@ -687,7 +647,7 @@ req_violation_detection_no_animal_violation_train:
 		--output requirements.txt
 
 .PHONY: build_violation_detection_no_animal_violation_train
-build_violation_detection_no_animal_violation_train: 
+build_violation_detection_no_animal_violation_train:
 	docker build \
 		--platform x86_64 \
 		-t $(DOCKER_NO_ANIMAL_VIOLATION_TRAIN_IMAGE_NAME) \
@@ -695,7 +655,7 @@ build_violation_detection_no_animal_violation_train:
 		.
 
 .PHONY: push_violation_detection_no_animal_violation_train
-push_violation_detection_no_animal_violation_train: 
+push_violation_detection_no_animal_violation_train:
 	docker push $(DOCKER_NO_ANIMAL_VIOLATION_TRAIN_IMAGE_NAME)
 
 
@@ -715,7 +675,7 @@ req_violation_detection_no_animal_violation_proxy:
 		--output requirements.txt
 
 .PHONY: build_violation_detection_no_animal_violation_proxy
-build_violation_detection_no_animal_violation_proxy: 
+build_violation_detection_no_animal_violation_proxy:
 	docker build \
 		--platform x86_64 \
 		-t $(DOCKER_NO_ANIMAL_VIOLATION_PROXY_IMAGE_NAME) \
@@ -723,11 +683,11 @@ build_violation_detection_no_animal_violation_proxy:
 		.
 
 .PHONY: push_violation_detection_no_animal_violation_proxy
-push_violation_detection_no_animal_violation_proxy: 
+push_violation_detection_no_animal_violation_proxy:
 	docker push $(DOCKER_NO_ANIMAL_VIOLATION_PROXY_IMAGE_NAME)
 
 .PHONY: deploy_no_animal_violation_proxy
-deploy_no_animal_violation_proxy: registry_violation_detection
+deploy_no_animal_violation_proxy:
 	kubectl apply \
 		-f $(VIOLATION_DETECTION_MANIFEST_DIR)/no_animal_violation_proxy.yaml
 
@@ -740,7 +700,7 @@ DOCKER_NO_ANIMAL_VIOLATION_SERVING_TAG = $(TAG)_violation_detection_no_animal_vi
 DOCKER_NO_ANIMAL_VIOLATION_SERVING_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_NO_ANIMAL_VIOLATION_SERVING_TAG)_$(NO_ANIMAL_VIOLATION_SERVING_VERSION)
 
 .PHONY: build_violation_detection_no_animal_violation_serving
-build_violation_detection_no_animal_violation_serving: 
+build_violation_detection_no_animal_violation_serving:
 	docker build \
 		--platform x86_64 \
 		-t $(DOCKER_NO_ANIMAL_VIOLATION_SERVING_IMAGE_NAME) \
@@ -748,11 +708,11 @@ build_violation_detection_no_animal_violation_serving:
 		.
 
 .PHONY: push_violation_detection_no_animal_violation_serving
-push_violation_detection_no_animal_violation_serving: 
+push_violation_detection_no_animal_violation_serving:
 	docker push $(DOCKER_NO_ANIMAL_VIOLATION_SERVING_IMAGE_NAME)
 
 .PHONY: deploy_no_animal_violation_serving
-deploy_no_animal_violation_serving: registry_violation_detection
+deploy_no_animal_violation_serving:
 	kubectl apply \
 		-f $(VIOLATION_DETECTION_MANIFEST_DIR)/no_animal_violation_serving.yaml
 
@@ -794,22 +754,16 @@ push_k8s_client:
 deploy_kube_system:
 	kubectl apply -f $(KUBE_SYSTEM_MANIFEST_DIR)/pdb.yaml
 
-.PHONY: registry_default
-registry_default:
-	@cd $(K8S_SECRET_DIR) && \
-		NAMESPACE=default ./private_registry_secret.sh
-
 .PHONY: initialize_deployment
 initialize_deployment: deploy_kube_system \
-	registry_default \
-	registry_data \
-	registry_api \
-	registry_violation_detection \
-	registry_es \
-	registry_mlflow \
-	registry_argo \
-	registry_search \
-	registry_monitoring \
+	deploy_data_ns \
+	deploy_mlflow_ns \
+	deploy_api_ns \
+	deploy_argo_ns \
+	deploy_monitoring_ns \
+	deploy_es_ns \
+	deploy_search_ns \
+	deploy_violation_detection_ns \
 	secret_api
 
 .PHONY: deploy_infra
@@ -839,7 +793,7 @@ deploy_searches: deploy_search_learn_to_rank_ab_test_proxy \
 	deploy_search_learn_to_rank_lgbm_regression_api \
 	deploy_similar_image_search_serving \
 	deploy_similar_image_search_proxy
-	
+
 .PHONY: register_argo
 register_argo: create_argo_learn_to_rank_train_cron \
 	create_argo_similar_image_search_train_cron \
@@ -898,7 +852,7 @@ build_all: \
 	build_search_learn_to_rank_lgbm_api \
 	build_violation_detection_portal \
 	build_similar_word_registry
-	
+
 .PHONY: push_all
 push_all: \
 	push_k8s_client \
@@ -920,4 +874,3 @@ push_all: \
 	push_search_learn_to_rank_lgbm_api \
 	push_violation_detection_portal \
 	push_similar_word_registry
-	

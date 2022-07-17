@@ -62,10 +62,10 @@ class AnimalRepository(
 
     override suspend fun saveAnimal(animal: Animal) {
         Log.i("AnimalRepository", "register ${animal}")
-        if (BuildConfig.USE_LOCAL_DATA) {
-            animalLocalDataSource.saveAnimal(animal)
-        }
-        animalRemoteDataSource.saveAnimal(animal)
+//        if (BuildConfig.USE_LOCAL_DATA) {
+//            animalLocalDataSource.saveAnimal(animal)
+//        }
+//        animalRemoteDataSource.saveAnimal(animal)
     }
 
     override suspend fun loadAnimalMetadata(refresh: Boolean) {
