@@ -240,13 +240,7 @@ registry_default:
 		NAMESPACE=default ./private_registry_secret.sh
 
 .PHONY: initialize_deployment
-initialize_deployment: deploy_kube_system \
-	registry_default \
-	registry_data \
-	registry_argo \
-	registry_mlflow \
-	registry_bi \
-	registry_data_registration
+initialize_deployment: deploy_kube_system
 
 .PHONY: deploy_base
 deploy_base: deploy_argo \
