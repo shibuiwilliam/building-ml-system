@@ -438,3 +438,19 @@ Data registrationジョブのログ
 
 販売実績対推論結果の評価
 ![img](images/bi_evaluations.png)
+
+### 6. 環境の削除
+
+構築した環境は `make delete_namespaces` で削除することができます。
+
+```sh
+$ make delete_namespaces
+kubectl delete ns argo & \
+	kubectl delete ns data & \
+	kubectl delete ns mlflow & \
+	kubectl delete ns beverage-sales-forecasting
+namespace "data" deleted
+namespace "argo" deleted
+namespace "beverage-sales-forecasting" deleted
+namespace "mlflow" deleted
+```
