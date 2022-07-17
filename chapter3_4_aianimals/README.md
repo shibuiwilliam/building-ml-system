@@ -1263,7 +1263,38 @@ NextScheduledTime:             Mon Jul 18 21:00:00 +0900 (1 day from now) (assum
 
 ![img](images/argo_top.png)
 
-## AndroidスマホアプリAIAnimalsの起動
+
+### 6. 環境の削除
+
+Kubernetesクラスターに構築した環境は `make delete_namespaces` で削除することができます。
+
+<details> <summary>Kubernetesクラスターに構築した環境の削除</summary>
+
+```sh
+$ make delete_namespaces
+kubectl delete ns aianimals & \
+	kubectl delete ns argo & \
+	kubectl delete ns data & \
+	kubectl delete ns violation-detection & \
+	kubectl delete ns mlflow & \
+	kubectl delete ns search & \
+	kubectl delete ns elastic-search & \
+	kubectl delete ns elastic-system & \
+	kubectl delete ns monitoring
+namespace "search" deleted
+namespace "mlflow" deleted
+namespace "violation-detection" deleted
+namespace "elastic-system" deleted
+namespace "argo" deleted
+namespace "monitoring" deleted
+namespace "data" deleted
+namespace "elastic-search" deleted
+namespace "aianimals" deleted
+```
+
+</details>
+
+## Getting started ~ AndroidスマホアプリAIAnimalsの起動 ~
 
 AndroidスマホアプリAIAnimalsの起動方法を説明します。
 起動はAndroid Studioで実行します。
