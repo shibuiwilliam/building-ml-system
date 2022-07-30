@@ -6,7 +6,7 @@ metadata:
   labels:
     app: mlflow
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: mlflow
@@ -26,8 +26,12 @@ spec:
             - "server"
             - "--backend-store-uri"
             - "postgresql://postgres:password@postgres.data.svc.cluster.local:5432"
-            - "--artifacts-destination"
-            - "gs://beverage_sales_forecasting/models"
+            - "--default-artifact-root"
+            # if you want to store the data into into your storage, instead of `--default-artifact-root`, specify your storage with `--artifacts-destination`.
+            # https://www.mlflow.org/docs/latest/tracking.html#artifact-stores
+            # E.g.
+            # - "--artifacts-destination"
+            # - "gs://beverage_sales_forecasting/models"
             - "--serve-artifacts"
             - "--host"
             - "0.0.0.0"
