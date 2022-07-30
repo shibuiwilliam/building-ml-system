@@ -20,7 +20,7 @@ deploy_data_ns:
 	kubectl apply -f $(DATA_MANIFEST_DIR)/namespace.yaml
 
 .PHONY: deploy_data
-deploy_data:
+deploy_data: deploy_data_ns
 	kubectl apply -f $(DATA_MANIFEST_DIR)/postgres.yaml
 
 .PHONY: connect_postgres
@@ -67,7 +67,7 @@ deploy_data_registration_ns:
 	kubectl apply -f $(DATA_REGISTRATION_MANIFEST_DIR)/namespace.yaml
 
 .PHONY: deploy_initial_data_registration
-deploy_initial_data_registration:
+deploy_initial_data_registration: deploy_data_registration_ns
 	kubectl apply -f $(DATA_REGISTRATION_MANIFEST_DIR)/initial_data_registration.yaml
 
 
@@ -95,7 +95,7 @@ deploy_mlflow_ns:
 	kubectl apply -f $(MLFLOW_MANIFEST_DIR)/namespace.yaml
 
 .PHONY: deploy_mlflow
-deploy_mlflow:
+deploy_mlflow: deploy_mlflow_ns
 	kubectl apply -f $(MLFLOW_MANIFEST_DIR)/mlflow.yaml
 
 
@@ -173,7 +173,7 @@ deploy_bi_ns:
 	kubectl apply -f $(BI_MANIFEST_DIR)/namespace.yaml
 
 .PHONY: deploy_bi
-deploy_bi:
+deploy_bi: deploy_bi_ns
 	kubectl apply -f $(BI_MANIFEST_DIR)/bi.yaml
 
 
