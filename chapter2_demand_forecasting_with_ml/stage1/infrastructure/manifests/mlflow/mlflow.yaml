@@ -26,11 +26,11 @@ spec:
             - "server"
             - "--backend-store-uri"
             - "postgresql://postgres:password@postgres.data.svc.cluster.local:5432"
-            - "--default-artifact-root"
-            # if you want to store the data into into your storage, instead of `--default-artifact-root`, specify your storage with `--artifacts-destination`.
+            - "--artifacts-destination"
+            - "/tmp/"
+            # if you want to store the data into into your storage, instead of `/tmp`, specify your storage URL.
             # https://www.mlflow.org/docs/latest/tracking.html#artifact-stores
             # E.g.
-            # - "--artifacts-destination"
             # - "gs://beverage_sales_forecasting/models"
             - "--serve-artifacts"
             - "--host"
