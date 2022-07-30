@@ -18,6 +18,9 @@ TODO:　後で書くかも
   - Kubernetesクラスターではノードの合計で48cpu以上, 128GB以上のメモリが必要になります。
 - makeコマンドの実行環境
 - [kubectl](https://kubernetes.io/ja/docs/tasks/tools/install-kubectl/)の実行環境
+  - kubectlは[公式ドキュメント](https://kubernetes.io/ja/docs/tasks/tools/install-kubectl/)からインストールしてください。
+- [argo cli](https://github.com/argoproj/argo-workflows/releases)の実行環境
+  - argo cliは[公式ドキュメント](https://github.com/argoproj/argo-workflows/releases)からインストールしてください。
 
 
 ## Getting started ~ バックエンド共通 ~
