@@ -185,7 +185,7 @@ deploy_argo_ns:
 	kubectl apply -f $(ARGO_MANIFEST_DIR)/namespace.yaml
 
 .PHONY: deploy_argo
-deploy_argo:
+deploy_argo: deploy_argo_ns
 	kubectl \
 		-n argo apply \
 		-f $(ARGO_MANIFEST_DIR)/argo_clusterrolebinding.yaml && \
