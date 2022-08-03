@@ -1160,6 +1160,9 @@ shibuiyusuke     78692   0.0  0.0 408628368   1648 s004  S+    6:01PM   0:00.00 
 #### ElasticSearch(Kibana)
 
 - URL: https://localhost:5601/login
+- 以下でログインできます。
+  - user: elastic_user
+  - password: password
 
 ![img](images/kibana_login.png)
 
