@@ -61,6 +61,9 @@ build_model_loader:
 push_model_loader:
 	docker push $(DOCKER_MODEL_LOADER_IMAGE_NAME)
 
+.PHONY: pull_model_loader
+pull_model_loader:
+	docker pull $(DOCKER_MODEL_LOADER_IMAGE_NAME)
 
 ############ MLFLOW COMMANDS ############
 MLFLOW_DIR := $(DIR)/mlflow
@@ -81,6 +84,10 @@ build_mlflow:
 .PHONY: push_mlflow
 push_mlflow:
 	docker push $(DOCKER_MLFLOW_IMAGE_NAME)
+
+.PHONY: pull_mlflow
+pull_mlflow:
+	docker pull $(DOCKER_MLFLOW_IMAGE_NAME)
 
 .PHONY: deploy_mlflow_ns
 deploy_mlflow_ns:
@@ -107,7 +114,7 @@ req_base_text_processing:
 		--output requirements.txt
 
 .PHONY: build_base_text_processing
-build_base_text_processing: 
+build_base_text_processing:
 	docker build \
 		--platform x86_64 \
 		-t $(DOCKER_BASE_TEXT_PROCESSING_IMAGE_NAME) \
@@ -115,8 +122,12 @@ build_base_text_processing:
 		.
 
 .PHONY: push_base_text_processing
-push_base_text_processing: 
+push_base_text_processing:
 	docker push $(DOCKER_BASE_TEXT_PROCESSING_IMAGE_NAME)
+
+.PHONY: pull_base_text_processing
+pull_base_text_processing:
+	docker pull $(DOCKER_BASE_TEXT_PROCESSING_IMAGE_NAME)
 
 
 ############ DATA REGISTRY COMMANDS ############
@@ -135,7 +146,7 @@ req_data_registry:
 		--output requirements.txt
 
 .PHONY: build_data_registry
-build_data_registry: 
+build_data_registry:
 	docker build \
 		--platform x86_64 \
 		--build-arg FROM_IMAGE=$(DOCKER_BASE_TEXT_PROCESSING_IMAGE_NAME) \
@@ -144,8 +155,12 @@ build_data_registry:
 		.
 
 .PHONY: push_data_registry
-push_data_registry: 
+push_data_registry:
 	docker push $(DOCKER_DATA_REGISTRY_IMAGE_NAME)
+
+.PHONY: pull_data_registry
+pull_data_registry:
+	docker pull $(DOCKER_DATA_REGISTRY_IMAGE_NAME)
 
 
 ############ FEATURE REGISTRY COMMANDS ############
@@ -176,6 +191,10 @@ build_feature_registry:
 push_feature_registry: 
 	docker push $(DOCKER_FEATURE_REGISTRY_IMAGE_NAME)
 
+.PHONY: pull_feature_registry
+pull_feature_registry: 
+	docker pull $(DOCKER_FEATURE_REGISTRY_IMAGE_NAME)
+
 
 ############ SIMILAR_WORD REGISTRY COMMANDS ############
 SIMILAR_WORD_REGISTRY_DIR := $(DIR)/batch/similar_word_registry
@@ -205,6 +224,10 @@ build_similar_word_registry:
 push_similar_word_registry: 
 	docker push $(DOCKER_SIMILAR_WORD_REGISTRY_IMAGE_NAME)
 
+.PHONY: pull_similar_word_registry
+pull_similar_word_registry: 
+	docker pull $(DOCKER_SIMILAR_WORD_REGISTRY_IMAGE_NAME)
+
 
 ############ API COMMANDS ############
 API_DIR := $(DIR)/api
@@ -233,6 +256,10 @@ build_api:
 .PHONY: push_api
 push_api: 
 	docker push $(DOCKER_API_IMAGE_NAME)
+
+.PHONY: pull_api
+pull_api: 
+	docker pull $(DOCKER_API_IMAGE_NAME)
 
 .PHONY: deploy_api_ns
 deploy_api_ns:
@@ -299,6 +326,10 @@ build_ab_test_proxy:
 .PHONY: push_ab_test_proxy
 push_ab_test_proxy: 
 	docker push $(DOCKER_AB_TEST_PROXY_IMAGE_NAME)
+
+.PHONY: pull_ab_test_proxy
+pull_ab_test_proxy: 
+	docker pull $(DOCKER_AB_TEST_PROXY_IMAGE_NAME)
 
 
 ############ ARGO COMMANDS ############
@@ -367,6 +398,10 @@ build_es:
 push_es:
 	docker push $(DOCKER_ES_IMAGE_NAME)
 
+.PHONY: pull_es
+pull_es:
+	docker pull $(DOCKER_ES_IMAGE_NAME)
+
 .PHONY: deploy_es_ns
 deploy_es_ns:
 	kubectl apply -f $(ES_MANIFEST_DIR)/namespace.yaml
@@ -422,6 +457,10 @@ build_search_learn_to_rank_train:
 push_search_learn_to_rank_train:
 	docker push $(DOCKER_SEARCH_LEARN_TO_RANK_TRAIN_IMAGE_NAME)
 
+.PHONY: pull_search_learn_to_rank_train
+pull_search_learn_to_rank_train:
+	docker pull $(DOCKER_SEARCH_LEARN_TO_RANK_TRAIN_IMAGE_NAME)
+
 
 ############ SEARCH_LEARN_TO_RANK_LGBM_API COMMANDS ############
 SEARCH_LEARN_TO_RANK_LGBM_API_DIR := $(DIR)/search/learn_to_rank/api
@@ -451,6 +490,10 @@ build_search_learn_to_rank_lgbm_api:
 .PHONY: push_search_learn_to_rank_lgbm_api
 push_search_learn_to_rank_lgbm_api:
 	docker push $(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_API_IMAGE_NAME)
+
+.PHONY: pull_search_learn_to_rank_lgbm_api
+pull_search_learn_to_rank_lgbm_api:
+	docker pull $(DOCKER_SEARCH_LEARN_TO_RANK_LGBM_API_IMAGE_NAME)
 
 .PHONY: deploy_search_learn_to_rank_lgbm_ranker_api
 deploy_search_learn_to_rank_lgbm_ranker_api:
@@ -524,6 +567,10 @@ build_search_similar_image_search_proxy:
 push_search_similar_image_search_proxy:
 	docker push $(DOCKER_SIMILAR_IMAGE_SEARCH_PROXY_IMAGE_NAME)
 
+.PHONY: pull_search_similar_image_search_proxy
+pull_search_similar_image_search_proxy:
+	docker pull $(DOCKER_SIMILAR_IMAGE_SEARCH_PROXY_IMAGE_NAME)
+
 .PHONY: deploy_similar_image_search_proxy
 deploy_similar_image_search_proxy:
 	kubectl apply \
@@ -548,6 +595,10 @@ build_search_similar_image_search_serving:
 .PHONY: push_search_similar_image_search_serving
 push_search_similar_image_search_serving:
 	docker push $(DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_SERVING_IMAGE_NAME)
+
+.PHONY: pull_search_similar_image_search_serving
+pull_search_similar_image_search_serving:
+	docker pull $(DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_SERVING_IMAGE_NAME)
 
 .PHONY: deploy_similar_image_search_serving
 deploy_similar_image_search_serving:
@@ -591,6 +642,10 @@ build_violation_detection_registry:
 push_violation_detection_registry:
 	docker push $(DOCKER_VIOLATION_DETECTION_REGISTRY_IMAGE_NAME)
 
+.PHONY: pull_violation_detection_registry
+pull_violation_detection_registry:
+	docker pull $(DOCKER_VIOLATION_DETECTION_REGISTRY_IMAGE_NAME)
+
 .PHONY: deploy_violation_detection_registry
 deploy_violation_detection_registry:
 	kubectl apply \
@@ -623,6 +678,10 @@ build_violation_detection_portal:
 .PHONY: push_violation_detection_portal
 push_violation_detection_portal:
 	docker push $(DOCKER_VIOLATION_DETECTION_PORTAL_IMAGE_NAME)
+
+.PHONY: pull_violation_detection_portal
+pull_violation_detection_portal:
+	docker pull $(DOCKER_VIOLATION_DETECTION_PORTAL_IMAGE_NAME)
 
 .PHONY: deploy_violation_detection_portal
 deploy_violation_detection_portal:
@@ -658,6 +717,10 @@ build_violation_detection_no_animal_violation_train:
 push_violation_detection_no_animal_violation_train:
 	docker push $(DOCKER_NO_ANIMAL_VIOLATION_TRAIN_IMAGE_NAME)
 
+.PHONY: pull_violation_detection_no_animal_violation_train
+pull_violation_detection_no_animal_violation_train:
+	docker pull $(DOCKER_NO_ANIMAL_VIOLATION_TRAIN_IMAGE_NAME)
+
 
 ############ NO_ANIMAL_VIOLATION_PROXY COMMANDS ############
 NO_ANIMAL_VIOLATION_PROXY_DIR := $(DIR)/violation_detection/no_animal_violation/proxy
@@ -686,6 +749,10 @@ build_violation_detection_no_animal_violation_proxy:
 push_violation_detection_no_animal_violation_proxy:
 	docker push $(DOCKER_NO_ANIMAL_VIOLATION_PROXY_IMAGE_NAME)
 
+.PHONY: pull_violation_detection_no_animal_violation_proxy
+pull_violation_detection_no_animal_violation_proxy:
+	docker pull $(DOCKER_NO_ANIMAL_VIOLATION_PROXY_IMAGE_NAME)
+
 .PHONY: deploy_no_animal_violation_proxy
 deploy_no_animal_violation_proxy:
 	kubectl apply \
@@ -710,6 +777,10 @@ build_violation_detection_no_animal_violation_serving:
 .PHONY: push_violation_detection_no_animal_violation_serving
 push_violation_detection_no_animal_violation_serving:
 	docker push $(DOCKER_NO_ANIMAL_VIOLATION_SERVING_IMAGE_NAME)
+
+.PHONY: pull_violation_detection_no_animal_violation_serving
+pull_violation_detection_no_animal_violation_serving:
+	docker pull $(DOCKER_NO_ANIMAL_VIOLATION_SERVING_IMAGE_NAME)
 
 .PHONY: deploy_no_animal_violation_serving
 deploy_no_animal_violation_serving:
@@ -749,6 +820,10 @@ build_k8s_client:
 .PHONY: push_k8s_client
 push_k8s_client:
 	docker push $(DOCKER_K8S_CLIENT_IMAGE_NAME)
+
+.PHONY: pull_k8s_client
+pull_k8s_client:
+	docker pull $(DOCKER_K8S_CLIENT_IMAGE_NAME)
 
 .PHONY: deploy_kube_system
 deploy_kube_system:
@@ -874,3 +949,25 @@ push_all: \
 	push_search_learn_to_rank_lgbm_api \
 	push_violation_detection_portal \
 	push_similar_word_registry
+
+.PHONY: pull_all
+pull_all: \
+	pull_k8s_client \
+	pull_model_loader \
+	pull_mlflow \
+	pull_base_text_processing \
+	pull_api \
+	pull_ab_test_proxy \
+	pull_data_registry \
+	pull_feature_registry \
+	pull_es \
+	pull_violation_detection_no_animal_violation_proxy \
+	pull_violation_detection_no_animal_violation_serving \
+	pull_violation_detection_registry \
+	pull_violation_detection_no_animal_violation_train \
+	pull_search_learn_to_rank_train \
+	pull_search_similar_image_search_train \
+	pull_search_similar_image_search_proxy \
+	pull_search_learn_to_rank_lgbm_api \
+	pull_violation_detection_portal \
+	pull_similar_word_registry
