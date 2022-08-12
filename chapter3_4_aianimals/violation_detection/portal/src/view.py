@@ -1,4 +1,5 @@
 import logging
+import random
 from abc import ABC, abstractmethod
 from enum import Enum
 from typing import List, Optional
@@ -255,14 +256,15 @@ class ViolationCheckView(BaseView, AbstractViolationCheckView):
             st.write(f"is_administrator_checked: {violation.is_administrator_checked}")
             st.write(violation.updated_at)
 
+        r = random.randint(0, 1_000_000)
         is_violating = st.checkbox(
             label=f"is {violation.violation_type_name}",
             value=violation.is_effective,
-            key=f"{violation.id}_{violation.violation_type_name}_{violation.updated_at}",
+            key=f"{violation.id}_{violation.violation_type_name}_{violation.updated_at}_{r}",
         )
         is_administrator_checked = st.button(
             label="administrator checked",
-            key=f"{violation.id}_{violation.violation_type_name}_{violation.updated_at}",
+            key=f"{violation.id}_{violation.violation_type_name}_{violation.updated_at}_{r}",
         )
         if is_administrator_checked:
             self.violation_service.register_admin_check(

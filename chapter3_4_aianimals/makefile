@@ -539,6 +539,10 @@ build_search_similar_image_search_train:
 push_search_similar_image_search_train:
 	docker push $(DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_IMAGE_NAME)
 
+.PHONY: pull_search_similar_image_search_train
+pull_search_similar_image_search_train:
+	docker pull $(DOCKER_SEARCH_SIMILAR_IMAGE_SEARCH_TRAIN_IMAGE_NAME)
+
 
 ############ SIMILAR_IMAGE_SEARCH_PROXY COMMANDS ############
 SIMILAR_IMAGE_SEARCH_PROXY_DIR := $(DIR)/search/similar_image_search/proxy
