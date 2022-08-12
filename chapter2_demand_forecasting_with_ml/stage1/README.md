@@ -45,7 +45,7 @@ $ make build_all
 docker build \
 		--platform x86_64 \
 		-t shibui/building-ml-system:beverage_sales_forecasting_data_registration_1.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter2_demand_forecasting_with_ml/stage1/data_registration/Dockerfile \
+		-f ~/building-ml-system/chapter2_demand_forecasting_with_ml/stage1/data_registration/Dockerfile \
 		.
 [+] Building 79.7s (11/11) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -70,7 +70,7 @@ Use 'docker scan' to run Snyk tests against images to find vulnerabilities and l
 docker build \
 		--platform x86_64 \
 		-t shibui/building-ml-system:beverage_sales_forecasting_ml_1.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter2_demand_forecasting_with_ml/stage1/ml/Dockerfile \
+		-f ~/building-ml-system/chapter2_demand_forecasting_with_ml/stage1/ml/Dockerfile \
 		.
 [+] Building 400.7s (11/11) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -95,7 +95,7 @@ Use 'docker scan' to run Snyk tests against images to find vulnerabilities and l
 docker build \
 		--platform x86_64 \
 		-t shibui/building-ml-system:beverage_sales_forecasting_mlflow_1.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter2_demand_forecasting_with_ml/stage1/mlflow/Dockerfile \
+		-f ~/building-ml-system/chapter2_demand_forecasting_with_ml/stage1/mlflow/Dockerfile \
 		.
 [+] Building 170.8s (8/8) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -116,7 +116,7 @@ Use 'docker scan' to run Snyk tests against images to find vulnerabilities and l
 docker build \
 		--platform x86_64 \
 		-t shibui/building-ml-system:beverage_sales_forecasting_bi_1.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter2_demand_forecasting_with_ml/stage1/bi/Dockerfile \
+		-f ~/building-ml-system/chapter2_demand_forecasting_with_ml/stage1/bi/Dockerfile \
 		.
 [+] Building 278.9s (10/10) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -364,11 +364,11 @@ ARGO_NAMESPACE=argo
 
 # ジョブの登録
 $ make deploy_job
-kubectl apply -f /Users/shibuiyusuke/book2/building-ml-system/chapter2_demand_forecasting_with_ml/stage1/infrastructure/manifests/beverage_sales_forecasting/namespace.yaml
+kubectl apply -f ~/building-ml-system/chapter2_demand_forecasting_with_ml/stage1/infrastructure/manifests/beverage_sales_forecasting/namespace.yaml
 namespace/beverage-sales-forecasting unchanged
 namespace: beverage-sales-forecasting
 secret/regcred configured
-kubectl apply -f /Users/shibuiyusuke/book2/building-ml-system/chapter2_demand_forecasting_with_ml/stage1/infrastructure/manifests/beverage_sales_forecasting/initial_data_registration.yaml
+kubectl apply -f ~/building-ml-system/chapter2_demand_forecasting_with_ml/stage1/infrastructure/manifests/beverage_sales_forecasting/initial_data_registration.yaml
 job.batch/initial-data-registration configured
 argo cron create infrastructure/manifests/argo/workflow/data_registration.yaml
 Handling connection for 2746

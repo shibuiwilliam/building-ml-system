@@ -40,6 +40,10 @@ build_ml:
 push_ml:
 	docker push $(DOCKER_ML_IMAGE_NAME)
 
+.PHONY: pull_ml
+pull_ml:
+	docker pull $(DOCKER_ML_IMAGE_NAME)
+
 .PHONY: build_mlflow
 build_mlflow:
 	docker build \
@@ -51,6 +55,10 @@ build_mlflow:
 .PHONY: push_mlflow
 push_mlflow:
 	docker push $(DOCKER_MLFLOW_IMAGE_NAME)
+
+.PHONY: pull_mlflow
+pull_mlflow:
+	docker pull $(DOCKER_MLFLOW_IMAGE_NAME)
 
 .PHONY: run_ml
 run_ml: build_ml
@@ -114,6 +122,10 @@ build_bi:
 push_bi:
 	docker push $(DOCKER_BI_IMAGE_NAME)
 
+.PHONY: pull_bi
+pull_bi:
+	docker pull $(DOCKER_BI_IMAGE_NAME)
+
 .PHONY: run_bi
 run_bi: build_bi
 	docker run \
@@ -145,6 +157,11 @@ build_all: build_ml \
 push_all: push_ml \
 	push_mlflow \
 	push_bi
+
+.PHONY: pull_all
+pull_all: pull_ml \
+	pull_mlflow \
+	pull_bi
 
 
 ############ DOCKER COMPOSE COMMANDS ############

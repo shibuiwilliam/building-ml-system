@@ -52,7 +52,7 @@ $ make build_all
 docker build \
 		--platform x86_64 \
 		-t shibui/building-ml-system:beverage_sales_forecasting_ml_0.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter2_demand_forecasting_with_ml/stage0/ml/Dockerfile \
+		-f ~/building-ml-system/chapter2_demand_forecasting_with_ml/stage0/ml/Dockerfile \
 		.
 [+] Building 2.1s (11/11) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -77,7 +77,7 @@ Use 'docker scan' to run Snyk tests against images to find vulnerabilities and l
 docker build \
 		--platform x86_64 \
 		-t shibui/building-ml-system:beverage_sales_forecasting_mlflow_0.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter2_demand_forecasting_with_ml/stage0/ml/Dockerfile.mlflow \
+		-f ~/building-ml-system/chapter2_demand_forecasting_with_ml/stage0/ml/Dockerfile.mlflow \
 		.
 [+] Building 133.7s (7/7) FINISHED
  => [internal] load build definition from Dockerfile.mlflow                                                                    0.0s
@@ -97,7 +97,7 @@ Use 'docker scan' to run Snyk tests against images to find vulnerabilities and l
 docker build \
 		--platform x86_64 \
 		-t shibui/building-ml-system:beverage_sales_forecasting_bi_0.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter2_demand_forecasting_with_ml/stage0/bi/Dockerfile \
+		-f ~/building-ml-system/chapter2_demand_forecasting_with_ml/stage0/bi/Dockerfile \
 		.
 [+] Building 0.9s (10/10) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -559,7 +559,7 @@ $ make run_bi
 docker build \
 		--platform x86_64 \
 		-t shibui/building-ml-system:beverage_sales_forecasting_bi_0.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter2_demand_forecasting_with_ml/stage0/bi/Dockerfile \
+		-f ~/building-ml-system/chapter2_demand_forecasting_with_ml/stage0/bi/Dockerfile \
 		.
 [+] Building 1.8s (11/11) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -586,7 +586,7 @@ docker run \
 		-d \
 		--name bi \
 		-p 8501:8501 \
-		-v /Users/shibuiyusuke/book2/building-ml-system/chapter2_demand_forecasting_with_ml/stage0/data:/opt/data \
+		-v ~/building-ml-system/chapter2_demand_forecasting_with_ml/stage0/data:/opt/data \
 		-e ITEM_SALES_RECORD_FILE=/opt/data/data/item_sales_records_train_2021_04.csv \
 		-e ITEM_SALES_PREDICTION_DIR=/opt/data/prediction \
 		shibui/building-ml-system:beverage_sales_forecasting_bi_0.0.0 \

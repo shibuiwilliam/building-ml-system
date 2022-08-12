@@ -62,6 +62,10 @@ build_data_registration:
 push_data_registration:
 	docker push $(DOCKER_DATA_REGISTRATION_IMAGE_NAME)
 
+.PHONY: pull_data_registration
+pull_data_registration:
+	docker pull $(DOCKER_DATA_REGISTRATION_IMAGE_NAME)
+
 .PHONY: deploy_data_registration_ns
 deploy_data_registration_ns:
 	kubectl apply -f $(DATA_REGISTRATION_MANIFEST_DIR)/namespace.yaml
@@ -89,6 +93,10 @@ build_mlflow:
 .PHONY: push_mlflow
 push_mlflow:
 	docker push $(DOCKER_MLFLOW_IMAGE_NAME)
+
+.PHONY: pull_mlflow
+pull_mlflow:
+	docker pull $(DOCKER_MLFLOW_IMAGE_NAME)
 
 .PHONY: deploy_mlflow_ns
 deploy_mlflow_ns:
@@ -125,6 +133,10 @@ build_ml:
 push_ml:
 	docker push $(DOCKER_ML_IMAGE_NAME)
 
+.PHONY: pull_ml
+pull_ml:
+	docker pull $(DOCKER_ML_IMAGE_NAME)
+
 
 ############ DEMAND FORECASTING BI COMMANDS ############
 BI_DIR := $(DIR)/bi
@@ -132,21 +144,6 @@ BI_MANIFEST_DIR := $(K8S_DIR)/manifests/beverage_sales_forecasting
 DOCKERFILE_BI = $(BI_DIR)/$(DOCKERFILE)
 DOCKER_BI_TAG = $(TAG)_bi
 DOCKER_BI_IMAGE_NAME = $(DOCKER_REPOSITORY):$(DOCKER_BI_TAG)_$(VERSION)
-
-.PHONY: patch_bi
-patch_bi:
-	cd $(BI_DIR) && \
-	poetry version patch
-
-.PHONY: minor_upgrade_bi
-minor_upgrade_bi:
-	cd $(BI_DIR) && \
-	poetry version minor
-
-.PHONY: major_upgrade_bi
-major_upgrade_bi:
-	cd $(BI_DIR) && \
-	poetry version major
 
 .PHONY: req_bi
 req_bi:
@@ -167,6 +164,10 @@ build_bi:
 .PHONY: push_bi
 push_bi:
 	docker push $(DOCKER_BI_IMAGE_NAME)
+
+.PHONY: pull_bi
+pull_bi:
+	docker pull $(DOCKER_BI_IMAGE_NAME)
 
 .PHONY: deploy_bi_ns
 deploy_bi_ns:
@@ -248,6 +249,12 @@ push_all: push_data_registration \
 	push_ml \
 	push_mlflow \
 	push_bi
+
+.PHONY: pull_all
+pull_all: pull_data_registration \
+	pull_ml \
+	pull_mlflow \
+	pull_bi
 
 
 ############ DOCKER COMPOSE COMMANDS ############

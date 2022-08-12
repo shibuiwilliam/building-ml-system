@@ -42,7 +42,7 @@ $ make build_all
 docker build \
 		--platform x86_64 \
 		-t shibui/building-ml-system:ai_animals_k8s_client_0.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/k8s_client/Dockerfile \
+		-f ~/building-ml-system/chapter3_4_aianimals/infrastructure/k8s_client/Dockerfile \
 		.
 [+] Building 2.0s (7/7) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -62,7 +62,7 @@ Use 'docker scan' to run Snyk tests against images to find vulnerabilities and l
 docker build \
 		--platform x86_64 \
 		-t shibui/building-ml-system:ai_animals_model_loader_0.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/model_loader/Dockerfile \
+		-f ~/building-ml-system/chapter3_4_aianimals/model_loader/Dockerfile \
 		.
 [+] Building 0.4s (10/10) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -86,7 +86,7 @@ Use 'docker scan' to run Snyk tests against images to find vulnerabilities and l
 docker build \
 		--platform x86_64 \
 		-t shibui/building-ml-system:ai_animals_mlflow_0.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/mlflow/Dockerfile \
+		-f ~/building-ml-system/chapter3_4_aianimals/mlflow/Dockerfile \
 		.
 [+] Building 0.4s (7/7) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -106,7 +106,7 @@ Use 'docker scan' to run Snyk tests against images to find vulnerabilities and l
 docker build \
 		--platform x86_64 \
 		-t shibui/building-ml-system:ai_animals_base_text_processing_0.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/base_text_processing/Dockerfile \
+		-f ~/building-ml-system/chapter3_4_aianimals/base_text_processing/Dockerfile \
 		.
 [+] Building 0.4s (9/9) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -130,7 +130,7 @@ docker build \
 		--platform x86_64 \
 		--build-arg FROM_IMAGE=shibui/building-ml-system:ai_animals_base_text_processing_0.0.0 \
 		-t shibui/building-ml-system:ai_animals_data_registry_0.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/batch/data_registry/Dockerfile \
+		-f ~/building-ml-system/chapter3_4_aianimals/batch/data_registry/Dockerfile \
 		.
 [+] Building 0.1s (10/10) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -155,7 +155,7 @@ docker build \
 		--platform x86_64 \
 		--build-arg FROM_IMAGE=shibui/building-ml-system:ai_animals_base_text_processing_0.0.0 \
 		-t shibui/building-ml-system:ai_animals_feature_registry_0.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/batch/feature_registry/Dockerfile \
+		-f ~/building-ml-system/chapter3_4_aianimals/batch/feature_registry/Dockerfile \
 		.
 [+] Building 0.1s (11/11) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -180,7 +180,7 @@ Use 'docker scan' to run Snyk tests against images to find vulnerabilities and l
 docker build \
 		--platform x86_64 \
 		-t shibui/building-ml-system:ai_animals_api_0.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/api/Dockerfile \
+		-f ~/building-ml-system/chapter3_4_aianimals/api/Dockerfile \
 		.
 [+] Building 0.4s (12/12) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -206,7 +206,7 @@ Use 'docker scan' to run Snyk tests against images to find vulnerabilities and l
 docker build \
 		--platform x86_64 \
 		-t shibui/building-ml-system:ai_animals_ab_test_proxy_0.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/ab_test_proxy/Dockerfile \
+		-f ~/building-ml-system/chapter3_4_aianimals/ab_test_proxy/Dockerfile \
 		.
 [+] Building 0.4s (13/13) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -232,7 +232,7 @@ docker build \
 Use 'docker scan' to run Snyk tests against images to find vulnerabilities and learn how to fix them
 docker build \
 		-t shibui/building-ml-system:ai_animals_elasticsearch_0.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/elasticsearch/Dockerfile \
+		-f ~/building-ml-system/chapter3_4_aianimals/elasticsearch/Dockerfile \
 		.
 [+] Building 0.1s (7/7) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -252,7 +252,7 @@ Use 'docker scan' to run Snyk tests against images to find vulnerabilities and l
 docker build \
 		--platform x86_64 \
 		-t shibui/building-ml-system:ai_animals_violation_detection_no_animal_violation_proxy_0.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/violation_detection/no_animal_violation/proxy/Dockerfile \
+		-f ~/building-ml-system/chapter3_4_aianimals/violation_detection/no_animal_violation/proxy/Dockerfile \
 		.
 [+] Building 0.4s (10/10) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -276,7 +276,7 @@ Use 'docker scan' to run Snyk tests against images to find vulnerabilities and l
 docker build \
 		--platform x86_64 \
 		-t shibui/building-ml-system:ai_animals_violation_detection_no_animal_violation_serving_0.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/violation_detection/no_animal_violation/serving/Dockerfile \
+		-f ~/building-ml-system/chapter3_4_aianimals/violation_detection/no_animal_violation/serving/Dockerfile \
 		.
 [+] Building 3.9s (10/10) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -300,7 +300,7 @@ Use 'docker scan' to run Snyk tests against images to find vulnerabilities and l
 docker build \
 		--platform x86_64 \
 		-t shibui/building-ml-system:ai_animals_violation_detection_registry_0.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/violation_detection/registry/Dockerfile \
+		-f ~/building-ml-system/chapter3_4_aianimals/violation_detection/registry/Dockerfile \
 		.
 [+] Building 0.4s (10/10) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -324,7 +324,7 @@ Use 'docker scan' to run Snyk tests against images to find vulnerabilities and l
 docker build \
 		--platform x86_64 \
 		-t shibui/building-ml-system:ai_animals_violation_detection_no_animal_violation_train_0.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/violation_detection/model_development/no_animal_violation/Dockerfile \
+		-f ~/building-ml-system/chapter3_4_aianimals/violation_detection/model_development/no_animal_violation/Dockerfile \
 		.
 [+] Building 0.5s (12/12) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -351,7 +351,7 @@ docker build \
 		--platform x86_64 \
 		--build-arg FROM_IMAGE=shibui/building-ml-system:ai_animals_base_text_processing_0.0.0 \
 		-t shibui/building-ml-system:ai_animals_search_learn_to_rank_train_0.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/search/model_development/learn_to_rank/Dockerfile \
+		-f ~/building-ml-system/chapter3_4_aianimals/search/model_development/learn_to_rank/Dockerfile \
 		.
 [+] Building 0.1s (11/11) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -376,7 +376,7 @@ Use 'docker scan' to run Snyk tests against images to find vulnerabilities and l
 docker build \
 		--platform x86_64 \
 		-t shibui/building-ml-system:ai_animals_search_similar_image_search_train_0.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/search/model_development/similar_image_search/Dockerfile \
+		-f ~/building-ml-system/chapter3_4_aianimals/search/model_development/similar_image_search/Dockerfile \
 		.
 [+] Building 0.4s (11/11) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -401,7 +401,7 @@ Use 'docker scan' to run Snyk tests against images to find vulnerabilities and l
 docker build \
 		--platform x86_64 \
 		-t shibui/building-ml-system:ai_animals_search_similar_image_search_proxy_0.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/search/similar_image_search/proxy/Dockerfile \
+		-f ~/building-ml-system/chapter3_4_aianimals/search/similar_image_search/proxy/Dockerfile \
 		.
 [+] Building 0.4s (12/12) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -428,7 +428,7 @@ docker build \
 		--platform x86_64 \
 		--build-arg FROM_IMAGE=shibui/building-ml-system:ai_animals_base_text_processing_0.0.0 \
 		-t shibui/building-ml-system:ai_animals_search_learn_to_rank_lgbm_api_0.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/search/learn_to_rank/api/Dockerfile \
+		-f ~/building-ml-system/chapter3_4_aianimals/search/learn_to_rank/api/Dockerfile \
 		.
 [+] Building 0.1s (12/12) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -454,7 +454,7 @@ Use 'docker scan' to run Snyk tests against images to find vulnerabilities and l
 docker build \
 		--platform x86_64 \
 		-t shibui/building-ml-system:ai_animals_violation_detection_portal_0.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/violation_detection/portal/Dockerfile \
+		-f ~/building-ml-system/chapter3_4_aianimals/violation_detection/portal/Dockerfile \
 		.
 [+] Building 0.4s (10/10) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -479,7 +479,7 @@ docker build \
 		--platform x86_64 \
 		--build-arg FROM_IMAGE=shibui/building-ml-system:ai_animals_base_text_processing_0.0.0 \
 		-t shibui/building-ml-system:ai_animals_similar_word_registry_0.0.0 \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/batch/similar_word_registry/Dockerfile \
+		-f ~/building-ml-system/chapter3_4_aianimals/batch/similar_word_registry/Dockerfile \
 		.
 [+] Building 0.1s (10/10) FINISHED
  => [internal] load build definition from Dockerfile                                                                           0.0s
@@ -685,30 +685,30 @@ Kubernetesクラスターにバックエンド基盤を構築する手順を説�
 ```sh
 # 各種namespaceのデプロイ
 $ make initialize_deployment
-kubectl apply -f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/kube_system/pdb.yaml
+kubectl apply -f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/kube_system/pdb.yaml
 poddisruptionbudget.policy/event-exporter-gke configured
 poddisruptionbudget.policy/konnectivity-agent configured
 poddisruptionbudget.policy/kube-dns-autoscaler configured
 poddisruptionbudget.policy/kube-dns configured
 poddisruptionbudget.policy/glbc configured
 poddisruptionbudget.policy/metrics-server configured
-kubectl apply -f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/data/namespace.yaml
+kubectl apply -f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/data/namespace.yaml
 namespace/data created
-kubectl apply -f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/mlflow/namespace.yaml
+kubectl apply -f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/mlflow/namespace.yaml
 namespace/mlflow created
-kubectl apply -f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/aianimals/namespace.yaml
+kubectl apply -f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/aianimals/namespace.yaml
 namespace/aianimals created
-kubectl apply -f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/argo/namespace.yaml
+kubectl apply -f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/argo/namespace.yaml
 namespace/argo created
-kubectl apply -f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/monitoring/namespace.yaml
+kubectl apply -f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/monitoring/namespace.yaml
 namespace/monitoring created
-kubectl apply -f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/elasticsearch/namespace.yaml
+kubectl apply -f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/elasticsearch/namespace.yaml
 namespace/elastic-search created
 kubectl apply \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/search/namespace.yaml
+		-f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/search/namespace.yaml
 namespace/search created
 kubectl apply \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/violation_detection/namespace.yaml
+		-f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/violation_detection/namespace.yaml
 namespace/violation-detection created
 kubectl -n aianimals \
 		create secret generic auth-secret \
@@ -717,9 +717,9 @@ secret/auth-secret created
 
 # インフラ系リソースのデプロイ
 $ make deploy_infra
-kubectl apply -f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/data/postgres.yaml && \
-	kubectl apply -f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/data/redis.yaml && \
-	kubectl apply -f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/data/rabbitmq.yaml
+kubectl apply -f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/data/postgres.yaml && \
+	kubectl apply -f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/data/redis.yaml && \
+	kubectl apply -f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/data/rabbitmq.yaml
 deployment.apps/postgres created
 service/postgres created
 deployment.apps/redis created
@@ -729,7 +729,7 @@ service/rabbitmq-amqp created
 service/rabbitmq-http created
 kubectl apply -f https://download.elastic.co/downloads/eck/2.1.0/crds.yaml && \
 	kubectl apply -f https://download.elastic.co/downloads/eck/2.1.0/operator.yaml && \
-	kubectl apply -f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/elasticsearch/deployment.yaml
+	kubectl apply -f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/elasticsearch/deployment.yaml
 customresourcedefinition.apiextensions.k8s.io/agents.agent.k8s.elastic.co created
 customresourcedefinition.apiextensions.k8s.io/apmservers.apm.k8s.elastic.co created
 customresourcedefinition.apiextensions.k8s.io/beats.beat.k8s.elastic.co created
@@ -753,7 +753,7 @@ elasticsearch.elasticsearch.k8s.elastic.co/elastic-search created
 kibana.kibana.k8s.elastic.co/kibana created
 kubectl \
 		-n argo apply \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/argo/argo_clusterrolebinding.yaml && \
+		-f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/argo/argo_clusterrolebinding.yaml && \
 	kubectl \
 		-n argo apply \
 		-f https://github.com/argoproj/argo-workflows/releases/download/v3.3.1/quick-start-postgres.yaml
@@ -802,7 +802,7 @@ deployment.apps/argo-server created
 deployment.apps/minio created
 deployment.apps/postgres created
 deployment.apps/workflow-controller created
-kubectl -n monitoring apply -f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/monitoring/prometheus.yaml
+kubectl -n monitoring apply -f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/monitoring/prometheus.yaml
 clusterrole.rbac.authorization.k8s.io/prometheus created
 clusterrolebinding.rbac.authorization.k8s.io/prometheus created
 deployment.apps/pushgateway created
@@ -810,7 +810,7 @@ service/pushgateway created
 configmap/prometheus created
 deployment.apps/prometheus created
 service/prometheus created
-kubectl -n monitoring apply -f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/monitoring/grafana.yaml
+kubectl -n monitoring apply -f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/monitoring/grafana.yaml
 configmap/grafana-datasources created
 configmap/grafana-dashboards-conf created
 configmap/grafana-dashboards created
@@ -819,26 +819,26 @@ service/grafana created
 
 # 共通ツールのデプロイ
 $ make deploy_init
-kubectl apply -f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/mlflow/mlflow.yaml
+kubectl apply -f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/mlflow/mlflow.yaml
 deployment.apps/mlflow created
 service/mlflow created
 kubectl apply \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/aianimals/data_configmap.yaml
+		-f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/aianimals/data_configmap.yaml
 configmap/data-paths created
 kubectl apply \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/aianimals/initial_data_registry.yaml
+		-f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/aianimals/initial_data_registry.yaml
 job.batch/initial-data-registry created
 
 # APIおよびバッチのデプロイ
 $ make deploy_base
-kubectl apply -f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/aianimals/api.yaml
+kubectl apply -f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/aianimals/api.yaml
 deployment.apps/api created
 service/api created
 kubectl apply \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/aianimals/search_registry.yaml
+		-f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/aianimals/search_registry.yaml
 deployment.apps/search-registry created
 kubectl apply \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/aianimals/animal_feature_registration.yaml
+		-f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/aianimals/animal_feature_registration.yaml
 deployment.apps/animal-feature-registry-registration created
 ```
 
@@ -1000,17 +1000,17 @@ no-animal-violation-servingで稼働する
 # 違反検知システムの構築
 $ make deploy_violation_detections
 kubectl apply \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/violation_detection/no_animal_violation_serving.yaml
+		-f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/violation_detection/no_animal_violation_serving.yaml
 deployment.apps/no-animal-violation-serving created
 service/no-animal-violation-serving created
 kubectl apply \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/violation_detection/registry.yaml
+		-f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/violation_detection/registry.yaml
 deployment.apps/registry created
 kubectl apply \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/violation_detection/no_animal_violation_proxy.yaml
+		-f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/violation_detection/no_animal_violation_proxy.yaml
 deployment.apps/no-animal-violation-proxy created
 kubectl apply \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/violation_detection/violation_detection_portal.yaml
+		-f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/violation_detection/violation_detection_portal.yaml
 deployment.apps/violation-detection-portal created
 service/violation-detection-portal created
 ```
@@ -1069,24 +1069,24 @@ service/violation-detection-portal    ClusterIP   10.36.0.88    <none>        95
 ```sh
 $ make deploy_searches
 kubectl apply \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/search/learn_to_rank_ab_test_proxy.yaml
+		-f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/search/learn_to_rank_ab_test_proxy.yaml
 configmap/learn-to-rank-ab-test-proxy created
 deployment.apps/learn-to-rank-ab-test-proxy created
 service/learn-to-rank-ab-test-proxy created
 kubectl apply \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/search/learn_to_rank_lgbm_ranker.yaml
+		-f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/search/learn_to_rank_lgbm_ranker.yaml
 deployment.apps/learn-to-rank-lgbm-ranker created
 service/learn-to-rank-lgbm-ranker created
 kubectl apply \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/search/learn_to_rank_lgbm_regression.yaml
+		-f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/search/learn_to_rank_lgbm_regression.yaml
 deployment.apps/learn-to-rank-lgbm-regression created
 service/learn-to-rank-lgbm-regression created
 kubectl apply \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/search/similar_image_search_serving.yaml
+		-f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/search/similar_image_search_serving.yaml
 deployment.apps/similar-image-search-serving created
 service/similar-image-search-serving created
 kubectl apply \
-		-f /Users/shibuiyusuke/book2/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/search/similar_image_search_proxy.yaml
+		-f ~/building-ml-system/chapter3_4_aianimals/infrastructure/manifests/search/similar_image_search_proxy.yaml
 deployment.apps/similar-image-search-proxy created
 service/similar-image-search-proxy created
 ```
