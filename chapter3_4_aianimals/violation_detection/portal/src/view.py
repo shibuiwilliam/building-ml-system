@@ -256,15 +256,14 @@ class ViolationCheckView(BaseView, AbstractViolationCheckView):
             st.write(f"is_administrator_checked: {violation.is_administrator_checked}")
             st.write(violation.updated_at)
 
-        r = random.randint(0, 1_000_000)
         is_violating = st.checkbox(
             label=f"is {violation.violation_type_name}",
             value=violation.is_effective,
-            key=f"{violation.id}_{violation.violation_type_name}_{violation.updated_at}_{r}",
+            key=f"checkbox_{violation.id}_{violation.violation_type_name}_{violation.updated_at}",
         )
         is_administrator_checked = st.button(
             label="administrator checked",
-            key=f"{violation.id}_{violation.violation_type_name}_{violation.updated_at}_{r}",
+            key=f"button_{violation.id}_{violation.violation_type_name}_{violation.updated_at}",
         )
         if is_administrator_checked:
             self.violation_service.register_admin_check(
