@@ -1,4 +1,4 @@
-ARG FROM_IMAGE=tensorflow/serving:2.9.2
+ARG FROM_IMAGE=tensorflow/serving:2.9.1
 
 FROM ${FROM_IMAGE}
 
