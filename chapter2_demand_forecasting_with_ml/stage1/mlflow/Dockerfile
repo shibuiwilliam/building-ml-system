@@ -1,4 +1,4 @@
-ARG FROM_IMAGE=python:3.9-slim
+ARG FROM_IMAGE=python:3.10-slim
 
 FROM ${FROM_IMAGE}
 

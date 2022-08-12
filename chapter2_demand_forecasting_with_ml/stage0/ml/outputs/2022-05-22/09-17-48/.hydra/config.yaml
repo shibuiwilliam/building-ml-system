@@ -1,0 +1,43 @@
+name: beverage_sales_forecasting
+jobs:
+  data:
+    source: local
+    path: /opt/data/data/item_sales_records_train_2021_32.csv
+    target_data:
+      date_from: '2017-01-01'
+      date_to: '2021-08-02'
+      item: ALL
+      store: ALL
+      region: ALL
+    train:
+      year: 2017
+      week: 1
+    test:
+      year: 2021
+      week: 30
+    predict:
+      year: 2021
+      week: 32
+      items: ALL
+      stores: ALL
+  model:
+    name: light_gbm_regression
+    params:
+      task: train
+      boosting: gbdt
+      objective: regression
+      num_leaves: 3
+      learning_rate: 0.05
+      feature_fraction: 0.5
+      max_depth: -1
+      num_iterations: 1000000
+      num_threads: 0
+      seed: 1234
+      early_stopping_rounds: 200
+      eval_metrics: mse
+      verbose_eval: 1000
+  train:
+    run: true
+  predict:
+    run: true
+    register: true
