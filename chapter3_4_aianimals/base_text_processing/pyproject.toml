@@ -6,7 +6,7 @@ authors = ["Your Name <you@example.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+Python = "3.10.6"
 lightgbm = "^3.3.2"
 cloudpickle = "^2.0.0"
 onnx = "^1.11.0"
