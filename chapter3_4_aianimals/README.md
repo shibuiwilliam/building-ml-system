@@ -31,9 +31,10 @@ TODO:　後で書くかも
 ### 1. Dockerイメージのビルド
 
 - バックエンドで使うDockerイメージをビルドします。
-- すべてのDockerイメージは`make build_all`でビルドすることができます。
-- ビルド済みのDockerイメージは以下に用意されています。
+- ビルドコマンドは `make build_all` です。
+- なお、ビルド済みのDockerイメージは以下に用意されています。
   - https://hub.docker.com/repository/docker/shibui/building-ml-system/general
+  - `make pull_all` でDockerイメージを取得することができます。
 
 <details> <summary>Docker buildのログ</summary>
 

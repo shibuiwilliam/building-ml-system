@@ -42,8 +42,9 @@ Stage0ではローカル環境で飲料品の需要予測モデルを学習、�
 Dockerイメージをビルドします。
 
 - ビルドコマンドは `make build_all` です。
-- ビルド済みのDockerイメージは以下に用意されています。
+- なお、ビルド済みのDockerイメージは以下に用意されています。
   - https://hub.docker.com/repository/docker/shibui/building-ml-system/general
+  - `make pull_all` でDockerイメージを取得することができます。
 
 <details> <summary>Docker buildのログ</summary>
 
