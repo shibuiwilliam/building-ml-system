@@ -9,7 +9,6 @@ DIR := $(ABSOLUTE_PATH)
 TAG = beverage_sales_forecasting
 
 K8S_DIR := $(ABSOLUTE_PATH)/infrastructure
-K8S_SECRET_DIR := $(K8S_DIR)/secrets
 
 
 ############ DATA COMMANDS ############

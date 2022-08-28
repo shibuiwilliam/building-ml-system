@@ -45,8 +45,6 @@ spec:
               value: beverage_sales_forecasting
             - name: LOG_LEVEL
               value: DEBUG
-      imagePullSecrets:
-        - name: regcred
 
 ---
 apiVersion: v1
