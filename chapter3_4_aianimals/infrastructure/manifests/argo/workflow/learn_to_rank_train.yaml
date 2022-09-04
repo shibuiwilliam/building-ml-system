@@ -219,6 +219,3 @@ spec:
             - "FEATURE_MLFLOW_PARAM_JSON={{inputs.parameters.feature-mlflow-params}}"
             - "MLFLOW_PARAM_JSON={{inputs.parameters.mlflow-params}}"
             - "EMPTY_RUN=0"
-
-    imagePullSecrets:
-      - name: regcred

@@ -73,8 +73,6 @@ spec:
         - name: config-volume
           configMap:
             name: learn-to-rank-ab-test-proxy
-      imagePullSecrets:
-        - name: regcred
 
 ---
 apiVersion: v1

@@ -63,5 +63,3 @@ spec:
               value: "224"
             - name: PREDICTOR_WIDTH
               value: "224"
-      imagePullSecrets:
-        - name: regcred

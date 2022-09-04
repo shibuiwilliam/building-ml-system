@@ -93,8 +93,6 @@ spec:
         - name: auth-secret
           secret:
             secretName: auth-secret
-      imagePullSecrets:
-        - name: regcred
 
 ---
 apiVersion: v1

@@ -6,7 +6,7 @@ metadata:
   labels:
     app: mlflow
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: mlflow
@@ -27,7 +27,11 @@ spec:
             - "--backend-store-uri"
             - "postgresql://postgres:password@postgres.data.svc.cluster.local:5432"
             - "--artifacts-destination"
-            - "gs://aianimals/models"
+            - "/tmp/"
+            # if you want to store the data into into your storage, instead of `/tmp`, specify your storage URL.
+            # https://www.mlflow.org/docs/latest/tracking.html#artifact-stores
+            # E.g.
+            # - "gs://aianimals/models"
             - "--serve-artifacts"
             - "--host"
             - "0.0.0.0"
@@ -40,8 +44,6 @@ spec:
             requests:
               cpu: "500m"
               memory: "1000Mi"
-      imagePullSecrets:
-        - name: regcred
 
 ---
 apiVersion: v1

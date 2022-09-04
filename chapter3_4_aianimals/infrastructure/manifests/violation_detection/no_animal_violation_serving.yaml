@@ -62,8 +62,6 @@ spec:
       volumes:
         - name: data
           emptyDir: {}
-      imagePullSecrets:
-        - name: regcred
 
 ---
 apiVersion: v1

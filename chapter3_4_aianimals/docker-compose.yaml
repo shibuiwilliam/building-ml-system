@@ -130,7 +130,7 @@ services:
       - JOB=animal_to_search_job
       - DATA_DIRECTORY=/opt/dataset/data/
     command: >
-      /bin/sh -c "sleep 90s && python -m src.main"
+      /bin/sh -c "sleep 120s && python -m src.main"
     depends_on:
       - postgres
       - redis
@@ -167,7 +167,7 @@ services:
       - WORKERS=1
       - PORT=8000
     command: >
-      /bin/sh -c "sleep 60s && ./run.sh"
+      /bin/sh -c "sleep 120s && ./run.sh"
     hostname: api
     depends_on:
       - postgres

@@ -96,5 +96,3 @@ spec:
           - "MLFLOW_PARAM_JSON={{inputs.parameters.mlflow-params}}"
           - "RUN=1"
           - "PSEUDO_PREDICTION=0"
-  imagePullSecrets:
-    - name: regcred

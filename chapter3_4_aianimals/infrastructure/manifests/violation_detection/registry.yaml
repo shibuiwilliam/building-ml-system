@@ -49,5 +49,3 @@ spec:
               value: password
             - name: VIOLATION_QUEUE
               value: violation
-      imagePullSecrets:
-        - name: regcred

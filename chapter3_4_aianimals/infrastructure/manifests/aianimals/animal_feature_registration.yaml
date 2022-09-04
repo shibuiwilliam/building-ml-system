@@ -71,5 +71,3 @@ spec:
               value: "{}"
             - name: EMPTY_RUN
               value: "1"
-      imagePullSecrets:
-        - name: regcred
