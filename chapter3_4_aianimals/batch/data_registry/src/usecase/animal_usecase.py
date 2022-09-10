@@ -33,6 +33,10 @@ class AbstractAnimalUsecase(ABC):
         self.cache = cache
 
     @abstractmethod
+    def ping_search(self) -> bool:
+        raise NotImplementedError
+
+    @abstractmethod
     def retrieve(
         self,
         request: Optional[AnimalRequest] = None,
@@ -95,6 +99,13 @@ class AnimalUsecase(AbstractAnimalUsecase):
             messaging=messaging,
             cache=cache,
         )
+
+    def ping_search(self) -> bool:
+        try:
+            self.search.info()
+            return True
+        except:
+            return False
 
     def retrieve(
         self,

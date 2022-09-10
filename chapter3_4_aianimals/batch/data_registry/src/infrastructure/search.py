@@ -1,7 +1,7 @@
 import logging
 import os
 from abc import ABC, abstractmethod
-from typing import Dict, Union
+from typing import Any, Dict, Union
 
 from elasticsearch import Elasticsearch
 
@@ -9,6 +9,10 @@ from elasticsearch import Elasticsearch
 class AbstractSearch(ABC):
     def __init__(self):
         self.logger = logging.getLogger(__name__)
+
+    @abstractmethod
+    def info(self) -> Any:
+        raise NotImplementedError
 
     @abstractmethod
     def create_index(
@@ -76,6 +80,9 @@ class ElasticsearchClient(AbstractSearch):
             verify_certs=self.__es_verify_certs,
             basic_auth=self.__basic_auth,
         )
+
+    def info(self) -> Any:
+        return self.es_client.info()
 
     def create_index(
         self,
