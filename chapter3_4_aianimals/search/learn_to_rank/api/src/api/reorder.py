@@ -1,7 +1,7 @@
 from logging import getLogger
 
 from fastapi import APIRouter, BackgroundTasks
-from src.registry.container import Container, EmptyContainer
+from src.registry.container import EmptyContainer
 from src.registry.registry import container
 from src.schema.animal import AnimalRequest, AnimalRequestResponse, AnimalResponse
 
