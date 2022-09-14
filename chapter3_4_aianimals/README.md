@@ -1129,7 +1129,7 @@ service/similar-image-search-serving    ClusterIP   10.36.12.250   <none>       
 
 Kubernetesクラスターにデプロイした各種リソースのうち、Webコンソール等のインターフェイスを持っているものは `port-forward` で接続することができます。
 
-<details> <summary>Argo Workflowsへのジョブの登録</summary>
+<details> <summary>`port-forward`で各種リソースに接続</summary>
 
 ```sh
 $ cat infrastructure/port_forward.sh
