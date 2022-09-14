@@ -183,66 +183,65 @@ class AnimalUsecase(AbstractAnimalUsecase):
     def register_document(
         self,
         animal_id: str,
-    ) -> bool:
+    ):
         self.logger.info(f"animal_id: {animal_id}")
-        try:
-            query = AnimalQuery(
-                id=animal_id,
-                deactivated=False,
-            )
-            animals = self.animal_repository.select(
-                query=query,
-                limit=1,
-                offset=0,
-            )
-            if len(animals) == 0:
-                return False
-            animal = animals[0]
+        query = AnimalQuery(
+            id=animal_id,
+            deactivated=False,
+        )
+        animals = self.animal_repository.select(
+            query=query,
+            limit=1,
+            offset=0,
+        )
+        if len(animals) == 0:
+            return
+        animal = animals[0]
 
-            like = self.like_repository.count(animal_ids=[animal.id])
+        like = self.like_repository.count(animal_ids=[animal.id])
 
-            document = AnimalDocument(
-                name=animal.name,
-                description=animal.description,
-                animal_category_name_en=animal.animal_category_name_en,
-                animal_category_name_ja=animal.animal_category_name_ja,
-                animal_subcategory_name_en=animal.animal_subcategory_name_en,
-                animal_subcategory_name_ja=animal.animal_subcategory_name_ja,
-                photo_url=animal.photo_url,
-                user_handle_name=animal.user_handle_name,
-                like=like[animal.id].count,
-                created_at=animal.created_at,
-            )
+        document = AnimalDocument(
+            name=animal.name,
+            description=animal.description,
+            animal_category_name_en=animal.animal_category_name_en,
+            animal_category_name_ja=animal.animal_category_name_ja,
+            animal_subcategory_name_en=animal.animal_subcategory_name_en,
+            animal_subcategory_name_ja=animal.animal_subcategory_name_ja,
+            photo_url=animal.photo_url,
+            user_handle_name=animal.user_handle_name,
+            like=like[animal.id].count,
+            created_at=animal.created_at,
+        )
 
-            if self.search.is_document_exist(
+        if animal.id.startswith("0"):
+            1 / 0
+
+        if self.search.is_document_exist(
+            index=ANIMAL_MAPPING_NAME,
+            id=animal.id,
+        ):
+            self.search.update_document(
                 index=ANIMAL_MAPPING_NAME,
                 id=animal.id,
-            ):
-                self.search.update_document(
-                    index=ANIMAL_MAPPING_NAME,
-                    id=animal.id,
-                    doc=document.dict(),
-                )
-            else:
-                self.search.create_document(
-                    index=ANIMAL_MAPPING_NAME,
-                    id=animal.id,
-                    body=document.dict(),
-                )
-            self.logger.info(f"registered: {animal_id}")
-            return True
-        except Exception as e:
-            self.logger.error(f"failed to register: {animal_id} with {e}")
-            return False
+                doc=document.dict(),
+            )
+        else:
+            self.search.create_document(
+                index=ANIMAL_MAPPING_NAME,
+                id=animal.id,
+                body=document.dict(),
+            )
+        self.logger.info(f"registered: {animal_id}")
 
     def register_document_from_queue(self):
         def callback(ch, method, properties, body):
             data = json.loads(body)
             self.logger.info(f"consumed data: {data}")
-            ok = self.register_document(animal_id=data["id"])
-            if ok:
+            try:
+                self.register_document(animal_id=data["id"])
                 ch.basic_ack(delivery_tag=method.delivery_tag)
-            else:
+            except Exception as e:
+                self.logger.error(f"failed to register document: {e}")
                 ch.basic_reject(
                     delivery_tag=method.delivery_tag,
                     requeue=True,

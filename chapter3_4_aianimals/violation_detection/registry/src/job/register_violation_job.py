@@ -23,9 +23,16 @@ class RegisterViolationJob(object):
         def callback(ch, method, properties, body):
             data = json.loads(body)
             self.logger.info(f"consumed data: {data}")
-            violation = ViolationCreateRequest(**data)
-            self.violation_usecase.register(request=violation)
-            ch.basic_ack(delivery_tag=method.delivery_tag)
+            try:
+                violation = ViolationCreateRequest(**data)
+                self.violation_usecase.register(request=violation)
+                ch.basic_ack(delivery_tag=method.delivery_tag)
+            except Exception as e:
+                self.logger.error(f"failed to register document: {e}")
+                ch.basic_reject(
+                    delivery_tag=method.delivery_tag,
+                    requeue=True,
+                )
 
         try:
             self.messaging.init_channel()
