@@ -213,9 +213,6 @@ class AnimalUsecase(AbstractAnimalUsecase):
             created_at=animal.created_at,
         )
 
-        if animal.id.startswith("0"):
-            1 / 0
-
         if self.search.is_document_exist(
             index=ANIMAL_MAPPING_NAME,
             id=animal.id,
