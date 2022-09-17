@@ -50,7 +50,7 @@ spec:
           resources:
             requests:
               memory: 20000Mi
-              cpu: 2000m
+              cpu: 5000m
         outputs:
           parameters:
             - name: mlflow-params
