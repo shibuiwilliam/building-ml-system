@@ -18,6 +18,7 @@ numpy = "^1.23.1"
 skl2onnx = "^1.12"
 onnxruntime = "^1.12.1"
 onnxmltools = "^1.11.1"
+httpx = "^0.23.0"
 
 [tool.poetry.dev-dependencies]
 

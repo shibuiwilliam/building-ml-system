@@ -7,7 +7,7 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "3.10.6"
-httpx = "^0.22.0"
+httpx = "^0.23.0"
 Pillow = "^9.0.1"
 numpy = "^1.22.3"
 fastapi = "^0.75.0"

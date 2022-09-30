@@ -14,6 +14,7 @@ psycopg2-binary = "^2.9.3"
 click = "^8.0.3"
 dependency-injector = "^4.39.1"
 prometheus-client = "^0.14.1"
+httpx = "^0.23.0"
 
 [tool.poetry.dev-dependencies]
 
