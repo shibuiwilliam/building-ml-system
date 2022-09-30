@@ -1,7 +1,7 @@
 async-timeout==4.0.2; python_version >= "3.6"
 cloudpickle==2.1.0; python_version >= "3.6"
 deprecated==1.2.13; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version >= "3.6"
-joblib==1.1.0; python_version >= "3.8"
+joblib==1.2.0; python_version >= "3.8"
 lightgbm==3.3.2
 mecab-python3==1.0.5
 numpy==1.23.1; python_version >= "3.8" and python_version < "3.12"
