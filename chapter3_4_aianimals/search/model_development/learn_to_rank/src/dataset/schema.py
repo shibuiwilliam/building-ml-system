@@ -57,16 +57,6 @@ class Animal(BaseModel):
         extra = Extra.forbid
 
 
-class AnimalFeature(BaseModel):
-    id: str
-    name_words: Union[Dict, List]
-    name_vector: Union[Dict, List]
-    description_words: Union[Dict, List]
-    description_vector: Union[Dict, List]
-    created_at: datetime
-    updated_at: datetime
-
-
 class AccessLog(BaseModel):
     id: str
     query_phrases: List[str]
