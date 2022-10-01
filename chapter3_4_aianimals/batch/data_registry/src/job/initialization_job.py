@@ -17,7 +17,6 @@ from src.request_object.violation_type import ViolationTypeCreateRequest
 from src.schema.access_log import AccessLog
 from src.schema.animal import Animal
 from src.schema.animal_category import AnimalCategory
-from src.schema.animal_feature import AnimalFeature
 from src.schema.animal_subcategory import AnimalSubcategory
 from src.schema.base import Base
 from src.schema.like import Like
@@ -73,7 +72,6 @@ class InitializationJob(AbstractJob):
             ViolationType,
             Violation,
             AccessLog,
-            AnimalFeature,
         ]
         for table in tables:
             self.logger.info(f"create table: {table.__table__}")
@@ -123,11 +121,6 @@ class InitializationJob(AbstractJob):
             {"column": Animal.animal_category_id, "unique": False},
             {"column": Animal.animal_subcategory_id, "unique": False},
         ]
-        animal_feature_indices = [
-            {"column": AnimalFeature.animal_id, "unique": False},
-            {"column": AnimalFeature.mlflow_experiment_id, "unique": False},
-            {"column": AnimalFeature.mlflow_run_id, "unique": False},
-        ]
         like_indices = [
             {"column": Like.user_id, "unique": False},
             {"column": Like.animal_id, "unique": False},
@@ -163,10 +156,6 @@ class InitializationJob(AbstractJob):
         )
         self.__create_index(
             indices=animal_indices,
-            table=Animal,
-        )
-        self.__create_index(
-            indices=animal_feature_indices,
             table=Animal,
         )
         self.__create_index(

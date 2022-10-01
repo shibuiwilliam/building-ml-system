@@ -5,7 +5,6 @@ from src.infrastructure.database import AbstractDatabase
 from src.job.animal_feature_initialization_job import AnimalFeatureInitializationJob
 from src.job.animal_feature_registration_job import AnimalFeatureRegistrationJob
 from src.middleware.logger import configure_logger
-from src.repository.animal_feature_repository import AbstractAnimalFeatureRepository, AnimalFeatureRepository
 from src.repository.animal_repository import AbstractAnimalRepository, AnimalRepository
 from src.service.feature_processing import (
     CategoricalVectorizer,
@@ -46,13 +45,9 @@ class Container(object):
         self.name_vectorizer = name_vectorizer
 
         self.animal_repository: AbstractAnimalRepository = AnimalRepository(database=self.database)
-        self.animal_feature_repository: AbstractAnimalFeatureRepository = AnimalFeatureRepository(
-            database=self.database
-        )
 
         self.animal_feature_usecase: AbstractAnimalFeatureUsecase = AnimalFeatureUsecase(
             animal_repository=self.animal_repository,
-            animal_feature_repository=self.animal_feature_repository,
             messaging=self.messaging,
             cache=self.cache,
             animal_category_vectorizer=self.animal_category_vectorizer,

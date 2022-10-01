@@ -5,12 +5,9 @@ from typing import List, Optional
 import cloudpickle
 from src.configurations import Configurations
 from src.entities.animal import AnimalQuery
-from src.entities.animal_feature import AnimalFeatureCreate, AnimalFeatureQuery, AnimalFeatureUpdate
 from src.infrastructure.cache import AbstractCache
 from src.infrastructure.client.rabbitmq_messaging import RabbitmqMessaging
 from src.middleware.logger import configure_logger
-from src.middleware.strings import get_uuid
-from src.repository.animal_feature_repository import AbstractAnimalFeatureRepository
 from src.repository.animal_repository import AbstractAnimalRepository
 from src.request_object.animal_feature import AnimalFeatureInitializeRequest, AnimalFeatureRegistrationRequest
 from src.response_object.animal_feature import AnimalFeatureInitializeResponse
@@ -31,7 +28,6 @@ class AbstractAnimalFeatureUsecase(ABC):
     def __init__(
         self,
         animal_repository: AbstractAnimalRepository,
-        animal_feature_repository: AbstractAnimalFeatureRepository,
         messaging: RabbitmqMessaging,
         cache: AbstractCache,
         animal_category_vectorizer: CategoricalVectorizer,
@@ -42,7 +38,6 @@ class AbstractAnimalFeatureUsecase(ABC):
         name_vectorizer: NameVectorizer,
     ):
         self.animal_repository = animal_repository
-        self.animal_feature_repository = animal_feature_repository
         self.messaging = messaging
         self.cache = cache
 
@@ -72,7 +67,6 @@ class AnimalFeatureUsecase(AbstractAnimalFeatureUsecase):
     def __init__(
         self,
         animal_repository: AbstractAnimalRepository,
-        animal_feature_repository: AbstractAnimalFeatureRepository,
         messaging: RabbitmqMessaging,
         cache: AbstractCache,
         animal_category_vectorizer: CategoricalVectorizer,
@@ -84,7 +78,6 @@ class AnimalFeatureUsecase(AbstractAnimalFeatureUsecase):
     ):
         super().__init__(
             animal_repository=animal_repository,
-            animal_feature_repository=animal_feature_repository,
             messaging=messaging,
             cache=cache,
             animal_category_vectorizer=animal_category_vectorizer,
@@ -297,49 +290,19 @@ class AnimalFeatureUsecase(AbstractAnimalFeatureUsecase):
                 vectorized_names,
             )
         ):
-            _cache = update
-            existing_feature = self.animal_feature_repository.select(
-                query=AnimalFeatureQuery(
-                    animal_id=animal_id,
-                    mlflow_experiment_id=mlflow_experiment_id,
-                    mlflow_run_id=mlflow_run_id,
-                )
-            )
-            data = dict(
-                animal_category_vector=animal_category_vector,
-                animal_subcategory_vector=animal_subcategory_vector,
-                name_words=name_words.split(" "),
-                description_words=description_words.split(" "),
-                name_vector=name_vector,
-                description_vector=description_vector,
-            )
-            if len(existing_feature) > 0:
-                if update:
-                    self.animal_feature_repository.update(
-                        record=AnimalFeatureUpdate(
-                            id=existing_feature[0].id,
-                            **data,
-                        )
-                    )
-                    _cache = True
-                else:
-                    _cache = False
-            else:
-                create_record = AnimalFeatureCreate(
-                    id=get_uuid(),
-                    animal_id=animal_id,
-                    mlflow_experiment_id=mlflow_experiment_id,
-                    mlflow_run_id=mlflow_run_id,
-                    **data,
-                )
-                self.animal_feature_repository.insert(record=create_record)
-                _cache = True
-
-            if _cache:
+            if update:
                 key = self.make_cache_key(
                     animal_id=animal_id,
                     mlflow_experiment_id=mlflow_experiment_id,
                     mlflow_run_id=mlflow_run_id,
+                )
+                data = dict(
+                    animal_category_vector=animal_category_vector,
+                    animal_subcategory_vector=animal_subcategory_vector,
+                    name_words=name_words.split(" "),
+                    description_words=description_words.split(" "),
+                    name_vector=name_vector,
+                    description_vector=description_vector,
                 )
                 self.cache.set(
                     key=key,

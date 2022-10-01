@@ -232,13 +232,17 @@ q_test: {sum(q_test) if q_test is not None else None}
         """
         )
 
-        likes_scaler_save_file_path = likes_scaler.save(file_path=likes_scaler_save_file_path)
-        query_phrase_encoder_save_file_path = query_phrase_encoder.save(file_path=query_phrase_encoder_save_file_path)
-        query_animal_category_id_encoder_save_file_path = query_animal_category_id_encoder.save(
-            file_path=query_animal_category_id_encoder_save_file_path
+        likes_scaler_path = likes_scaler.save(
+            file_path=likes_scaler_save_file_path,
         )
-        query_animal_subcategory_id_encoder_save_file_path = query_animal_subcategory_id_encoder.save(
-            file_path=query_animal_subcategory_id_encoder_save_file_path
+        q_phrase_encoder_path = query_phrase_encoder.save(
+            file_path=query_phrase_encoder_save_file_path,
+        )
+        q_animal_category_id_encoder_path = query_animal_category_id_encoder.save(
+            file_path=query_animal_category_id_encoder_save_file_path,
+        )
+        q_animal_subcategory_id_encoder_path = query_animal_subcategory_id_encoder.save(
+            file_path=query_animal_subcategory_id_encoder_save_file_path,
         )
 
         data = PreprocessedData(
@@ -250,9 +254,9 @@ q_test: {sum(q_test) if q_test is not None else None}
             q_test=q_test,
         )
         artifact = PreprocessArtifact(
-            likes_scaler_save_file_path=likes_scaler_save_file_path,
-            query_phrase_encoder_save_file_path=query_phrase_encoder_save_file_path,
-            query_animal_category_id_encoder_save_file_path=query_animal_category_id_encoder_save_file_path,
-            query_animal_subcategory_id_encoder_save_file_path=query_animal_subcategory_id_encoder_save_file_path,
+            likes_scaler_save_file_path=likes_scaler_path,
+            query_phrase_encoder_save_file_path=q_phrase_encoder_path,
+            query_animal_category_id_encoder_save_file_path=q_animal_category_id_encoder_path,
+            query_animal_subcategory_id_encoder_save_file_path=q_animal_subcategory_id_encoder_path,
         )
         return data, artifact

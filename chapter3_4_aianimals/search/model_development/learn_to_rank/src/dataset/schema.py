@@ -31,7 +31,6 @@ class Action(Enum):
 class TABLES(Enum):
     ANIMAL = "animals"
     ACCESS_LOG = "access_logs"
-    ANIMAL_FEATURE = "animal_features"
 
     @staticmethod
     def has_value(value: str) -> bool:
