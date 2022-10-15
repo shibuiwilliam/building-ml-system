@@ -1,5 +1,4 @@
 from logging import getLogger
-from re import X
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
