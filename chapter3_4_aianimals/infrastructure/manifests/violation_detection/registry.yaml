@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: registry
+  namespace: violation-detection
+  labels:
+    app: registry
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: registry
+  template:
+    metadata:
+      labels:
+        app: registry
+    spec:
+      containers:
+        - name: registry
+          image: shibui/building-ml-system:ai_animals_violation_detection_registry_0.0.0
+          imagePullPolicy: Always
+          command:
+            - "python"
+            - "-m"
+            - "src.main"
+          resources:
+            limits:
+              cpu: 500m
+              memory: "800Mi"
+            requests:
+              cpu: 200m
+              memory: "400Mi"
+          env:
+            - name: POSTGRES_HOST
+              value: postgres.data.svc.cluster.local
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: password
+            - name: POSTGRES_DB
+              value: aianimals
+            - name: RABBITMQ_HOST
+              value: rabbitmq-amqp.data.svc.cluster.local
+            - name: RABBITMQ_USER
+              value: user
+            - name: RABBITMQ_PASSWORD
+              value: password
+            - name: VIOLATION_QUEUE
+              value: violation

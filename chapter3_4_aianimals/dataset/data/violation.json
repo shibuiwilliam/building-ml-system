@@ -1,0 +1,578 @@
+{
+    "65226dd97e9d4ccc96bc16f05bb74812": {
+        "animal_id": "0aab8485c5a047cbb7241408a850fcfc",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "2d319274b55a472d9404e0ab24175480": {
+        "animal_id": "0c5604554c10428b887680bb91e7cdd7",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "92050a9408ad4f1bb18b791ad758ef66": {
+        "animal_id": "0c6a782d75cc46ebb3bafeab25972baf",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "f9c8abdeec924e47a70b88d7dd81a927": {
+        "animal_id": "149cbda5a23e4e788b78124f38057782",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "88ee3636e1d549148192ccc9b43e04ce": {
+        "animal_id": "14c16a6b58694055ae88f1907ff8b262",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "4b4641b016d041aeb2d85e5db5c153dd": {
+        "animal_id": "1557ba375cc241768e0e999d6dcf0c1b",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "8430f6f31dd045b0ae8ab78b1084332c": {
+        "animal_id": "15b676b75add4c5190047950c4b6ef09",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "a8cd0763d3564c3498845d0d4d137ff4": {
+        "animal_id": "15db6b110bbd4146965623ca2dc0c47a",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "fd8ca6b298e943f29d00ef12f7dc8497": {
+        "animal_id": "17854577a4ab498aafafded69c0fede4",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "501f9845db784666b94ef567d5624dcf": {
+        "animal_id": "1a7f77d1573d4d0eaf0bff52f3f335c9",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "3ccfb71cc94140bfaa47b02a3212fd82": {
+        "animal_id": "1ba03b8737c24e99bd4acdfea25363d8",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "ab6cfdd3865d4962aa1bb67a0fc75f23": {
+        "animal_id": "22fd597d16dc42339ff6907fda37efb4",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "232c6c95640749cf84edf1118b286d67": {
+        "animal_id": "23c10be070d84db9a826aac0f9505c0e",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "61713da68d4c47a187ddd7e477e4f7ce": {
+        "animal_id": "256f2f8768cb4925b8391abfb319317e",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "2cfaa9b9afe840be9cbccb8c2b55e0c3": {
+        "animal_id": "286de125ec454fbdb44e69c4f7d53bc4",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "aacff4dad58b408292a64dcacd5a43b0": {
+        "animal_id": "2a7333920b8944eab6f779bd6634cb17",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "0241d46cb43b4092a8a9b8bc28ebd916": {
+        "animal_id": "2b5f595c8cb54fd59d85fb48f0fb811a",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "36484880ad924d69961c9ab090e034b5": {
+        "animal_id": "2f1d37e326e5448ab048db98d379ec6c",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "f0b796ff093f417cb1faaf1e10679c42": {
+        "animal_id": "322bc76e6a714d8cbd4cac59635bd16c",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "78fb1224aa7d4e13b2c2c5fcaed6f0de": {
+        "animal_id": "3b5aa9b71c394f61b1f43e2d5d9b01fb",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "8976261cfe6e47f4b946e0b4dd7962a5": {
+        "animal_id": "3c78d5f7a5dd4b7ea4f3d4355d7e5c25",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "547e4264fb3e4670901089c815106037": {
+        "animal_id": "493871168a11400a82212816985c9136",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "9d126163769c442c975d5103f46b78a6": {
+        "animal_id": "494485eb52e54843a219bc2f579e40c3",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "cddb15a850ae40f6af2e3df0a3ecbfb3": {
+        "animal_id": "4a77e789b1304daeb26790c31f69255d",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "7e0657ab71b5496bafe84ca74246fa6d": {
+        "animal_id": "4b46ffa1452845bba44abb3e1a7e7c39",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "13e7f01d7911459886c4035f7ddb89b0": {
+        "animal_id": "4e04a477acfd4ce290eb4b695642f852",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "fbb01a66d2a243848bd422137c53a3f9": {
+        "animal_id": "53e65eb4f52643c9a07ff8e366148aea",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "d32a031c8e5f4a20bf2269732068c128": {
+        "animal_id": "57c86c4f18624e9aa8dc19970079e262",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "33cb0b8476d8408e89758a55d1c92143": {
+        "animal_id": "5f85e8b358d642ffa95f8923e462ad0a",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "94dc73b3886243258ed158b99b2ae227": {
+        "animal_id": "60c83ffbb2544cea9afe1507b6535c86",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "0f814b0720034d1b8ce11e3acfc3ee19": {
+        "animal_id": "62821a6caef04240808e683b55cc0931",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "ba165a54732d4c739f18ffbf02a87123": {
+        "animal_id": "666c199bddd04235970e39307044d3d8",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "17eca737d0184f3a80c967e2a5ee0a2d": {
+        "animal_id": "66730c85493c4147a6bc14851eb33b51",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "ddf65ccdcf38450c954972facd180bf6": {
+        "animal_id": "6a0c35c5441848f79932040362e97ec1",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "6dbe83c97c83467d9f8588a49c68547e": {
+        "animal_id": "6c76a85e19124d30b56153be47d30a26",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "dcece6b4638b4643a6c4a4766f07c28b": {
+        "animal_id": "6cc5540e985d4bb7a9f7afd02ff6dd8c",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "5d0e162940e442b88e9a10f795796765": {
+        "animal_id": "6d241f81707041df8a21a8629913795c",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "9fa5a61deb204d5e86c0d69b79343b31": {
+        "animal_id": "7050d009e8ad4c19969238f8824fc22c",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "110fe75b214f458e835f5d07c8eaed68": {
+        "animal_id": "7344e33a7688471e9384a649d4094314",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "97043b25a5324380bed33988d304303b": {
+        "animal_id": "73b0bb6c70f54f5999d2a0f4bdaf2aea",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "2a74c89f9dcf456ca4c987d0103785b7": {
+        "animal_id": "73f40aa58d174a68841a40785a1d02c2",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "5df128257b0b4ce5a6b90aa7d0581b10": {
+        "animal_id": "7717719b793e42d5906aea70fd6e3926",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "b8595bb57ad04e48a33bade0008bc3d5": {
+        "animal_id": "7b575f379ab44ce4b51b58c14c38d2ef",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "0a39fcbea20b42738378c77b06b03279": {
+        "animal_id": "7f79b5ac1cbc47f2b565fce582d491c3",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "9c2f28c094114250b08e7e202d76cbcd": {
+        "animal_id": "85211257210249e9b0836c51f156bb30",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "d2ef6c5c3d0d41f9b2e595d8a0b96a23": {
+        "animal_id": "88f91bae8b21421287480f852e1b92b3",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "66b147434f1d40f5be2ee95ec1a9d6f4": {
+        "animal_id": "8d63ca03369d461981b1eef8e92cdf11",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "d0827110046540f1b4fc5b5de9fc593b": {
+        "animal_id": "940abd0cfdc540938b232e7c71a70ea8",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "335fc3ec5c91412b91ddc10cfdc81087": {
+        "animal_id": "a0f3223c603a42688b0652fd464186c0",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "7159c8f1109f4d03a63e9460e3532457": {
+        "animal_id": "a1fedf5974794cd1ab60cba002a3fbea",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "61f7c2c966744e8fb153a57f500237e0": {
+        "animal_id": "a2ed4288aeb843f0a94cea4eb29edc95",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "334ce4c0226b4afb8ec226a27c933708": {
+        "animal_id": "a721a63e1b2d4a389992a939c7fd1762",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "4b95e8f513e143e48e3199359b9a8781": {
+        "animal_id": "af6af6d5c0044924a0d66be1466e1000",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "4f5e0178713548f6ba2c91eed55aa28c": {
+        "animal_id": "af71242681914da09b2d53a5ec26e41e",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "75c7fc2c7470411a898c24fc00592118": {
+        "animal_id": "b1d4714d30224fe7b68c2a8ea219a375",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "fdde8a6617c94a4291c8a09c1da13cf9": {
+        "animal_id": "b4e34847339d40869895285e46449fd1",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "e298d29f42f840faa383077000ec939c": {
+        "animal_id": "ba62992e145f4212ae0d8a77279c4592",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "497474e4386b41f2af6aa368b44cf26c": {
+        "animal_id": "c5f3a69179144c118f5dcab06f7d9aaa",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "8e79c517f0e0424cb1e6d4a76e129f59": {
+        "animal_id": "c8643ec168454b2693de06b1c020c3df",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "9472a2c93f394951b1711509f428ef71": {
+        "animal_id": "d220b70969a642f9a6e65c8482031fa6",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "e5180795a79d49bc92331f763fcb1a1d": {
+        "animal_id": "d3162aa0bfea436cb3e84daf82c7efe9",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "4a3b0577009b4fb2bf1b7ffe894e2404": {
+        "animal_id": "da54b3d5ab864507ba53e1b95fd7296d",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "fdc4fd6d7ab4459289f7358f429319fd": {
+        "animal_id": "da59e4d5f64d49189671cd8a924a2774",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "79137b9afe2742308d2264bfc863c953": {
+        "animal_id": "df85704d19d84ff7a6afda9ac05848bc",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "7faf804431c3484bb99b99e40b4886f2": {
+        "animal_id": "e283149293cb4e49817a2e845b1ac7a2",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "3dc11fc9251f4db2b853e9f40acb845e": {
+        "animal_id": "e474ed9c2ac144f2a4ebd6310ab73799",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "ae8d2ad5b74143f8895b678fcb56da08": {
+        "animal_id": "e6c8e5ffcae54da9b890b0146e07efe7",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "4d92d9dc3a3e4557bb813822230900d0": {
+        "animal_id": "e7ef716432504bdf94378ba1707cd808",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "2f9d81be67aa4f8684505fe76411db8c": {
+        "animal_id": "eaa3b5cef19b45baafd4b88477ab531a",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "d779978fa6ff45a0ad57959221b2560b": {
+        "animal_id": "fb91a4cf8a784b7b8e6f783a505144c0",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "8798560e045f4bbcb20146266a58ce21": {
+        "animal_id": "fe6671028f58403fadfcd00e3098c3df",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    },
+    "82d8ba29dfe94f159a9fb4ae350f5491": {
+        "animal_id": "fff66ec1cd554374ba98ab39abffd98e",
+        "violation_type_id": "93e7109457344567bbdddda9b15a241b",
+        "violation_type": "human_face_violation",
+        "judge": "administrator",
+        "probability": 1.0,
+        "is_effective": true
+    }
+}

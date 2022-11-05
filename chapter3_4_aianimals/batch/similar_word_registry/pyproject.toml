@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "similar_word_registry"
+version = "0.0.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "3.10.6"
+gensim = "^4.2.0"
+pydantic = "^1.9.0"
+httpx = "^0.23.0"
+psycopg2-binary = "^2.9.3"
+dependency-injector = "^4.39.1"
+redis = "^4.2.2"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

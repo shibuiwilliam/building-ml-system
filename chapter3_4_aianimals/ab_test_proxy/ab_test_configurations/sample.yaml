@@ -1,0 +1,14 @@
+ab_test_type: random
+random_ab_test_random_distribution:
+  endpoint_a:
+    endpoint:
+      name: a
+      endpoint: http://example.com
+    rate: 0.6
+  endpoint_b:
+    endpoint:
+      name: b
+      endpoint: http://example.com
+    rate: 0.4
+timeout: 10.0
+retries: 2

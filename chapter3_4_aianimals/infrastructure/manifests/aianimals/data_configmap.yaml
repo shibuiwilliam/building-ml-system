@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: data-paths
+  namespace: aianimals
+data:
+  access_logs: https://storage.googleapis.com/aianimals/data/access_logs.json
+  animal: https://storage.googleapis.com/aianimals/data/animal.json
+  animal_category: https://storage.googleapis.com/aianimals/data/animal_category.json
+  animal_subcategory: https://storage.googleapis.com/aianimals/data/animal_subcategory.json
+  no_animal_violation: https://storage.googleapis.com/aianimals/data/no_animal_violation.json
+  user: https://storage.googleapis.com/aianimals/data/user.json
+  like: https://storage.googleapis.com/aianimals/data/likes.json
+  violation: https://storage.googleapis.com/aianimals/data/violation.json
+  violation_type: https://storage.googleapis.com/aianimals/data/violation_type.json

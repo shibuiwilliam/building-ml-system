@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "violation_detection"
+version = "0.0.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "3.10.6"
+tensorboard = "^2.8.0"
+Pillow = "^9.0.0"
+scikit-learn = "^1.0.2"
+numpy = "^1.22.1"
+hydra-core = "^1.1.1"
+mlflow = "^1.23.1"
+nptyping = "^1.4.4"
+pydantic = "^1.9.0"
+httpx = "^0.23.0"
+psycopg2-binary = "^2.9.3"
+tensorflow-hub = "^0.12.0"
+dependency-injector = "^4.39.1"
+tensorflow = "^2.9.1"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

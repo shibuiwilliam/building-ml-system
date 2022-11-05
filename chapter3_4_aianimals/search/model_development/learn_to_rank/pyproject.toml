@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "learn_to_rank"
+version = "0.0.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "3.10.6"
+psycopg2-binary = "^2.9.3"
+dependency-injector = "^4.40.0"
+hydra-core = "^1.2.0"
+mlflow = "^1.28.0"
+pydantic = "^1.9.2"
+SQLAlchemy = "^1.4.40"
+pandas = "^1.4.3"
+numpy = "^1.23.1"
+skl2onnx = "^1.12"
+onnxruntime = "^1.12.1"
+onnxmltools = "^1.11.1"
+httpx = "^0.23.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

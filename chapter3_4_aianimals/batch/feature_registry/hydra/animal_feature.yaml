@@ -1,0 +1,20 @@
+task_name: animal_feature_extraction
+jobs:
+  animal_category:
+    type: category
+    one_hot_encoding:
+      sparse: true
+      handle_unknown: ignore
+  animal_subcategory:
+    type: category
+    one_hot_encoding:
+      sparse: true
+      handle_unknown: ignore
+  description:
+    type: text
+    vectorizer:
+      max_features: 500
+  name:
+    type: text
+    vectorizer:
+      max_features: 300

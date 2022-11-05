@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: elastic-search
+---
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: elastic-search
+  namespace: elastic-search
+spec:
+  version: 8.0.1
+  nodeSets:
+    - name: default
+      count: 1
+      config:
+        node.store.allow_mmap: false
+      podTemplate:
+        spec:
+          initContainers:
+          - name: install-plugins
+            command:
+            - /usr/bin/env
+            - bash
+            - -c
+            - |
+              bin/elasticsearch-users useradd elastic_user -p password -r superuser
+              bin/elasticsearch-plugin install analysis-kuromoji
+              bin/elasticsearch-plugin install analysis-icu
+
+---
+apiVersion: kibana.k8s.elastic.co/v1
+kind: Kibana
+metadata:
+  name: kibana
+  namespace: elastic-search
+spec:
+  version: 8.0.1
+  count: 1
+  elasticsearchRef:
+    name: elastic-search

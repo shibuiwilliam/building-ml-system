@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "portal"
+version = "0.0.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "3.10.6"
+streamlit = "^1.8.1"
+psycopg2-binary = "^2.9.3"
+httpx = "^0.23.0"
+pydantic = "^1.9.0"
+dependency-injector = "^4.39.1"
+pandas = "^1.4.2"
+plotly = "^5.7.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

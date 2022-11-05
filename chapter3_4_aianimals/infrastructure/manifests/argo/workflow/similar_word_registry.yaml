@@ -1,0 +1,72 @@
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  generateName: similar-word-registry-pipeline-
+spec:
+  schedule: "0 12 * * 1"
+  concurrencyPolicy: "Forbid"
+  startingDeadlineSeconds: 0
+  workflowSpec:
+    entrypoint: pipeline
+    templates:
+      - name: pipeline
+        steps:
+          - - name: similar-word-registry
+              template: similar-word-registry
+
+      - name: similar-word-registry
+        initContainers:
+          - name: similar-word-registry-init
+            image: shibui/building-ml-system:ai_animals_similar_word_registry_0.0.0
+            imagePullPolicy: Always
+            command:
+              - bash
+              - -c
+              - |
+                mkdir -p /opt/model/
+                wget https://storage.googleapis.com/aianimals/models/search/cc.ja.300.vec.gz -P /opt/model/
+            volumeMounts:
+              - mountPath: /opt/model/
+                name: data
+        container:
+          image: shibui/building-ml-system:ai_animals_similar_word_registry_0.0.0
+          imagePullPolicy: Always
+          command:
+            - "python"
+            - "-m"
+            - "src.main"
+          env:
+            - name: POSTGRES_HOST
+              value: postgres.data.svc.cluster.local
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: password
+            - name: POSTGRES_DB
+              value: aianimals
+            - name: REDIS_HOST
+              value: redis.data.svc.cluster.local
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_DB
+              value: "0"
+            - name: JOB
+              value: similar_word_registration_job
+            - name: MODEL_PATH
+              value: /opt/model/cc.ja.300.vec.gz
+            - name: SEARCH_TOP_N
+              value: "100"
+            - name: SIMILAR_TOP_N
+              value: "10"
+          resources:
+            requests:
+              memory: 16000Mi
+              cpu: 1500m
+          volumeMounts:
+            - mountPath: /opt/model/
+              name: data
+        volumes:
+          - name: data
+            emptyDir: {}

@@ -1,0 +1,180 @@
+version: "3"
+
+services:
+  postgres:
+    image: postgres:13.5
+    container_name: postgres
+    restart: always
+    networks:
+      - default
+    ports:
+      - 5432:5432
+    volumes:
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=aianimals
+      - POSTGRES_INITDB_ARGS="--encoding=UTF-8"
+    hostname: postgres
+    stdin_open: true
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    restart: always
+    networks:
+      - default
+    ports:
+      - 6379:6379
+    hostname: redis
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management
+    restart: always
+    networks:
+      - default
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password
+    hostname: rabbitmq
+
+  es:
+    container_name: es
+    image: shibui/building-ml-system:ai_animals_elasticsearch_0.0.0
+    restart: always
+    networks:
+      - default
+    ports:
+      - 127.0.0.1:9200:9200
+      - 127.0.0.1:9201:9201
+      - 127.0.0.1:9300:9300
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+    hostname: es
+
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:8.1.2
+    restart: always
+    networks:
+      - default
+    ports:
+      - 127.0.0.1:5601:5601
+    environment:
+      - ELASTICSEARCH_HOSTS="http://es:9200"
+    hostname: kibana
+    depends_on:
+      - es
+
+  initial_data_registry:
+    container_name: initial_data_registry
+    image: shibui/building-ml-system:ai_animals_data_registry_0.0.0
+    volumes:
+      - ./dataset/data/:/opt/dataset/data/
+    restart: "no"
+    networks:
+      - default
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=aianimals
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=user
+      - RABBITMQ_PASSWORD=password
+      - ANIMAL_VIOLATION_QUEUE_NO_ANIMAL_VIOLATION=no_animal_violation
+      - ES_HOST=http://es:9200
+      - LOG_LEVEL=INFO
+      - RUN_ENVIRONMENT=local
+      - JOB=initialization_job
+      - DATA_DIRECTORY=/opt/dataset/data/
+    command: >
+      /bin/sh -c "sleep 20s && python -m src.main"
+    depends_on:
+      - postgres
+      - redis
+
+  search_registry:
+    container_name: search_registry
+    image: shibui/building-ml-system:ai_animals_data_registry_0.0.0
+    volumes:
+      - ./dataset/data/:/opt/dataset/data/
+    restart: always
+    networks:
+      - default
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=aianimals
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=user
+      - RABBITMQ_PASSWORD=password
+      - ES_HOST=http://es:9200
+      - LOG_LEVEL=INFO
+      - RUN_ENVIRONMENT=local
+      - JOB=animal_to_search_job
+      - DATA_DIRECTORY=/opt/dataset/data/
+    command: >
+      /bin/sh -c "sleep 60s && python -m src.main"
+    depends_on:
+      - postgres
+      - redis
+      - es
+
+  api:
+    container_name: api
+    image: shibui/building-ml-system:ai_animals_api_0.0.0
+    volumes:
+      - ./api/secrets/secret.key:/opt/secrets/secret.key
+    restart: always
+    networks:
+      - default
+    ports:
+      - 8000:8000
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=aianimals
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=user
+      - RABBITMQ_PASSWORD=password
+      - ES_HOST=http://es:9200
+      - ANIMAL_REGISTRY_QUEUE=animal
+      - ANIMAL_VIOLATION_QUEUE_NO_ANIMAL_VIOLATION=no_animal_violation
+      - LOG_LEVEL=INFO
+      - RUN_ENVIRONMENT=local
+      - KEY_FILE_PATH=/opt/secrets/secret.key
+      - WORKERS=1
+      - PORT=8000
+    command: >
+      /bin/sh -c "sleep 120s && ./run.sh"
+    hostname: api
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+      - es
+
+networks:
+  default:
+    name: aianimals

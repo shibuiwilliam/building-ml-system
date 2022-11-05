@@ -1,0 +1,91 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: learn-to-rank-ab-test-proxy
+  namespace: search
+data:
+  config.yaml: |
+    ab_test_type: random
+    random_ab_test_random_distribution:
+      endpoint_a:
+        endpoint:
+          name: learn-to-rank-lgbm-ranker
+          endpoint: http://learn-to-rank-lgbm-ranker.search.svc.cluster.local:10000/v0/reorder
+        rate: "0.4"
+      endpoint_b:
+        endpoint:
+          name: learn-to-rank-lgbm-regression
+          endpoint: http://learn-to-rank-lgbm-regression.search.svc.cluster.local:10100/v0/reorder
+        rate: "0.6"
+    timeout: "10.0"
+    retries: "2"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: learn-to-rank-ab-test-proxy
+  namespace: search
+  labels:
+    app: learn-to-rank-ab-test-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: learn-to-rank-ab-test-proxy
+  template:
+    metadata:
+      labels:
+        app: learn-to-rank-ab-test-proxy
+    spec:
+      containers:
+        - name: learn-to-rank-ab-test-proxy
+          image: shibui/building-ml-system:ai_animals_ab_test_proxy_0.0.0
+          imagePullPolicy: Always
+          command:
+            - "./run.sh"
+          ports:
+            - containerPort: 11000
+          resources:
+            limits:
+              cpu: 1000m
+              memory: "1000Mi"
+            requests:
+              cpu: 500m
+              memory: "1000Mi"
+          env:
+            - name: RUN_ENVIRONMENT
+              value: cloud
+            - name: PORT
+              value: "11000"
+            - name: WORKERS
+              value: "2"
+            - name: TIMEOUT
+              value: "10"
+            - name: LOG_LEVEL
+              value: INFO
+            - name: AB_TEST_CONFIGURATION
+              value: /opt/config.yaml
+          volumeMounts:
+            - name: config-volume
+              mountPath: /opt/config.yaml
+              subPath: config.yaml
+      volumes:
+        - name: config-volume
+          configMap:
+            name: learn-to-rank-ab-test-proxy
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: learn-to-rank-ab-test-proxy
+  namespace: search
+  labels:
+    app: learn-to-rank-ab-test-proxy
+spec:
+  ports:
+    - name: learn-to-rank-ab-test-proxy
+      port: 11000
+      protocol: TCP
+  selector:
+    app: learn-to-rank-ab-test-proxy

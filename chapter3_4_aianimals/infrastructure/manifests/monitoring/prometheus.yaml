@@ -1,0 +1,176 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: prometheus
+  namespace: monitoring
+rules:
+  - apiGroups: [""]
+    resources:
+      - nodes
+      - nodes/proxy
+      - services
+      - endpoints
+      - pods
+    verbs: ["get", "list", "watch"]
+  - apiGroups:
+      - extensions
+    resources:
+      - ingresses
+    verbs: ["get", "list", "watch"]
+  - nonResourceURLs: ["/metrics"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: prometheus
+  namespace: monitoring
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: prometheus
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: monitoring
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pushgateway
+  namespace: monitoring
+  labels:
+    app: pushgateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pushgateway
+  template:
+    metadata:
+      labels:
+        app: pushgateway
+    spec:
+      containers:
+        - name: pushgateway
+          image: prom/pushgateway:latest
+          ports:
+            - containerPort: 9091
+          resources:
+            limits:
+              cpu: 2000m
+              memory: "4000Mi"
+            requests:
+              cpu: 500m
+              memory: "1000Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pushgateway
+  namespace: monitoring
+  labels:
+    app: pushgateway
+spec:
+  selector:
+    app: pushgateway
+  ports:
+    - name: pushgateway
+      port: 9091
+      protocol: TCP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus
+  namespace: monitoring
+  labels:
+    name: prometheus
+data:
+  prometheus.yml: |-
+    global:
+      scrape_interval:     15s
+      evaluation_interval: 15s
+    alerting:
+      alertmanagers:
+      - static_configs:
+        - targets:
+    rule_files:
+    scrape_configs:
+      - job_name: 'prometheus'
+        static_configs:
+        - targets: ['localhost:9090']      
+      - job_name: 'pushgateway'
+        honor_labels: true
+        metrics_path: /metrics
+        static_configs:
+        - targets: ['pushgateway:9091']
+      - job_name: 'search-learn-to-rank-lgbm-ranker'
+        honor_labels: true
+        metrics_path: /metrics
+        static_configs:
+        - targets: ['learn-to-rank-lgbm-ranker.search.svc.cluster.local:10000']
+      - job_name: 'search-learn-to-rank-lgbm-regression'
+        honor_labels: true
+        metrics_path: /metrics
+        static_configs:
+        - targets: ['learn-to-rank-lgbm-regression.search.svc.cluster.local:10100']
+      - job_name: 'search-similar-image-search-proxy'
+        honor_labels: true
+        metrics_path: /metrics
+        static_configs:
+        - targets: ['similar-image-search-proxy.search.svc.cluster.local:15000']
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: monitoring
+  labels:
+    app: prometheus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+        - name: prometheus
+          image: prom/prometheus:latest
+          args:
+            - "--config.file=/etc/config/prometheus.yml"
+            - "--storage.tsdb.path=/prometheus/"
+            - "--storage.tsdb.retention=3d"
+          ports:
+            - containerPort: 9090
+          resources:
+            limits:
+              cpu: 2000m
+              memory: "4000Mi"
+            requests:
+              cpu: 500m
+              memory: "1000Mi"
+          volumeMounts:
+            - name: config
+              mountPath: /etc/config
+      volumes:
+        - name: config
+          configMap:
+            name: prometheus
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: monitoring
+spec:
+  selector:
+    app: prometheus
+  ports:
+    - name: prometheus
+      port: 9090
+      protocol: TCP

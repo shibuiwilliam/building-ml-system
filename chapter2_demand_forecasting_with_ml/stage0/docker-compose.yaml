@@ -1,0 +1,63 @@
+version: "3"
+
+services:
+  postgres:
+    image: postgres:14.3
+    container_name: postgres
+    volumes:
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    networks:
+      - default
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=mlflow
+      - POSTGRES_INITDB_ARGS="--encoding=UTF-8"
+    ports:
+      - 5432:5432
+    hostname: postgres
+    restart: always
+    stdin_open: true
+
+  mlflow:
+    container_name: mlflow
+    image: shibui/building-ml-system:beverage_sales_forecasting_mlflow_0.0.0
+    volumes:
+      - ./ml/outputs/mlruns:/opt/outputs/mlruns
+    command:
+      - "mlflow"
+      - "server"
+      - "--backend-store-uri"
+      - "postgresql+psycopg2://postgres:password@postgres:5432/mlflow"
+      - "--default-artifact-root"
+      - "/opt/outputs/mlruns"
+      - "--host"
+      - "0.0.0.0"
+    ports:
+      - 15000:5000
+    restart: always
+    hostname: mlflow
+    depends_on:
+      - postgres
+
+  ml:
+    container_name: ml
+    image: shibui/building-ml-system:beverage_sales_forecasting_ml_0.0.0
+    restart: "no"
+    volumes:
+      - ./data:/opt/data
+      - ./ml/hydra:/opt/hydra
+      - ./ml/outputs:/opt/outputs
+    networks:
+      - default
+    environment:
+      - LOG_LEVEL=INFO
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - TARGET_CONFIG_NAME=2021_04
+    command: /bin/sh -c "sleep 10s && python -m src.main"
+    depends_on:
+      - mlflow
+
+networks:
+  default:
+    name: ml

@@ -1,0 +1,113 @@
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  generateName: search-similar-image-search-pipeline-
+spec:
+  schedule: "0 * * * *"
+  concurrencyPolicy: "Forbid"
+  startingDeadlineSeconds: 0
+  workflowSpec:
+    entrypoint: pipeline
+    templates:
+      - name: pipeline
+        steps:
+          - - name: search-similar-image-search-train
+              template: search-similar-image-search-train
+          - - name: search-similar-image-search-update
+              template: search-similar-image-search-update
+              arguments:
+                parameters:
+                  - name: deployment
+                    value: similar-image-search-serving
+                  - name: containers
+                    value: model-loader
+                  - name: mlflow-params
+                    value: "{{steps.search-similar-image-search-train.outputs.parameters.mlflow-params}}"
+            - name: search-similar-image-search-proxy-update
+              template: search-similar-image-search-proxy-update
+              arguments:
+                parameters:
+                  - name: deployment
+                    value: similar-image-search-proxy
+                  - name: containers
+                    value: similar-image-search-proxy
+                  - name: mlflow-params
+                    value: "{{steps.search-similar-image-search-train.outputs.parameters.mlflow-params}}"
+
+      - name: search-similar-image-search-train
+        container:
+          image: shibui/building-ml-system:ai_animals_search_similar_image_search_train_0.0.0
+          imagePullPolicy: Always
+          command:
+            - "python"
+            - "-m"
+            - "src.main"
+          env:
+            - name: MODEL_CONFIG
+              value: mobilenet_v3_scann
+            - name: MLFLOW_TRACKING_URI
+              value: http://mlflow.mlflow.svc.cluster.local:5000
+            - name: MLFLOW_EXPERIMENT
+              value: search_similar_image_search
+            - name: POSTGRES_HOST
+              value: postgres.data.svc.cluster.local
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: password
+            - name: POSTGRES_DB
+              value: aianimals
+          resources:
+            requests:
+              memory: 16000Mi
+              cpu: 2000m
+        outputs:
+          parameters:
+            - name: mlflow-params
+              valueFrom:
+                path: /tmp/output.json
+
+      - name: search-similar-image-search-update
+        serviceAccountName: user-admin
+        inputs:
+          parameters:
+            - name: deployment
+            - name: containers
+            - name: mlflow-params
+        container:
+          image: shibui/building-ml-system:ai_animals_k8s_client_0.0.0
+          command: [kubectl]
+          args:
+            - -n
+            - search
+            - set
+            - env
+            - deployment
+            - "{{inputs.parameters.deployment}}"
+            - "--containers={{inputs.parameters.containers}}"
+            - "MLFLOW_PARAM_JSON={{inputs.parameters.mlflow-params}}"
+            - "TARGET_ARTIFACTS=saved_model"
+            - "TARGET_URLS=''"
+
+      - name: search-similar-image-search-proxy-update
+        serviceAccountName: user-admin
+        inputs:
+          parameters:
+            - name: deployment
+            - name: containers
+            - name: mlflow-params
+        container:
+          image: shibui/building-ml-system:ai_animals_k8s_client_0.0.0
+          command: [kubectl]
+          args:
+            - -n
+            - search
+            - set
+            - env
+            - deployment
+            - "{{inputs.parameters.deployment}}"
+            - "--containers={{inputs.parameters.containers}}"
+            - "MLFLOW_PARAM_JSON={{inputs.parameters.mlflow-params}}"
+            - "PSEUDO_PREDICTION=0"

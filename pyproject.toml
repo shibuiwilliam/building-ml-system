@@ -1,0 +1,19 @@
+[tool.poetry]
+authors = ["Your Name <you@example.com>"]
+description = ""
+license = "MIT"
+name = "building-ml-system"
+version = "0.0.0"
+
+[tool.poetry.dependencies]
+kaggle = "^1.5.12"
+python = "3.10.6"
+psycopg2-binary = "^2.9.1"
+uvloop = "^0.16.0"
+scikit-learn = "1.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]

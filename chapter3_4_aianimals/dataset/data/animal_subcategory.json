@@ -1,0 +1,230 @@
+{
+    "other": {
+        "category": 0,
+        "subcategory": 0,
+        "name_en": "other",
+        "name_ja": "その他"
+    },
+    "abyssinian": {
+        "category": 1,
+        "subcategory": 1,
+        "name_en": "abyssinian",
+        "name_ja": "アビシニアン"
+    },
+    "american_bulldog": {
+        "category": 2,
+        "subcategory": 2,
+        "name_en": "american_bulldog",
+        "name_ja": "ブルドッグ"
+    },
+    "american_pit_bull_terrier": {
+        "category": 2,
+        "subcategory": 3,
+        "name_en": "american_pit_bull_terrier",
+        "name_ja": "アメリカンピットブルテリア"
+    },
+    "basset_hound": {
+        "category": 2,
+        "subcategory": 4,
+        "name_en": "basset_hound",
+        "name_ja": "バセットハウンド"
+    },
+    "beagle": {
+        "category": 2,
+        "subcategory": 5,
+        "name_en": "beagle",
+        "name_ja": "ビーグル"
+    },
+    "bengal": {
+        "category": 1,
+        "subcategory": 6,
+        "name_en": "bengal",
+        "name_ja": "ベンガル"
+    },
+    "birman": {
+        "category": 1,
+        "subcategory": 7,
+        "name_en": "birman",
+        "name_ja": "バーマン"
+    },
+    "bombay": {
+        "category": 1,
+        "subcategory": 8,
+        "name_en": "bombay",
+        "name_ja": "ボンベイ"
+    },
+    "boxer": {
+        "category": 2,
+        "subcategory": 9,
+        "name_en": "boxer",
+        "name_ja": "ボクサー"
+    },
+    "british_shorthair": {
+        "category": 1,
+        "subcategory": 10,
+        "name_en": "british_shorthair",
+        "name_ja": "ブリティッシュショートヘア"
+    },
+    "chihuahua": {
+        "category": 2,
+        "subcategory": 11,
+        "name_en": "chihuahua",
+        "name_ja": "チワワ"
+    },
+    "egyptian_mau": {
+        "category": 1,
+        "subcategory": 12,
+        "name_en": "egyptian_mau",
+        "name_ja": "エジプシャンマウ"
+    },
+    "english_cocker_spaniel": {
+        "category": 2,
+        "subcategory": 13,
+        "name_en": "english_cocker_spaniel",
+        "name_ja": "イングリッシュコッカースパニエル"
+    },
+    "english_setter": {
+        "category": 2,
+        "subcategory": 14,
+        "name_en": "english_setter",
+        "name_ja": "イングリッシュセッター"
+    },
+    "german_shorthaired": {
+        "category": 2,
+        "subcategory": 15,
+        "name_en": "german_shorthaired",
+        "name_ja": "ジャーマンショートヘアードポインター"
+    },
+    "great_pyrenees": {
+        "category": 2,
+        "subcategory": 16,
+        "name_en": "great_pyrenees",
+        "name_ja": "グレートピレニーズ"
+    },
+    "havanese": {
+        "category": 2,
+        "subcategory": 17,
+        "name_en": "havanese",
+        "name_ja": "ハバニーズ"
+    },
+    "japanese_chin": {
+        "category": 2,
+        "subcategory": 18,
+        "name_en": "japanese_chin",
+        "name_ja": "チン"
+    },
+    "keeshond": {
+        "category": 2,
+        "subcategory": 19,
+        "name_en": "keeshond",
+        "name_ja": "キースホンド"
+    },
+    "leonberger": {
+        "category": 2,
+        "subcategory": 20,
+        "name_en": "leonberger",
+        "name_ja": "レオンベルガー"
+    },
+    "maine_coon": {
+        "category": 1,
+        "subcategory": 21,
+        "name_en": "maine_coon",
+        "name_ja": "メインクーン"
+    },
+    "miniature_pinscher": {
+        "category": 2,
+        "subcategory": 22,
+        "name_en": "miniature_pinscher",
+        "name_ja": "ミニチュアピンシャー"
+    },
+    "newfoundland": {
+        "category": 2,
+        "subcategory": 23,
+        "name_en": "newfoundland",
+        "name_ja": "ニューファンドランド"
+    },
+    "persian": {
+        "category": 1,
+        "subcategory": 24,
+        "name_en": "persian",
+        "name_ja": "ペルシャ"
+    },
+    "pomeranian": {
+        "category": 2,
+        "subcategory": 25,
+        "name_en": "pomeranian",
+        "name_ja": "ポメラニアン"
+    },
+    "pug": {
+        "category": 2,
+        "subcategory": 26,
+        "name_en": "pug",
+        "name_ja": "パグ"
+    },
+    "ragdoll": {
+        "category": 1,
+        "subcategory": 27,
+        "name_en": "ragdoll",
+        "name_ja": "ラグドール"
+    },
+    "russian_blue": {
+        "category": 1,
+        "subcategory": 28,
+        "name_en": "russian_blue",
+        "name_ja": "ロシアンブルー"
+    },
+    "saint_bernard": {
+        "category": 2,
+        "subcategory": 29,
+        "name_en": "saint_bernard",
+        "name_ja": "セントバーナード"
+    },
+    "samoyed": {
+        "category": 2,
+        "subcategory": 30,
+        "name_en": "samoyed",
+        "name_ja": "サモエド"
+    },
+    "scottish_terrier": {
+        "category": 2,
+        "subcategory": 31,
+        "name_en": "scottish_terrier",
+        "name_ja": "スコティッシュテリア"
+    },
+    "shiba_inu": {
+        "category": 2,
+        "subcategory": 32,
+        "name_en": "shiba_inu",
+        "name_ja": "シバイヌ"
+    },
+    "siamese": {
+        "category": 1,
+        "subcategory": 33,
+        "name_en": "siamese",
+        "name_ja": "シャム"
+    },
+    "sphynx": {
+        "category": 1,
+        "subcategory": 34,
+        "name_en": "sphynx",
+        "name_ja": "スフィンクス"
+    },
+    "staffordshire_bull_terrier": {
+        "category": 2,
+        "subcategory": 35,
+        "name_en": "staffordshire_bull_terrier",
+        "name_ja": "スタッフォードシャーブルテリア"
+    },
+    "wheaten_terrier": {
+        "category": 2,
+        "subcategory": 36,
+        "name_en": "wheaten_terrier",
+        "name_ja": "ウィートンテリア"
+    },
+    "yorkshire_terrier": {
+        "category": 2,
+        "subcategory": 37,
+        "name_en": "yorkshire_terrier",
+        "name_ja": "ヨークシャーテリア"
+    }
+}

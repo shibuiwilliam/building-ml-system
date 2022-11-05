@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: similar-image-search-serving
+  namespace: search
+  labels:
+    app: similar-image-search-serving
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: similar-image-search-serving
+  template:
+    metadata:
+      labels:
+        app: similar-image-search-serving
+    spec:
+      initContainers:
+        - name: model-loader
+          image: shibui/building-ml-system:ai_animals_model_loader_0.0.0
+          imagePullPolicy: Always
+          command:
+            - "python"
+            - "-m"
+            - "src.main"
+          env:
+            - name: MLFLOW_TRACKING_URI
+              value: http://mlflow.mlflow.svc.cluster.local:5000
+            - name: MLFLOW_PARAM_JSON
+              value: "{}"
+            - name: TARGET_ARTIFACTS
+              value: "saved_model"
+            - name: TARGET_URLS
+              value: "https://storage.googleapis.com/aianimals/models/search/similar_image_search/saved_model.zip"
+            - name: TARGET_DIRECTORY
+              value: "/models/similar_image_search/"
+          volumeMounts:
+            - mountPath: /models/similar_image_search/
+              name: data
+      containers:
+        - name: similar-image-search-serving
+          image: shibui/building-ml-system:ai_animals_search_similar_image_search_serving_0.0.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8500
+            - containerPort: 8501
+          resources:
+            limits:
+              cpu: 2000m
+              memory: "8000Mi"
+            requests:
+              cpu: 1000m
+              memory: "4000Mi"
+          volumeMounts:
+            - mountPath: /models/similar_image_search/
+              name: data
+      volumes:
+        - name: data
+          emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: similar-image-search-serving
+  namespace: search
+  labels:
+    app: similar-image-search-serving
+spec:
+  ports:
+    - name: grpc
+      port: 8500
+      protocol: TCP
+    - name: rest
+      port: 8501
+      protocol: TCP
+  selector:
+    app: similar-image-search-serving

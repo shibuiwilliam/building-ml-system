@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: learn-to-rank-lgbm-regression
+  namespace: search
+  labels:
+    app: learn-to-rank-lgbm-regression
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: learn-to-rank-lgbm-regression
+  template:
+    metadata:
+      labels:
+        app: learn-to-rank-lgbm-regression
+    spec:
+      containers:
+        - name: learn-to-rank-lgbm-regression
+          image: shibui/building-ml-system:ai_animals_search_learn_to_rank_lgbm_api_0.0.0
+          imagePullPolicy: Always
+          command:
+            - "./run.sh"
+          ports:
+            - containerPort: 10100
+          resources:
+            limits:
+              cpu: 2000m
+              memory: "2000Mi"
+            requests:
+              cpu: 1000m
+              memory: "1000Mi"
+          env:
+            - name: POSTGRES_HOST
+              value: postgres.data.svc.cluster.local
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: password
+            - name: POSTGRES_DB
+              value: aianimals
+            - name: REDIS_HOST
+              value: redis.data.svc.cluster.local
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_DB
+              value: "0"
+            - name: RUN_ENVIRONMENT
+              value: cloud
+            - name: PORT
+              value: "10100"
+            - name: WORKERS
+              value: "2"
+            - name: TIMEOUT
+              value: "10"
+            - name: LOG_LEVEL
+              value: INFO
+            - name: MODEL_VERSION
+              value: learn_to_rank_lightgbm_regression_0.0.0
+            - name: MLFLOW_TRACKING_URI
+              value: http://mlflow.mlflow.svc.cluster.local:5000
+            - name: MLFLOW_PARAM_JSON
+              value: "{}"
+            - name: FEATURE_MLFLOW_PARAM_JSON
+              value: "{}"
+            - name: IS_ONNX_PREDICTOR
+              value: "0"
+            - name: PREDICTOR_BATCH_SIZE
+              value: "32"
+            - name: PREDICTOR_INPUT_NAME
+              value: inputs
+            - name: PREDICTOR_OUTPUT_NAME
+              value: outputs
+            - name: EMPTY_RUN
+              value: "1"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: learn-to-rank-lgbm-regression
+  namespace: search
+  labels:
+    app: learn-to-rank-lgbm-regression
+spec:
+  ports:
+    - name: learn-to-rank-lgbm-regression
+      port: 10100
+      protocol: TCP
+  selector:
+    app: learn-to-rank-lgbm-regression

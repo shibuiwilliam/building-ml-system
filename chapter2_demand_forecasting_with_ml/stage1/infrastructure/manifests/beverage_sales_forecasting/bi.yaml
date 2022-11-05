@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bi
+  namespace: beverage-sales-forecasting
+  labels:
+    app: bi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bi
+  template:
+    metadata:
+      labels:
+        app: bi
+    spec:
+      containers:
+        - name: bi
+          image: shibui/building-ml-system:beverage_sales_forecasting_bi_1.0.0
+          imagePullPolicy: Always
+          command:
+            - streamlit
+            - run
+            - src/main.py
+          ports:
+            - containerPort: 8501
+          resources:
+            limits:
+              cpu: 1000m
+              memory: "1000Mi"
+            requests:
+              cpu: 500m
+              memory: "500Mi"
+          env:
+            - name: POSTGRES_HOST
+              value: postgres.data.svc.cluster.local
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: password
+            - name: POSTGRES_DB
+              value: beverage_sales_forecasting
+            - name: LOG_LEVEL
+              value: DEBUG
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bi
+  namespace: beverage-sales-forecasting
+  labels:
+    app: bi
+spec:
+  ports:
+    - name: bi
+      port: 8501
+      protocol: TCP
+  selector:
+    app: bi

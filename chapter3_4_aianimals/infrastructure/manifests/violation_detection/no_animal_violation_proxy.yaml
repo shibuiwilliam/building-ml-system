@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: no-animal-violation-proxy
+  namespace: violation-detection
+  labels:
+    app: no-animal-violation-proxy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: no-animal-violation-proxy
+  template:
+    metadata:
+      labels:
+        app: no-animal-violation-proxy
+    spec:
+      containers:
+        - name: no-animal-violation-proxy
+          image: shibui/building-ml-system:ai_animals_violation_detection_no_animal_violation_proxy_0.0.0
+          imagePullPolicy: Always
+          command:
+            - "python"
+            - "-m"
+            - "src.main"
+          resources:
+            limits:
+              cpu: 500m
+              memory: "800Mi"
+            requests:
+              cpu: 200m
+              memory: "400Mi"
+          env:
+            - name: POSTGRES_HOST
+              value: postgres.data.svc.cluster.local
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: password
+            - name: POSTGRES_DB
+              value: aianimals
+            - name: RABBITMQ_HOST
+              value: rabbitmq-amqp.data.svc.cluster.local
+            - name: RABBITMQ_USER
+              value: user
+            - name: RABBITMQ_PASSWORD
+              value: password
+            - name: CONSUMING_QUEUE
+              value: no_animal_violation
+            - name: REGISTRATION_QUEUE
+              value: violation
+            - name: RUN
+              value: "0"
+            - name: PSEUDO_PREDICTION
+              value: "0"
+            - name: MLFLOW_PARAM_JSON
+              value: "{}"
+            - name: PREDICTOR_URL
+              value: http://no-animal-violation-serving.violation-detection.svc.cluster.local:8501/v1/models/no_animal_violation:predict
+            - name: PREDICTOR_HEIGHT
+              value: "224"
+            - name: PREDICTOR_WIDTH
+              value: "224"

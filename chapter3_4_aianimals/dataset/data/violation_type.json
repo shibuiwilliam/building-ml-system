@@ -1,0 +1,17 @@
+{
+    "93e7109457344567bbdddda9b15a241b": {
+        "name": "human_face_violation"
+    },
+    "4cc11afb7f8944ab9b3c1573e85abbf3": {
+        "name": "no_animal_violation"
+    },
+    "408c2ad827054453a0d01debe1811086": {
+        "name": "inappropriate_violation"
+    },
+    "c725121bf2de4501aab23a61ec44bf42": {
+        "name": "not_photo_violation"
+    },
+    "a4334cfa3acf4303b999bd6271c38801": {
+        "name": "copyright_violation"
+    }
+}

@@ -1,0 +1,10 @@
+task_name: mobilenet_v3_scann
+input:
+  height: 224
+  width: 224
+model:
+  tfhub_url: https://tfhub.dev/google/imagenet/mobilenet_v3_large_100_224/feature_vector/5
+  batch_size: 32
+  num_leaves: 1000
+  num_leaves_to_search: 100
+  num_reordering_candidates: 100

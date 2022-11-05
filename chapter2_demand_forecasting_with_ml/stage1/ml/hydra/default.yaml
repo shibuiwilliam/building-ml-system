@@ -1,0 +1,31 @@
+name: beverage_sales_forecasting
+jobs:
+  data:
+    source: db
+  predict_after:
+    year: 2021
+    week_of_year: 26
+
+  model:
+    name: light_gbm_regression
+    params:
+      task: "train"
+      boosting: "gbdt"
+      objective: "regression"
+      num_leaves: 3
+      learning_rate: 0.05
+      feature_fraction: 0.5
+      max_depth: -1
+      num_iterations: 1000000
+      num_threads: 0
+      seed: 1234
+      early_stopping_rounds: 200
+      eval_metrics: mse
+      verbose_eval: 1000
+
+  train:
+    run: true
+
+  predict:
+    run: true
+    register: true
